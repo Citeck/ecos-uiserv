@@ -15,8 +15,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.request.rest.RestHandler;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.DashboardDTO;
-import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;
+import ru.citeck.ecos.uiserv.domain.ConfigDTO;
+import ru.citeck.ecos.uiserv.service.config.ConfigEntityService;
 import ru.citeck.ecos.uiserv.web.rest.RecordsApi;
 import ru.citeck.ecos.uiserv.web.rest.TestEntityRecordUtil;
 import ru.citeck.ecos.uiserv.web.rest.TestUtil;
@@ -39,9 +39,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
-public class DashboardRecordControllerTest {
+public class ConfigRecordControllerTest {
 
-    private static final String RECORD_ID = "dashboard";
+    private static final String RECORD_ID = "config";
     private static final String RECORD_ID_AT = RECORD_ID + "@";
 
     private MockMvc mockRecordsApi;
@@ -56,7 +56,7 @@ public class DashboardRecordControllerTest {
     private RecordsService recordsService;
 
     @MockBean
-    private DashboardEntityService mockDashboardService;
+    private ConfigEntityService configEntityService;
 
     @Before
     public void setup() {
@@ -73,11 +73,13 @@ public class DashboardRecordControllerTest {
             "  \"record\": \"" + RECORD_ID_AT + id + "\",\n" +
             "  \"attributes\": {\n" +
             "    \"key\": \"key\",\n" +
-            "    \"config\": \"config?json\"\n" +
+            "    \"title\": \"title\",\n" +
+            "    \"description\": \"description\",\n" +
+            "    \"value\": \"value?json\"\n" +
             "  }\n" +
             "}";
 
-        when(mockDashboardService.getById(id))
+        when(configEntityService.getById(id))
             .thenReturn(Optional.of(getTestDtoForQueryWithId(id)));
 
         mockRecordsApi.perform(
@@ -86,37 +88,59 @@ public class DashboardRecordControllerTest {
                 .content(queryJson))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id", is(RECORD_ID_AT + id)))
-            .andExpect(jsonPath("$.attributes.key", is("main-dashboard")))
-            .andExpect(jsonPath("$.attributes.config.menu.type", is("TOP")))
-            .andExpect(jsonPath("$.attributes.config.layout.columns[1].widgets[0].id",
-                is("some-test-widget-id")));
+            .andExpect(jsonPath("$.attributes.key", is("test-config-key")))
+            .andExpect(jsonPath("$.attributes.title", is("test-config-title")))
+            .andExpect(jsonPath("$.attributes.description", is("test-config-description")))
+            .andExpect(jsonPath("$.attributes.value.type", is("TOP")))
 
+            .andExpect(jsonPath("$.attributes.value.links[*]", hasSize(3)))
+
+            .andExpect(jsonPath("$.attributes.value.links[0].label", is("Журнал")))
+            .andExpect(jsonPath("$.attributes.value.links[0].position", is(0)))
+            .andExpect(jsonPath("$.attributes.value.links[0].link", is("/share/page/journals")))
+
+            .andExpect(jsonPath("$.attributes.value.links[1].label", is("Журнал дашборда и еще " +
+                "много-много текста в этой ссылке")))
+            .andExpect(jsonPath("$.attributes.value.links[1].position", is(1)))
+            .andExpect(jsonPath("$.attributes.value.links[1].link", is("/share/page/journalsDashboard")))
+
+            .andExpect(jsonPath("$.attributes.value.links[2].label", is("Настройка дашборда")))
+            .andExpect(jsonPath("$.attributes.value.links[2].position", is(2)))
+            .andExpect(jsonPath("$.attributes.value.links[2].link", is("/dashboard/settings")));
     }
 
     @Test
     public void create() throws Exception {
         final String id = UUID.randomUUID().toString();
-        String key = "test-dashboard";
+        String key = "menu-config-23";
+        String title = "Menu config";
+        String description = "Some description for menu config";
 
         String json = "{\n" +
             "  \"records\": [\n" +
-            "  \t\t{\n" +
-            "  \t\t\t\"id\": \"" + RECORD_ID_AT + "\",\n" +
-            "  \t\t\t\"attributes\": {\n" +
-            "  \t\t\t\t\"key\": \"" + key + "\"\n" +
-            "  \t\t\t}\n" +
-            "  \t\t}\n" +
-            "  \t]\n" +
+            "    {\n" +
+            "      \"id\": \"" + RECORD_ID_AT + "\",\n" +
+            "      \"attributes\": {\n" +
+            "        \"title\": \"" + title + "\",\n" +
+            "        \"description\": \"" + description + "\",\n" +
+            "        \"key\": \"" + key + "\"\n" +
+            "      }\n" +
+            "    }\n" +
+            "  ]\n" +
             "}";
 
-        DashboardDTO dto = new DashboardDTO();
+        ConfigDTO dto = new ConfigDTO();
         dto.setKey(key);
+        dto.setTitle(title);
+        dto.setDescription(description);
 
-        DashboardDTO createdDto = new DashboardDTO();
-        createdDto.setKey(key);
+        ConfigDTO createdDto = new ConfigDTO();
         createdDto.setId(id);
+        createdDto.setKey(key);
+        createdDto.setTitle(title);
+        createdDto.setDescription(description);
 
-        when(mockDashboardService.create(dto)).thenReturn(createdDto);
+        when(configEntityService.create(dto)).thenReturn(createdDto);
 
         TestEntityRecordUtil.performMutateAndCheckResponseId(json, RECORD_ID_AT + id, mockRecordsApi);
     }
@@ -124,7 +148,7 @@ public class DashboardRecordControllerTest {
     @Test
     public void mutate() throws Exception {
         final String id = UUID.randomUUID().toString();
-        String key = "new-dashboard";
+        String key = "new-menu-config-key";
 
         String json = "{\n" +
             "  \"records\": [\n" +
@@ -137,16 +161,16 @@ public class DashboardRecordControllerTest {
             "  \t]\n" +
             "}";
 
-        DashboardDTO dto = new DashboardDTO();
+        ConfigDTO dto = new ConfigDTO();
         dto.setKey(key);
         dto.setId(id);
 
-        DashboardDTO createdDto = new DashboardDTO();
+        ConfigDTO createdDto = new ConfigDTO();
         createdDto.setKey(key);
         createdDto.setId(id);
 
-        when(mockDashboardService.getById(id)).thenReturn(Optional.of(dto));
-        when(mockDashboardService.update(dto)).thenReturn(createdDto);
+        when(configEntityService.getById(id)).thenReturn(Optional.of(dto));
+        when(configEntityService.update(dto)).thenReturn(createdDto);
 
         TestEntityRecordUtil.performMutateAndCheckResponseId(json, RECORD_ID_AT + id, mockRecordsApi);
     }
@@ -170,8 +194,8 @@ public class DashboardRecordControllerTest {
     }
 
     @Test
-    public void queryNotExistsDashboard() {
-        String nonExistsId = "some-non-exists-id";
+    public void queryNotExistsConfig() {
+        String nonExistsId = "on-exists-record-id";
         String json = "{\n" +
             "  \"record\": \"" + RECORD_ID_AT + nonExistsId + "\",\n" +
             "  \"attributes\": {\n" +
@@ -190,7 +214,7 @@ public class DashboardRecordControllerTest {
 
     @Test
     public void mutateNotExistsDashboard() {
-        String nonExistsId = "some-non-exists-id";
+        String nonExistsId = "non-exists-record-id";
         String json = "{\n" +
             "  \"records\": [\n" +
             "    {\n" +
@@ -210,61 +234,35 @@ public class DashboardRecordControllerTest {
         assertEquals(thrown.getCause().getMessage(), "Entity with id " + nonExistsId + " not found!");
     }
 
-    private DashboardDTO getTestDtoForQueryWithId(String id) throws IOException {
-        DashboardDTO dto = new DashboardDTO();
-        dto.setKey("main-dashboard");
+    private ConfigDTO getTestDtoForQueryWithId(String id) throws IOException {
+        ConfigDTO dto = new ConfigDTO();
+        dto.setKey("test-config-key");
+        dto.setTitle("test-config-title");
+        dto.setDescription("test-config-description");
         dto.setId(id);
 
         String configJson = "{\n" +
-            "  \"menu\": {\n" +
-            "    \"type\": \"TOP\",\n" +
-            "    \"links\": [\n" +
-            "      {\n" +
-            "        \"label\": \"Journal\",\n" +
-            "        \"position\": 0,\n" +
-            "        \"link\": \"/share/page/journals\"\n" +
-            "      }\n" +
-            "    ]\n" +
-            "  },\n" +
-            "  \"layout\": {\n" +
-            "    \"type\": \"2-columns-big-small\",\n" +
-            "    \"columns\": [\n" +
-            "      {\n" +
-            "        \"width\": \"60%\",\n" +
-            "        \"widgets\": [\n" +
-            "          {\n" +
-            "            \"id\": \"a857c687-9a83-4af4-83ed-58c3c9751e04\",\n" +
-            "            \"label\": \"Предпросмотр\",\n" +
-            "            \"type\": \"doc-preview\",\n" +
-            "            \"props\": {\n" +
-            "              \"id\": \"a857c687-9a83-4af4-83ed-58c3c9751e04\",\n" +
-            "              \"config\": {\n" +
-            "                \"height\": \"500px\",\n" +
-            "                \"link\": \"/share/proxy/alfresco/demo.pdf\",\n" +
-            "                \"scale\": 1\n" +
-            "              }\n" +
+            "          \"type\": \"TOP\",\n" +
+            "          \"links\": [\n" +
+            "            {\n" +
+            "              \"label\": \"Журнал\",\n" +
+            "              \"position\": 0,\n" +
+            "              \"link\": \"/share/page/journals\"\n" +
             "            },\n" +
-            "            \"style\": {\n" +
-            "              \"height\": \"300px\"\n" +
+            "            {\n" +
+            "              \"label\": \"Журнал дашборда и еще много-много текста в этой ссылке\",\n" +
+            "              \"position\": 1,\n" +
+            "              \"link\": \"/share/page/journalsDashboard\"\n" +
+            "            },\n" +
+            "            {\n" +
+            "              \"label\": \"Настройка дашборда\",\n" +
+            "              \"position\": 2,\n" +
+            "              \"link\": \"/dashboard/settings\"\n" +
             "            }\n" +
-            "          }\n" +
-            "        ]\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"width\": \"40%\",\n" +
-            "        \"widgets\": [\n" +
-            "          {\n" +
-            "            \"id\": \"some-test-widget-id\",\n" +
-            "            \"label\": \"Журнал\",\n" +
-            "            \"type\": \"journal\"\n" +
-            "          }\n" +
-            "        ]\n" +
-            "      }\n" +
-            "    ]\n" +
-            "  }\n" +
-            "}";
+            "          ]\n" +
+            "        }";
         JsonNode config = mapper.readValue(configJson, JsonNode.class);
-        dto.setConfig(config);
+        dto.setValue(config);
         return dto;
     }
 
