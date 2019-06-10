@@ -24,7 +24,7 @@ public class RecordsApi {
         return restQueryHandler.queryRecords(queryBody);
     }
 
-    @DeleteMapping("/delete")
+    @PostMapping("/delete")
     public ResponseEntity<RecordsDelResult> delete(@RequestBody RecordsDeletion request) {
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON_UTF8)
