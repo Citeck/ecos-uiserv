@@ -49,6 +49,8 @@ public class ConfigEntityService extends AbstractBaseEntityService<ConfigDTO> {
     }
 
     private ConfigDTO saveWithId(String id, ConfigDTO entity) {
+        checkKey(entity);
+
         ConfigDTO result = new ConfigDTO();
 
         result.setId(id);
@@ -59,6 +61,12 @@ public class ConfigEntityService extends AbstractBaseEntityService<ConfigDTO> {
 
         writeToFile(result);
         return result;
+    }
+
+    private void checkKey(ConfigDTO entity) {
+        if (StringUtils.isBlank(entity.getKey())) {
+            throw new IllegalArgumentException("'Key' attribute is mandatory for config entity");
+        }
     }
 
     private void writeToFile(ConfigDTO entity) {
