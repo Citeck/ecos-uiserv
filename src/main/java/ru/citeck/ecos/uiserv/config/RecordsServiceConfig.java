@@ -1,9 +1,13 @@
 package ru.citeck.ecos.uiserv.config;
 
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -19,37 +23,27 @@ import org.springframework.web.util.UriTemplateHandler;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.RecordsServiceFactory;
 import ru.citeck.ecos.records2.request.rest.RestHandler;
+import ru.citeck.ecos.records2.source.dao.RecordsDAO;
 import ru.citeck.ecos.records2.source.dao.remote.RemoteRecordsDAO;
-import ru.citeck.ecos.uiserv.service.dashdoard.DashboardRecords;
-import ru.citeck.ecos.uiserv.service.dashdoard.DashboardRepository;
-import ru.citeck.ecos.uiserv.service.dashdoard.DashboardService;
-import ru.citeck.ecos.uiserv.service.dashdoard.DashboardServiceImpl;
-import ru.citeck.ecos.uiserv.service.form.EcosFormRecords;
-import ru.citeck.ecos.uiserv.service.form.EcosFormService;
-import ru.citeck.ecos.uiserv.service.form.EcosFormServiceImpl;
-import ru.citeck.ecos.uiserv.service.form.FormProvider;
-import ru.citeck.ecos.uiserv.service.form.NormalFormProvider;
+import ru.citeck.ecos.uiserv.service.entity.AbstractEntityRecords;
+import ru.citeck.ecos.uiserv.service.form.*;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.util.Map;
 import java.util.Collection;
+import java.util.Map;
 
+@Log4j2
 @Configuration
 //This one configures RecordService.
 //Note that single RecordService is responsible for both serving data to requests from uiserv's clients,
 //  and for requesting data from remote data sources (namely Ecos) - depending on sourceId.
-public class RecordsServiceConfig {
+public class RecordsServiceConfig implements ApplicationContextAware {
     public static final String RECORDS_DAO_ID = "alfresco";
 
     @Autowired
@@ -64,6 +58,13 @@ public class RecordsServiceConfig {
     @Autowired
     @Qualifier("alfrescoRestTemplate")
     private RestTemplate alfrescoRestTemplate;
+
+    private ApplicationContext applicationContext;
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     @Component
     public static class LanguageRelayingInterceptor implements ClientHttpRequestInterceptor {
@@ -137,19 +138,28 @@ public class RecordsServiceConfig {
     }
 
     @Bean
-    public RecordsService recordsService(EcosFormRecords formsDao, DashboardRecords dashboardDao) {
+    public RecordsService recordsService(EcosFormRecords formsDao) {
         final RecordsServiceFactory factory = new RecordsServiceFactory();
         final RecordsService recordsService = factory.createRecordsService();
 
         final RemoteRecordsDAO dao = new RemoteRecordsDAO();
         dao.setId(RECORDS_DAO_ID);
-        dao.setRestConnection(this::alfrescoJsonPost);
+        dao.setRestConnection(alfrescoRestTemplate()::postForObject);
         recordsService.register(dao);
 
-        recordsService.register(formsDao);
-        recordsService.register(dashboardDao);
+        registerRecordsDAO(recordsService, dao);
+        registerRecordsDAO(recordsService, formsDao);
+
+        Map<String, AbstractEntityRecords> entityRecords = applicationContext.getBeansOfType(
+            AbstractEntityRecords.class);
+        entityRecords.forEach((k, records) -> registerRecordsDAO(recordsService, records));
 
         return recordsService;
+    }
+
+    private void registerRecordsDAO(RecordsService recordsService, RecordsDAO recordsSource) {
+        log.info("Register recordsDAO: " + recordsSource.getId());
+        recordsService.register(recordsSource);
     }
 
     @Bean
@@ -160,14 +170,6 @@ public class RecordsServiceConfig {
         result.setRecordsService(outgoingRecordsService);
         providers.forEach(result::register);
         return result;
-    }
-
-    @Bean
-    public DashboardService dashboardService(DashboardRepository dashboardRepository,
-                                             @Lazy RecordsService recordsService) {
-        final DashboardServiceImpl dashboardService = new DashboardServiceImpl(dashboardRepository);
-        dashboardService.setRecordsService(recordsService);
-        return dashboardService;
     }
 
     @Bean

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
+import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
 import ru.citeck.ecos.records2.request.rest.MutationBody;
 import ru.citeck.ecos.records2.request.rest.QueryBody;
 import ru.citeck.ecos.records2.request.rest.RestHandler;
@@ -24,7 +25,7 @@ public class RecordsApi {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<RecordsDelResult> delete(@RequestBody ru.citeck.ecos.records2.request.delete.RecordsDeletion request) {
+    public ResponseEntity<RecordsDelResult> delete(@RequestBody RecordsDeletion request) {
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON_UTF8)
             .body(recordsService.delete(request));
