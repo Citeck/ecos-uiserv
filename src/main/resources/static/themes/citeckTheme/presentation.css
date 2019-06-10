@@ -1,0 +1,5046 @@
+@import "/share/res/fonts/citeck/css/citeck.css";
+@import "/share/res/fonts/FontAwesome/css/font-awesome.css";
+
+/* mobile */
+@import "/share/res/themes/citeckTheme/custom-mobile.css";
+
+/* hack to fix mobile styles jumping */
+.mobile .grid {
+    visibility: hidden;
+}
+
+ /* Site-wide Styles */
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url(../../css/fonts/opensans.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans Bold';
+  font-style: normal;
+  font-weight: 600;
+  src: url(../../css/fonts/opensansbold.woff) format('woff');
+}
+
+
+.info {
+  margin-bottom: 10px;
+}
+
+
+.yui-overlay,
+.alfresco-share .sticky-wrapper,
+.login-panel
+{
+  font:13px/1.231 Open Sans,arial,helvetica,clean,sans-serif;
+}
+
+.alfresco-share .sticky-wrapper select,
+.yui-overlay select,
+.alfresco-share .sticky-wrapper input,
+.yui-overlay input,
+.alfresco-share .sticky-wrapper textarea,
+.yui-overlay textarea,
+.alfresco-share .sticky-wrapper button:not(.ecos-btn),
+.yui-overlay button
+{
+  font:99% Open Sans,arial,helvetica,clean,sans-serif;
+}
+
+.alfresco-share .sticky-wrapper select,
+.yui-overlay select,
+.alfresco-share .sticky-wrapper input,
+.yui-overlay input,
+.alfresco-share .sticky-wrapper textarea,
+.yui-overlay textarea {
+   border: 1px solid #ccc;
+}
+
+.alfresco-share .sticky-wrapper hr,
+.yui-overlay hr
+{
+   height: 0 !important;
+}
+
+.sticky-wrapper,
+.sticky-footer
+{
+   font-family: Open Sans, Arial, sans-serif;
+   font-size: 81%;
+   color: #333;
+}
+
+.sticky-wrapper a,
+.sticky-wrapper a:visited,
+.sticky-footer a,
+.sticky-footer a:visited,
+.yui-overlay a,
+.yui-overlay a:visited {
+   color: #1c55da;
+   text-decoration: none;
+   cursor: pointer;
+}
+
+.sticky-wrapper a:hover,
+.sticky-footer a:hover,
+.yui-overlay a:hover {
+   color: red;
+   text-decoration: none;
+}
+
+.sticky-wrapper a:disabled,
+.sticky-footer a:disabled,
+.yui-overlay a:disabled {
+  color: #ccc;
+}
+
+.sticky-footer {
+  position: relative;
+}
+
+/** linked to h1 above - right margin for long name wrap */
+.page-title div.title
+{
+   margin-right: 162px;
+}
+
+h1.sub-title
+{
+   padding-top: 0.75em;
+}
+
+.sticky-wrapper h2,
+.yui-overlay h2
+{
+   font-size: 123.1%;
+   font-weight: normal;
+}
+
+h1 .light,
+h1 .lighter,
+h2 .light,
+h2 .lighter
+{
+   color: #ccc;
+   font-weight: normal;
+}
+
+.sticky-wrapper h3,
+.yui-overlay h3 {
+   color: #1c55da;
+   font-size: 108%;
+}
+
+.sticky-wrapper h3.dark,
+.yui-overlay h3.dark {
+   color: #333;
+}
+
+.sticky-wrapper h3.thin,
+.yui-overlay h3.thin {
+   font-weight: normal;
+}
+
+.sticky-wrapper h4,
+.yui-overlay h4
+{
+   font-weight: normal !important;
+}
+
+h3 .light,
+h3 .lighter,
+h4 .light,
+h4 .lighter
+{
+   color: #aaa;
+}
+
+.sticky-wrapper hr
+{
+   color: #eee;
+   background-color: #eee;
+}
+
+.sticky-wrapper label,
+.share-form .viewmode-label
+{
+   color: #333;
+   margin-right: 0.4em;
+   padding-bottom: 5px;
+   font-family: Open Sans Bold, Arial, sans-serif;
+   font-weight: normal;
+}
+
+/*.alfresco-share .sticky-wrapper
+{
+   background-color: #f0f0f0;
+}*/
+
+.error
+{
+   color: red;
+}
+
+.alfresco-share .sticky-wrapper .error
+{
+   background: white !important;
+   color: red !important;
+   font-family: Open Sans Bold, Arial, sans-serif;
+   font-weight: normal;
+   padding: 0.2em 1em;
+}
+
+.alfresco-share .sticky-wrapper .error-alt
+{
+   background-color: red !important;
+   color: white !important;
+   font-family: Open Sans Bold, Arial, sans-serif;
+   font-weight: normal;
+   padding: 0.2em 1em;
+}
+
+.light
+{
+   font-weight: normal;
+}
+
+.lighter
+{
+   font-size: 93%;
+   font-weight: normal;
+}
+
+.faded
+{
+   color: #999;
+}
+
+
+
+/* after clearfix */
+
+.dashlet > .toolbar:after,
+.share-form .form-container .form-fields .form-field:after,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel form.bd .form-fields .form-field:after {
+  content: "";
+  display: block;
+  width: 100%;
+  clear: both;
+}
+
+
+/* Override YUI Button styles for - flat button style */
+
+/*.yui-skin-lightTheme .yui-button,
+.yui-skin-lightTheme .yui-button .first-child
+{
+   background: none repeat scroll 0 0 #fff;
+}
+
+.yui-skin-lightTheme div.flat-button span.yui-button
+{
+   background: none;
+   border-color: transparent;
+}
+
+.yui-skin-lightTheme div.flat-button span.yui-button span.first-child
+{
+   border-color: transparent;
+}
+
+.yui-skin-lightTheme div.flat-button span.yui-button-hover
+{
+   background: transparent;
+   border-color: #ccc;
+}
+
+.yui-skin-lightTheme div.flat-button span.yui-button-hover span.first-child
+{
+   border-color: #ccc;
+}
+
+.yui-skin-lightTheme div.flat-button span.yui-radio-button-checked,
+.yui-skin-lightTheme div.flat-button span.yui-checkbox-button-checked
+{
+   background: #ccc none;
+}*/
+
+/* DASHLETS */
+
+.dashlet {
+   background-color: #fff;
+   box-shadow: 0 0 5px 2px lightgray;
+   min-height: 300px;
+}
+
+.dashlet > .title {
+  padding: 10px 15px;
+  background-color: #758faa;
+  color: white;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 100%;
+}
+
+.dashlet .feed
+{
+   background-image: url(images/feed-icon-16.png);
+   background-repeat: no-repeat;
+}
+
+.dashlet > .toolbar    {
+   border-bottom: 1px solid #ccc;
+   padding: 10px 15px;
+   min-height: 15px;
+}
+
+.dashlet > .body {
+   padding: 15px;
+   overflow: auto;
+   box-sizing: border-box;
+   min-height: 212px;
+}
+
+.dashlet.yui-resize .yui-resize-handle {
+  bottom: 0;
+  border-top: 1px solid #eee;
+  margin: 0;
+  padding: 1px 0;
+}
+
+.dashlet .welcome-body a,
+.dashlet .welcome-body a:visited,
+.dashlet .welcome-body a:hover
+{
+   color: #333;
+}
+
+.dashlet .detail-list-item
+{
+   border-bottom: 1px solid #eee;
+}
+
+.dashlet.dynamic-welcome
+{
+   background: none repeat scroll 0 0 #eee !important;
+   border: 1px solid #ccc !important;
+}
+
+.dashlet div.flat-button span.yui-radio-button-checked,
+.dashlet div.flat-button span.yui-checkbox-button-checked
+{
+   background: none;
+}
+
+.welcome-border-container
+{
+   border-right: solid 1px #ccc !important;
+}
+
+.dashlet .toolbar .yui-menu-button {
+   margin-right: 15px;
+}
+
+
+/* dashlet title actions */
+
+.dashlet .titleBarActions {
+   top: 7px;
+   right: 15px;
+}
+
+.dashlet .titleBarActions .titleBarActionIcon {
+   opacity: 0.8;
+   width: 18px;
+   height: 18px;
+   margin: 0;
+
+   background-position: center;
+   background-repeat: no-repeat;
+}
+
+.dashlet .titleBarActions .titleBarActionIcon:hover {
+   opacity: 1;
+}
+
+.dashlet .titleBarActions .edit {
+   background-image: url(images/dashlet-edit.png);
+}
+
+.dashlet .titleBarActions .help {
+   background-image: url(images/dashlet-help.png);
+}
+
+/* end dashlet title actions */
+
+/* dashlet sitesearch */
+
+.dashlet.sitesearch .toolbar {
+  padding: 10px 15px;
+}
+
+.dashlet.sitesearch .toolbar .search-text {
+  padding: 0;
+}
+
+.dashlet.sitesearch .toolbar .search-text input {
+   padding: 5px 25px  5px 5px;
+   background-color: #f0f0f0;
+}
+
+.dashlet.sitesearch .toolbar .search-text input:hover,
+.dashlet.sitesearch .toolbar .search-text input:focus {
+  background-color: white;
+}
+
+.dashlet.sitesearch .toolbar .search-text + .yui-button.search-icon {
+  position: relative;
+  left: -25px;
+  margin: 0;
+}
+
+.dashlet.sitesearch .toolbar .search-text + .yui-button.search-icon .first-child {
+  padding: 0;
+  background-image: none;
+}
+
+.dashlet.sitesearch .toolbar .search-text + .yui-button.search-icon .first-child button {
+  padding: 0;
+  text-indent: 9999px;
+  width: 20px;
+  height: 30px;
+
+  overflow: hidden;
+
+  background-image: url(images/search.png);
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.dashlet.sitesearch .toolbar .search-text + .yui-button.search-icon + div {
+  float: none;
+  display: inline-block;
+  margin-left: -5px;
+  margin-top: 5px;
+}
+
+/* end dashlet sitesearch */
+
+/*.dashlet .toolbar .yui-button .first-child button {
+  padding: 0;
+  color: #333;
+}
+
+.dashlet .toolbar .yui-button.yui-button-active .first-child button {
+   color: #1c55da;
+}*/
+
+
+
+/*.yui-skin-lightTheme .yui-panel-container.shadow .underlay
+{
+   display: none !important;
+}
+
+.yui-skin-lightTheme .yui-panel
+{
+   border-bottom: medium none;
+   box-shadow: 0.33px 2px 8px rgba(0, 0, 0, 0.3);
+   border-radius: 6px;
+   min-width: 36em;
+}
+
+.yui-skin-lightTheme .mask
+{
+   opacity: 0.2;
+}
+
+.yui-skin-lightTheme .yui-panel .hd,
+.yui-skin-lightTheme .yui-panel .form-buttons,
+.yui-skin-lightTheme .yui-panel .bdft,
+.yui-skin-lightTheme .yui-panel .ft
+{
+   color: #333;
+   background: #eee;
+   border-left-color: #ccc;
+   border-right-color: #ccc;
+}
+
+.yui-skin-lightTheme .yui-panel .hd
+{
+   font-family: Open Sans Condensed, Arial, sans-serif;
+   font-size: 230%;
+   font-weight: normal;
+   border-bottom: 1px solid #eee;
+   border-top-left-radius: 6px;
+   border-top-right-radius: 6px;
+   line-height: 1em;
+   padding: 0.25em;
+}
+
+.yui-skin-lightTheme .yui-panel .form-buttons,
+.yui-skin-lightTheme .yui-panel .bdft
+{
+   font-size: 100%;
+   border-top: 1px solid #eee;
+   border-bottom-left-radius: 6px;
+   border-bottom-right-radius: 6px;
+}
+
+.yui-skin-lightTheme .yui-panel div.form-fields
+{
+   border-bottom: none;
+}
+
+.yui-skin-lightTheme .yui-panel .ft
+{
+   border-top: 1px solid #eee;
+   padding: 5px;
+   border-bottom-left-radius: 6px;
+   border-bottom-right-radius: 6px;
+}
+
+.yui-skin-lightTheme .yui-panel .bd
+{
+   color: #333;
+   background-color: #fff;
+   border-left-color: #ccc;
+   border-right-color: #ccc;
+   border-bottom-left-radius: 6px;
+   border-bottom-right-radius: 6px;
+}
+
+.yui-skin-lightTheme .yui-panel .bd .yui-resize .yui-resize-handle
+{
+   background-color: transparent;
+}
+
+.yui-skin-lightTheme .yui-panel .bd .help
+{
+   font-size: 83%;
+}*/
+
+#prompt .bd
+{
+   border-bottom-left-radius: 0;
+   border-bottom-right-radius: 0;
+}
+
+/* Data Lists: DataTable (Needs to appear before yui-dt-highlighted rule) */
+
+/*.yui-skin-lightTheme .datagrid tr.yui-dt-even
+{
+   background-color: #fff;
+}
+.yui-skin-lightTheme .datagrid tr.yui-dt-even td.yui-dt-asc,
+.yui-skin-lightTheme .datagrid tr.yui-dt-even td.yui-dt-desc
+{
+   background-color: #f8f8f8;
+}
+
+.yui-skin-lightTheme .datagrid tr.yui-dt-odd
+{
+   background-color: #f8f8f8;
+}
+.yui-skin-lightTheme .datagrid tr.yui-dt-odd td.yui-dt-asc,
+.yui-skin-lightTheme .datagrid tr.yui-dt-odd td.yui-dt-desc
+{
+   background-color: #f0f0f0;
+}*/
+
+/* End Data Lists */
+
+/*.yui-skin-lightTheme .yui-dt-data tr.yui-dt-highlighted td.yui-dt-asc,
+.yui-skin-lightTheme .yui-dt-data tr.yui-dt-highlighted td.yui-dt-desc
+{
+   background-color: #eee;
+   cursor: auto;
+}
+
+.yui-skin-lightTheme .yui-dt-message,
+.yui-skin-lightTheme .yui-dt-message tr.yui-dt-highlighted
+{
+   background-color: #fff;
+}*/
+
+/* Style the default message  */
+
+/*.yui-skin-lightTheme #message .bd
+{
+   background-color: #808080;
+   color: white;
+}
+
+.yui-skin-lightTheme #message .bd span.wait
+{
+   background-image: url(images/wait.gif);
+   background-repeat: no-repeat;
+}
+
+.yui-skin-lightTheme .yui-overlay-hidden #message .bd span.wait
+{
+   display: none;
+}*/
+
+/* Style the default prompt */
+
+/*.yui-skin-lightTheme #prompt,
+.yui-skin-lightTheme #userInput
+{
+   border-top: 1px solid #eee;
+   border-bottom: 1px solid #eee;
+   background-color: #fff;
+}
+
+.yui-skin-lightTheme #prompt .bd,
+.yui-skin-lightTheme #userInput .bd
+{
+   background-color: #fff;
+}
+
+.yui-skin-lightTheme #prompt .ft,
+.yui-skin-lightTheme #userInput .ft
+{
+   border-left: 1px solid #eee;
+   border-right: 1px solid #eee;
+   background-color: #eee;
+}*/
+
+/* Page title and navigation styles */
+
+.page-title
+{
+   color: #333;
+   padding: 12px 10px;
+}
+
+.page-title a,
+.page-title a:visited
+{
+   color: #333;
+}
+
+.page-title a:hover
+{
+   color: #fff;
+}
+
+.page-title h1 span
+{
+   color: #333;
+}
+
+.site-navigation
+{
+   background: none;
+   border-bottom: 1px solid #eee;
+   border-top: 1px solid #eee;
+   color: white;
+}
+
+span.navigation-separator,
+span.navigation-item,
+span.navigation-item-alt
+{
+   color: #ccc;
+}
+
+span.navigation-item a,
+span.navigation-item a:visited
+{
+   color: #333;
+}
+
+span.navigation-item a.active-page,
+span.navigation-item a.active-page:visited
+{
+   color: #333;
+   font-family: Open Sans Bold, Arial, sans-serif;
+}
+
+span.navigation-item a:hover
+{
+   color: #333;
+   background-color: #eee;
+}
+
+span.navigation-separator
+{
+   border-right: 1px solid #eee;
+}
+
+span.navigation-separator-alt
+{
+   border-right: 1px solid #eee;
+}
+
+/* Standard toolbars */
+
+.share-toolbar,
+.toolbar
+{
+   border-bottom: none;
+}
+
+.share-toolbar .action-bar,
+.toolbar .action-bar
+{
+   border-right: 1px solid #eee;
+}
+
+.share-toolbar .separator,
+.toolbar .separator
+{
+   border-right: 1px solid #eee;
+}
+
+.share-toolbar .backLink
+{
+   background-image: url(../../components/images/back-arrow.png);
+   background-position: left center;
+   background-repeat: no-repeat;
+   color: #333333;
+   padding: 0 5px 0 19px;
+   margin-right: 5px;
+}
+
+.share-toolbar .forwardLink
+{
+   background-image: url(../../components/images/forward-arrow-16.png);
+   background-position: right center;
+   background-repeat: no-repeat;
+   color: #333333;
+   padding: 0 21px 0 5px;
+   margin-right: 5px;
+}
+
+.sticky-wrapper strong
+{
+}
+
+.sticky-wrapper em
+{
+   font-style: italic;
+}
+
+.rich-content a.wiki-missing-page
+{
+   color: #CC2200 !important;
+}
+
+/* Share forms */
+
+.share-form .form-container .form-fields
+{
+
+}
+
+.yui-skin-citeckTheme #bd .share-form > div:not([id*="mgr"])
+{
+    width: 800px;
+}
+
+.form-container textarea,
+.page-form-body textarea
+{
+   width: 99.5% !important;
+}
+
+/*.form-container .input,
+.form-container input[type="file"],
+.form-container input[type="text"],
+.form-container input[type="password"],
+.form-container textarea,
+.form-container .input input[type="file"],
+.form-container .input input[type="text"],
+.form-container .input input[type="password"],
+.form-container .input textarea,
+.form-container select,
+.page-form-body .input,
+.page-form-body input[type="file"],
+.page-form-body input[type="text"],
+.page-form-body input[type="password"],
+.page-form-body textarea,
+.page-form-body .input input[type="file"],
+.page-form-body .input input[type="text"],
+.page-form-body .input input[type="password"],
+.page-form-body .input textarea,
+.page-form-body select
+{
+   box-shadow: 0.33px 2px 8px rgba(0, 0, 0, 0.1);
+}*/
+
+.defaultSkin table.mceLayout
+{
+   width: 100% !important;
+}
+
+.formsCheckBox {
+  margin-left: 10px;
+  top: 3px;
+  position: relative;
+}
+
+.mceEditor.defaultSkin
+{
+   box-shadow: 0.33px 2px 8px rgba(0, 0, 0, 0.15);
+   display: block;
+}
+
+/*.input,
+.sticky-wrapper input[type="text"],
+.sticky-wrapper input[type="password"],
+.sticky-wrapper textarea,
+.sticky-wrapper select,
+.yui-overlay input[type="text"],
+.yui-overlay input[type="password"],
+.yui-overlay textarea,
+.yui-overlay select,
+.form-element-border,
+.share-form .yui-dt table
+{
+   border: 1px solid #eee;
+   font-weight: normal;
+}
+*/
+
+.share-form .yui-dt table td.yui-dt-last
+{
+   border-right: none;
+}
+
+.share-form .form-manager {
+  overflow: auto;
+  margin-left: 1em;
+  width: 800px;
+  padding: 0;
+}
+
+.share-form .form-manager label.workflow-definition {
+  margin: 0;
+  padding: 0;
+  line-height: 155%;
+  margin-right: 10px;
+}
+
+.share-form .form-manager h1
+{
+   margin-bottom: 0.5em !important;
+}
+
+.form-element-background-color
+{
+   background-color: #fff;
+}
+
+.create-content-mgr .heading
+{
+   font-family: Open Sans Condensed, Arial, sans-serif;
+   font-size: 230% !important;
+   padding: 0.5em 0.2em 0 !important;
+}
+
+.yui-skin-lightTheme .yui-navset .yui-content
+{
+   background: #eee;
+}
+
+/* same as theme-color-2 */
+
+.toolbar .link a:hover,
+.members-bar .member-link a:hover
+{
+   color: #333;
+}
+
+/* Richtext Editor Plug-ins */
+
+.yui-toolbar-container .yui-toolbar-alfresco-imagelib span.yui-toolbar-icon,
+span.mce_alfresco-imagelibrary
+{
+   background-position: 0 0 !important;
+   background-image: url(images/alfresco-imagelib.png) !important;
+}
+
+.mce_alfresco-imagelibrary img
+{
+   background-position: 0px 2px !important;
+}
+
+.yui-toolbar-container .yui-toolbar-alfresco-imagelib span.yui-toolbar-icon,
+span.mce_alfresco-linklibrary
+{
+   background-position: 0 0 !important;
+   background-image: url(images/alfresco-linklib.png) !important;
+}
+
+.mce_alfresco-linklibrary img
+{
+   background-position: 0px 2px !important;
+}
+
+/* Override checked styles for doclist */
+
+/*.yui-skin-lightTheme .no-check-bg div.flat-button span.yui-radio-button-checked,
+.yui-skin-lightTheme .no-check-bg div.flat-button span.yui-checkbox-button-checked,
+.yui-skin-lightTheme .no-check-bg div.flat-button span.yui-radio-button-checked,
+.yui-skin-lightTheme .no-check-bg div.flat-button span.yui-checkbox-button-checked
+{
+   border-color: #ccc;
+   background: none;
+}*/
+
+/*.yui-skin-lightTheme .no-check-bg div.flat-button span.yui-radio-button-checked span.first-child,
+.yui-skin-lightTheme .no-check-bg div.flat-button span.yui-checkbox-button-checked span.first-child,
+.yui-skin-lightTheme .no-check-bg div.flat-button span.yui-radio-button-checked span.first-child,
+.yui-skin-lightTheme .no-check-bg div.flat-button span.yui-checkbox-button-checked span.first-child
+{
+   border-color: #ccc;
+}*/
+
+/* Ensure hover state can be activated */
+
+/*.yui-skin-lightTheme .no-check-bg div.flat-button span.yui-button-hover
+{
+   background: none;
+   border-color: #ccc;
+}*/
+
+/* Override YUI Button styles for - attention button style */
+
+/*.yui-skin-lightTheme .alfresco-attention-yui-button,
+.yui-skin-lightTheme .alfresco-attention-yui-button span.first-child
+{
+   border-color: #e0b000;
+}
+
+.yui-skin-lightTheme .alfresco-attention-yui-button.yui-button
+{
+   background-position: 0 -2000px;
+}
+
+.yui-skin-lightTheme .alfresco-attention-yui-button.yui-button-hover
+{
+   background-position: 0 -2100px;
+}
+
+.yui-skin-lightTheme .alfresco-attention-yui-button.yui-button-disabled
+{
+   background-position: 0 -2200px;
+}*/
+
+/* Paginator link styling */
+
+/*.yui-skin-lightTheme .yui-pg-container span
+{
+   color: #333;
+}
+
+.yui-skin-lightTheme .yui-pg-container span.yui-pg-page.yui-pg-current-page
+{
+   color: #333;
+   font-weight: normal;
+}
+
+.yui-skin-lightTheme .yui-pg-container a.yui-pg-first,
+.yui-skin-lightTheme .yui-pg-container a.yui-pg-previous,
+.yui-skin-lightTheme .yui-pg-container a.yui-pg-page,
+.yui-skin-lightTheme .yui-pg-container a.yui-pg-next,
+.yui-skin-lightTheme .yui-pg-container a.yui-pg-last
+{
+   border-color: #ccc;
+   color: #333;
+   text-decoration: none;
+}
+
+.yui-skin-lightTheme .yui-pg-container a.yui-pg-first:hover,
+.yui-skin-lightTheme .yui-pg-container a.yui-pg-previous:hover,
+.yui-skin-lightTheme .yui-pg-container a.yui-pg-page:hover,
+.yui-skin-lightTheme .yui-pg-container a.yui-pg-next:hover,
+.yui-skin-lightTheme .yui-pg-container a.yui-pg-last:hover
+{
+   text-decoration: underline;
+}*/
+
+/* A combination of a link and splitbutton wrapped inside a span */
+
+/*.yui-skin-lightTheme .link-menu-button .yui-button span button
+{
+   color: #333;
+   font-size: 2px;
+   background-image: url(images/link-menu-button-arrow.png);
+   background-position: center center;
+}
+
+body.yui-skin-lightTheme .link-menu-button .yui-button.yui-button-hover
+{
+   background-color: #fff;
+   border: 1px solid #eee;
+}
+
+body.yui-skin-lightTheme .link-menu-button.link-menu-button-menu-active .yui-button.yui-button-hover
+{
+   border-color: transparent;
+   background-color: transparent;
+}
+
+.yui-skin-lightTheme .link-menu-button .yui-button span.first-child,
+.yui-skin-lightTheme .link-menu-button .yui-button.yui-button-activeoption span.first-child,
+.yui-skin-lightTheme .link-menu-button .yui-button.yui-button-hover span.first-child
+{
+   border-width: 0;
+}
+
+.yui-skin-lightTheme .link-menu-button span.link-menu-button-link
+{
+   border-right: 1px #ccc solid;
+}
+
+body.yui-skin-lightTheme .link-menu-button.link-menu-button-menu-active
+{
+   background-color: #fff;
+   border: 1px solid #eee;
+}
+
+.yui-skin-lightTheme .link-menu-button.link-menu-button-menu-active .yui-button.yui-menu-button-hover
+{
+   border: 1px solid #fff;
+}*/
+
+.topiclist .yui-dt-liner
+{
+   padding: 0;
+}
+
+.topicview
+{
+   border: 1px solid #ccc !important;
+}
+
+.links-body .yui-dt td
+{
+   border-bottom: 1px solid #ccc !important;
+}
+
+.links-body .over
+{
+   border: 1px solid #ccc !important;
+}
+
+.links-header .links-infobar
+{
+   border-bottom: 1px solid #ccc !important;
+}
+
+.nodeFooter
+{
+   border-bottom: 1px solid #ccc !important;
+   border-top: 1px solid #ccc !important;
+   padding: 6px !important;
+}
+
+.topicview .nodeFooter, .postview .nodeFooter, .reply .nodeFooter, .linksview .nodeFooter
+{
+   border: none !important;
+}
+
+.task-list .task-list-bar
+{
+   border-bottom: 1px solid #ccc !important;
+}
+
+.task-list .tasks tr:hover td.yui-dt-last .yui-dt-liner
+{
+   border-left: 1px solid #ccc !important;
+}
+
+.task-list .task-edit-link-over,
+.task-list .task-view-link-over,
+.task-list .workflow-view-link-over
+{
+   border: 1px solid #ccc !important;
+}
+
+/* blog/wiki action items links */
+
+/*body.yui-skin-lightTheme .wikipage .editPage a:hover,
+body.yui-skin-lightTheme .wikipage .deletePage a:hover,
+body.yui-skin-lightTheme .wikipage .detailsPage a:hover,
+body.yui-skin-lightTheme .nodeEdit .onEditBlogPost a:hover,
+body.yui-skin-lightTheme .nodeEdit .onDeleteBlogPost a:hover
+{
+
+}*/
+
+.wikipage
+{
+   border-bottom: 1px solid #ccc !important;
+}
+
+/* YUI Menu */
+
+/*body.yui-skin-lightTheme .yuimenu .bd
+{
+   border: 1px solid #eee;
+   padding: 3px;
+   font-size: 109%;
+   border-bottom-left-radius: 6px;
+   border-bottom-right-radius: 6px;
+}*/
+
+
+/*
+ * This ensures that the quick share actions can get displayed focus
+ */
+
+/*.yui-skin-lightTheme .yuimenu h6
+{
+   border: none;
+   font-family: Open Sans Bold, Arial, sans-serif;
+}*/
+
+/* YUI Menu roll over state */
+
+/*body.yui-skin-lightTheme .yuimenuitemlabel
+{
+   text-decoration: none;
+}
+
+body.yui-skin-lightTheme .yuimenu .bd ul li.yuimenuitem-selected
+{
+   background-color: #eee;
+}
+
+body.yui-skin-lightTheme .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel,
+body.yui-skin-lightTheme .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel a,
+body.yui-skin-lightTheme .yuimenu .bd ul li.yuimenuitem-selected div .yuimenuitemlabel,
+body.yui-skin-lightTheme .yuimenu .bd ul li.yuimenuitem-selected div .yuimenuitemlabel a
+{
+   color: #333;
+}
+
+body.yui-skin-lightTheme .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel-disabled
+{
+   color: #aaa;
+   cursor: default;
+}*/
+
+/*end YUI Menu */
+
+/* Location */
+
+/*
+
+.yui-skin-lightTheme .location-path,
+.yui-skin-lightTheme .location-site
+{
+   background-position: left 50%;
+   background-repeat: no-repeat;
+   padding: 2px 0 2px 20px;
+}
+
+.yui-skin-lightTheme .location-none
+{
+   margin-left: 0.5em;
+}
+
+.yui-skin-lightTheme .location-path
+{
+   background-image: url(../../components/documentlibrary/images/folder-closed-16.png);
+   margin-left: 0.5em;
+}
+
+.yui-skin-lightTheme .location-site
+{
+   background-image: url(../../components/images/site-16.png);
+}
+
+*/
+
+/* end Location*/
+
+/* Doclist */
+
+/*
+
+body.yui-skin-lightTheme #alfresco-documentlibrary
+{
+   border-top: 1px solid #eee;
+}
+
+body.yui-skin-lightTheme .doclist .more-actions a:active,
+body.yui-skin-lightTheme .doclist .more-actions a:hover
+{
+   background-color: #eee;
+   color: #333;
+}
+
+body.yui-skin-lightTheme .doclist div.more-actions
+{
+   border: 1px solid #eee;
+   border-bottom-left-radius: 6px;
+   border-bottom-right-radius: 6px;
+}
+
+body.yui-skin-lightTheme .doclist .action-set a:active,
+body.yui-skin-lightTheme .doclist .action-set a:hover,
+body.yui-skin-lightTheme .doclist .action-set .highlighted,
+#divCalendarContent .yui-dt-col-actions a:active,
+#divCalendarContent .yui-dt-col-actions a:hover
+{
+   border: 1px solid #eee;
+}
+
+body.yui-skin-lightTheme .yui-dt-data tr.yui-dt-highlighted,
+body.yui-skin-lightTheme .doclist tr.yui-dt-odd.yui-dt-highlighted,
+body.yui-skin-lightTheme .doclist tr.yui-dt-even.yui-dt-highlighted,
+body.yui-skin-lightTheme .links-body tr.links-selected-row,
+body.yui-skin-lightTheme .over,
+.topicview
+{
+   background-color: #F5F5F5;
+}
+
+.site-members .search-controls
+{
+   background-color: #F5F5F5;
+}
+
+body.yui-skin-lightTheme .doclist tr.yui-dt-odd.yui-dt-highlighted td.yui-dt-last,
+body.yui-skin-lightTheme .doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-last
+{
+   border-left: 1px solid #eee;
+}
+
+body.yui-skin-lightTheme .categoryview .category .ygtvtn,
+body.yui-skin-lightTheme .categoryview .category .ygtvtm,
+body.yui-skin-lightTheme .categoryview .category .ygtvtmh, body.yui-skin-lightTheme .categoryview .category .ygtvtmhh,
+body.yui-skin-lightTheme .categoryview .category .ygtvtp,
+body.yui-skin-lightTheme .categoryview .category .ygtvtph, body.yui-skin-lightTheme .categoryview .category .ygtvtphh,
+body.yui-skin-lightTheme .categoryview .category .ygtvln,
+body.yui-skin-lightTheme .categoryview .category .ygtvlm,
+body.yui-skin-lightTheme .categoryview .category .ygtvlmh, body.yui-skin-lightTheme .categoryview .category .ygtvlmhh,
+body.yui-skin-lightTheme .categoryview .category .ygtvlp,
+body.yui-skin-lightTheme .categoryview .category .ygtvlph, body.yui-skin-lightTheme .categoryview .category .ygtvlphh,
+body.yui-skin-lightTheme .categoryview .category .ygtvdepthcell
+{
+   background-image: url(images/categoryview-sprite.gif);
+}
+
+body.yui-skin-lightTheme .treeview .ygtvtn,
+body.yui-skin-lightTheme .treeview .ygtvtm,
+body.yui-skin-lightTheme .treeview .ygtvtmh,
+body.yui-skin-lightTheme .treeview .ygtvtmhh,
+body.yui-skin-lightTheme .treeview .ygtvtp,
+body.yui-skin-lightTheme .treeview .ygtvtph,
+body.yui-skin-lightTheme .treeview .ygtvtphh,
+body.yui-skin-lightTheme .treeview .ygtvln,
+body.yui-skin-lightTheme .treeview .ygtvlm,
+body.yui-skin-lightTheme .treeview .ygtvlmh,
+body.yui-skin-lightTheme .treeview .ygtvlmhh,
+body.yui-skin-lightTheme .treeview .ygtvlp,
+body.yui-skin-lightTheme .treeview .ygtvlph,
+body.yui-skin-lightTheme .treeview .ygtvlphh,
+body.yui-skin-lightTheme .treeview .ygtvdepthcell
+{
+   background-image: url(images/treeview-sprite.gif) !important;
+}
+
+*/
+
+/* end doclist */
+
+/* invite page */
+
+.inviteusersbyemail .byemailbody
+{
+   background-color: #fbfbfb;
+}
+
+.people-finder .results
+{
+   background-color: #fff;
+}
+
+/*.yui-skin-lightTheme .dayview h2, .weekview h2,
+.yui-skin-lightTheme .calendar.weekview thead th,
+.yui-skin-lightTheme .calendar.monthview thead th
+{
+   color: #333;
+}
+
+/* filter list link */
+
+/*
+
+.yui-skin-lightTheme li.selected,
+body.yui-skin-lightTheme .treeview .selected,
+body.yui-skin-lightTheme .categoryview .selected,
+body.yui-skin-lightTheme .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected
+{
+   background-color: #eee;
+}
+
+*/
+
+/* these rules need to be separate from the above for ie6 */
+
+/*
+.yui-skin-lightTheme .treeview .selected > table,
+.yui-skin-lightTheme .categoryview .selected > table
+{
+   background-color: #eee;
+}
+
+.yui-skin-lightTheme .filter a.disabled,
+.yui-skin-lightTheme .filter a.disabled:active,
+.yui-skin-lightTheme .filter a.disabled:hover,
+.yui-skin-lightTheme .filter a.disabled:visited,
+.yui-skin-lightTheme .tags a.disabled,
+.yui-skin-lightTheme .tags a.disabled:active,
+.yui-skin-lightTheme .tags a.disabled:hover,
+.yui-skin-lightTheme .tags a.disabled:visited
+{
+   color: #ccc;
+   cursor: not-allowed;
+}
+
+.yui-skin-lightTheme .filter a:hover,
+.yui-skin-lightTheme .tags a:hover
+{
+   text-decoration: none;
+}
+
+*/
+
+/* Link color */
+
+/*
+
+.yui-skin-lightTheme .node .nodeTitle a,
+.yui-skin-lightTheme .node .nodeURL a,
+.yui-skin-lightTheme .nodeAttrValue a,
+.yui-skin-lightTheme .nodeFooter .tag a,
+.yui-skin-lightTheme .yui-dt-highlighted .tag a,
+.yui-skin-lightTheme .yui-dt-highlighted .category a,
+.yui-skin-lightTheme .yui-dt-highlighted .item-social a,
+.yui-skin-lightTheme a.wiki-tag-link,
+.yui-skin-lightTheme .node .userLink a,
+.yui-skin-lightTheme .site-members h3 a,
+.yui-skin-lightTheme .yui-calendar td.calcell a,
+.yui-skin-lightTheme .doclist .documents a,
+.yui-skin-lightTheme .attrValue a,
+.yui-skin-lightTheme .detail .item a,
+.yui-skin-lightTheme .info .meta-value a,
+.yui-skin-lightTheme .rules-none a,
+.yui-skin-lightTheme .agendaview a,
+.yui-skin-lightTheme a.previousEvents,
+.yui-skin-lightTheme a.nextEvents,
+.yui-skin-lightTheme div.channels a
+{
+   color: #333;
+}
+
+.yui-skin-lightTheme .tag a,
+.yui-skin-lightTheme .category a,
+.yui-skin-lightTheme .item-social a,
+.yui-skin-lightTheme .document-tags .tag
+{
+   color: #333;
+}
+
+.yui-skin-lightTheme .tag a,
+.yui-skin-lightTheme .document-tags .tag
+{
+   background-color: #eee;
+}
+*/
+
+.cmis .body a
+{
+   color: #00AE42;
+}
+
+.yui-skin-lightTheme .rules-list a
+{
+   color: #333;
+}
+
+/* Calendar */
+
+/* Day/Week timed events */
+.fc-content .fc-event-skin
+{
+   background-color: #C0C0C0; /* Theme Colour 1 */
+   border-color: #B0B0B0;
+   color: #333;
+}
+
+/* Month view timed events */
+.fc-content .fc-view-month .fc-event-skin
+{
+   background-color: transparent;
+   border-color: transparent;
+   color: #333;
+}
+
+/* All day events */
+.fc-content .fc-event-allday .fc-event-skin,
+.fc-content a.fc-event.fc-event-allday,
+.fc-content .fc-view-month .fc-event-multiday .fc-event-skin,
+.fc-content .fc-view-month a.fc-event.fc-event-multiday
+{
+   background-color: #C0C0C0;
+   border-color: #C0C0C0;
+   color: #333;
+}
+
+.fc-content a.fc-event-skin:hover
+{
+   color: #333;
+}
+
+/* End Calendar */
+
+/* Document */
+
+.document-version
+{
+   background-color: #aaa;
+   color: #fff;
+}
+
+/* Twisters */
+
+h2.alfresco-twister-open
+{
+   background: url(images/open-twister.png) no-repeat scroll 0 50%;
+}
+
+h2.alfresco-twister-closed
+{
+   background: url(images/close-twister.png) no-repeat scroll 0 50%;
+}
+
+h3.alfresco-twister-open
+{
+   background: url(images/second-twister-open.png) no-repeat scroll 0 50%;
+}
+
+h3.alfresco-twister-closed
+{
+   background: url(images/second-twister-close.png) no-repeat scroll 0 50%;
+}
+
+/* Preview Tooltip */
+
+.yui-skin-citeckTheme .yui-tt .bd {
+  background-color: #758faa;
+  color: white;
+  padding: 3px 5px;
+  text-align: justify;
+  border: none;
+  border-radius: 3px;
+}
+
+.yui-skin-citeckTheme .yui-tt .yui-tt-shadow {
+  display: none;
+}
+
+/* Theme colors */
+
+.theme-color-1,
+a.theme-color-1,
+a.theme-color-1:visited,
+a.theme-color-1:hover
+{
+   color: #333;
+}
+
+.theme-color-2,
+a.theme-color-2,
+a.theme-color-2:visited,
+a.theme-color-2:hover
+{
+   color: #333;
+}
+
+.theme-color-3,
+a.theme-color-3,
+a.theme-color-3:visited,
+a.theme-color-3:hover
+{
+   color: #333;
+}
+
+.theme-color-4,
+a.theme-color-4,
+a.theme-color-4:visited,
+a.theme-color-4:hover
+{
+   color: #333;
+}
+
+.theme-color-5,
+a.theme-color-5,
+a.theme-color-5:visited,
+a.theme-color-5:hover
+{
+   color: #ccc;
+}
+
+/* Theme background colors */
+
+.theme-bg-color-1,
+div.theme-bg-color-1
+{
+   background-color: #fff;
+}
+
+.theme-bg-color-2,
+div.theme-bg-color-2
+{
+   background-color: #eee;
+}
+
+.theme-bg-color-3,
+div.theme-bg-color-3
+{
+   background-color: #F5F5F5;
+}
+
+.theme-bg-color-4,
+div.theme-bg-color-4
+{
+   background-color: #eee;
+}
+
+.theme-bg-color-5,
+div.theme-bg-color-5
+{
+   background-color: #222;
+}
+
+.theme-bg-color-6,
+div.theme-bg-color-6
+{
+   background-color: #f4f4f4;
+}
+
+/* Used for editing - same as meta data fields */
+
+.theme-bg-color-7,
+div.theme-bg-color-7
+{
+   background-color: #fff;
+}
+
+.theme-bg-color-8,
+div.theme-bg-color-8
+{
+   background-color: #fff;
+}
+
+.theme-bg-1
+{
+
+}
+
+.theme-bg-2
+{
+   background-color: #fff;
+}
+
+.theme-bg-3
+{
+   background-color: #CCCCCC;
+   background-image: -webkit-gradient(
+      linear,
+      left top,
+      left bottom,
+      color-stop(0, rgb(204,204,204)),
+      color-stop(1, rgb(232,232,232))
+   );
+   background-image: -moz-linear-gradient(
+       center top,
+       rgb(204,204,204) 0%,
+       rgb(232,232,232) 100%
+   );
+}
+
+.theme-bg-4
+{
+   background-color: #33FF66;
+   background-image: -webkit-gradient(
+      linear,
+      left top,
+      left bottom,
+      color-stop(0, rgb(51,255,102)),
+      color-stop(1, rgb(51,153,102))
+   );
+   background-image: -moz-linear-gradient(
+      top,
+      rgb(51,255,102) 0%,
+      rgb(51,153,102) 100%
+   );
+}
+
+.theme-bg-selected
+{
+   background-color: #eee;
+}
+
+/* Theme border type/colors */
+
+.theme-border-1
+{
+   border-color: #ccc;
+}
+
+.theme-border-2
+{
+   border-color: #333;
+}
+
+.theme-border-3
+{
+   border: 1px solid #c6c6c6 !important;
+}
+
+.theme-border-4
+{
+   border: 1px solid #eee;
+}
+
+.theme-border-5
+{
+   border: 1px solid #eee;
+}
+
+/* Unauthenticated pages (inc login) */
+
+body.alfresco-guest
+{
+   background: none;
+}
+
+.alfresco-guest .sticky-wrapper
+{
+   background: none;
+}
+
+.alfresco-guest .theme-overlay
+{
+   padding-left: 24px;
+   font-family: Open Sans,Arial,Helvetica,sans-serif;
+   color: #333;
+   border: 1px solid #eee;
+   background-color: #fff;
+   box-shadow: 0.33px 2px 8px rgba(0, 0, 0, 0.3);
+   border-radius: 6px;
+}
+
+.login input[type="text"],
+.login input[type="password"]
+{
+   width: 260px;
+   padding-left: 3px 10px;
+}
+
+.login label
+{
+   padding-bottom: 5px;
+   display: inline-block;
+}
+
+.login .copy {
+   display: none;
+}
+
+.login .yui-button
+{
+   margin-left: 1px;
+   margin-top: 2px;
+}
+
+.login .form-fields .form-field > span.yui-button > .first-child > button {
+   padding: 3px 10px;
+}
+
+.login .form-fields .form-field > span.yui-button > .first-child {
+   border-radius: 3px;
+}
+
+.login .form-fields .form-field:last-child {
+   margin-bottom: 0;
+}
+
+.login .form-fields {
+   padding: 1em 0 0 0 !important;
+}
+
+
+/* share locale changer */
+
+.login {
+  position: relative;
+}
+
+.login #sharelocaleform {
+  position: absolute;
+  bottom: 1.5em;
+  right: 1.5em;
+  padding: 0;
+  z-index: 100;
+}
+
+.login #sharelocaleform select {
+  font-size: 13px;
+  height: 24px;
+  border-radius: 3px;
+  background-color: white;
+}
+
+/* end share locale changer */
+
+
+.theme-company-logo {
+   height: 34px;
+   width: 428px;
+   background: transparent url(images/citeck-logo.png) no-repeat;
+}
+
+.theme-flow-arrow
+{
+   margin:  0;
+   padding: 0;
+  width: 50px;
+   height: 98px;
+   background: url(images/flow-arrow.png) no-repeat;
+}
+
+.balloon
+{
+   border-radius: 6px !important;
+   padding: 10px 12px !important;
+   font-size: 91%;
+}
+
+/* Meeting Places Code */
+
+.docfolder-label
+{
+   overflow:auto;
+}
+
+.docfolder-input
+{
+   width: 203px;
+   vertical-align: top;
+   margin-top: 2px;
+}
+
+.tree-div
+{
+   height: 200px;
+   overflow: auto;
+   margin-left: 5px;
+}
+
+/** YUI component overrides */
+
+.ygtvlabel, .ygtvlabel:link, .ygtvlabel:visited, .ygtvlabel:hover
+{
+   background-color: #fff;
+   cursor: pointer;
+   margin-left: 5px;
+   text-decoration: none;
+}
+
+.yui-resize .yui-resize-handle-b {
+   background-color: transparent;
+}
+
+/** Share component overrides */
+
+.header .header-left
+{
+   margin-left: -160px;
+}
+
+.header .logo
+{
+   position: relative;
+   left: 168px;
+   top: 58px;
+}
+
+.header .header-left .logo-spacer
+{
+   border-right: 1px solid #ccc !important;
+   height: 40px !important;
+   width: 1px !important;
+   margin: 0 !important;
+   position: relative;
+   left: 165px;
+   top: 62px;
+}
+
+.header .app-items
+{
+   margin-left: 8px;
+}
+
+.header .app-items span.yui-button span.first-child button
+{
+   margin-bottom: 3px !important;
+}
+
+.header .user-items div.search-box
+{
+   border: 1px solid #ccc !important;
+   top: 5px !important;
+   padding: 2px;
+}
+
+.header .user-items div.search-box span.yui-button
+{
+   height: 21px !important;
+}
+
+.header .user-items div.yuimenu div.bd ul li.user-menuitem
+{
+   background: none !important;
+   border-bottom: 1px solid #eee !important;
+}
+
+.header .app-items span.yui-button span.first-child button
+{
+   padding: 22px 4px 1px !important;
+}
+
+.header .yuimenu .bd
+{
+   margin-top: -2px !important;
+}
+
+.page-title div.links
+{
+   padding-top: 6px;
+}
+
+.node-header .node-path
+{
+   padding-top: 0 !important;
+}
+
+.node-header .status-banner
+{
+   margin-top: 0 !important;
+   margin-bottom: 0.75em;
+}
+
+
+.node-header .node-action .onDownloadDocumentClick a {
+   background-image: url(images/download.png) !important;
+   background-position: left center !important;
+   background-repeat: no-repeat;
+   padding: 0 10px 0 20px !important;
+}
+
+.node-header .node-action .onDownloadDocumentClick a:hover {
+   background-image: url(images/download-active.png) !important;
+}
+
+/** tweak width of global picker treeview to avoid wrap*/
+.global-folder .treeview
+{
+   width: 31em !important;
+}
+
+.global-folder .site-picker a.selected,
+.global-folder .container-picker a.selected,
+.global-folder .site-picker a:active,
+.global-folder .site-picker a:hover,
+.global-folder .container-picker a:active,
+.global-folder .container-picker a:hover
+{
+   background-color: #eee !important;
+}
+
+.global-folder .site-picker a,
+.global-folder .container-picker a
+{
+   border-bottom: 1px solid #eee !important;
+}
+
+.global-folder .mode button
+{
+   color: #333 !important;
+}
+
+.users .header-bar
+{
+   font-family: Open Sans Bold, Arial, sans-serif;
+   font-weight: normal !important;
+   background-color: #eee !important;
+   border-bottom: 1px solid #ccc !important;
+   margin: 1.5em 1em 1em !important;
+}
+
+.profile {
+  padding: 0 40px 0 25px;
+}
+
+.profile .viewcolumn .header-bar,
+.profile form .header-bar {
+   background-color: #758faa !important;
+   border: none;
+   margin: 0;
+   color: white;
+   padding: 10px 15px;
+}
+
+.profile form .header-bar {
+  margin-bottom: 10px;
+}
+
+.profile .viewcolumn .sites,
+.profile .viewcolumn .content,
+.profile .viewcolumn .people {
+   margin: 0 !important;
+}
+
+.profile .viewcolumn .content {
+  margin-bottom: 15px !important;
+}
+
+.profile .fieldlabelright
+{
+   font-family: Open Sans Bold, Arial, sans-serif;
+   font-weight: normal !important;
+}
+
+.profile .sites li.first, .profile .content li.first, .profile .people li.first {
+   border-top: 0 none !important;
+}
+
+.profile .sites li, .profile .content li, .profile .people li
+{
+   border-top: 1px solid #ccc !important;
+}
+
+.profile .people li a
+{
+   font-family: Open Sans Bold, Arial, sans-serif;
+   font-weight: normal !important;
+}
+
+.profile .row {
+  padding: 0px 15px 10px 15px;
+}
+
+.profile .row input {
+   background-color: white;
+   padding: 5px;
+   border: 1px solid #CCC;
+   box-shadow: none;
+}
+
+.profile.password .row .label {
+  padding-top: 5px;
+}
+
+.profile.notifications .row input[type="checkbox"] {
+  margin-top: 15px;
+  margin-left: 5px;
+}
+
+/* only target the user profile toolbar - not others e.g. doclib */
+.toolbar.userprofile {
+   padding: 0 30px 10px;
+   margin: 0;
+}
+
+#bd .toolbar.userprofile {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.search .itemname a
+{
+   font-weight: normal !important;
+   font-size: 139% !important;
+}
+
+.search .search-box input
+{
+   padding: 3.666px !important;
+}
+
+.search .search-sites
+{
+   padding-top: 0 !important;
+}
+
+.search .search-sites a.bold
+{
+   font-family: Open Sans Bold, Arial, sans-serif;
+   font-weight: normal !important;
+}
+
+.search .form-row
+{
+   margin: -10px 0 1em 2em !important;
+}
+
+.search .thumbnail > span img
+{
+   box-shadow: 0.33px 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.images .thumbnail
+{
+   box-shadow: 0.33px 2px 3px rgba(0, 0, 0, 0.35) !important;
+}
+
+.yui-dt-data .yui-dt-last td
+{
+   border-bottom: none !important;
+}
+
+/** Collab component toolbars e.g. blog */
+.share-toolbar .action-bar, .share-toolbar .rss-feed
+{
+   padding: 0.25em 0.5em !important;
+}
+
+.customise-pages-page-list-item img
+{
+   border-radius: 6px;
+   box-shadow: 0.33px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/** search boxes for site, people and members finders */
+.site-finder .search-bar
+{
+   border-bottom: 1px solid #ccc !important;
+   height: 2.5em !important;
+}
+
+.site-finder .search-bar div
+{
+   padding-top: 0.2em;
+}
+
+.people-finder .search-bar,
+.group-finder .search-bar
+{
+   border-bottom: 1px solid #ccc !important;
+   height: 2.5em !important;
+}
+
+.people-finder .search-bar div,
+.group-finder .search-bar div
+{
+   padding-top: 0.2em;
+}
+
+/*.object-finder .picker-header .search .search-input
+{
+   padding: 0.3em 1em 0.3em 0.5em !important;
+}*/
+
+/** search controls for people, groups and pending invites */
+.search-controls
+{
+   border-bottom: 1px solid #ccc !important;
+   height: 2.5em !important;
+}
+
+.search-controls div
+{
+   padding-top: 0.25em;
+}
+
+.help .subtitle
+{
+   font-family: Open Sans Bold, Arial, sans-serif;
+   font-weight: normal !important;
+}
+
+.alfresco-share div.calendar-currentMonth .yui-button
+{
+   background: none !important;
+}
+
+.alfresco-share div.calendar-currentMonth .yui-button-checked
+{
+   background: none repeat scroll 0 0 #ccc !important;
+}
+
+#alfresco-repository, #alfresco-mytasks, #alfresco-myworkflows
+{
+   border-top: 1px solid #eee;
+}
+
+.usedDashlet
+{
+   background-color: #eee !important;
+}
+
+.path-nav .heading
+{
+   font-family: Open Sans Bold, Arial, sans-serif;
+   font-weight: normal !important;
+}
+
+.doclist .info-banner
+{
+   font-family: Open Sans Bold, Arial, sans-serif;
+   font-weight: normal !important;
+}
+
+/* saved and site search dashlets */
+table td.thumbnail img
+{
+   box-shadow: 0 3px 4px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Tag editor in wiki/discussions/blog */
+.tags_box li a:link
+{
+   color: #333 !important;
+}
+
+.tags_box li a:hover,
+.tags_box li a.hover
+{
+   border: 1px solid transparent !important;
+}
+
+/* Uploaders */
+.fileupload-percentage-span,
+.fileupload-progressInfo-span
+{
+   font-family: Open Sans Bold, Arial, sans-serif;
+   font-weight: normal !important;
+}
+
+.dnd-upload .title-folder
+{
+   vertical-align: baseline !important;
+}
+
+.about-share .bd
+{
+   border-radius: 0 !important;
+}
+
+
+
+/*.yui-skin-citeckTheme .alf-menu-bar .dijitMenuBar .dijitMenuItemHover,
+.yui-skin-citeckTheme .alf-menu-bar .dijitMenuBar .dijitMenuItemSelected {
+   background-color: transparent !important;
+}*/
+
+
+/* HEADER */
+
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER #HEADER_MOBILE_MENU {
+    display: none;
+}
+
+#alf-hd {
+    border-bottom: 1px solid #ccc;
+    background-color: white;
+    width: 100% !important;
+}
+
+#alf-full-width {
+   margin: 0;
+}
+
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header,
+#alf-hd .alfresco-header-Header {
+   margin: 0;
+   padding: 0 25px;
+   background-color: #758faa;
+   border-bottom: 1px solid #ccc;
+}
+
+#alf-hd #SHARE_HEADER {
+    padding: 0 26px;
+}
+
+#HEADER_SLIDE_MENU {
+    margin-right: 5px;
+    float: left;
+}
+
+.yui-skin-citeckTheme #menu .menu-mobile-icon {
+    width: 25px;
+}
+
+/*.yui-skin-citeckTheme .mm-slideout #HEADER_USER_MENU_BAR {*/
+    /*margin: 2px;*/
+/*}*/
+
+/* SLIDE MENU ICON*/
+#menu.mm-menu .mm-listview i.fa {
+    background-image: none !important;
+}
+
+.fa.HEADER_TASKS_ACTIVE_TASKS_JOURNAL:before,
+.fa.HEADER_TASKS_COMPLETED_TASKS_JOURNAL:before,
+.fa.HEADER_TASKS_CONTROLLED_JOURNAL:before,
+.fa.HEADER_TASKS_SUBORDINATE_TASKS_JOURNAL:before,
+.fa.HEADER_TASKS_INITIATOR_TASKS_JOURNAL:before,
+.fa.HEADER_TASKS_INCOME_PACKAGE_TASKS_JOURNAL:before,
+.fa.HEADER_SITES_SEARCH:before,
+.fa.HEADER_SITES_CREATE:before,
+.fa.HEADER_CONTRACTS:before,
+.fa.HEADER_CASES:before,
+.fa.HEADER_LETTERS:before,
+.fa.HEADER_MEETINGS:before,
+.fa.HEADER_ORDER_PASS:before,
+.fa.HEADER_ORDERS:before,
+.fa.HEADER_COMMON_DOCUMENTS:before,
+.fa.HEADER_ECOS_FINANCE:before,
+.fa.HEADER_COMMON_DOCUMENTS:before,
+.fa.HEADER_MENU_ORGSTRUCT_WIDGET:before,
+.fa.HEADER_COMPLETED_WORKFLOWS:before,
+.fa.HEADER_MY_WORKFLOWS:before,
+.fa.HEADER_MY_CONTENT:before,
+.fa.HEADER_MY_FILES:before,
+.fa.HEADER_MY_SITES:before,
+.fa[class*="_JOURNALS"]:before,
+.fa.HEADER_REPOSITORY:before,
+.fa.HEADER_MY_PROFILE:before,
+.fa.HEADER_APPLICATION_MENU:before,
+.fa.HEADER_GROUPS:before,
+.fa.HEADER_USERS:before,
+.fa.HEADER_CATEGORIES:before,
+.fa.HEADER_SYSTEM:before,
+.fa.HEADER_TEMPLATES:before,
+.fa.HEADER_MORE:before,
+.fa.HEADER_LIFECYCLE_EDITOR:before,
+.fa.HEADER_FLOWABLE_MODELER:before,
+.fa.HEADER_TASKS_TASK_STATISTIC_JOURNAL:before {
+    color: inherit;
+}
+
+.yui-skin-citeckTheme .fa.HEADER_TASKS_ACTIVE_TASKS_JOURNAL:before {
+    content: "\f03a";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_TASKS_COMPLETED_TASKS_JOURNAL:before {
+    content: "\f187";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_TASKS_CONTROLLED_JOURNAL:before {
+    content: "\f06e";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_TASKS_SUBORDINATE_TASKS_JOURNAL:before {
+    content: "\f037";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_TASKS_INITIATOR_TASKS_JOURNAL:before {
+    content: "\f0fe";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_TASKS_TASK_STATISTIC_JOURNAL:before {
+    content: "\f080";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_TASKS_INCOME_PACKAGE_TASKS_JOURNAL:before {
+    content: "\f265";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_SITES_SEARCH:before {
+    content: "\f002";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_SITES_CREATE:before {
+    content: "\f055";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_CONTRACTS:before {
+    content: "\f2bb";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_CASES:before {
+    content: "\f0f2";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_LETTERS:before {
+    content: "\f0e0";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_MEETINGS:before {
+     content: "\f0c0";
+ }
+
+.yui-skin-citeckTheme .fa.HEADER_ORDER_PASS:before {
+    content: "\f207";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_ORDERS:before {
+    content: "\f0c9";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_COMMON_DOCUMENTS:before {
+    content: "\f05b";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_ECOS_FINANCE:before {
+    content: "\f09d";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_MENU_ORGSTRUCT_WIDGET:before {
+    content: "\f0e8";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_COMPLETED_WORKFLOWS:before {
+    content: "\f14a";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_MY_WORKFLOWS:before {
+    content: "\f247";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_MY_CONTENT:before {
+    content: "\f0db";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_MY_FILES:before {
+    content: "\f15b";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_MY_SITES:before {
+    content: "\f0ac";
+}
+
+.yui-skin-citeckTheme .fa[class*="_JOURNALS"]:before {
+    content: "\f1ea";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_REPOSITORY:before {
+    content: "\f0ae";
+}
+.yui-skin-citeckTheme .fa.HEADER_FLOWABLE_MODELER:before {
+    content: "\f079";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_APPLICATION_MENU:before {
+    content: "\f108";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_GROUPS:before {
+    content: "\f24d";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_MY_PROFILE:before,
+.yui-skin-citeckTheme .fa.HEADER_USERS:before {
+    content: "\f007";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_CATEGORIES:before {
+    content: "\f2a1";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_SYSTEM:before {
+    content: "\f085";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_TEMPLATES:before {
+    content: "\f121";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_MORE:before {
+    content: "\f141";
+}
+
+.yui-skin-citeckTheme .fa.HEADER_LIFECYCLE_EDITOR:before {
+    content: "\f079";
+}
+
+.yui-skin-citeckTheme #HEADER_USER_MENU_dropdown #HEADER_USER_MENU_REPORTISSUE span,
+.yui-skin-citeckTheme #HEADER_USER_MENU_dropdown #HEADER_USER_MENU_MY_PROFILE span,
+.yui-skin-citeckTheme #HEADER_USER_MENU_dropdown #HEADER_USER_MENU_AVAILABILITY span,
+.yui-skin-citeckTheme #HEADER_USER_MENU_dropdown #HEADER_USER_MENU_PASSWORD span,
+.yui-skin-citeckTheme #HEADER_USER_MENU_dropdown #HEADER_USER_MENU_FEEDBACK span,
+.yui-skin-citeckTheme #HEADER_USER_MENU_dropdown #HEADER_USER_MENU_LOGOUT span {
+    background-image: none !important;
+}
+
+.yui-skin-citeckTheme #HEADER_USER_MENU_dropdown span:after {
+    font-family: FontAwesome;
+    font-size: 17px;
+}
+
+.yui-skin-citeckTheme #HEADER_USER_MENU_dropdown #HEADER_USER_MENU_PASSWORD span:after {
+    content: "\f084";
+}
+
+.yui-skin-citeckTheme #HEADER_USER_MENU_dropdown #HEADER_USER_MENU_REPORTISSUE span:after {
+    content: "\f27a";
+}
+
+.yui-skin-citeckTheme #HEADER_USER_MENU_dropdown #HEADER_USER_MENU_MY_PROFILE span:after {
+    content: "\f007";
+}
+
+.yui-skin-citeckTheme #HEADER_USER_MENU_dropdown #HEADER_USER_MENU_AVAILABILITY span:after {
+    content: "\f235";
+}
+
+.yui-skin-citeckTheme #HEADER_USER_MENU_dropdown #HEADER_USER_MENU_FEEDBACK span:after {
+    content: "\f06a";
+}
+
+.yui-skin-citeckTheme #HEADER_USER_MENU_dropdown #HEADER_USER_MENU_LOGOUT span:after {
+    content: "\f057";
+}
+
+
+
+.yui-skin-citeckTheme .mm-btn_menu .hamburger-box:after,
+.yui-skin-citeckTheme .mm-listitem_divider,
+.yui-skin-citeckTheme .mm-panel_iconpanel-first .fa {
+    color: #52759d;
+}
+
+.yui-skin-citeckTheme.mobile .hamburger-mobile-menu .hamburger {
+    padding: 11px 10px 5px 10px;
+}
+
+.yui-skin-citeckTheme .mm-menu .mm-listview .mm-btn_next:after {
+    border-color: #52759d
+}
+
+.yui-skin-citeckTheme .mm-menu_selected-hover .mm-listitem>a.mm-btn_fullwidth:hover+span,.mm-menu_selected-hover .mm-listitem>a:not(.mm-btn_fullwidth):hover {
+    color: blue;
+}
+
+.alfresco-header-Header .dijitMenuBar .dijitMenuItem:not(#HEADER_SEARCH_BOX_DROPDOWN_MENU) {
+   background-color: #758faa;
+   color: white;
+   margin: 0;
+   padding: 10px 10px;
+   height: 20px;
+}
+
+.yui-skin-citeckTheme .dijitMenuItemLabel,
+.yui-skin-citeckTheme .dijitMenuItemLabel a.alfresco-navigation-_HtmlAnchorMixin,
+.yui-skin-citeckTheme .alfresco-share .alf-header-menu-bar .dijitMenuItem,
+.yui-skin-citeckTheme .alfresco-header-CurrentUserStatus .lastUpdate {
+    color: white;
+}
+
+.yui-skin-citeckTheme.alfresco-share .alf-header-menu-bar .alf-menu-group .dijitMenuItemSelected,
+.yui-skin-citeckTheme.alfresco-share .alf-header-menu-bar .dijitMenu .dijitMenuItemSelected td,
+.yui-skin-citeckTheme.alfresco-share .alf-header-menu-bar .alf-menu-group .dijitMenuItemSelected,
+.yui-skin-citeckTheme.alfresco-share .alf-header-menu-bar .dijitMenu .dijitMenuItemHover td {
+    background-color: #a6c8ec;
+}
+
+.yui-skin-citeckTheme .alfresco-header-CurrentUserStatus .status {
+    border: none;
+}
+
+#alf-hd .alfresco-menus-AlfMenuBar .dijitMenuBar .dijitMenuItem.dijitMenuItemHover,
+#alf-hd .alfresco-menus-AlfMenuBar .dijitMenuBar .dijitMenuItem.dijitMenuItemSelected,
+#alf-hd .alfresco-header-Header .dijitMenuBar .dijitMenuItem > span.alf-header-js-wrapper-outer,
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .dijitMenuBar .dijitMenuItem > span.alf-header-js-wrapper-outer {
+   background-color: transparent;
+}
+
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .dijitMenuBar .dijitMenuItem span[class*="alfresco-menus-AlfMenuBarPopup__arrow"],
+#alf-hd .alfresco-header-Header .dijitMenuBar .dijitMenuItem span[class*="alfresco-menus-AlfMenuBarPopup__arrow"] {
+    padding-left: 7px !important;
+}
+
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .dijitMenuBar .dijitMenuItem span,
+#alf-hd .alfresco-header-Header .dijitMenuBar .dijitMenuItem span {
+   padding: 0 !important;
+   margin: 0 !important;
+}
+
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .dijitMenuBar .dijitMenuItem > span.alf-header-js-wrapper-outer > span.alf-header-js-wrapper-inner,
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .dijitMenuBar .dijitMenuItem > span.alf-header-js-wrapper-outer,
+#alf-hd .alfresco-header-Header .dijitMenuBar .dijitMenuItem > span.alf-header-js-wrapper-outer > span.alf-header-js-wrapper-inner,
+#alf-hd .alfresco-header-Header .dijitMenuBar .dijitMenuItem > span.alf-header-js-wrapper-outer {
+   height: auto !important;
+   display: inline-block;
+}
+
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER.alfresco-header-Header .dijitMenuBar .dijitMenuItem > span.alf-header-js-wrapper-outer >
+span.alf-header-js-wrapper-inner > button.alf-header-js-wrapper-button,
+#alf-hd .alfresco-header-Header .dijitMenuBar .dijitMenuItem > span.alf-header-js-wrapper-outer >
+span.alf-header-js-wrapper-inner > button.alf-header-js-wrapper-button {
+   border: none;
+   padding: 0 15px 0 0;
+   background-color: #758faa;
+   color: white !important;
+   line-height: normal;
+   background-position-y: 3px;
+}
+
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .alfresco-menus-AlfMenuBar .dijitMenuBar,
+.alfresco-share #alf-hd .alfresco-header-Header .alfresco-menus-AlfMenuBar .dijitMenuBar {
+   padding: 0;
+}
+
+#alf-hd .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem {
+    border-left: 1px solid #88a5c3;
+}
+
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem:first-child,
+#alf-hd .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem:first-child {
+   border-left: none;
+}
+
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem:nth-last-child(2),
+#alf-hd .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem:nth-last-child(2) {
+   border-right: none;
+}
+
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.dijitMenuItemHover,
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .alfresco-layout-LeftAndRight__right .dijitMenuBar .dijitMenuItem.dijitMenuItemHover:not(#HEADER_SEARCH_BOX_DROPDOWN_MENU),
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.yui-menu-button-hover,
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.yui-menu-button-hover >
+span.alf-header-js-wrapper-outer > span.alf-header-js-wrapper-inner > button.alf-header-js-wrapper-button,
+#alf-hd .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.dijitMenuItemHover,
+#alf-hd .alfresco-header-Header .alfresco-layout-LeftAndRight__right .dijitMenuBar .dijitMenuItem.dijitMenuItemHover:not(#HEADER_SEARCH_BOX_DROPDOWN_MENU),
+#alf-hd .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.yui-menu-button-hover,
+#alf-hd .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.yui-menu-button-hover >
+span.alf-header-js-wrapper-outer > span.alf-header-js-wrapper-inner > button.alf-header-js-wrapper-button {
+   background-color: #88a5c3;
+}
+
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.yui-menu-button-active,
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.yui-menu-button-active >
+span.alf-header-js-wrapper-outer > span.alf-header-js-wrapper-inner > button.alf-header-js-wrapper-button,
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.dijitMenuItemSelected.dijitMenuItemFocused,
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.dijitMenuItemSelected.dijitMenuItemFocused button,
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .alfresco-layout-LeftAndRight__right .dijitMenuBar.dijitMenuActive .dijitMenuItem,
+#alf-hd .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.yui-menu-button-active,
+#alf-hd .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.yui-menu-button-active >
+span.alf-header-js-wrapper-outer > span.alf-header-js-wrapper-inner > button.alf-header-js-wrapper-button,
+#alf-hd .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.dijitMenuItemSelected.dijitMenuItemFocused,
+#alf-hd .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.dijitMenuItemSelected.dijitMenuItemFocused button,
+#alf-hd .alfresco-header-Header .alfresco-layout-LeftAndRight__right .dijitMenuBar.dijitMenuActive .dijitMenuItemHover {
+   background-color: #88a5c3;
+}
+
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.yui-menu-button-active >
+span.alfresco-header-Header > span.alf-header-js-wrapper-inner > button.alf-header-js-wrapper-button,
+#alf-hd .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.yui-menu-button-active >
+span.alfresco-header-Header > span.alf-header-js-wrapper-inner > button.alf-header-js-wrapper-button {
+   background-position-y: 6px;
+}
+
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.yui-menu-button-active button.alf-header-js-wrapper-button,
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.dijitMenuItemSelected.dijitMenuItemFocused .alf-menu-arrow,
+.yui-skin-citeckTheme #ALF_STICKY_FOOTER .alfresco-header-Header .alfresco-layout-LeftAndRight__right .dijitMenuBar.dijitMenuActive .dijitMenuItem.dijitMenuItemSelected .alf-menu-arrow,
+#alf-hd .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.yui-menu-button-active button.alf-header-js-wrapper-button,
+#alf-hd .alfresco-header-Header .alfresco-layout-LeftAndRight__left .dijitMenuBar .dijitMenuItem.dijitMenuItemSelected.dijitMenuItemFocused .alf-menu-arrow,
+#alf-hd .alfresco-header-Header .alfresco-layout-LeftAndRight__right .dijitMenuBar.dijitMenuActive .dijitMenuItem.dijitMenuItemSelected .alf-menu-arrow {
+   background-image: url(images/open-menu-tringle.png);
+   background-position: center right;
+}
+
+/* end only for left-widgets*/
+
+/* only for right-widgets */
+
+.alfresco-share .alfresco-layout-LeftAndRight__right .alfresco-menus-AlfMenuBar .dijitMenuBar {
+   padding-left: 5px;
+}
+
+/*#alf-hd .alf-header .right-widgets .horizontal-widget {
+   float: right;
+}*/
+
+.yui-skin-citeckTheme.alfresco-share .alfresco-header-SearchBox {
+    height: 30px;
+    padding: 0;
+    margin: 5px 10px;
+    width: auto !important;
+}
+
+.yui-skin-citeckTheme.alfresco-share .alfresco-header-SearchBox .alfresco-header-SearchBox-menu {
+    padding-top: 4px;
+    padding-left: 5px;
+}
+
+.yui-skin-citeckTheme .alfresco-header-Header .dijitMenuBar #HEADER_CHANGE_LANGUAGE {
+    padding-top: 12px;
+    height: 17px
+}
+
+.yui-skin-citeckTheme #HEADER_TITLE {
+    padding-left: 39px;
+    margin-top: 7px;
+}
+
+.yui-skin-citeckTheme #HEADER_APP_MENU_BAR #HEADER_CREATE_CASE {
+    display: inline-block;
+}
+
+/*.yui-skin-citeckTheme #HEADER_CREATE_CASE:hover {*/
+    /*cursor: pointer;*/
+    /*background-image: url(images/create-case-active.png);*/
+/*}*/
+
+/* end only for right-widgets*/
+
+
+#alf-hd .path-nav {
+  padding: 0 40px 15px 40px;
+  margin: 0;
+}
+
+#alf-hd .widgets > .left-and-right {
+  height: 45px;
+  padding: 0 30px 0 40px;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 810px) {
+  #alf-hd .widgets > .left-and-right {
+    height: 150px;
+  }
+}
+
+#alf-hd .widgets > .left-and-right > div,
+#alf-hd .widgets > .left-and-right > div > .left-widgets,
+#alf-hd .widgets > .left-and-right > div > .right-widgets {
+  height: 45px;
+}
+
+#alf-hd .widgets > .left-and-right .left-widgets .horizontal-widget,
+#alf-hd .widgets > .left-and-right .right-widgets .horizontal-widget {
+  position: relative;
+  top: 50%;
+
+  transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+}
+
+.yui-skin-citeckTheme #HEADER_MOBILE_LOGO {
+    padding: 10px 5px;
+}
+
+.yui-skin-citeckTheme #HEADER_LOGO {
+    padding: 8px 13px 10px 16px;
+}
+
+.yui-skin-citeckTheme.alfresco-share .logo {
+    border: medium none;
+}
+
+.yui-skin-citeckTheme.alfresco-share .mm-slideout #HEADER_USER_MENU_text {
+    line-height: 40px;
+}
+.yui-skin-citeckTheme.mobile .mm-slideout #HEADER_USER_MENU_text:before {
+    content: "";
+}
+.yui-skin-citeckTheme.alfresco-share .mm-slideout #HEADER_USER_MENU_BAR #HEADER_USER_MENU {
+    padding: 0 15px;
+    height: 40px;
+}
+
+.yui-skin-citeckTheme.alfresco-share .mm-slideout img.user-photo-header {
+    height: 35px;
+    width: 35px;
+    margin-top: 2.5px;
+}
+
+.yui-skin-citeckTheme.alfresco-share.mobile img.user-photo-header {
+    height: 25px;
+    width: 25px;
+    margin-top: 8px;
+}
+
+.yui-skin-citeckTheme #HEADER_SITE_MENU:before,
+.yui-skin-citeckTheme.mobile #HEADER_USER_MENU:before,
+.yui-skin-citeckTheme .hamburger-mobile-menu .hamburger-box:after {
+    color: white;
+}
+
+#HEADER_SITE_DOCUMENTLIBRARY_text,
+#HEADER_SITE_JOURNALS_text {
+    width: 90%;
+}
+
+.yui-skin-citeckTheme #alfresco-documentlibrary #yui-main {
+    background-color: white;
+}
+
+.alfresco-share .alf-menu-title,
+.alfresco-share .title-menu,
+.alfresco-share .navigation-menu {
+   margin: 0 !important;
+}
+
+.alfresco-share .navigation-menu .alfresco-menus-AlfMenuBar {
+   padding-bottom: 5px;
+}
+
+.alfresco-share .alf-menu-title .alf-menu-title-text {
+   font-family: Open Sans !important;
+   font-weight: 900 !important;
+   font-size: 18px !important;
+   text-transform: uppercase;
+}
+
+.alfresco-share #alf-hd .alfresco-header-Header .alfresco-menus-AlfMenuBar .dijitMenuBar #HEADER_CUSTOMIZE_USER_DASHBOARD .dijitMenuItemHover,
+.alfresco-share #alf-hd .alfresco-header-Header .alfresco-menus-AlfMenuBar .dijitMenuBar #HEADER_CUSTOMIZE_USER_DASHBOARD .dijitMenuItemSelected {
+   background-color: transparent;
+}
+
+/* END HEADER */
+
+
+
+
+
+/* CONTENT */
+
+.yui-skin-citeckTheme #doc3 {
+   margin: 0;
+}
+
+.yui-skin-citeckTheme #bd {
+    padding-bottom: 0;
+}
+.yui-skin-citeckTheme #bd, .yui-skin-citeckTheme .sticky-wrapper {
+    background-color: white;
+}
+
+#bd .grid {
+  padding: 5px 25px;
+  margin: 0;
+  background-color: #f0f0f0;
+  min-height: 80vh;
+}
+
+#bd .yui-g.grid > .yui-g.dcolumn {
+  margin-top: 0;
+}
+
+#bd .members-bar {
+    margin: 0;
+    padding-left: 40px;
+    padding-right: 40px;
+}
+
+/* breadcrumbs */
+
+.node-path {
+  padding: 5px 0;
+}
+
+.node-path .folder-link a{
+  font-weight: 900;
+  font-size: 14px;
+}
+
+/* node-header */
+
+#bd .node-header {
+   background: #f0f0f0;
+   padding: 15px 15px 15px 40px;
+   margin: 0;
+   min-height: 0;
+}
+
+#bd .node-header .node-thumbnail {
+   margin-right: 10px;
+   margin-top: 1px;
+   padding: 0;
+   width: 16px;
+}
+
+#bd .node-header h1 {
+   font-size: 16px;
+   font-weight: 900;
+   margin-bottom: 5px;
+   padding: 0;
+   text-transform: uppercase;
+   line-height: 100%;
+}
+
+#bd .node-header .node-action {
+   padding-top: 0;
+}
+
+#bd .header-tabs {
+  padding: 0 10px 0 27px;
+  background-color: #f0f0f0;
+  overflow: hidden;
+}
+
+#bd .header-tabs .header-tab {
+   float: left;
+   padding: 0;
+   margin: 0;
+   background: none;
+}
+
+#bd .header-tabs .header-tab > a {
+    display: inline-block;
+    padding: 10px;
+    background-color: #f0f0f0;
+    font-size: 16px;
+    font-weight: 900;
+    border-left: 2px solid white;
+    border-right: 2px solid white;
+    border-top: 2px solid white;
+    color: gray;
+}
+
+#bd .header-tabs .header-tab.current > a {
+    background-color: white;
+    border-color: white;
+    color: #52759d;
+}
+
+#bd .header-tabs .header-tab.current > a:hover {
+    background-color: white;
+    border-color: white;
+    color: #758faa;
+}
+
+#bd .header-tabs .header-tab.current > a:hover {
+   background-color: white;
+   border-color: white;
+   color: #758faa;
+}
+
+#bd .header-tabs .header-tab > a:hover {
+   border-color: gray;
+   background-color: gray;
+   color: white;
+}
+
+/* end node-header */
+
+
+/* card of document */
+#bd > .yui-gc:not(.grid) {
+    background-color: #fafafa;
+    clear: both;
+}
+
+#bd > .yui-gc:not(.grid) > .yui-u {
+    width: 33.85%;
+    margin: 0;
+}
+
+#bd > .yui-gc:not(.grid) > .yui-u.first {
+   width: 66%;
+   background-color: white;
+   border-right: 1px solid #ccc;
+}
+
+#bd .card-details-mode-body > .yui-gc:not(.grid) > .yui-u {
+    width: 33.85%;
+    margin: 0;
+}
+
+#bd .card-details-mode-body > .yui-gc:not(.grid) > .yui-u.first {
+   width: 66%;
+   background-color: white;
+   border-right: 1px solid #ccc;
+}
+
+#bd #card-mode-documents .card-details-mode-body > .yui-gc:not(.grid) > .yui-u.first {
+    width:100%;
+    border: none;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u .document-details-panel {
+   background-color: none;
+   padding: 10px 0 0 10px;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u:last-child .document-details-panel {
+  padding: 10px 25px 0 10px;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u.first .document-details-panel {
+   padding-left: 40px;
+   border-bottom: 1px solid #ccc;
+}
+
+
+/* Card of document. Approved and requested */
+#bd .yui-gc:not(.grid) > .yui-u.first .document-details-panel .form-container .form-fields .yui-g .yui-u .set-title {
+  border: none;
+  margin-top: 30px;
+  margin-bottom: 5px;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u.first .document-details-panel .form-container .form-fields .yui-g .yui-u .set-title br {
+   display: none;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u.first .document-details-panel .form-container .form-fields .yui-g .yui-u .set-title label {
+  float: none !important;
+}
+
+
+#bd .yui-gc:not(.grid) > .yui-u .node-actions .action-set a:hover {
+    background-color: #fafafa;
+    color: red;
+}
+#bd .yui-gc:not(.grid) > .yui-u .node-actions .action-set a {
+    border: medium none;
+    color: #1c55da;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u .node-actions .doclist .action-set div {
+   padding: 3px 20px;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u .node-actions .doclist .action-set {
+    padding-bottom: 10px;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u > div:last-child {
+   border-bottom: none;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u .yui-dt  .document-details-panel .panel-body {
+   padding: 10px 0 10px 15px;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u .document-details-panel .panel-body {
+   padding: 0 15px 10px 25px;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u .document-details-panel .form-container .form-fields {
+   padding: 0 0 0 25px;
+   overflow: hidden;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u .document-details-panel > h2 {
+   text-transform: uppercase;
+   font-size: 14px;
+   font-weight: bold;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u .document-details-panel > h2 .alfresco-twister-actions {
+   text-transform: none;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u .document-details-panel > h2,
+#bd .yui-gc:not(.grid) > .yui-u .document-details-panel .panel-body h3.alfresco-twister.alfresco-twister-open {
+   margin-bottom: 10px;
+   margin-top: 0;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u .document-details-panel.document-versions-comparison {
+   padding: 10px;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u .document-details-panel.document-versions-comparison .panel-body {
+   padding: 0;
+}
+
+#bd .yui-gc:not(.grid) .yui-dt table {
+   margin: 0;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u .document-details-panel .yui-dt  .form-container .form-fields {
+   padding: 0;
+}
+
+.form-field .table-children {
+    margin-top: 5px;
+}
+
+#bd .yui-gc:not(.grid) > .yui-u .document-details-panel .dynamic-table,
+.form-field .table-children .dynamic-table {
+   margin-bottom: 15px;
+}
+
+/* ENT CONTENT */
+
+
+/* CONTROLS */
+
+.yui-skin-citeckTheme #bd .div-filter .yuimenu {
+  box-shadow: none;
+}
+
+
+.yui-skin-citeckTheme .items-list li,
+.yui-skin-citeckTheme #bd .div-filter .yuimenu .bd .yuimenuitem {
+   padding: 7px 10px 7px 40px;
+   color: #1c55da;
+   font-size: 100%;
+   border-bottom: 1px solid #ccc;
+   cursor: pointer;
+   background-color: #fdfaf3;
+}
+
+.yui-skin-citeckTheme #bd .div-filter .yuimenu .bd .yuimenuitem .yuimenuitemlabel {
+   cursor: pointer;
+}
+
+.yui-skin-citeckTheme .items-list li, .yui-skin-citeckTheme #bd .div-filter .yuimenu .bd .yuimenuitem.yuimenuitem-selected {
+   background-color: transparent;
+}
+
+.yui-skin-citeckTheme #bd .div-filter .yuimenu .yuimenuitem .yuimenuitemlabel {
+   padding: 0;
+   border-bottom: none;
+}
+
+.alfresco-share .items-list li.selected,
+.alfresco-share .items-list li.selected:hover,
+.yui-skin-citeckTheme #bd .div-filter .yuimenu .bd .yuimenuitem-selected {
+   color: #333;
+   font-weight: normal;
+}
+
+.yui-skin-citeckTheme #bd .div-filter .yuimenu .bd {
+   padding: 0;
+   box-shadow: none;
+}
+
+.alfresco-share .items-list li:hover,
+.yui-skin-citeckTheme .div-filter .yuimenuitem.yuimenuitem-selected {
+   color: red !important;
+   background-color: transparent;
+}
+
+.yui-skin-citeckTheme #bd .div-filter .yuimenu .bd .yuimenuitem.filter-selected,
+.yui-skin-citeckTheme #bd .div-filter .yuimenu .bd .yuimenuitem.filter-selected:hover {
+    background-color: #eee;
+    border-bottom: 1px solid #eee;
+}
+
+.yui-skin-citeckTheme #bd .div-filter .yuimenu .bd .yuimenuitem.filter-selected a,
+.yui-skin-citeckTheme #bd .div-filter .yuimenu .bd .yuimenuitem.filter-selected:hover a {
+   cursor: default;
+    color: #333;
+}
+
+.alfresco-share .toolbar > h2 {
+   padding: 10px 10px 10px 40px;
+   font-size: 100%;
+   font-weight: bold;
+   margin-left: 0;
+   text-transform: uppercase;
+   color: #333;
+}
+
+.yui-skin-citeckTheme .div-filter .yuimenuitem .yuimenuitemlabel {
+    padding: 0;
+}
+
+.yui-skin-citeckTheme .div-filter .bd {
+   box-shadow: none;
+}
+
+/* share-form */
+
+.form-container .form-field, .form-fields .form-field {
+   margin: 0 10px 10px 0;
+}
+
+.document-details-panel .form-container .form-fields {
+   padding: 15px;
+   margin: 0;
+}
+
+
+/* END CONTROLS */
+
+
+/* Journal */
+
+#bd #alfresco-journals {
+   border-top: none;
+}
+
+.filter-criteria .criterion .criterion-predicate select,
+.filter-criteria-table .criterion .criterion-predicate select {
+  background-color: white;
+}
+
+.filter-criteria .criterion .criterion-value .criterion-value-field-input button,
+.filter-criteria-table .criterion .criterion-value .criterion-value-field-input button {
+  padding: 2px 10px;
+  font-weight: 900;
+  background-color: white;
+  border: 2px solid #1c55da;
+  color: #1c55da;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.filter-criteria .criterion .criterion-value .criterion-value-field-input button:hover,
+.filter-criteria .criterion .criterion-value .criterion-value-field-input button:focus,
+.filter-criteria-table .criterion .criterion-value .criterion-value-field-input button:hover,
+.filter-criteria-table .criterion .criterion-value .criterion-value-field-input button:focus {
+  color: white;
+  background-color: #1c55da;
+}
+
+.filter-criteria .criterion .criterion-value .criterion-value-field-input button:disabled,
+.filter-criteria-table .criterion .criterion-value .criterion-value-field-input button:disabled {
+  color: #ccc;
+  border-color: #ccc;
+  background-color: white;
+  cursor: default;
+}
+
+
+#alfresco-journals .toolbar.icon-buttons .yui-button.sidebar-toggle {
+  display: none;
+}
+
+#alfresco-journals .toolbar.icon-buttons .yui-button.sidebar-toggle span.first-child button {
+  background-image: none;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+}
+
+#alfresco-journals .toolbar.icon-buttons .yui-button.sidebar-toggle span.first-child button:before {
+  font-family: FontAwesome;
+  font-size: 20px;
+  content: "\f0c9";
+}
+
+
+.yui-skin-citeckTheme .journal-container {
+    height: 385px;
+}
+
+.yui-skin-citeckTheme .journal-container .journal {
+    height: calc(100% - 31px);
+}
+
+.yui-skin-citeckTheme .journal-pagination {
+    border-top: none;
+}
+
+.yui-skin-citeckTheme .journal-picker-page-container .full .filter-page,
+.yui-skin-citeckTheme .journal-picker-page-container .create-page {
+  height: 385px;
+  overflow: auto;
+}
+
+/*  end journal */
+
+
+/* card-details */
+
+#bd .document-details-panel,
+#bd .document-details-panel .panel-body {
+   padding: 0;
+   border: none;
+}
+
+#bd .document-details-panel .panel-body.doc-uploader {
+  background-color: white;
+}
+
+#bd .document-details-panel.document-status .panel-body {
+  color: #47b815;
+}
+
+/* end card-details */
+
+
+.yui-skin-citeckTheme .alfresco-twister {
+    padding-left: 25px !important;
+    color: #52759d;
+}
+
+
+.clear {
+    height: 0;
+}
+
+.form-container .viewmode-value {
+   font-weight: 900;
+}
+
+.share-form .viewmode-field {
+   margin: 0;
+}
+
+
+/* share-form */
+
+.share-form {
+  padding: 13px 15px;
+  background: #f0f0f0;
+}
+
+[id*="profile"].share-form,
+#bd > .share-form {
+  padding-left: 27px;
+}
+
+.share-form .form-container {
+   border: none;
+}
+
+.share-form .form-container .caption {
+    left: 855px;
+    width: auto;
+}
+
+@media (min-width: 1010px) {
+   .share-form .form-container .caption {
+     position: absolute;
+     text-align: left;
+   }
+}
+
+.share-form .form-container .form-fields {
+   padding: 0 1em !important;
+   border-bottom: none;
+}
+
+.static .ecos-form .form-fields .ecos-case-form-section,
+.share-form .form-container .form-fields > .set {
+    border: 1px solid #ccc;
+    background-color: #fff;
+    padding: 20px;
+    position: relative;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.15);
+    border-radius: 8px;
+}
+
+.static .ecos-form .form-fields .ecos-case-form-section {
+    margin-left: 40px;
+}
+
+.share-form .form-container .form-fields .set .set-title {
+    margin: 0;
+    font-weight: 600;
+    color: #666;
+    background: #fff6d9;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+}
+
+.share-form .form-container .form-fields .set:not(:first-child) .set-title {
+   /*margin-top: 30px;*/
+}
+
+
+.share-form .form-container .form-fields .set-title {
+  font-size: 18px;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+  margin-top: 15px;
+  border: none;
+}
+
+.yui-skin-citeckTheme .form-container .form-fields .set-title.bold {
+  font-weight: 900;
+}
+
+.yui-skin-citeckTheme .form-container .form-fields .set-title.upcase {
+  text-transform: uppercase;
+}
+
+.share-form .form-container .form-fields .set-title:empty {
+   display: none;
+}
+
+.share-form .form-container .form-fields .form-field > label {
+   float: left;
+   padding: 0;
+   line-height: 100%;
+   margin: 8px 0 0 0;
+   position: relative;
+   max-width: 40%;
+}
+
+.share-form .form-container .form-fields .form-field label.checkbox {
+   max-width: none;
+}
+
+/* search field on forms */
+
+.share-form .form-container .form-fields .form-field.search-field > label {
+   margin: 0 0 10px 0;
+   max-width: none;
+}
+
+.share-form .form-container .form-fields .form-field.search-field > input[type="text"] {
+   width: 75%;
+   clear: both;
+}
+
+.share-form .form-container .form-fields .form-field.search-field > span.yui-menu-button {
+   float: left;
+}
+
+/* end search field */
+
+.share-form .form-container .form-fields .form-field > a {
+  float: right;
+  right: 20.5%;
+  top: 5px;
+  position: relative;
+}
+
+.share-form div[id*="start"] .form-container .form-fields .form-field > input[class*="date-entry"] + a {
+    right: 0;
+}
+
+.share-form .form-container .form-fields .form-field > .format-info {
+  float: right;
+  clear: both;
+  right: 43.5%;
+  position: relative;
+  line-height: 100%;
+}
+
+.share-form div[id*="start"] .form-container .form-fields .form-field > div[class*="datepicker"] + div[class*="format-info"] {
+    right: 41.5%;
+}
+
+.share-form .form-container .form-fields > .form-field:not(.alf-textarea) > label > span.mandatory-indicator {
+  top: 2px;
+  left: -17px;
+  position: absolute;
+  color: #008c03;
+}
+
+.share-form .form-container .form-fields .form-field label.checkbox,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel form.bd .form-fields .form-field label.checkbox {
+   margin: 0;
+   clear: none;
+   float: left;
+}
+
+.share-form .form-container .form-fields .form-field select,
+.share-form .form-container .form-fields .form-field input[type="text"],
+.share-form .form-container .form-fields .form-field.alf-textarea textarea,
+#bd #yui-main .search .forms-container .share-form .form-container .form-fields .set > input.terms,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .form-field.alf-textarea textarea,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .form-field input[type="text"],
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .form-field select {
+   background-color: white;
+   padding: 5px;
+   border: 1px solid #CCC;
+   box-shadow: none;
+   border-radius: 6px;
+   box-sizing: border-box;
+}
+
+.yui-skin-citeckTheme .select-picker-box a.select-picker-link {
+    border-radius: 6px;
+}
+
+
+.share-form .form-container .form-fields .form-field select {
+  padding: 4px 5px;
+}
+
+.share-form .form-container .form-fields .form-field input[type="text"].number,
+.share-form .form-container .form-fields .form-field input[type="text"].auto-manual-input,
+.share-form .form-container .form-fields .form-field input[type="text"].date-entry {
+   position: relative;
+   right: 40%;
+   width: 15%;
+}
+
+.share-form div[id*="start"] .form-container .form-fields .form-field input[type="text"].date-entry {
+    right: 35%;
+}
+
+.share-form .form-container .form-fields .form-field input[type="text"].auto-manual-input {
+  margin: 0;
+}
+
+.share-form .form-container .form-fields .form-field input[type="text"].time-entry {
+  right: 15%;
+  width: 15%;
+}
+
+.share-form .form-container .form-fields .form-field input[type="text"].time-entry + div.format-info {
+  right: 20%;
+  width: 40%;
+}
+
+.share-form .form-container .form-fields .form-field input[type="text"].time-entry + div.format-info > span.date-format {
+  margin-right: 13%;
+  margin-left: 22%;
+}
+
+.share-form .form-container .form-fields .form-field input[type="checkbox"] {
+   margin-right: 10px;
+   float: left;
+   width: auto;
+}
+
+.share-form .form-container .form-fields .form-field span.help-icon {
+  position: relative;
+  right: 21.5%;
+  display: inline-block;
+  top: 3px;
+  float: right;
+  margin: 0;
+}
+
+.share-form .form-container .form-fields .form-field input[type="text"]:not(.number) + span.help-icon {
+  right: 5px;
+}
+
+.form-fields .form-field span.help-icon > img {
+   cursor: pointer;
+}
+
+.form-fields .form-field div.help-text {
+   font-size: 10px;
+  text-align: left;
+  border: none;
+  background-color: transparent;
+  margin: 0;
+  padding: 0;
+}
+
+.share-form .form-container .form-fields .form-field div.help-text {
+  width: 35%;
+  float: right;
+  right: -17%;
+  position: relative;
+  line-height: 135%;
+}
+
+.share-form .form-container .form-fields .form-field input[type="text"]:not(.number) + span.help-icon + div.help-text {
+  width: 55%;
+  right: 0;
+  margin-top: 5px;
+}
+
+.share-form .form-container .form-fields .form-field div.auto-manual-select {
+  display: inline-block;
+  float: right;
+  margin: 8px 0 0 0;
+  line-height: 100%;
+}
+
+.share-form .form-container .form-fields .form-field div.object-finder {
+   text-align: left;
+   margin: 0;
+}
+
+.share-form .form-container .form-fields .form-field div.object-finder.inlineable {
+  padding: 0;
+}
+
+.share-form .form-container .form-fields .form-field div.object-finder.inlineable .object-finder-items {
+  width: 75%;
+  padding: 0;
+  float: left;
+}
+
+.share-form .form-container .form-fields .form-field div.object-finder.inlineable .object-finder-items .itemtype-tag {
+  padding: 3px 7px;
+  background-color: #e8f3ff;
+  border-radius: 5px;
+  color: white;
+  margin: 0 5px 5px 0;
+  font-weight: normal;
+}
+
+.share-form .form-container .form-fields .form-field div.object-finder.inlineable div.show-picker {
+  clear: none;
+  padding: 0;
+}
+
+.share-form .form-container .form-fields .form-field div.object-finder.inlineable div.show-picker .yui-button {
+   margin: 0;
+}
+
+.share-form .form-container .form-fields .form-field div.object-finder,
+.share-form .form-container .form-fields .form-field div.object-finder > div {
+   display: inline-block;
+}
+
+.share-form .form-container .form-fields .form-field div[id$="packageItems-cntrl"].object-finder {
+  width: 100%;
+  display: block;
+  margin-top: 10px;
+}
+
+.share-form .form-container .form-fields .form-field div[id$="packageItems-cntrl"].object-finder .object-finder-list {
+  margin-bottom: 10px;
+  border-radius: 6px;
+}
+
+.share-form .form-container .form-fields .form-field div.object-finder > div.dynamic-list .ygtvcontent {
+   padding-right: 30px;
+}
+
+.share-form .form-container .form-fields .form-field div.object-finder > div.dynamic-list .item-buttons button.itemUnselect {
+   cursor: pointer;
+   background-image: url(images/remove.png);
+   background-repeat: no-repeat;
+}
+
+.share-form .form-container .form-fields .form-field div.object-finder > div.dynamic-list .item-buttons button.itemUnselect:hover {
+   cursor: pointer;
+   background-image: url(images/remove-active.png);
+}
+
+.share-form .form-container .form-fields .form-field div.object-finder div.show-picker {
+   float: right;
+}
+
+/* the width of text fields, selects and blocks */
+.share-form .form-container .form-fields .form-field div.object-finder,
+.share-form .form-container .form-fields .form-field select,
+.share-form .form-container .form-fields .form-field input,
+#bd #yui-main .search .forms-container .share-form .form-container .form-fields .set > input.terms {
+   width: 55%;
+   float: right;
+   font-weight: 900;
+   clear: none;
+}
+
+.share-form .form-container .form-fields .form-field.select-control select {
+  width: 55% !important;
+}
+
+.share-form .form-container .form-fields .form-field.search-field table,
+.share-form  .form-container .form-field.select-control div.error {
+  clear: both;
+}
+
+
+.share-form .form-container .form-fields .form-field .table-children {
+  padding-top: 1em;
+  display: block;
+  clear: both;
+}
+
+.share-form .form-container .form-fields .form-field .table-children .show-picker .yui-button button {
+   border: none;
+  line-height: 100%;
+  padding: 5px;
+}
+
+.share-form .form-container .form-fields .form-field .table-children .show-picker .yui-button.yui-button-hover button {
+   background-color: transparent;
+}
+
+.share-form .form-container .form-fields .form-field .table-children .dynamic-table {
+  margin: 0;
+}
+
+
+.share-form .form-container .form-fields .form-field.alf-textarea textarea {
+  margin-top: 10px;
+  box-shadow: none;
+  padding: 5px;
+}
+
+.share-form .form-container .form-fields .form-field.alf-textarea label  {
+   margin: 0;
+}
+
+.share-form .form-container .form-fields .form-field .yui-button.yui-menu-button > span.first-child > button {
+  margin-top: 5px;
+  margin-left: 10px;
+}
+
+.share-form .form-container .form-buttons {
+   margin: 0;
+   padding-top: 0;
+}
+
+
+/* .share-form .form-container .form-fields .form-field */
+.share-form .form-container .form-fields .yui-u .form-field {
+   position: relative;
+   padding-bottom: 0;
+   margin-bottom: 0;
+   border: none;
+}
+
+.share-form .form-container .form-fields .yui-u .form-field .error {
+  margin-top: 6px;
+  float: left;
+  padding: 0;
+}
+
+/* reset blocks and controls */
+.share-form .form-container .form-fields .yui-u .form-field > label,
+.yui-skin-citeckTheme .share-form .form-container .form-fields .yui-u .form-field > label:not([for*="workflowDueDate-cntrl-date"]),
+.share-form .form-container .form-fields .yui-u .form-field > select,
+.share-form .form-container .form-fields .yui-u .form-field > input[type="text"]:not(.date-entry),
+.share-form .form-container .form-fields .yui-u .form-field > .format-info,
+.share-form .form-container .form-fields .yui-u .form-field > .object-finder,
+.share-form .form-container .form-fields .yui-u .form-field > .object-finder .show-picker,
+.share-form .form-container .form-fields .yui-u .form-field > .object-finder .dynamic-list,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > label,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > select,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > input[type="text"]:not(.date-entry),
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > input[type="text"]:not(.time-entry),
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > .format-info,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > .object-finder,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > .object-finder .show-picker,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > .object-finder .dynamic-list {
+   float: none;
+   position: initial;
+   display: block;
+   max-width: none;
+   clear: both;
+   width: 100% !important;
+}
+
+.yui-skin-citeckTheme .share-form .form-container .form-fields div[id*="workflowDueDate"] .yui-u .form-field > label[for*="workflowDueDate-cntrl-date"] {
+    margin-top: 7px;
+}
+
+.share-form .form-container .form-fields .yui-u .form-field div.auto-manual-select {
+  float: none;
+  margin-top: 10px;
+}
+
+.share-form .form-container .form-fields .form-field,
+.share-form .form-container .form-fields .yui-g,
+.share-form .form-container .form-fields .yui-gb,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .form-field,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-g,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-gb {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+  margin-right: 0;
+}
+
+.share-form .form-container .form-fields .form-field:last-child,
+.share-form .form-container .form-fields .yui-g:last-child,
+.share-form .form-container .form-fields .yui-gb:last-child,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .form-field:last-child,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-g:last-child,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-gb:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.share-form .form-container .form-fields .form-field .yui-g,
+.share-form .form-container .form-fields .yui-g .form-field {
+  clear: both;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.share-form .form-container .form-fields .yui-u .form-field:not(:last-child) {
+  margin-bottom: 15px;
+}
+
+.yui-skin-citeckTheme .yui-panel-container .yui-panel form.bd .form-fields .yui-g .yui-u .form-field {
+  margin: 0;
+  padding: 0;
+  border: none;
+  position: relative;
+}
+
+.share-form .form-container .form-fields .yui-g .yui-u .form-field input[type="text"],
+.yui-skin-citeckTheme .share-form .form-container .form-fields div[id*="workflowDueDate"] .yui-g .yui-u .form-field input[type="text"]:not(.date-entry, .time-entry),
+.share-form .form-container .form-fields .yui-g .yui-u .form-field input[type="file"] {
+  width: 100%;
+  float: none;
+}
+
+.share-form .form-container .form-fields .set .form-field > .object-finder .dynamic-doclib-table {
+  width: 97%;
+  margin: auto;
+}
+
+.share-form .form-container .form-fields .set .form-field > .object-finder .show-picker .yui-button {
+   margin-right: 10px;
+}
+
+.share-form .form-container .form-fields .form-field > .object-finder > div.object-finder-items:empty,
+.share-form .form-container .form-fields .yui-u .form-field > .object-finder > div.object-finder-items:empty,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .form-field > .object-finder > div.object-finder-items:empty,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > .object-finder > div.object-finder-items:empty {
+   display: none;
+}
+
+.share-form .form-container .form-fields .set .form-field > .object-finder > div.object-finder-items,
+.share-form .form-container .form-fields .set .form-field > .object-finder > .object-finder-list,
+.share-form .form-container .form-fields .yui-u .form-field > .object-finder > div.object-finder-items,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .set .form-field > .object-finder > div.object-finder-items,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .set .form-field > .object-finder > .object-finder-list,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > .object-finder > div.object-finder-items {
+   display: block;
+}
+
+.form-element-border {
+  border: 1px solid #ccc;
+}
+
+.share-form .form-container .form-fields .yui-u .form-field > .object-finder > div.object-finder-items {
+   margin-bottom: 10px;
+}
+
+.share-form .form-container .form-fields .yui-u .form-field > label,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > label {
+   margin: 0;
+   padding-bottom: 10px;
+}
+
+.yui-skin-citeckTheme .share-form .form-container div[id*="workflowDueDate"] .yui-g .yui-u.first,
+.share-form .form-container .form-fields .yui-u .form-field > input[type="text"].number,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > input[type="text"].number {
+  position: initial;
+  width: 100%;
+}
+
+.yui-skin-citeckTheme .share-form .form-container div[id*="workflowDueDate"] .yui-g .yui-u.first .form-field .format-info {
+    width: 49.5%;
+    right: 0.5%;
+}
+
+.yui-skin-citeckTheme .share-form .form-container div[id*="workflowDueDate"] .yui-g .yui-u.first .form-field .format-info .time-format {
+    margin-left: 32%;
+}
+
+.share-form .form-container .form-fields .yui-u .form-field > input[type="text"].date-entry:not([id*="workflowDueDate-cntrl"]),
+.share-form .form-container .form-fields .yui-u .form-field > input[type="text"].time-entry:not([id*="workflowDueDate-cntrl"]),
+.share-form .form-container .form-fields .form-field .yui-u input[type="text"].date-entry,
+.share-form .form-container .form-fields .form-field .yui-u input[type="text"].time-entry,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > input[type="text"].date-entry,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > input[type="text"].time-entry {
+   float: left;
+   position: initial;
+   clear: none;
+}
+
+.share-form .form-container .form-fields .yui-u .form-field > input[type="text"].date-entry,
+.share-form .form-container .form-fields .yui-u .form-field > input[type="text"].time-entry,
+.share-form .form-container .form-fields .form-field .yui-u input[type="text"].date-entry,
+.share-form .form-container .form-fields .form-field .yui-u input[type="text"].time-entry,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > input[type="text"].date-entry,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > input[type="text"].time-entry {
+   width: 100px !important;
+}
+
+.share-form .form-container .form-fields .form-field .yui-u .format-info {
+  clear: both;
+}
+
+.share-form .form-container .form-fields .yui-u .form-field > input[type="text"].time-entry,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > input[type="text"].time-entry {
+   margin-left: 35px;
+}
+
+.share-form .form-container .form-fields .yui-u .form-field input[type="text"].time-entry + div.format-info > span.date-format,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field input[type="text"].time-entry + div.format-info > span.date-format {
+  margin: 0;
+}
+
+.share-form .form-container .form-fields .yui-u .form-field input[type="text"].time-entry + div.format-info,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field input[type="text"].time-entry + div.format-info {
+   width: 100%;
+}
+
+.share-form .form-container .form-fields .yui-u .form-field > .format-info > span.time-format,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > .format-info > span.time-format {
+  margin-left: 75px;
+}
+
+.share-form .form-container .form-fields .yui-u .form-field > .format-info > span.date-format,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > .format-info > span.date-format {
+  margin-left: 20px;
+}
+
+.share-form .form-container .form-fields .yui-u .form-field > a:not([id*="workflowDueDate-cntrl-icon"]),
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > a {
+    float: left;
+    margin: 5px 0 0 5px;
+    position: initial;
+}
+
+.yui-skin-citeckTheme .share-form .form-container .form-fields div[id*="workflowDueDate"] .yui-u .form-field > a[id*="workflowDueDate-cntrl-icon"] {
+    right: 24%;
+}
+
+.share-form .form-container .form-fields .yui-u .form-field > span.help-icon,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > span.help-icon {
+  position: absolute;
+  top: -5px;
+  right: 0;
+  margin: 0;
+}
+
+.share-form .form-container .form-fields .form-field.alf-textarea span.help-icon {
+  right: 0;
+  top: 0;
+}
+
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .form-field .yui-button + span.help-icon {
+  display: none;
+}
+
+.share-form .form-container .form-fields .yui-u .form-field div.help-text,
+.share-form .form-container .form-fields .form-field.alf-textarea div.help-text,
+.yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field div.help-text {
+  float: none;
+  position: initial;
+  clear: both;
+  padding-top: 10px;
+  width: 100%;
+}
+
+.share-form .form-container .form-fields .form-field.alf-textarea div.help-text {
+  text-align: right;
+}
+
+.share-form .form-container .form-fields .form-field > select + span.help-icon {
+  display: none;
+}
+
+/*.share-form .form-container .form-buttons {
+   text-align: right;
+   width: 800px;
+}*/
+
+
+/*.share-form .form-container .form-fields .set .yui-g .yui-u .form-field > input.date-entry {
+   right: 33.5%;
+}
+
+.share-form .form-container .form-fields .set .yui-g .yui-u .form-field > a  {
+   right: 12%;
+}
+
+.share-form .form-container .form-fields .set .yui-g .yui-u .form-field > input.time-entry {
+     width: 15%;
+  margin-right: 0;
+  right: 0;
+  position: absolute;
+}
+*/
+
+/* workflow form */
+
+.share-form .workflow-form .form-fields .set {
+   padding: 0;
+}
+
+.share-form .workflow-form .form-fields .form-field,
+.share-form .workflow-form .form-fields .yui-gb,
+.share-form .workflow-form .form-fields .yui-g {
+   padding-bottom: 15px;
+   margin-bottom: 15px;
+}
+
+.share-form .workflow-form .form-fields .form-field .viewmode-field {
+   margin-bottom: 0;
+}
+
+.share-form .workflow-details-header h1 {
+   padding-left: 12px;
+   margin-bottom: 5px;
+}
+
+.share-form .workflow-form .workflow-summary-buttons {
+   margin-bottom: 15px;
+   margin-top: -2.25em;
+}
+
+.share-form .workflow-details-actions .yui-button .first-child {
+   padding: 0;
+   background-image: none;
+}
+
+/* end workflow form */
+
+
+/* advansed search */
+
+#bd #yui-main .search {
+   width: 800px;
+}
+
+#bd #yui-main .search .forms-container .share-form .form-container .form-fields,
+#bd #yui-main .search .yui-gc {
+   width: auto;
+}
+
+#bd #yui-main .search,
+#bd #yui-main .search > div,
+#bd #yui-main .search .forms-container .share-form .form-container .form-fields .set {
+   margin: 0;
+   padding: 0;
+}
+
+#bd #yui-main .search .forms-container .share-form {
+   padding: 5px 15px;
+   background-color: transparent;
+}
+
+#bd #yui-main .search .forms-container .share-form .form-container .form-fields {
+   padding: 1em !important;
+   border: 1px solid #ccc;
+   margin-left: 10px;
+   background-color: #f0f0f0;
+}
+
+#bd #yui-main .search .forms-container .share-form .form-container .form-fields .set > input.terms {
+   width: 100%;
+   float: none;
+   margin-top: 10px;
+}
+
+#bd #yui-main .search .forms-container .share-form .form-container .form-fields .form-field {
+   border: none;
+  padding: 0;
+}
+
+#bd #yui-main .search .forms-container .share-form .form-container .form-fields .form-field:last-child,
+#bd #yui-main .search .forms-container .share-form .form-container .form-fields form {
+   margin: 0;
+}
+
+#bd #yui-main .search .forms-container .share-form .form-container .form-fields .form-field > div,
+#bd #yui-main .search .forms-container .share-form .form-container .form-fields .form-field .yui-g .yui-u .format-info {
+   clear: both;
+}
+
+#bd #yui-main .search .forms-container .share-form .form-container .form-fields .form-field .yui-g .yui-u input.date-entry {
+  float: left;
+  width: 70%;
+  right: 0;
+}
+
+#bd #yui-main .search .forms-container .share-form .form-container .form-fields .form-field .yui-g .yui-u a > img.datepicker-icon {
+   vertical-align: -10px;
+}
+
+#bd #yui-main .search .forms-container .share-form .form-container .form-fields .form-field .yui-g {
+   padding-top: 5px;
+}
+
+#bd #yui-main .search .yui-gc {
+   margin: 15px 15px 15px 25px !important;
+}
+
+
+#bd #yui-main .search .yui-gc,
+#bd #yui-main .search .yui-gc .yui-u {
+   background-color: transparent;
+   border: none;
+}
+
+#bd #yui-main .search .yui-gc .yui-u span.lookfor {
+   float: left;
+  padding-top: 3px;
+  font-weight: 900;
+}
+
+#bd #yui-main .search .yui-gc .yui-u .yui-button.search-icon > .first-child {
+   padding: 0;
+   background: none;
+}
+
+
+/* end advanced search*/
+
+/* FOOTER */
+
+.sticky-footer .footer {
+   padding: 15px 0;
+   box-shadow: 0px 10px 15px -10px gray inset;
+   border-bottom: none;
+   background-color: #e0e6ec;
+}
+
+.sticky-footer .footer-content {
+  overflow: hidden;
+  padding: 3px 40px;
+  font-size: 10px;
+}
+
+.sticky-footer .footer a.contact-us-link {
+   float: right;
+}
+
+.sticky-footer .footer .description {
+  float: left;
+}
+
+.sticky-footer .footer.modules-info-footer {
+  box-shadow: none;
+}
+
+/* END FOOTER */
+
+
+/* alfresco twister actions */
+
+.alfresco-twister.alfresco-twister-open .alfresco-twister-actions {
+   position: relative;
+   float: right;
+   right: 15px;
+   display: block;
+}
+
+.alfresco-twister.alfresco-twister-open .alfresco-twister-actions > a {
+  padding: 0;
+  background-position: right center;
+  display: inline-block;
+  width: 17px;
+  height: 17px;
+  margin-left: 10px;
+}
+
+.alfresco-twister.alfresco-twister-open .alfresco-twister-actions a[id$="onPanelButtonCreate"] {
+   background-image: url(images/create.png) !important;
+}
+
+.alfresco-twister.alfresco-twister-open .alfresco-twister-actions a[id$="onPanelButtonCreate"]:hover {
+   background-image: url(images/create-active.png) !important;
+}
+
+.alfresco-twister.alfresco-twister-open .alfresco-twister-actions a[id$="onPanelButtonEdit"] {
+   background-image: url(images/edit-properties.png) !important;
+}
+
+.alfresco-twister.alfresco-twister-open .alfresco-twister-actions a[id$="onPanelButtonEdit"]:hover {
+   background-image: url(images/edit-properties-active.png) !important;
+}
+
+.alfresco-twister.alfresco-twister-open .alfresco-twister-actions a[id$="onPanelButtonUpload"],
+.alfresco-twister.alfresco-twister-open .alfresco-twister-actions a[name$="onUploadNewVersionClick"] {
+   background-image: url(images/upload.png) !important;
+}
+
+.alfresco-twister.alfresco-twister-open .alfresco-twister-actions a[id$="onPanelButtonUpload"]:hover,
+.alfresco-twister.alfresco-twister-open .alfresco-twister-actions a[name$="onUploadNewVersionClick"]:hover {
+   background-image: url(images/upload-active.png) !important;
+}
+
+ .alfresco-twister.alfresco-twister-open .alfresco-twister-actions a[id$="onPanelButtonAddRole"] {
+     background-image: url(images/create-document.png) !important;
+ }
+
+ .alfresco-twister.alfresco-twister-open .alfresco-twister-actions a[id$="onPanelButtonAddRole"]:hover {
+     background-image: url(images/create-document-active.png) !important;
+ }
+
+
+.alfresco-header-CurrentUserStatus .status {
+   padding: 5px;
+  border-radius: 10px;
+  border: 1px solid;
+  max-width: 100% !important;
+  margin-bottom: 5px;
+}
+
+div#HEADER_USER_STATUS {
+  margin-top: 7px;
+}
+
+.yui-skin-citeckTheme #share-header {
+   min-height: 40px;
+   margin: 0;
+}
+
+#bd .yui-gc > .yui-u .document-details-panel .panel-body h3:not(:first-child) {
+  margin-top: 10px;
+}
+
+/* comment-list */
+
+.comments-list {
+  padding: 0 15px 0 40px;
+  box-sizing: border-box;
+}
+
+.comments-list .comment-details {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* ALF-FILTERS */
+
+#alf-filters {
+  background-color: #fdfaf3;
+  min-height: 83vh;
+  box-sizing: border-box;
+}
+
+#alf-filters .filter,
+#alf-filters .filter  li {
+   padding-left: 25px;
+}
+
+#alf-filters .filter .tree,
+#alf-filters .filter .category {
+   padding-left: 23px;
+}
+
+#alf-filters .filter .category .ygtvitem {
+  background-color: transparent;
+}
+
+#alf-filters .filter > h2 {
+   font-weight: 900;
+   text-transform: uppercase;
+   overflow: hidden;
+}
+
+#alf-filters .filter .tree .ygtvitem {
+   background-color: transparent;
+}
+
+#alf-filters .filter .filter-link {
+  white-space: nowrap;
+}
+
+
+
+/* ALFRESCO-REPOSITORY */
+
+#alfresco-repository #alf-filters {
+  padding-left: 15px;
+}
+
+#alfresco-repository .toolbar,
+#alfresco-repository .doclist .doclist-bar,
+#alfresco-repository .doclist .documents {
+   margin: 0;
+}
+
+#alfresco-repository .toolbar .header-bar {
+   padding: 5px 15px 5px 0;
+}
+
+
+#alfresco-repository .toolbar .nav-bar {
+   padding: 5px 0 10px 0   ;
+   border: none;
+}
+
+/* breadcrumbs */
+
+#alfresco-repository .toolbar .nav-bar .breadcrumb {
+  overflow: hidden;
+  padding: 0;
+  margin-top: 5px;
+}
+
+#alfresco-repository .toolbar .nav-bar .breadcrumb .crumb,
+#alfresco-repository .toolbar .nav-bar .breadcrumb .separator {
+   line-height: 100%;
+   margin: 0 15px 0 0;
+   display: inline-block;
+   padding: 0;
+}
+
+#alfresco-repository .toolbar .nav-bar .breadcrumb .separator {
+   margin-top: 2px;
+}
+
+#alfresco-repository .toolbar .nav-bar .breadcrumb .crumb a.icon {
+   border: none;
+   background-image: url(images/small-repo-folder.png);
+   display: inline-block;
+   margin: 0;
+   padding: 0 0 0 12px;
+   background-position: left 2px;
+}
+
+#alfresco-repository .toolbar .nav-bar .breadcrumb .crumb:hover a.icon {
+   background-image: url(images/small-repo-folder-active.png);
+}
+
+#alfresco-repository .toolbar .nav-bar .breadcrumb .crumb a.folder {
+   margin: 0;
+}
+
+#alfresco-repository .toolbar .nav-bar .breadcrumb .crumb:hover a.folder {
+   color: red;
+}
+
+/* end breadcrumbs */
+
+/*  folder up */
+#alfresco-repository .toolbar .folder-up .yui-button span.first-child {
+   min-height: none;
+   background: none;
+   padding: 0;
+}
+
+#alfresco-repository .toolbar .folder-up .yui-button span.first-child button {
+   background-image: url(images/up.png);
+   background-repeat: no-repeat;
+   background-position: center;
+
+   height: 15px;
+   width: 17px;
+   padding: 0;
+}
+
+#alfresco-repository .toolbar .folder-up .yui-button.yui-button-hover span.first-child button {
+   background-image: url(images/up-active.png);
+}
+
+
+#alfresco-repository .toolbar .nav-bar .separator {
+   display: none;
+}
+
+/* end folder up */
+
+/* doclist */
+
+#alfresco-repository .doclist tr.yui-dt-rec {
+   border-bottom: 1px solid #ccc;
+   border-top: 1px solid #ccc;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td {
+  padding: 10px 0;
+  vertical-align: middle;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions,
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .yui-dt-liner {
+  width: auto !important;
+}
+
+#alfresco-repository .doclist td.yui-dt-last .yui-dt-liner {
+  padding: 4px 10px;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-nodeRef .yui-dt-liner {
+   text-align: center;
+}
+
+/* checkbox */
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-nodeRef .yui-dt-liner input[type="checkbox"] {
+  background-color: transparent;
+  border: none;
+  width: 18px;
+  height: 18px;
+
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -o-appearance: none;
+
+  background-image: url(images/checkbox.png);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-nodeRef .yui-dt-liner input[type="checkbox"]:checked {
+  border-color: #777;
+  background-image: url(images/checkbox-checked.png);
+}
+
+/* rename action */
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-fileName span.insitu-edit {
+   background-image: url(images/edit.png);
+   background-size: 15px;
+   height: 15px;
+   margin-top: 6px;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-fileName span.insitu-edit:hover {
+   background-image: url(images/edit-active.png);
+}
+
+
+/* actions */
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions {
+   border: none;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set .highlighted {
+   background-color: transparent;
+   border: none;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set > div {
+  margin-left: 5px;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set a {
+   padding: 4px 4px 4px 25px;
+   background-repeat: no-repeat;
+   background-position-y: center;
+   border: none;
+   color: #1c55da;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set {
+   float: right;
+   padding-right: 5px;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set.simple > div:not(.internal-show-more) > a {
+   padding-left: 20px;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set a:hover {
+   background-color: transparent;
+   border: none;
+   color: red;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set .folder-view-details a {
+   background-image: url(images/view-details.png) !important;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set .folder-view-details a:hover {
+   background-image: url(images/view-details-active.png) !important;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set .document-edit-properties a {
+   background-image: url(images/edit-properties.png) !important;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set .document-edit-properties a:hover {
+   background-image: url(images/edit-properties-active.png) !important;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set .document-delete a {
+   background-image: url(images/delete-case.png) !important;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set .document-delete a:hover {
+   background-image: url(images/delete-case-active.png) !important;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set .folder-download a {
+  background-image: url(images/download.png) !important;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set .folder-download a:hover {
+  background-image: url(images/download-active.png) !important;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set .document-copy-to a {
+   background-image: url(images/copy.png) !important
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set .document-copy-to a:hover {
+   background-image: url(images/copy-active.png) !important
+}
+
+/*#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set .custom-manage-permissions a {
+   background-image: url(images/custom-manage-permissions.png) !important
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set .custom-manage-permissions a:hover {
+   background-image: url(images/custom-manage-permissions-active.png) !important
+}*/
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set .internal-show-more a {
+   background-image: url(images/2-level-dark.png) !important;
+   background-position-x: right;
+   color: #333;
+   padding: 4px 15px 4px 4px;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set.detailed .internal-show-more a {
+   background-position-x: 45px;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set .internal-show-more a:hover {
+   background-image: url(images/2-level.png) !important;
+   color: #1c55da;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set.detailed .internal-show-more a.highlighted {
+   color: red;
+   background-image: url(images/2-level-up-red.png) !important;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set .more-actions {
+   padding: 7px;
+   border: none;
+   box-shadow: 0 0 5px 2px gray;
+   width: 175px;
+   margin: 0;
+   right: 25px;
+}
+
+#alfresco-repository .doclist tr.yui-dt-rec td.yui-dt-col-actions .action-set .more-actions a:hover {
+   background-color: #f0f0f0;
+   color: red;
+}
+
+
+#alfresco-repository .doclist .doclist-bar-bottom {
+   padding: 15px 0;
+   border: none;
+}
+
+#alfresco-repository .doclist .doclist-bar .paginator {
+   padding: 0;
+}
+
+
+#alfresco-repository .doclist .alf-table.yui-dt .yui-dt-data td {
+  border-bottom: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  background: none;
+}
+
+/* end doclist */
+
+#alfresco-repository .ygtvtm, #alfresco-repository .ygtvtmh,
+#alfresco-repository .ygtvtmhh, #alfresco-repository .ygtvtp,
+#alfresco-repository .ygtvtph, #alfresco-repository .ygtvtphh,
+#alfresco-repository .ygtvlm, #alfresco-repository .ygtvlmh,
+#alfresco-repository .ygtvlmhh, #alfresco-repository .ygtvlp,
+#alfresco-repository .ygtvlph, #alfresco-repository .ygtvlphh {
+   cursor: pointer;
+}
+
+#alfresco-repository .ygtvcell {
+   background-repeat: no-repeat;
+   background-position: center;
+}
+
+#alfresco-repository .ygtvtm, #alfresco-repository .ygtvlm,
+#alfresco-repository .ygtvtmh, #alfresco-repository .ygtvlmh {
+   background-image: url(images/small-repo-folder-open.png);
+   width: 18px;
+}
+
+#alfresco-repository .ygtvtp, #alfresco-repository .ygtvlp,
+#alfresco-repository .ygtvln, #alfresco-repository .ygtvtn {
+   background-image: url(images/small-repo-folder.png);
+   width: 18px;
+}
+
+#alfresco-repository .ygtvtph, #alfresco-repository .ygtvtphh,
+#alfresco-repository .ygtvlmhh, #alfresco-repository .ygtvlph, #alfresco-repository .ygtvlphh {
+   background-image: url(images/small-repo-folder-active.png);
+   width: 18px;
+}
+
+
+.header-bar .right .yui-button {
+  margin-left: 15px;
+}
+.header-bar .left .yui-button {
+  margin-right: 15px;
+}
+
+#alfresco-repository .toolbar .header-bar .sort-direction .yui-button .first-child,
+#alfresco-repository .toolbar .header-bar .file-upload .yui-button .first-child {
+  background-image: none;
+  padding: 0;
+  min-height: 10px;
+}
+
+#alfresco-repository .toolbar .header-bar .sort-direction .yui-button .first-child button,
+#alfresco-repository .toolbar .header-bar .file-upload .yui-button .first-child button {
+   background-repeat: no-repeat;
+   padding: 0;
+}
+
+/* sort direction button */
+
+#alfresco-repository .toolbar .header-bar .sort-direction {
+   margin-top: 3px;
+   line-height: 100%;
+}
+
+#alfresco-repository .toolbar .header-bar .sort-direction .yui-button .first-child button {
+   background-image: url(images/sort-down.png);
+   background-position: center;
+   height: 11px;
+   width: 14px;
+}
+
+#alfresco-repository .toolbar .header-bar .sort-direction .yui-button.yui-button-hover .first-child button {
+   background-image: url(images/sort-down-active.png);
+}
+
+#alfresco-repository .toolbar .header-bar .sort-direction .yui-button.sort-descending .first-child button {
+   background-image: url(images/sort-up.png);
+}
+
+#alfresco-repository .toolbar .header-bar .sort-direction .yui-button.sort-descending.yui-button-hover .first-child button {
+   background-image: url(images/sort-up-active.png);
+}
+
+/* file-upload */
+
+#alfresco-repository .toolbar .header-bar .file-upload .yui-button.yui-button-hover .first-child button {
+   color: #1c55da;
+}
+
+
+#alfresco-repository .treeview .ygtvlabel,
+#alfresco-repository .treeview .ygtvlabel:link,
+#alfresco-repository .treeview .ygtvlabel:visited,
+#alfresco-repository .category .ygtvlabel,
+#alfresco-repository .category .ygtvlabel:link,
+#alfresco-repository .category .ygtvlabel:visited {
+   color: #1c55da;
+   margin: 0;
+}
+
+#alfresco-repository .treeview .ygtvlabel:hover,
+#alfresco-repository .category .ygtvlabel:hover {
+   color: red;
+}
+
+#alfresco-repository .category .ygtvcontent {
+  padding-left: 3px;
+}
+
+/* END ALFRESCO REPOSITORY */
+
+
+/* ALFRESCO CONSOLE */
+
+#alfresco-console .tool {
+  padding-left: 40px;
+  overflow: hidden;
+}
+
+#alfresco-console .tool h3,
+#alfresco-console .tool h2 {
+  color: #333;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  }
+
+#alfresco-console .tool h2 {
+  background-image: none;
+  text-transform: uppercase;
+}
+
+#alfresco-console .tool h3 {
+  margin-top: 25px;
+}
+
+#alfresco-console .tool .tool-link {
+  white-space: nowrap;
+}
+
+
+#alfresco-console .application {
+  margin: 5px 0 0 0;
+}
+
+#alfresco-console .application .label {
+  padding: 4px 0 0 0;
+  font-weight: normal;
+}
+
+#alfresco-console .application .logo {
+  margin-right: 15px;
+  padding: 5px;
+  margin-bottom: 0;
+  border-color: #ccc;
+}
+
+.yui-skin-citeckTheme #alfresco-console .application .row {
+  height: auto;
+  overflow: auto;
+  padding: 5px 15px;
+}
+
+#alfresco-console .application .row .logonote {
+  padding: 5px 0 0 0;
+  line-height: normal;
+}
+
+#alfresco-console .application .apply {
+  margin: 5px 0 0 145px;
+}
+
+/* END ALFRESCO CONSOLE */
+
+
+/* ORGSTRUCT CONSOLE */
+
+#bd .orgstruct-console {
+    padding: 0;
+    background-color: white;
+}
+
+#bd .orgstruct-console .orgstruct-tree-resizer {
+   background-color: #f5f6f8;
+   padding: 15px 15px 15px 40px;
+}
+
+#bd .orgstruct-console .selected-item-details {
+  padding: 15px 25px 15px 22px;
+}
+
+#bd .orgstruct-console .toolbar {
+  padding: 0;
+  background-color: transparent;
+  min-height: 30px;
+  margin-bottom: 10px;
+}
+
+#bd .orgstruct-console .toolbar .search input.search-input {
+  padding: 5px;
+  border-radius: 10px;
+  margin-right: 5px;
+}
+
+#bd .orgstruct-console .dynamic-tree-list .item-buttons {
+  right: 0;
+  padding-left: 5px;
+}
+
+#bd .orgstruct-console .orgstruct-tree-resizer .ygtv-highlight0 .dynamic-tree-list .item-buttons {
+  background-color: #fdfaf3;
+}
+
+#bd .orgstruct-console .orgstruct-tree-resizer .ygtv-highlight1 .dynamic-tree-list .item-buttons {
+  background-color: #f0f0f0;
+}
+
+
+
+/* END ORGSTRUCT CONSOLE */
+
+/* CUSTOMISE PAGE */
+
+.customise-pages {
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+/* END CUSTOMISE PAGE */
+
+
+#alf-hd h1.sub-title {
+  padding: 15px 40px;
+  border-top: 1px solid #ccc;
+  font-size: 22px;
+  font-weight: normal;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+#alf-content {
+  padding: 15px 25px 0px 25px;
+    background-color: #fff;
+}
+
+/* others */
+[rel="diff_stylesheet"].yui-u > div:not(:first-child) {
+  padding-left: 40px;
+  padding-right: 15px;
+  color: black;
+}
+
+
+/*  customize layout  */
+
+.customise-layout,
+.customise-dashlets {
+  padding: 15px 40px;
+}
+
+.customise-layout .currentLayout > h2,
+.customise-layout .layouts > h2,
+.customise-dashlets .instructions > h2 {
+  font-weight: 900;
+  color: #333;
+}
+
+.customise-layout .currentLayout > h2 > span,
+.customise-layout .layouts .text,
+.customise-dashlets .instructions .text {
+  margin: 5px 0 0 0;
+  width: 35%;
+  display: block;
+  font-weight: normal;
+  font-size: 13px;
+}
+
+/* end customize layout */
+
+
+/*
+#394353 - top menu
+#1c55da - blue button
+#008c03 - green button
+*/
+
+/* chrome hacks */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+   #alf-hd .alfresco-header-Header .dijitMenuBar .dijitMenuItem > span.alf-header-js-wrapper-outer >
+   span.alf-header-js-wrapper-inner > button.alf-header-js-wrapper-button {
+      padding-bottom: 3px;
+   }
+}
+
+/* firefox hacks */
+@-moz-document url-prefix() {
+   #alf-hd .alfresco-header-Header .dijitMenuBar .dijitMenuItem > span.alf-header-js-wrapper-outer >
+   span.alf-header-js-wrapper-inner > button.alf-header-js-wrapper-button {
+      position: relative;
+      top: -1px;
+   }
+}
+
+/* mobile fixes */
+
+.sticky-wrapper h3,
+.yui-overlay h3,
+.comments-list .alfresco-datatable td .yui-dt-liner {
+  overflow: hidden;
+}
+
+
+/* create-site */
+
+.create-site .moderated {
+  padding: 0 !important;
+  margin-top: 5px;
+  margin-left: 17px;
+}
+
+.create-site span.help {
+  display: block;
+  white-space: normal !important;
+  margin-top: 5px;
+}
+
+.create-site .moderated span.help {
+  margin-left: 17px;
+}
+
+.create-site input[type="radio"],
+.create-site input[type="checkbox"] {
+  position: relative;
+  top: 2px;
+}
+
+.create-site label {
+  display: inline-block;
+  margin-top: 3px;
+}
+
+
+/* WORKFLOW RESPONSIVE*/
+
+.document-workflows .workflow img + div {
+  float: left;
+}
+
+@media screen and (min-width: 1230px) {
+  .document-workflows .workflow img + div {
+    max-width: 75%;
+  }
+}
+
+@media screen and (max-width: 1229px) and (min-width: 1080px) {
+  .document-workflows .workflow img + div {
+    max-width: 70%;
+  }
+}
+
+@media screen and (max-width: 1079px) and (min-width: 970px) {
+  .document-workflows .workflow img + div {
+    max-width: 65%;
+  }
+}
+
+@media screen and (max-width: 969) and (min-width: 970px) {
+  .document-workflows .workflow img + div {
+    max-width: 60%;
+  }
+}
+
+@media screen and (max-width: 890px) {
+  .document-workflows .workflow img + div {
+    max-width: 100%;
+  }
+}
+
+/* OBJECT FINDER for view */
+
+.form-container .form-fields .plain .object-finder {
+  margin-bottom: 0;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.form-container .form-fields .plain .object-finder .current-values {
+  margin-bottom: 0;
+}
+
+
+/* ONLY FOR IE */
+
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    /* initiate to static */
+  .share-form .form-container .form-fields .yui-u .form-field > input[type="text"].date-entry,
+  .share-form .form-container .form-fields .yui-u .form-field > input[type="text"].time-entry,
+  .share-form .form-container .form-fields .yui-u .form-field div.help-text,
+  .share-form .form-container .form-fields .yui-u .form-field > label,
+  .share-form .form-container .form-fields .yui-u .form-field > select,
+  .share-form .form-container .form-fields .yui-u .form-field > input[type="text"],
+  .share-form .form-container .form-fields .yui-u .form-field > .format-info,
+  .share-form .form-container .form-fields .yui-u .form-field > .object-finder,
+  .share-form .form-container .form-fields .yui-u .form-field > .object-finder .show-picker,
+  .share-form .form-container .form-fields .yui-u .form-field > .object-finder .dynamic-list,
+  .share-form .form-container .form-fields .yui-u .form-field > a,
+  .share-form .form-container .form-fields .form-field .yui-u input[type="text"].date-entry,
+  .share-form .form-container .form-fields .form-field .yui-u input[type="text"].time-entry,
+  .share-form .form-container .form-fields .form-field.alf-textarea div.help-text,
+  .yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > label,
+  .yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > select,
+  .yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > input[type="text"],
+  .yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > .format-info,
+  .yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > .object-finder,
+  .yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > .object-finder .show-picker,
+  .yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > .object-finder .dynamic-list,
+  .yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > a,
+  .yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > input[type="text"].date-entry,
+  .yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field > input[type="text"].time-entry,
+  .yui-skin-citeckTheme .yui-panel-container .yui-panel .form-fields .yui-u .form-field div.help-text,
+  #alf-hd .alf-header #HEADER_SEARCH_BOX input.alf-search-box-text {
+    position: static;
+  }
+}
+
+
+/* dynamic-tree */
+.yui-skin-citeckTheme .dynamic-tree-picker .dynamic-tree-list .item-buttons {
+  right: -25px;
+}
+
+
+/* tab-template */
+
+.yui-skin-citeckTheme .static .form-template-tabs .form-fields {
+  padding: 0;
+}
+
+.yui-skin-citeckTheme .form-template-tabs .form-buttons {
+  padding-top: 15px !important;
+}
+
+.yui-skin-citeckTheme .static .form-template-tabs .form-fields > .template-tabs {
+    border: none;
+    border-bottom: 1px solid #ccc;
+}
+
+.yui-skin-citeckTheme .invariants-form .template-tabs .tabs-title {
+  padding: 7px 30px 0 30px;
+  background-color: #758faa;
+  color: white;
+}
+
+.yui-skin-citeckTheme .invariants-form .template-tabs .tabs-title span.scroll-tabs {
+    height: 34px;
+    width: 30px;
+    padding: 14px 0 0 0;
+    border: none;
+}
+
+.yui-skin-citeckTheme .invariants-form .template-tabs .tabs-title li.tab-title {
+  border: none;
+  padding: 5px 10px;
+  border: 1px solid #f0f0f0;
+  border-bottom: none;
+  cursor: pointer;
+}
+
+.yui-skin-citeckTheme .invariants-form .template-tabs .tabs-title li.tab-title.selected {
+  background-color: #f0f0f0;
+  color: #333;
+  cursor: default;
+}
+
+.yui-skin-citeckTheme .invariants-form .template-tabs .tabs-title li.tab-title:not(.selected):hover {
+  font-weight: 900;
+  color: white;
+}
+
+.yui-skin-citeckTheme .invariants-form .template-table .template-tabs .tabs-title {
+  padding-bottom: 0 !important;
+}
+
+.yui-skin-citeckTheme .invariants-form .template-table .template-tabs .tabs-title li.tab-title {
+  border-color: white;
+}
+
+.yui-skin-citeckTheme .invariants-form .template-table .template-tabs .tabs-title li.tab-title.selected {
+  background-color: white;
+}
+
+.yui-skin-citeckTheme .invariants-form .template-table .template-tabs .tabs-body {
+  background-color: white;
+}
+
+.yui-skin-citeckTheme .form-template-tabs .template-tabs .tabs-body {
+  padding-bottom: 5px;
+}
+
+
+/* tab-template in view mode */
+
+.yui-skin-citeckTheme .invariants-form.view-form .template-tabs .tabs-body {
+  padding: 15px;
+}
+
+.yui-skin-citeckTheme .invariants-form.view-form .template-tabs .tabs-title li.tab-title.selected {
+  background-color: #fafafa;
+}
+
+/* batch-edit */
+.yui-skin-citeckTheme #batch-edit-div .form-buttons input,
+.yui-skin-citeckTheme .form-buttons.batch-edit-results-form-buttons input.batch-edit-results-button {
+    border: 2px solid #1c55da;
+    background-color: #1c55da;
+    color: #fff;
+}
+.yui-skin-citeckTheme #batch-edit-div .form-buttons {
+    border-top: 1px solid #ccc;
+}
+
+.yui-skin-citeckTheme #batch-edit-div .criterion-value button {
+    border: 2px solid #1c55da;
+    color: #1c55da;
+    background-color: #fff;
+}
+.yui-skin-citeckTheme .orgstruct-console .toolbar.theme-bg-2 {
+  position: static;
+}
+
+.yui-skin-citeckTheme .orgstruct-console .toolbar .toolbar-buttons {
+  position: static;
+  display: inline-block;
+  height: 20px;
+}
+
+/* template table */
+
+.yui-skin-citeckTheme .invariants-form .template-table .template-label {
+  width: 100%;
+}
+
+.yui-skin-citeckTheme .invariants-form .template-table .template-row .template-label {
+  width: 45.5%;
+}
+
+.yui-skin-citeckTheme .invariants-form .template-table .template-half-width .template-label,
+.yui-skin-citeckTheme .invariants-form .template-table .template-third-width .template-label {
+  min-height: 36px;
+}
+
+.yui-skin-citeckTheme .invariants-form .form-field-inline-mode-changer {
+  color: #1c55da;
+}
+
+.yui-skin-citeckTheme .invariants-form .form-field-inline-mode-changer:hover {
+  color: red;
+}
+
+.yui-skin-citeckTheme .yui-button.users-of-group {
+    padding: 5px 10px;
+}
+
+.yui-skin-citeckTheme #bd .yuimenu.users-of-group-menu-button .bd ul li.yuimenuitem-selected {
+    background-color: inherit;
+}
+
+.yui-skin-citeckTheme #bd .yuimenu.users-of-group-menu-button .bd ul li.yuimenuitem-selected .yuimenuitemlabel {
+    color: #1c55da;
+}
+
+.ecos-form .form-fields .form-field .form-region.template-img {
+  margin: 0;
+}
+
+.template-img .img-cover {
+  margin: 0;
+}
+
+/*case status*/
+.yui-skin-citeckTheme .cardlet div[id*="case-status"] div.panel-body {
+    color: #008c03;
+}
+
+/*custom scroll bar*/
+.yui-skin-citeckTheme .nicescroll-rails > div {
+    background-color: #858585 !important;
+}
+
+.yui-skin-citeckTheme.alfresco-share .alfresco-menus-AlfMenuBarPopup__arrow {
+    vertical-align: top;
+}
+
+.yui-skin-citeckTheme.alfresco-share #HEADER_SITE_MENU .alfresco-menus-AlfMenuBarPopup__arrow {
+    font-size: 13px;
+    vertical-align: super;
+}
+
+.yui-skin-citeckTheme .mm-slideout .alfresco-header-Header #HEADER_SITE_MENU {
+    padding-right: 5px;
+}
+
+body:not(.mobile).yui-skin-citeckTheme #bd .site-document-types {
+    padding-left: 15px;
+}
+
+body:not(.mobile).yui-skin-citeckTheme #bd .cardlet > div[id*="SurfRegion"] > div[id*="case-documents"],
+body:not(.mobile).yui-skin-citeckTheme #bd .cardlet #cardlet-remote-case-documents-container {
+    padding-left: 4px;
+}
+
+body:not(.mobile).yui-skin-citeckTheme .sticky-footer .footer {
+    box-shadow: 0 10px 15px -10px grey inset;
+}
+
+body:not(.mobile).yui-skin-citeckTheme .card-details-top-panel {
+    padding-left: 40px;
+}
+
+.yui-skin-citeckTheme .user-calendar .yui-dt tr.yui-dt-even,
+.yui-skin-citeckTheme .user-calendar .yui-dt tr.yui-dt-odd {
+    background-color: transparent;
+}
+
+.mm-wrapper_opening .yui-skin-citeckTheme .mm-menu .mm-listitem_selected > a:not(.mm-btn_next),
+.mm-wrapper_opening .yui-skin-citeckTheme .mm-menu .mm-listitem_selected > span {
+    background-color: #c6d3de;
+}
+
+/* faceted-search page hack */
+body:not(.mobile).yui-skin-citeckTheme > .sticky-wrapper .sticky-footer {
+    display: none;
+}

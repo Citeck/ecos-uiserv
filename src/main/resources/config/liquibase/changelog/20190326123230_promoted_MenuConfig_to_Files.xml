@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!-- todo also rename constraints but that's not that important -->
+    <changeSet id="20190326123230-0" author="mgumerov">
+        <renameTable oldTableName="menu_config" newTableName="files"/>
+        <renameTable oldTableName="menu_config_version" newTableName="file_version"/>
+        <renameColumn tableName="file_version" oldColumnName="menu_config_id" newColumnName="file_id"/>
+        <renameColumn tableName="files" oldColumnName="menu_id" newColumnName="file_id"/>
+        <renameColumn tableName="files" oldColumnName="menu_config_version_id" newColumnName="file_version_id"/>
+        <renameColumn tableName="file_version" oldColumnName="xml" newColumnName="bytes"/>
+    </changeSet>
+
+    <changeSet id="20190326123230-3" author="mgumerov">
+        <addColumn tableName="files">
+            <column name="type" type="varchar(16)">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20190326123230-4" author="mgumerov">
+        <dropIndex tableName="files" indexName="idx_menuconfig_menu_id"/>
+        <createIndex tableName="files" indexName="ux_menuconfig_menu_id"
+                     unique="true">
+            <column name="type"/>
+            <column name="file_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

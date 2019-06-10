@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+   targetNamespace="http://www.citeck.ru/lifecycle/1.0"
+   xmlns:dd="http://www.citeck.ru/lifecycle/1.0"
+   elementFormDefault="qualified" version="0.1">
+
+	<xs:element name="lifecycle">
+		<xs:complexType>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element name="state" type="dd:state" />
+				<xs:element name="transition" type="dd:transition" />
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+    
+	<xs:complexType name="state">
+		<xs:sequence>
+			<xs:element name="id"          type="xs:string" minOccurs="1" maxOccurs="1" />
+			<xs:element name="event"       type="dd:event"  minOccurs="0" maxOccurs="1" />
+			<xs:element name="startAction" type="dd:action" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="endAction"   type="dd:action" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+    
+	<xs:complexType name="transition">
+		<xs:sequence>
+			<xs:element name="fromState" type="xs:string"    minOccurs="1" maxOccurs="1" />
+			<xs:element name="event"     type="dd:event"     minOccurs="1" maxOccurs="1" />
+			<xs:element name="toState"   type="xs:string"    minOccurs="1" maxOccurs="1" />
+			<xs:element name="condition" type="dd:condition" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="action"    type="dd:action"    minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	
+    <xs:complexType name="action">
+        <xs:sequence>
+            <xs:element name="param" type="dd:param" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="type" type="dd:actionType" use="required" />
+    </xs:complexType>
+	
+    <xs:complexType name="condition">
+        <xs:sequence>
+            <xs:element name="param" type="dd:param" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="type" type="dd:conditionType" use="required" />
+    </xs:complexType>
+	
+	<xs:complexType name="event">
+        <xs:sequence>
+            <xs:element name="param" type="dd:param" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+        <xs:attribute name="type" type="dd:eventType" use="required" />
+	</xs:complexType>
+    
+    <xs:simpleType name="actionType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="javascript"/>
+            <xs:enumeration value="documentAttribute"/>
+            <xs:enumeration value="startProcess"/>
+            <xs:enumeration value="sendEmail"/>
+            <xs:enumeration value="processVariable"/>
+            <xs:enumeration value="fail"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="conditionType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="javascript"/>
+            <xs:enumeration value="userInDocument"/>
+            <xs:enumeration value="userInGroup"/>
+            <xs:enumeration value="userHasPermission"/>
+            <xs:enumeration value="processVariable"/>
+            <xs:enumeration value="documentAttribute"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="eventType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="auto"/>
+            <xs:enumeration value="user"/>
+            <xs:enumeration value="timer"/>
+            <xs:enumeration value="processStart"/>
+            <xs:enumeration value="processEnd"/>
+            <xs:enumeration value="signal"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+	<xs:complexType name="param">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="name" type="xs:string" use="required" />
+            </xs:extension>    
+        </xs:simpleContent>
+	</xs:complexType>
+    
+</xs:schema>

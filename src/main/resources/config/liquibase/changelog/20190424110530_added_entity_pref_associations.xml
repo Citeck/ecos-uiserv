@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="20190425150530-1" author="mgumerov">
+        <createTable tableName="journal_pref_associations">
+            <column name="id" type="bigint" autoIncrement="${autoIncrement}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="pref_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <!-- no proper journal config support is tested yet, so we fall back to String ids alone -->
+            <column name="journal_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner" type="varchar(255)"/>
+        </createTable>
+
+        <createIndex tableName="journal_pref_associations" indexName="ux_associations_pref"
+                     unique="true">
+            <column name="pref_id"/>
+        </createIndex>
+        <createIndex tableName="journal_pref_associations" indexName="idx_associations_journal">
+            <column name="journal_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseColumnNames="pref_id"
+                                 baseTableName="journal_pref_associations"
+                                 constraintName="fk_associations_pref"
+                                 referencedColumnNames="id"
+                                 referencedTableName="files"/>
+        <!--addForeignKeyConstraint baseColumnNames="journal_id"
+                                 baseTableName="journal_pref_associations"
+                                 constraintName="fk_associations_journal"
+                                 referencedColumnNames="id"
+                                 referencedTableName="files"/-->
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <!-- Sequential numbering, both to sort changes by historical order, and to prevent forking
+    when concurrently creating next version -->
+    <changeSet id="20190305210720-1" author="mgumerov">
+        <addColumn tableName="menu_config_version">
+            <column name="ordinal" type="bigint"/>
+        </addColumn>
+        <addColumn tableName="menu_config">
+            <column name="latest_ordinal" type="bigint"/>
+        </addColumn>
+
+        <createIndex tableName="menu_config_version" indexName="ux_menu_config_version_menu_config_id_version"
+                     unique="true">
+            <column name="menu_config_id"/>
+            <column name="ordinal"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Since the service is not run in prod env yet, I'll leave manual re-numbering of
+        existing records to fellow developers, if this step fails.
+        Or, they can just wipe their menus from DB.
+        Also, don't forget to set menu_config.latest_ordinal accordingly. -->
+    <changeSet id="20190305210720-2" author="mgumerov">
+        <addNotNullConstraint tableName="menu_config_version" columnName="ordinal"
+            columnDataType="BIGINT"/>
+    </changeSet>
+
+    <!-- Allow nulls to enable "switching off" standard menus rathen than overwriting them -->
+    <changeSet id="20190305210720-3" author="mgumerov">
+        <dropNotNullConstraint tableName="menu_config_version" columnName="xml"
+            columnDataType="longblob"/>
+    </changeSet>
+
+    <!-- Entries with non-null product version are "standard" menus, entries with
+        null product version are custom overrides. Records related to standard menus
+        correspond to either versions installed by this app's updates,
+        or re-application of versions installed by previous updates (when there was a custom
+        menu override and then it was reverted to latest standard menu). -->
+    <changeSet id="20190305210720-4" author="mgumerov">
+        <addColumn tableName="menu_config_version">
+            <column name="product_version" type="bigint"/>
+        </addColumn>
+    </changeSet>
+
+    <!-- Like said above, this flag tells reverts from updates. Actually, since
+        reverting keeps the same product version as some previously installed menu,
+        it can be detected by simply looking for same product version, but this way is
+        simplier. -->
+    <changeSet id="20190305210720-5" author="mgumerov">
+        <addColumn tableName="menu_config_version">
+            <column name="is_revert" type="boolean"/>
+        </addColumn>
+        <addNotNullConstraint tableName="menu_config_version" columnName="is_revert"
+                              columnDataType="boolean"
+                              defaultNullValue="false"/>
+    </changeSet>
+
+</databaseChangeLog>

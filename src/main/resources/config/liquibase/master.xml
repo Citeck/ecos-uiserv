@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20190225055830_added_entity_MenuConfig.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20190225093211_added_entity_Translated.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20190225093212_added_entity_Translation.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20190226062120_added_entity_MenuConfigVersion.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20190225055830_added_entity_constraints_MenuConfig.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20190225093212_added_entity_constraints_Translation.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20190226062120_added_entity_constraints_MenuConfigVersion.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20190227210620_added_entity_constraints_MenuConfig.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20190227210720_added_entity_constraints_Translation.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20190305210720_reverts_in_MenuConfigVersion.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20190326123230_promoted_MenuConfig_to_Files.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20190424110530_added_entity_pref_associations.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20190509163730_added_contentType_to_FileVersion.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20190513103730_added_userTheme.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20190520115930_added_file_metadata.xml" relativeToChangelogFile="false"/>
+    <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
+    <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
+</databaseChangeLog>

@@ -1,0 +1,47 @@
+{
+    "name": "MenuConfigVersion",
+    "fields": [
+        {
+            "fieldName": "xml",
+            "fieldType": "byte[]",
+            "fieldTypeBlobContent": "any",
+            "fieldValidateRules": [
+                "required"
+            ]
+        }
+    ],
+    "relationships": [
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "translated",
+            "otherEntityName": "translated",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "menuConfigVersion"
+        },
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "menuConfig",
+            "otherEntityName": "menuConfig",
+            "otherEntityField": "id",
+            "otherEntityRelationshipName": "menuConfigVersion"
+        },
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "menuConfig",
+            "otherEntityName": "menuConfig",
+            "ownerSide": false,
+            "otherEntityRelationshipName": "menuConfigVersion"
+        }
+    ],
+    "changelogDate": "20190226062120",
+    "entityTableName": "menu_config_version",
+    "dto": "no",
+    "pagination": "no",
+    "service": "no",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "myApp",
+    "applications": "*",
+    "microserviceName": "myApp"
+}

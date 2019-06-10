@@ -1,0 +1,39 @@
+{
+    "name": "Translation",
+    "fields": [
+        {
+            "fieldName": "langTag",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "bundle",
+            "fieldType": "byte[]",
+            "fieldTypeBlobContent": "any",
+            "fieldValidateRules": [
+                "required"
+            ]
+        }
+    ],
+    "relationships": [
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "translated",
+            "otherEntityName": "translated",
+            "otherEntityField": "id",
+            "otherEntityRelationshipName": "translation"
+        }
+    ],
+    "changelogDate": "20190225093212",
+    "entityTableName": "translation",
+    "dto": "no",
+    "pagination": "no",
+    "service": "no",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "myApp",
+    "applications": "*",
+    "microserviceName": "myApp"
+}

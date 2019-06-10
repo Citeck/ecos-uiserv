@@ -1,0 +1,38 @@
+{
+    "name": "MenuConfig",
+    "fields": [
+        {
+            "fieldName": "menuId",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        }
+    ],
+    "relationships": [
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "menuConfigVersion",
+            "otherEntityName": "menuConfigVersion",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "menuConfig"
+        },
+        {
+            "relationshipType": "one-to-many",
+            "relationshipName": "menuConfigVersion",
+            "otherEntityName": "menuConfigVersion",
+            "otherEntityRelationshipName": "menuConfig"
+        }
+    ],
+    "changelogDate": "20190225055830",
+    "entityTableName": "menu_config",
+    "dto": "no",
+    "pagination": "no",
+    "service": "no",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "myApp",
+    "applications": "*",
+    "microserviceName": "myApp"
+}

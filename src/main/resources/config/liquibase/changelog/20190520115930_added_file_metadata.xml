@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="20190520115930-1" author="mgumerov">
+        <createTable tableName="file_meta">
+            <column name="id" type="bigint" autoIncrement="${autoIncrement}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="file_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="key" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="varchar(255)"/>
+        </createTable>
+
+        <createIndex tableName="file_meta" indexName="ux_file_meta_contraint"
+                     unique="true">
+            <column name="file_id"/>
+            <column name="key"/>
+        </createIndex>
+        <createIndex tableName="file_meta" indexName="idx_file_meta_lookup">
+            <column name="key"/>
+            <column name="value"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseColumnNames="file_id"
+                                 baseTableName="file_meta"
+                                 constraintName="fk_file_meta_file"
+                                 referencedColumnNames="id"
+                                 referencedTableName="files"/>
+        <!--addForeignKeyConstraint baseColumnNames="journal_id"
+                                 baseTableName="journal_pref_associations"
+                                 constraintName="fk_associations_journal"
+                                 referencedColumnNames="id"
+                                 referencedTableName="files"/-->
+    </changeSet>
+
+    <changeSet id="20190520115930-2" author="mgumerov">
+        <sql>
+            insert into file_meta(id, file_id, key, value)
+            select nextval('hibernate_sequence'), pref_id, 'lookupKey' as key, concat(owner, '@', journal_id) as value
+            from journal_pref_associations
+        </sql>
+
+        <dropTable tableName="journal_pref_associations"/>
+    </changeSet>
+
+</databaseChangeLog>

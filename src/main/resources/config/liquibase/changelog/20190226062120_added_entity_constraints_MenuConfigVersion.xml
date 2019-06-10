@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <!--
+        Added the constraints for entity MenuConfigVersion.
+    -->
+    <changeSet id="20190226062120-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="translated_id"
+                                 baseTableName="menu_config_version"
+                                 constraintName="fk_menu_config_version_translated_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="translated"/>
+
+        <addForeignKeyConstraint baseColumnNames="menu_config_id"
+                                 baseTableName="menu_config_version"
+                                 constraintName="fk_menu_config_version_menu_config_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="menu_config"/>
+
+    </changeSet>
+</databaseChangeLog>

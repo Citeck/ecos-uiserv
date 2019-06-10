@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="20190513-3" author="mgumerov">
+        <createTable tableName="user_theme">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="theme_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="user_theme" indexName="ux_user_theme_username">
+            <column name="user_name" />
+        </createIndex>
+        <createIndex tableName="user_theme" indexName="ux_user_theme_id">
+            <column name="theme_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20190513-4" author="mgumerov">
+        <validCheckSum>7:f24be62ffb078fd96087b54dd1b7d8bc</validCheckSum>
+        <addColumn tableName="user_theme">
+            <column name="site_id" type="varchar(255)" />
+        </addColumn>
+        <addNotNullConstraint tableName="user_theme" columnName="site_id"
+                              defaultNullValue="*" columnDataType="varchar(255)"/>
+
+        <dropIndex tableName="user_theme" indexName="ux_user_theme_username"/>
+        <createIndex tableName="user_theme" indexName="ux_user_theme_username_site">
+            <column name="user_name" />
+            <column name="site_id" />
+        </createIndex>
+
+        <dropIndex tableName="user_theme" indexName="ux_user_theme_id" />
+    </changeSet>
+
+</databaseChangeLog>

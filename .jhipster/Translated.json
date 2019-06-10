@@ -1,0 +1,29 @@
+{
+    "name": "Translated",
+    "fields": [],
+    "relationships": [
+        {
+            "relationshipType": "one-to-one",
+            "relationshipName": "menuConfigVersion",
+            "otherEntityName": "menuConfigVersion",
+            "ownerSide": false,
+            "otherEntityRelationshipName": "translated"
+        },
+        {
+            "relationshipType": "one-to-many",
+            "relationshipName": "translation",
+            "otherEntityName": "translation",
+            "otherEntityRelationshipName": "translated"
+        }
+    ],
+    "changelogDate": "20190225093211",
+    "entityTableName": "translated",
+    "dto": "no",
+    "pagination": "no",
+    "service": "no",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "myApp",
+    "applications": "*",
+    "microserviceName": "myApp"
+}
