@@ -185,7 +185,7 @@ public class ConfigRecordControllerTest {
             "}";
 
         mockRecordsApi.perform(
-            MockMvcRequestBuilders.delete(TestEntityRecordUtil.URL_RECORDS_DELETE)
+            MockMvcRequestBuilders.post(TestEntityRecordUtil.URL_RECORDS_DELETE)
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(json))
             .andExpect(status().isOk())
