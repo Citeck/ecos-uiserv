@@ -2,6 +2,8 @@ package ru.citeck.ecos.uiserv.service.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileType;
@@ -17,6 +19,8 @@ import java.util.Optional;
  * @author Roman Makarskiy
  */
 public abstract class AbstractBaseEntityService<T> implements BaseEntityService<T> {
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractBaseEntityService.class);
 
     private final Class<T> typeParameterClass;
 
@@ -61,8 +65,7 @@ public abstract class AbstractBaseEntityService<T> implements BaseEntityService<
             return Optional.empty();
         }
         if (found.size() > 1) {
-            throw new RuntimeException(String.format("More than one entity <%s> found by key: %s",
-                typeParameterClass, key));
+            logger.warn(String.format("More than one entity <%s> found by key: %s", typeParameterClass, key));
         }
         return Optional.of(fromJson(found.get(0)));
     }
