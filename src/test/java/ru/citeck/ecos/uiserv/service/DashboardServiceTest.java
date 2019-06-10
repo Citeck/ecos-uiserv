@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.DashboardDTO;
-import ru.citeck.ecos.uiserv.service.dashdoard.DashboardService;
+import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;;
 
 import java.io.IOException;
 import java.util.*;
@@ -29,7 +29,7 @@ public class DashboardServiceTest {
     private List<DashboardDTO> dashboards = new ArrayList<>();
 
     @Autowired
-    private DashboardService dashboardService;
+    private DashboardEntityService dashboardService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -89,7 +89,7 @@ public class DashboardServiceTest {
             "  }\n" +
             "}", JsonNode.class));
 
-        DashboardDTO saved = dashboardService.save(dto);
+        DashboardDTO saved = dashboardService.create(dto);
         DashboardDTO found = dashboardService.getById(id).get();
 
         assertThat(found, is(saved));
@@ -105,7 +105,7 @@ public class DashboardServiceTest {
             "  }\n" +
             "}", JsonNode.class));
 
-        DashboardDTO saved = dashboardService.save(dto);
+        DashboardDTO saved = dashboardService.create(dto);
 
         assertThat(dto.getKey(), is(saved.getKey()));
         assertThat(saved.getId(), notNullValue());
@@ -124,7 +124,7 @@ public class DashboardServiceTest {
             "  }\n" +
             "}", JsonNode.class));
 
-        DashboardDTO saved = dashboardService.save(dto);
+        DashboardDTO saved = dashboardService.create(dto);
         DashboardDTO found = dashboardService.getById(id).get();
 
         assertThat(saved, is(found));
@@ -138,7 +138,7 @@ public class DashboardServiceTest {
         dto.setId(id);
         dto.setKey("some-test-key");
 
-        DashboardDTO saved = dashboardService.save(dto);
+        DashboardDTO saved = dashboardService.create(dto);
         DashboardDTO found = dashboardService.getById(id).get();
 
         assertThat(saved, is(found));
@@ -157,7 +157,7 @@ public class DashboardServiceTest {
             "  }\n" +
             "}", JsonNode.class));
 
-        dashboardService.save(dto);
+        dashboardService.create(dto);
 
         DashboardDTO found = dashboardService.getById(id).get();
         found.setKey("board-test-key");
@@ -167,7 +167,7 @@ public class DashboardServiceTest {
             "  }\n" +
             "}", JsonNode.class));
 
-        DashboardDTO mutated = dashboardService.save(found);
+        DashboardDTO mutated = dashboardService.update(found);
         DashboardDTO mutatedFound = dashboardService.getById(id).get();
 
         assertThat(mutated, is(mutatedFound));
@@ -186,7 +186,7 @@ public class DashboardServiceTest {
             "  }\n" +
             "}", JsonNode.class));
 
-        DashboardDTO saved = dashboardService.save(dto);
+        DashboardDTO saved = dashboardService.create(dto);
         DashboardDTO found = dashboardService.getById(id).get();
 
         assertThat(found, is(saved));
@@ -247,6 +247,6 @@ public class DashboardServiceTest {
         dashboards.add(contractDashboard);
         dashboards.add(siteDashboard);
 
-        dashboards.forEach(dashboardDTO -> dashboardService.save(dashboardDTO));
+        dashboards.forEach(dashboardDTO -> dashboardService.create(dashboardDTO));
     }
 }

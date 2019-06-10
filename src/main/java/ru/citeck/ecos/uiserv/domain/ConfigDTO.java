@@ -8,10 +8,12 @@ import lombok.Data;
  * @author Roman Makarskiy
  */
 @Data
-public class DashboardDTO implements EntityDTO {
+public class ConfigDTO implements EntityDTO {
 
     private String id;
     private String key;
-    private JsonNode config = NullNode.getInstance();
+    private String title;
+    private String description;
+    private JsonNode value = NullNode.getInstance();
 
 }
