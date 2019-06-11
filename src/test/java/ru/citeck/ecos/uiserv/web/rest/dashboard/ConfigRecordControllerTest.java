@@ -41,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Application.class)
 public class ConfigRecordControllerTest {
 
-    /*private static final String RECORD_ID = "config";
+    private static final String RECORD_ID = "config";
     private static final String RECORD_ID_AT = RECORD_ID + "@";
 
     private MockMvc mockRecordsApi;
@@ -68,11 +68,10 @@ public class ConfigRecordControllerTest {
 
     @Test
     public void query() throws Exception {
-        final String id = UUID.randomUUID().toString();
+        final String id = "some-test-config-with-large-json-value";
         String queryJson = "{\n" +
             "  \"record\": \"" + RECORD_ID_AT + id + "\",\n" +
             "  \"attributes\": {\n" +
-            "    \"key\": \"key\",\n" +
             "    \"title\": \"title\",\n" +
             "    \"description\": \"description\",\n" +
             "    \"value\": \"value?json\"\n" +
@@ -88,7 +87,6 @@ public class ConfigRecordControllerTest {
                 .content(queryJson))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id", is(RECORD_ID_AT + id)))
-            .andExpect(jsonPath("$.attributes.key", is("test-config-key")))
             .andExpect(jsonPath("$.attributes.title", is("test-config-title")))
             .andExpect(jsonPath("$.attributes.description", is("test-config-description")))
             .andExpect(jsonPath("$.attributes.value.type", is("TOP")))
@@ -112,31 +110,28 @@ public class ConfigRecordControllerTest {
     @Test
     public void create() throws Exception {
         final String id = UUID.randomUUID().toString();
-        String key = "menu-config-23";
         String title = "Menu config";
         String description = "Some description for menu config";
 
         String json = "{\n" +
             "  \"records\": [\n" +
             "    {\n" +
-            "      \"id\": \"" + RECORD_ID_AT + "\",\n" +
+            "      \"id\": \"" + RECORD_ID_AT + id + "\",\n" +
             "      \"attributes\": {\n" +
             "        \"title\": \"" + title + "\",\n" +
-            "        \"description\": \"" + description + "\",\n" +
-            "        \"key\": \"" + key + "\"\n" +
+            "        \"description\": \"" + description + "\"\n" +
             "      }\n" +
             "    }\n" +
             "  ]\n" +
             "}";
 
         ConfigDTO dto = new ConfigDTO();
-        dto.setKey(key);
+        dto.setId(id);
         dto.setTitle(title);
         dto.setDescription(description);
 
         ConfigDTO createdDto = new ConfigDTO();
         createdDto.setId(id);
-        createdDto.setKey(key);
         createdDto.setTitle(title);
         createdDto.setDescription(description);
 
@@ -148,25 +143,23 @@ public class ConfigRecordControllerTest {
     @Test
     public void mutate() throws Exception {
         final String id = UUID.randomUUID().toString();
-        String key = "new-menu-config-key";
+        String title = "new-title-key";
 
         String json = "{\n" +
             "  \"records\": [\n" +
             "  \t\t{\n" +
             "  \t\t\t\"id\": \"" + RECORD_ID_AT + id + "\",\n" +
             "  \t\t\t\"attributes\": {\n" +
-            "  \t\t\t\t\"key\": \"" + key + "\"\n" +
+            "  \t\t\t\t\"title\": \"" + title + "\"\n" +
             "  \t\t\t}\n" +
             "  \t\t}\n" +
             "  \t]\n" +
             "}";
 
         ConfigDTO dto = new ConfigDTO();
-        dto.setKey(key);
         dto.setId(id);
 
         ConfigDTO createdDto = new ConfigDTO();
-        createdDto.setKey(key);
         createdDto.setId(id);
 
         when(configEntityService.getById(id)).thenReturn(Optional.of(dto));
@@ -209,18 +202,17 @@ public class ConfigRecordControllerTest {
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(json)));
 
-        assertEquals(thrown.getCause().getMessage(), "Entity with id " + nonExistsId + " not found!");
+        assertEquals("Entity with id <" + nonExistsId + "> not found!", thrown.getCause().getMessage());
     }
 
     @Test
-    public void mutateNotExistsDashboard() {
-        String nonExistsId = "non-exists-record-id";
+    public void createWithoutId() {
         String json = "{\n" +
             "  \"records\": [\n" +
             "    {\n" +
-            "      \"id\": \"" + RECORD_ID_AT + nonExistsId + "\",\n" +
+            "      \"id\": \"" + RECORD_ID_AT + "\",\n" +
             "      \"attributes\": {\n" +
-            "         \"key\": \"new-key\"\n" +
+            "         \"title\": \"some-title\"\n" +
             "      }\n" +
             "    }\n" +
             "  ]\n" +
@@ -231,12 +223,11 @@ public class ConfigRecordControllerTest {
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(json)));
 
-        assertEquals(thrown.getCause().getMessage(), "Entity with id " + nonExistsId + " not found!");
+        assertEquals("Parameter 'id' is mandatory for config record", thrown.getCause().getMessage());
     }
 
     private ConfigDTO getTestDtoForQueryWithId(String id) throws IOException {
         ConfigDTO dto = new ConfigDTO();
-        dto.setKey("test-config-key");
         dto.setTitle("test-config-title");
         dto.setDescription("test-config-description");
         dto.setId(id);
@@ -264,6 +255,6 @@ public class ConfigRecordControllerTest {
         JsonNode config = mapper.readValue(configJson, JsonNode.class);
         dto.setValue(config);
         return dto;
-    }*/
+    }
 
 }

@@ -8,6 +8,7 @@ import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.uiserv.domain.ConfigDTO;
 import ru.citeck.ecos.uiserv.domain.EntityDTO;
+import ru.citeck.ecos.uiserv.service.RecordNotFoundException;
 import ru.citeck.ecos.uiserv.service.entity.AbstractEntityRecords;
 import ru.citeck.ecos.uiserv.service.entity.BaseEntityService;
 
@@ -59,15 +60,6 @@ public class ConfigRecords extends AbstractEntityRecords {
 
     @Override
     public List<EntityDTO> getValuesToMutate(List<RecordRef> records) {
-        return bakeEntities(records);
-    }
-
-    @Override
-    public List<EntityDTO> getMetaValues(List<RecordRef> records) {
-        return bakeEntities(records);
-    }
-
-    private List<EntityDTO> bakeEntities(List<RecordRef> records) {
         List<EntityDTO> result = new ArrayList<>();
         for (RecordRef recordRef : records) {
             String id = recordRef.getId();
@@ -83,6 +75,26 @@ public class ConfigRecords extends AbstractEntityRecords {
                 ConfigDTO dto = new ConfigDTO();
                 dto.setId(id);
                 result.add(dto);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<EntityDTO> getMetaValues(List<RecordRef> records) {
+        List<EntityDTO> result = new ArrayList<>();
+        for (RecordRef recordRef : records) {
+            String id = recordRef.getId();
+            if (StringUtils.isBlank(id)) {
+                result.add(getEmpty());
+                continue;
+            }
+
+            Optional<EntityDTO> found = entityService.getById(id);
+            if (found.isPresent()) {
+                result.add(found.get());
+            } else {
+                throw new RecordNotFoundException(String.format("Entity with id <%s> not found!", id));
             }
         }
         return result;

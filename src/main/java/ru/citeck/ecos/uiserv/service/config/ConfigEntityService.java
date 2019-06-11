@@ -35,6 +35,10 @@ public class ConfigEntityService extends AbstractBaseEntityService<ConfigDTO> {
 
     @Override
     public ConfigDTO create(ConfigDTO entity) {
+        if (StringUtils.isNotBlank(entity.getId()) && getById(entity.getId()).isPresent()) {
+            throw new IllegalArgumentException(String.format("Config with id <%s> already exists, use update instead",
+                entity.getId()));
+        }
         return save(entity);
     }
 
@@ -72,6 +76,16 @@ public class ConfigEntityService extends AbstractBaseEntityService<ConfigDTO> {
     public Optional<ConfigDTO> getByRecord(RecordRef recordRef) {
         ConfigKey keys = recordsService.getMeta(recordRef, ConfigKey.class);
         return getByKeys(keys.getKeys());
+    }
+
+    @Override
+    public Optional<ConfigDTO> getByKey(String key) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ConfigDTO> getByKeys(List<String> keys) {
+        return Optional.empty();
     }
 
     private static class ConfigKey {

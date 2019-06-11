@@ -29,7 +29,8 @@ public abstract class AbstractEntityRecords extends CrudRecordsDAO<EntityDTO> {
                 Optional.of(id)
                     .filter(str -> !str.isEmpty())
                     .map(x -> entityService.getById(x)
-                        .orElseThrow(() -> new RecordNotFoundException("Entity with id " + id + " not found!")))
+                        .orElseThrow(() -> new RecordNotFoundException(String.format("Entity with id <%s> not found!",
+                            id))))
                     .orElseGet(this::getEmpty))
             .collect(Collectors.toList());
     }
@@ -75,7 +76,8 @@ public abstract class AbstractEntityRecords extends CrudRecordsDAO<EntityDTO> {
             .map(id -> Optional.of(id)
                 .filter(str -> !str.isEmpty())
                 .map(x -> entityService.getById(x)
-                    .orElseThrow(() -> new RecordNotFoundException("Entity with id " + id + " not found!")))
+                    .orElseThrow(() -> new RecordNotFoundException(String.format("Entity with id <%s> not found!",
+                        id))))
                 .orElseGet(this::getEmpty))
             .collect(Collectors.toList());
     }

@@ -185,7 +185,7 @@ public class DashboardRecordControllerTest {
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(json)));
 
-        assertEquals(thrown.getCause().getMessage(), "Entity with id " + nonExistsId + " not found!");
+        assertEquals("Entity with id <" + nonExistsId + "> not found!", thrown.getCause().getMessage());
     }
 
     @Test
@@ -207,7 +207,7 @@ public class DashboardRecordControllerTest {
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(json)));
 
-        assertEquals(thrown.getCause().getMessage(), "Entity with id " + nonExistsId + " not found!");
+        assertEquals("Entity with id <" + nonExistsId + "> not found!", thrown.getCause().getMessage());
     }
 
     private DashboardDTO getTestDtoForQueryWithId(String id) throws IOException {
