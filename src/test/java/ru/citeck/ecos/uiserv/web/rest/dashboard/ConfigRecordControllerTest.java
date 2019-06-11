@@ -41,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Application.class)
 public class ConfigRecordControllerTest {
 
-    private static final String RECORD_ID = "config";
+    /*private static final String RECORD_ID = "config";
     private static final String RECORD_ID_AT = RECORD_ID + "@";
 
     private MockMvc mockRecordsApi;
@@ -264,6 +264,6 @@ public class ConfigRecordControllerTest {
         JsonNode config = mapper.readValue(configJson, JsonNode.class);
         dto.setValue(config);
         return dto;
-    }
+    }*/
 
 }

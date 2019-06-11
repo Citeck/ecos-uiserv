@@ -14,18 +14,14 @@ import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.entity.AbstractBaseEntityService;
 import ru.citeck.ecos.uiserv.service.file.FileService;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * @author Roman Makarskiy
  */
 @Service("ConfigEntityService")
 public class ConfigEntityService extends AbstractBaseEntityService<ConfigDTO> {
-
-    private static final String KEY = "key";
 
     private RecordsService recordsService;
 
@@ -39,22 +35,20 @@ public class ConfigEntityService extends AbstractBaseEntityService<ConfigDTO> {
 
     @Override
     public ConfigDTO create(ConfigDTO entity) {
-        String id = StringUtils.isNotBlank(entity.getId()) ? entity.getId() : UUID.randomUUID().toString();
-        return saveWithId(id, entity);
+        return save(entity);
     }
 
     @Override
     public ConfigDTO update(ConfigDTO entity) {
-        return saveWithId(entity.getId(), entity);
+        return save(entity);
     }
 
-    private ConfigDTO saveWithId(String id, ConfigDTO entity) {
-        checkKey(entity);
+    private ConfigDTO save(ConfigDTO entity) {
+        checkId(entity);
 
         ConfigDTO result = new ConfigDTO();
 
-        result.setId(id);
-        result.setKey(entity.getKey());
+        result.setId(entity.getId());
         result.setValue(entity.getValue());
         result.setTitle(entity.getTitle());
         result.setDescription(entity.getDescription());
@@ -63,15 +57,15 @@ public class ConfigEntityService extends AbstractBaseEntityService<ConfigDTO> {
         return result;
     }
 
-    private void checkKey(ConfigDTO entity) {
-        if (StringUtils.isBlank(entity.getKey())) {
-            throw new IllegalArgumentException("'Key' attribute is mandatory for config entity");
+    private void checkId(ConfigDTO entity) {
+        if (StringUtils.isBlank(entity.getId())) {
+            throw new IllegalArgumentException("'Id' attribute is mandatory for config entity");
         }
     }
 
     private void writeToFile(ConfigDTO entity) {
         fileService.deployFileOverride(type, entity.getId(), null,
-            toJson(entity), Collections.singletonMap(KEY, entity.getKey()));
+            toJson(entity), null);
     }
 
     @Override

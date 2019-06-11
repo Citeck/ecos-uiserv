@@ -8,13 +8,12 @@ import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.uiserv.domain.ConfigDTO;
 import ru.citeck.ecos.uiserv.domain.EntityDTO;
-import ru.citeck.ecos.uiserv.service.RecordNotFoundException;
 import ru.citeck.ecos.uiserv.service.entity.AbstractEntityRecords;
 import ru.citeck.ecos.uiserv.service.entity.BaseEntityService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author Roman Makarskiy
@@ -28,20 +27,31 @@ public class ConfigRecords extends AbstractEntityRecords {
         setId(ID);
     }
 
-    //TODO: we want to return a 'config key' as result id?
+    //Its safe, because we know - ConfigEntityService extends Abstract class with <ConfigDTO>
+    @SuppressWarnings("unchecked")
+    public ConfigRecords(@Qualifier("ConfigEntityService") BaseEntityService entityService) {
+        this.entityService = entityService;
+    }
+
     @Override
     public RecordsMutResult save(List<EntityDTO> values) {
         RecordsMutResult recordsMutResult = new RecordsMutResult();
         values.forEach(entityDTO -> {
             EntityDTO saved;
+            String id = entityDTO.getId();
 
-            if (StringUtils.isBlank(entityDTO.getId())) {
-                saved = entityService.create(entityDTO);
-            } else {
-                saved = entityService.update(entityDTO);
+            if (StringUtils.isBlank(id)) {
+                throw new IllegalArgumentException("Parameter 'id' is mandatory for config record");
             }
 
-            RecordMeta recordMeta = new RecordMeta(saved.getKey());
+            Optional<EntityDTO> found = entityService.getById(id);
+            if (found.isPresent()) {
+                saved = entityService.update(entityDTO);
+            } else {
+                saved = entityService.create(entityDTO);
+            }
+
+            RecordMeta recordMeta = new RecordMeta(saved.getId());
             recordsMutResult.addRecord(recordMeta);
         });
         return recordsMutResult;
@@ -49,33 +59,33 @@ public class ConfigRecords extends AbstractEntityRecords {
 
     @Override
     public List<EntityDTO> getValuesToMutate(List<RecordRef> records) {
-        return records.stream()
-            .map(RecordRef::getId)
-            .map(key ->
-                Optional.of(key)
-                    .filter(str -> !str.isEmpty())
-                    .map(x -> entityService.getByKey(x)
-                        .orElseThrow(() -> new RecordNotFoundException("Config with key " + key + " not found!")))
-                    .orElseGet(this::getEmpty))
-            .collect(Collectors.toList());
+        return bakeEntities(records);
     }
 
     @Override
     public List<EntityDTO> getMetaValues(List<RecordRef> records) {
-        return records.stream()
-            .map(RecordRef::getId)
-            .map(key -> Optional.of(key)
-                .filter(str -> !str.isEmpty())
-                .map(x -> entityService.getByKey(x)
-                    .orElseThrow(() -> new RecordNotFoundException("Config with key " + key + " not found!")))
-                .orElseGet(this::getEmpty))
-            .collect(Collectors.toList());
+        return bakeEntities(records);
     }
 
-    //Its safe, because we know - ConfigEntityService extends Abstract class with <ConfigDTO>
-    @SuppressWarnings("unchecked")
-    public ConfigRecords(@Qualifier("ConfigEntityService") BaseEntityService entityService) {
-        this.entityService = entityService;
+    private List<EntityDTO> bakeEntities(List<RecordRef> records) {
+        List<EntityDTO> result = new ArrayList<>();
+        for (RecordRef recordRef : records) {
+            String id = recordRef.getId();
+            if (StringUtils.isBlank(id)) {
+                result.add(getEmpty());
+                continue;
+            }
+
+            Optional<EntityDTO> found = entityService.getById(id);
+            if (found.isPresent()) {
+                result.add(found.get());
+            } else {
+                ConfigDTO dto = new ConfigDTO();
+                dto.setId(id);
+                result.add(dto);
+            }
+        }
+        return result;
     }
 
     @Override
