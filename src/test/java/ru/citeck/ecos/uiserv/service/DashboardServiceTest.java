@@ -10,13 +10,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.DashboardDTO;
-import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;;
+import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 /**
