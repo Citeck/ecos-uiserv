@@ -145,7 +145,6 @@ public class RecordsServiceConfig implements ApplicationContextAware {
         final RemoteRecordsDAO dao = new RemoteRecordsDAO();
         dao.setId(RECORDS_DAO_ID);
         dao.setRestConnection(alfrescoRestTemplate()::postForObject);
-        recordsService.register(dao);
 
         registerRecordsDAO(recordsService, dao);
         registerRecordsDAO(recordsService, formsDao);
