@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.service.form;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
@@ -46,8 +47,7 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     @Override
     public Optional<EcosFormModel> getFormByKey(List<String> formKeys) {
-
-        if (formKeys == null || formKeys.isEmpty()) {
+        if (CollectionUtils.isEmpty(formKeys)) {
             return Optional.empty();
         }
 
@@ -60,7 +60,7 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     @Override
     public List<EcosFormModel> getFormsByKeys(List<String> formKeys) {
-        if (formKeys == null || formKeys.isEmpty()) {
+        if (CollectionUtils.isEmpty(formKeys)) {
             return new ArrayList<>();
         }
 
