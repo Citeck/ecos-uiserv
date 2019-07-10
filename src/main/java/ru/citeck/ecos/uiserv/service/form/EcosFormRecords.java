@@ -1,9 +1,9 @@
 package ru.citeck.ecos.uiserv.service.form;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -19,13 +19,7 @@ import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.CrudRecordsDAO;
 import ru.citeck.ecos.uiserv.domain.EcosFormModel;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -132,7 +126,16 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
         Query query = recordsQuery.getQuery(Query.class);
         Optional<EcosFormModel> form = Optional.empty();
 
-        if (StringUtils.isNotBlank(query.formKey)) {
+        if (CollectionUtils.isNotEmpty(query.formKeys)) {
+            List<EcosFormModelDownstream> formsByKeys = eformFormService.getFormsByKeys(query.formKeys)
+                .stream()
+                .map(this::toDownstream)
+                .collect(Collectors.toList());
+
+            result.setTotalCount(formsByKeys.size());
+            result.setRecords(formsByKeys);
+            return result;
+        } else if (StringUtils.isNotBlank(query.formKey)) {
 
             form = eformFormService.getFormByKey(Arrays.stream(query.formKey.split(","))
                 .filter(StringUtils::isNotBlank)
@@ -160,12 +163,12 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
         return result;
     }
 
+    @Data
     static class Query {
-        @Getter
-        @Setter
         private String formKey;
-        @Getter @Setter private RecordRef record;
-        @Getter @Setter private Boolean isViewMode;
+        private List<String> formKeys;
+        private RecordRef record;
+        private Boolean isViewMode;
     }
 
     public static class EcosFormModelDownstream extends EcosFormModel {
