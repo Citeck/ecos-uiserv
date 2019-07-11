@@ -45,7 +45,7 @@ public class DashboardServiceTest {
         List<DashboardDTO> found = dashboards.stream()
             .map(dashboardDTO -> dashboardService.getById(dashboardDTO.getId()).get())
             .collect(Collectors.toList());
-        assertThat(found, is(found));
+        assertThat(found, is(dashboards));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class DashboardServiceTest {
         List<DashboardDTO> found = dashboards.stream()
             .map(dashboardDTO -> dashboardService.getByKey(null, dashboardDTO.getKey()).get())
             .collect(Collectors.toList());
-        assertThat(found, is(found));
+        assertThat(found, is(dashboards));
     }
 
     @Test
@@ -63,7 +63,7 @@ public class DashboardServiceTest {
                 Arrays.asList("some-key", dashboardDTO.getKey(), "undefined-key")
             ).get())
             .collect(Collectors.toList());
-        assertThat(found, is(found));
+        assertThat(found, is(dashboards));
     }
 
     //TODO: fix test
