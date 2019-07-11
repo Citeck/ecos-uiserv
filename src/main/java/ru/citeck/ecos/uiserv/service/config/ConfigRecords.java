@@ -1,7 +1,8 @@
 package ru.citeck.ecos.uiserv.service.config;
 
+import com.netflix.discovery.converters.Auto;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
@@ -10,7 +11,6 @@ import ru.citeck.ecos.uiserv.domain.ConfigDTO;
 import ru.citeck.ecos.uiserv.domain.EntityDTO;
 import ru.citeck.ecos.uiserv.service.RecordNotFoundException;
 import ru.citeck.ecos.uiserv.service.entity.AbstractEntityRecords;
-import ru.citeck.ecos.uiserv.service.entity.BaseEntityService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,22 +20,18 @@ import java.util.Optional;
  * @author Roman Makarskiy
  */
 @Component
-public class ConfigRecords extends AbstractEntityRecords {
+public class ConfigRecords extends AbstractEntityRecords<ConfigDTO> {
 
     public static final String ID = "config";
 
-    {
+    @Autowired
+    public ConfigRecords(ConfigEntityService entityService) {
         setId(ID);
-    }
-
-    //Its safe, because we know - ConfigEntityService extends Abstract class with <ConfigDTO>
-    @SuppressWarnings("unchecked")
-    public ConfigRecords(@Qualifier("ConfigEntityService") BaseEntityService entityService) {
         this.entityService = entityService;
     }
 
     @Override
-    public RecordsMutResult save(List<EntityDTO> values) {
+    public RecordsMutResult save(List<ConfigDTO> values) {
         RecordsMutResult recordsMutResult = new RecordsMutResult();
         values.forEach(entityDTO -> {
             EntityDTO saved;
@@ -45,7 +41,7 @@ public class ConfigRecords extends AbstractEntityRecords {
                 throw new IllegalArgumentException("Parameter 'id' is mandatory for config record");
             }
 
-            Optional<EntityDTO> found = entityService.getById(id);
+            Optional<ConfigDTO> found = entityService.getById(id);
             if (found.isPresent()) {
                 saved = entityService.update(entityDTO);
             } else {
@@ -59,8 +55,8 @@ public class ConfigRecords extends AbstractEntityRecords {
     }
 
     @Override
-    public List<EntityDTO> getValuesToMutate(List<RecordRef> records) {
-        List<EntityDTO> result = new ArrayList<>();
+    public List<ConfigDTO> getValuesToMutate(List<RecordRef> records) {
+        List<ConfigDTO> result = new ArrayList<>();
         for (RecordRef recordRef : records) {
             String id = recordRef.getId();
             if (StringUtils.isBlank(id)) {
@@ -68,7 +64,7 @@ public class ConfigRecords extends AbstractEntityRecords {
                 continue;
             }
 
-            Optional<EntityDTO> found = entityService.getById(id);
+            Optional<ConfigDTO> found = entityService.getById(id);
             if (found.isPresent()) {
                 result.add(found.get());
             } else {
@@ -81,8 +77,8 @@ public class ConfigRecords extends AbstractEntityRecords {
     }
 
     @Override
-    public List<EntityDTO> getMetaValues(List<RecordRef> records) {
-        List<EntityDTO> result = new ArrayList<>();
+    public List<ConfigDTO> getMetaValues(List<RecordRef> records) {
+        List<ConfigDTO> result = new ArrayList<>();
         for (RecordRef recordRef : records) {
             String id = recordRef.getId();
             if (StringUtils.isBlank(id)) {
@@ -90,7 +86,7 @@ public class ConfigRecords extends AbstractEntityRecords {
                 continue;
             }
 
-            Optional<EntityDTO> found = entityService.getById(id);
+            Optional<ConfigDTO> found = entityService.getById(id);
             if (found.isPresent()) {
                 result.add(found.get());
             } else {
@@ -101,8 +97,7 @@ public class ConfigRecords extends AbstractEntityRecords {
     }
 
     @Override
-    protected EntityDTO getEmpty() {
+    protected ConfigDTO getEmpty() {
         return new ConfigDTO();
     }
-
 }

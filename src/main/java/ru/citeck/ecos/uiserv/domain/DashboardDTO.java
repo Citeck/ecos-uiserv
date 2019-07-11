@@ -12,6 +12,6 @@ public class DashboardDTO implements EntityDTO {
 
     private String id;
     private String key;
+    private String type;
     private JsonNode config = NullNode.getInstance();
-
 }

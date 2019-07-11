@@ -6,4 +6,5 @@ public interface EntityDTO {
 
     String getKey();
 
+    String getType();
 }

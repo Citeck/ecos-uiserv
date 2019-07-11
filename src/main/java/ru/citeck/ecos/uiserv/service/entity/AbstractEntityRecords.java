@@ -1,7 +1,6 @@
 package ru.citeck.ecos.uiserv.service.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.apache.commons.lang.StringUtils;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
@@ -17,12 +16,12 @@ import ru.citeck.ecos.uiserv.service.RecordNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class AbstractEntityRecords extends CrudRecordsDAO<EntityDTO> {
+public abstract class AbstractEntityRecords<T extends EntityDTO> extends CrudRecordsDAO<T> {
 
-    protected BaseEntityService<EntityDTO> entityService;
+    protected BaseEntityService<T> entityService;
 
     @Override
-    public List<EntityDTO> getValuesToMutate(List<RecordRef> records) {
+    public List<T> getValuesToMutate(List<RecordRef> records) {
         return records.stream()
             .map(RecordRef::getId)
             .map(id ->
@@ -35,13 +34,13 @@ public abstract class AbstractEntityRecords extends CrudRecordsDAO<EntityDTO> {
             .collect(Collectors.toList());
     }
 
-    protected abstract EntityDTO getEmpty();
+    protected abstract T getEmpty();
 
     @Override
-    public RecordsMutResult save(List<EntityDTO> values) {
+    public RecordsMutResult save(List<T> values) {
         RecordsMutResult recordsMutResult = new RecordsMutResult();
         values.forEach(entityDTO -> {
-            EntityDTO saved;
+            T saved;
 
             if (StringUtils.isBlank(entityDTO.getId())) {
                 saved = entityService.create(entityDTO);
@@ -70,7 +69,7 @@ public abstract class AbstractEntityRecords extends CrudRecordsDAO<EntityDTO> {
     }
 
     @Override
-    public List<EntityDTO> getMetaValues(List<RecordRef> records) {
+    public List<T> getMetaValues(List<RecordRef> records) {
         return records.stream()
             .map(RecordRef::getId)
             .map(id -> Optional.of(id)
@@ -83,18 +82,22 @@ public abstract class AbstractEntityRecords extends CrudRecordsDAO<EntityDTO> {
     }
 
     @Override
-    public RecordsQueryResult<EntityDTO> getMetaValues(RecordsQuery recordsQuery) {
+    public RecordsQueryResult<T> getMetaValues(RecordsQuery recordsQuery) {
+
         String language = recordsQuery.getLanguage();
         if (StringUtils.isNotBlank(language)) {
             throw new IllegalArgumentException("This records source does not support query via language");
         }
 
-        RecordsQueryResult<EntityDTO> result = new RecordsQueryResult<>();
+        RecordsQueryResult<T> result = new RecordsQueryResult<>();
         EntityQuery query = recordsQuery.getQuery(EntityQuery.class);
-        Optional<EntityDTO> entityDTO = Optional.empty();
+        if (query.key == null) {
+            query.key = "DEFAULT";
+        }
+        Optional<T> entityDTO = Optional.empty();
 
         if (StringUtils.isNotBlank(query.key)) {
-            entityDTO = entityService.getByKeys(Arrays.stream(query.key.split(","))
+            entityDTO = entityService.getByKeys(query.type, Arrays.stream(query.key.split(","))
                 .filter(StringUtils::isNotBlank)
                 .collect(Collectors.toList()));
         } else if (query.record != null) {
@@ -111,14 +114,11 @@ public abstract class AbstractEntityRecords extends CrudRecordsDAO<EntityDTO> {
         return result;
     }
 
+    @Data
     private static class EntityQuery {
-        @Getter
-        @Setter
         private String key;
-
-        @Getter
-        @Setter
+        private String type;
+        private String user;
         private RecordRef record;
     }
-
 }

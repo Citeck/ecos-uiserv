@@ -51,7 +51,7 @@ public class DashboardServiceTest {
     @Test
     public void getByKey() {
         List<DashboardDTO> found = dashboards.stream()
-            .map(dashboardDTO -> dashboardService.getByKey(dashboardDTO.getKey()).get())
+            .map(dashboardDTO -> dashboardService.getByKey(null, dashboardDTO.getKey()).get())
             .collect(Collectors.toList());
         assertThat(found, is(found));
     }
@@ -59,7 +59,7 @@ public class DashboardServiceTest {
     @Test
     public void getByKeys() {
         List<DashboardDTO> found = dashboards.stream()
-            .map(dashboardDTO -> dashboardService.getByKeys(
+            .map(dashboardDTO -> dashboardService.getByKeys(null,
                 Arrays.asList("some-key", dashboardDTO.getKey(), "undefined-key")
             ).get())
             .collect(Collectors.toList());
@@ -198,7 +198,6 @@ public class DashboardServiceTest {
 
         assertThat(mustBeEmpty, is(Optional.empty()));
     }
-
 
     private void createTestDashboards() throws IOException {
         DashboardDTO mainDashboard = new DashboardDTO();
