@@ -51,7 +51,8 @@ public class DashboardServiceTest {
     @Test
     public void getByKey() {
         List<DashboardDTO> found = dashboards.stream()
-            .map(dashboardDTO -> dashboardService.getByKey(null, dashboardDTO.getKey()).get())
+            .map(dashboardDTO -> dashboardService.getByKey(dashboardDTO.getType(),
+                                                           dashboardDTO.getKey()).get())
             .collect(Collectors.toList());
         assertThat(found, is(dashboards));
     }
@@ -59,7 +60,7 @@ public class DashboardServiceTest {
     @Test
     public void getByKeys() {
         List<DashboardDTO> found = dashboards.stream()
-            .map(dashboardDTO -> dashboardService.getByKeys(null,
+            .map(dashboardDTO -> dashboardService.getByKeys(dashboardDTO.getType(),
                 Arrays.asList("some-key", dashboardDTO.getKey(), "undefined-key")
             ).get())
             .collect(Collectors.toList());
@@ -203,6 +204,7 @@ public class DashboardServiceTest {
         DashboardDTO mainDashboard = new DashboardDTO();
         mainDashboard.setKey("main-dashboard");
         mainDashboard.setId("main-dashboard-id");
+        mainDashboard.setType("user-dashboard");
         mainDashboard.setConfig(objectMapper.readValue("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"TOP\"\n" +
@@ -215,6 +217,7 @@ public class DashboardServiceTest {
         DashboardDTO contractDashboard = new DashboardDTO();
         contractDashboard.setKey("contract-dashboard");
         contractDashboard.setId("contract-dashboard-id");
+        contractDashboard.setType("case-details");
         contractDashboard.setConfig(objectMapper.readValue("{\n" +
             "    \"_id\": \"5cf91d01f2f927246c3098db\",\n" +
             "    \"index\": 0,\n" +
@@ -234,6 +237,7 @@ public class DashboardServiceTest {
         DashboardDTO siteDashboard = new DashboardDTO();
         siteDashboard.setKey("site-dashboard");
         siteDashboard.setId("site-dashboard-id");
+        siteDashboard.setType("site-dashboard");
         siteDashboard.setConfig(objectMapper.readValue("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"LEFT\"\n" +
