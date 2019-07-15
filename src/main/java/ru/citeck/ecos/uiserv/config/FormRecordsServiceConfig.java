@@ -20,6 +20,7 @@ import java.util.Collection;
 @Configuration
 @RequiredArgsConstructor
 public class FormRecordsServiceConfig extends RecordsServiceFactory {
+
     private final EcosFormRecords dao;
 
     @Bean
@@ -45,7 +46,8 @@ public class FormRecordsServiceConfig extends RecordsServiceFactory {
     @Configuration
     public static class NotRequiresRecordsDAO {
         @Bean
-        public EcosFormService formService(NormalFormProvider normalFormProvider, Collection<FormProvider> providers,
+        public EcosFormService formService(NormalFormProvider normalFormProvider,
+                                           Collection<FormProvider> providers,
                                            RecordsService outgoingRecordsService) {
             final EcosFormServiceImpl result = new EcosFormServiceImpl();
             result.setNewFormsStore(normalFormProvider);

@@ -5,8 +5,6 @@ import ru.citeck.ecos.records2.RecordRef;
 import java.util.List;
 import java.util.Optional;
 
-import ru.citeck.ecos.uiserv.domain.EcosFormModel;
-
 
 public interface EcosFormService {
 

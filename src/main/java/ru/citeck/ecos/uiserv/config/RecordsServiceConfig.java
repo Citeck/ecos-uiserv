@@ -1,13 +1,9 @@
 package ru.citeck.ecos.uiserv.config;
 
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -23,9 +19,6 @@ import org.springframework.web.util.UriTemplateHandler;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.RecordsServiceFactory;
 import ru.citeck.ecos.records2.request.rest.RestHandler;
-import ru.citeck.ecos.records2.source.dao.RecordsDAO;
-import ru.citeck.ecos.records2.source.dao.remote.RemoteRecordsDAO;
-import ru.citeck.ecos.uiserv.service.entity.AbstractEntityRecords;
 import ru.citeck.ecos.uiserv.service.form.*;
 
 import javax.net.ssl.*;
@@ -43,7 +36,8 @@ import java.util.Map;
 //This one configures RecordService.
 //Note that single RecordService is responsible for both serving data to requests from uiserv's clients,
 //  and for requesting data from remote data sources (namely Ecos) - depending on sourceId.
-public class RecordsServiceConfig implements ApplicationContextAware {
+public class RecordsServiceConfig {
+
     public static final String RECORDS_DAO_ID = "alfresco";
 
     @Autowired
@@ -54,17 +48,6 @@ public class RecordsServiceConfig implements ApplicationContextAware {
     private CookiesRelayingInterceptor cookiesRelayingInterceptor;
     @Autowired
     private AlfrescoClientProperties alfrescoClientProperties;
-
-    @Autowired
-    @Qualifier("alfrescoRestTemplate")
-    private RestTemplate alfrescoRestTemplate;
-
-    private ApplicationContext applicationContext;
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-    }
 
     @Component
     public static class LanguageRelayingInterceptor implements ClientHttpRequestInterceptor {
@@ -93,14 +76,16 @@ public class RecordsServiceConfig implements ApplicationContextAware {
     //  with admin user or maybe microservice auth (if records-search service becomes a microservice),
     //  and either post-filter returned records or specify username to test access against.
     public static class CookiesRelayingInterceptor implements ClientHttpRequestInterceptor {
+
         @Autowired(required = false)
         private HttpServletRequest thisRequest;
 
         @Override
-        public ClientHttpResponse intercept(HttpRequest newRequest, byte[] bytes, ClientHttpRequestExecution clientHttpRequestExecution) throws IOException {
+        public ClientHttpResponse intercept(HttpRequest newRequest,
+                                            byte[] bytes,
+                                            ClientHttpRequestExecution clientHttpRequestExecution) throws IOException {
             if (thisRequest != null) {
-                newRequest.getHeaders().set("Cookie",
-                    thisRequest.getHeader("Cookie"));
+                newRequest.getHeaders().set("Cookie", thisRequest.getHeader("Cookie"));
             }
             return clientHttpRequestExecution.execute(newRequest, bytes);
         }
@@ -133,32 +118,10 @@ public class RecordsServiceConfig implements ApplicationContextAware {
             .build();
     }
 
-    private <T> T alfrescoJsonPost(String url, Object req, Class<T> respType) {
-        return alfrescoRestTemplate.postForObject(url, req, respType);
-    }
-
     @Bean
-    public RecordsService recordsService(EcosFormRecords formsDao) {
+    public RecordsService recordsService() {
         final RecordsServiceFactory factory = new RecordsServiceFactory();
-        final RecordsService recordsService = factory.createRecordsService();
-
-        final RemoteRecordsDAO dao = new RemoteRecordsDAO();
-        dao.setId(RECORDS_DAO_ID);
-        dao.setRestConnection(alfrescoRestTemplate()::postForObject);
-
-        registerRecordsDAO(recordsService, dao);
-        registerRecordsDAO(recordsService, formsDao);
-
-        Map<String, AbstractEntityRecords> entityRecords = applicationContext.getBeansOfType(
-            AbstractEntityRecords.class);
-        entityRecords.forEach((k, records) -> registerRecordsDAO(recordsService, records));
-
-        return recordsService;
-    }
-
-    private void registerRecordsDAO(RecordsService recordsService, RecordsDAO recordsSource) {
-        log.info("Register recordsDAO: " + recordsSource.getId());
-        recordsService.register(recordsSource);
+        return factory.createRecordsService();
     }
 
     @Bean

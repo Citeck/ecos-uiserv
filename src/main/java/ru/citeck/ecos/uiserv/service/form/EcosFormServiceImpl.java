@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
 
-import ru.citeck.ecos.uiserv.domain.EcosFormModel;
-
 import java.util.*;
 import java.util.stream.Collectors;
 

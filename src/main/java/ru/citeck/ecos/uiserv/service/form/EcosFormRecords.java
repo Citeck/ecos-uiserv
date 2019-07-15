@@ -17,7 +17,6 @@ import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.CrudRecordsDAO;
-import ru.citeck.ecos.uiserv.domain.EcosFormModel;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -164,7 +163,7 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
     }
 
     @Data
-    static class Query {
+    public static class Query {
         private String formKey;
         private List<String> formKeys;
         private RecordRef record;
