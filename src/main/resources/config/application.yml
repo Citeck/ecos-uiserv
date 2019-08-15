@@ -191,7 +191,7 @@ application:
 uiserv:
     config:
         tabs-enabled:
-            value: false
+            value: true
 
 #alfresco:
 #    schema: https
