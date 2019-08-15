@@ -43,7 +43,7 @@ spring:
             indent-output: true
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
-        url: jdbc:postgresql://localhost:5432/uiserv
+        url: jdbc:postgresql://localhost:5431/uiserv
         username: uiserv
         password:
         hikari:

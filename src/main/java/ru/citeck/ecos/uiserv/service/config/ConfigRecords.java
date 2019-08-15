@@ -1,15 +1,15 @@
 package ru.citeck.ecos.uiserv.service.config;
 
-import com.netflix.discovery.converters.Auto;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
+import ru.citeck.ecos.uiserv.config.UIServConfigProperties;
 import ru.citeck.ecos.uiserv.domain.ConfigDTO;
 import ru.citeck.ecos.uiserv.domain.EntityDTO;
-import ru.citeck.ecos.uiserv.service.RecordNotFoundException;
 import ru.citeck.ecos.uiserv.service.entity.AbstractEntityRecords;
 
 import java.util.ArrayList;
@@ -24,10 +24,14 @@ public class ConfigRecords extends AbstractEntityRecords<ConfigDTO> {
 
     public static final String ID = "config";
 
+    private UIServConfigProperties properties;
+
     @Autowired
-    public ConfigRecords(ConfigEntityService entityService) {
+    public ConfigRecords(ConfigEntityService entityService,
+                         UIServConfigProperties properties) {
         setId(ID);
         this.entityService = entityService;
+        this.properties = properties;
     }
 
     @Override
@@ -85,15 +89,25 @@ public class ConfigRecords extends AbstractEntityRecords<ConfigDTO> {
                 result.add(getEmpty());
                 continue;
             }
-
-            Optional<ConfigDTO> found = entityService.getById(id);
-            if (found.isPresent()) {
-                result.add(found.get());
-            } else {
-                throw new RecordNotFoundException(String.format("Entity with id <%s> not found!", id));
-            }
+            result.add(getConfigDtoById(id));
         }
         return result;
+    }
+
+    private ConfigDTO getConfigDtoById(String id) {
+        Optional<ConfigDTO> found = entityService.getById(id);
+        return found.orElseGet(() -> getConfigFromProps(id).orElseGet(this::getEmpty));
+    }
+
+    private Optional<ConfigDTO> getConfigFromProps(String id) {
+        return properties.getProperty(id).map(v -> {
+            ConfigDTO config = new ConfigDTO();
+            config.setId(id);
+            config.setTitle(v.getTitle());
+            config.setDescription(v.getDescription());
+            config.setValue(TextNode.valueOf(v.getValue()));
+            return config;
+        });
     }
 
     @Override
