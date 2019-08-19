@@ -5,14 +5,14 @@ import ru.citeck.ecos.records2.RecordRef;
 import java.util.List;
 import java.util.Optional;
 
-import ru.citeck.ecos.uiserv.domain.EcosFormModel;
-
 
 public interface EcosFormService {
 
     Optional<EcosFormModel> getFormByKey(String formKey);
 
     Optional<EcosFormModel> getFormByKey(List<String> formKeys);
+
+    List<EcosFormModel> getFormsByKeys(List<String> formKeys);
 
     Optional<EcosFormModel> getFormByRecord(RecordRef record, Boolean isViewMode);
 

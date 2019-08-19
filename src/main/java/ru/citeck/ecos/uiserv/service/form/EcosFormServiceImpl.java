@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.service.form;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
@@ -11,9 +12,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
 
-import ru.citeck.ecos.uiserv.domain.EcosFormModel;
-
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class EcosFormServiceImpl implements EcosFormService {
 
@@ -45,8 +45,7 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     @Override
     public Optional<EcosFormModel> getFormByKey(List<String> formKeys) {
-
-        if (formKeys == null || formKeys.isEmpty()) {
+        if (CollectionUtils.isEmpty(formKeys)) {
             return Optional.empty();
         }
 
@@ -55,6 +54,20 @@ public class EcosFormServiceImpl implements EcosFormService {
             .filter(Optional::isPresent)
             .map(Optional::get)
             .findFirst();
+    }
+
+    @Override
+    public List<EcosFormModel> getFormsByKeys(List<String> formKeys) {
+        if (CollectionUtils.isEmpty(formKeys)) {
+            return new ArrayList<>();
+        }
+
+        return formKeys.stream()
+            .distinct()
+            .map(this::getFormByKey)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toList());
     }
 
     @Override

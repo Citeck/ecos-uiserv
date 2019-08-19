@@ -3,7 +3,6 @@ package ru.citeck.ecos.uiserv.service.form;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.citeck.ecos.uiserv.domain.EcosFormModel;
 import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.file.FileService;
@@ -16,6 +15,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class NormalFormProvider implements FormProvider, MutableFormProvider {
+
     private final FileService fileService;
     private final ObjectMapper objectMapper;
 

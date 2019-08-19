@@ -1,38 +1,27 @@
 package ru.citeck.ecos.uiserv.service.dashdoard;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.uiserv.domain.DashboardDTO;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.entity.AbstractBaseEntityService;
 import ru.citeck.ecos.uiserv.service.file.FileService;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Roman Makarskiy
  */
-@Service("DashboardEntityService")
+@Service
 public class DashboardEntityService extends AbstractBaseEntityService<DashboardDTO> {
 
-    private static final String KEY = "key";
+    private static final String META_KEY = "key";
+    private static final String META_TYPE = "type";
 
-    private RecordsService recordsService;
-
-    public DashboardEntityService(@Lazy RecordsService recordsService,
-                                  ObjectMapper objectMapper, FileService fileService) {
+    public DashboardEntityService(ObjectMapper objectMapper, FileService fileService) {
         super(DashboardDTO.class, FileType.DASHBOARD);
-        this.recordsService = recordsService;
         this.objectMapper = objectMapper;
         this.fileService = fileService;
     }
@@ -48,11 +37,20 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
         return saveWithId(entity.getId(), entity);
     }
 
+    @Override
+    public Optional<DashboardDTO> getByKey(String type, String key) {
+        if (type == null) {
+            type = "case-details";
+        }
+        return super.getByKey(type, key);
+    }
+
     private DashboardDTO saveWithId(String id, DashboardDTO entity) {
         DashboardDTO result = new DashboardDTO();
 
         result.setId(id);
         result.setKey(entity.getKey());
+        result.setType(entity.getType());
         result.setConfig(entity.getConfig());
 
         writeToFile(result);
@@ -60,22 +58,14 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
     }
 
     private void writeToFile(DashboardDTO entity) {
-        fileService.deployFileOverride(type, entity.getId(), null,
-            toJson(entity), Collections.singletonMap(KEY, entity.getKey()));
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put(META_KEY, entity.getKey());
+        metadata.put(META_TYPE, entity.getType());
+        fileService.deployFileOverride(type, entity.getId(), null, toJson(entity), metadata);
     }
 
     @Override
     public Optional<DashboardDTO> getByRecord(RecordRef recordRef) {
-        DashboardKey keys = recordsService.getMeta(recordRef, DashboardKey.class);
-        return getByKeys(keys.getKeys());
-    }
-
-    private static class DashboardKey {
-        private final static String ATT_DASHBOARD_KEY = "_dashboardKey";
-
-        @MetaAtt(ATT_DASHBOARD_KEY)
-        @Getter
-        @Setter
-        private List<String> keys;
+        return Optional.empty();
     }
 }

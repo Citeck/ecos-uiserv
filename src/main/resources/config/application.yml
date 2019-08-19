@@ -188,5 +188,10 @@ application:
     #  in particular with "-Dapplication.try-header-for-username="
     try-header-for-username: X-Alfresco-Remote-User
 
+uiserv:
+    config:
+        tabs-enabled:
+            value: false
+
 #alfresco:
 #    schema: https

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.CollectionUtils;
 import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.uiserv.domain.EntityDTO;
 import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.file.FileService;
@@ -12,13 +13,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Roman Makarskiy
  */
 @Log4j2
-public abstract class AbstractBaseEntityService<T> implements BaseEntityService<T> {
+public abstract class AbstractBaseEntityService<T extends EntityDTO> implements BaseEntityService<T> {
 
     private final Class<T> typeParameterClass;
 
@@ -48,34 +51,32 @@ public abstract class AbstractBaseEntityService<T> implements BaseEntityService<
             .map(this::fromJson);
     }
 
-    private T fromJson(File file) {
-        try {
-            return objectMapper.readValue(file.getFileVersion().getBytes(), typeParameterClass);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed convert File to DashboardDTO", e);
-        }
-    }
-
     @Override
-    public Optional<T> getByKey(String key) {
+    public Optional<T> getByKey(String type, String key) {
         List<File> found = fileService.find("key", Collections.singletonList(key));
         if (found.isEmpty()) {
             return Optional.empty();
         }
-        if (found.size() > 1) {
-            log.warn(String.format("More than one entity <%s> found by key: %s", typeParameterClass, key));
+
+        List<T> entities = found.stream().map(this::fromJson).filter(t ->
+            Objects.equals(t.getType(), type)
+        ).collect(Collectors.toList());
+
+        if (entities.size() > 1) {
+            log.warn(String.format("More than one entity <%s> found by type: '%s' and key: '%s'",
+                                   typeParameterClass, type, key));
         }
-        return Optional.of(fromJson(found.get(0)));
+        return entities.stream().findFirst();
     }
 
     @Override
-    public Optional<T> getByKeys(List<String> keys) {
+    public Optional<T> getByKeys(String type, List<String> keys) {
         if (CollectionUtils.isEmpty(keys)) {
             return Optional.empty();
         }
 
         return keys.stream()
-            .map(this::getByKey)
+            .map(key -> getByKey(type, key))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .findFirst();
@@ -83,6 +84,14 @@ public abstract class AbstractBaseEntityService<T> implements BaseEntityService<
 
     @Override
     public abstract Optional<T> getByRecord(RecordRef recordRef);
+
+    private T fromJson(File file) {
+        try {
+            return objectMapper.readValue(file.getFileVersion().getBytes(), typeParameterClass);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed convert File to DashboardDTO", e);
+        }
+    }
 
     protected byte[] toJson(T entity) {
         try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
@@ -92,5 +101,4 @@ public abstract class AbstractBaseEntityService<T> implements BaseEntityService<
             throw new RuntimeException(String.format("Failed convert entity <%s> to json", typeParameterClass), e);
         }
     }
-
 }

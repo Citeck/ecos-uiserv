@@ -19,4 +19,9 @@ public class ConfigDTO implements EntityDTO {
     public String getKey() {
         return null;
     }
+
+    @Override
+    public String getType() {
+        return null;
+    }
 }
