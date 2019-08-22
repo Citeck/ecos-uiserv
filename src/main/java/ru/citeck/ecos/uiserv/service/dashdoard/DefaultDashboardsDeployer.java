@@ -21,6 +21,7 @@ public class DefaultDashboardsDeployer {
         deployEmptyDashboard(DashboardConstants.TYPE_USER_DASHBOARD, "DEFAULT");
         deployEmptyDashboard(DashboardConstants.TYPE_SITE_DASHBOARD, "DEFAULT");
         deployEmptyDashboard(DashboardConstants.TYPE_CASE_DETAILS, "DEFAULT");
+        deployEmptyDashboard(DashboardConstants.TYPE_PROFILE_DETAILS, "DEFAULT");
     }
 
     private void deployEmptyDashboard(String type, String key) {
