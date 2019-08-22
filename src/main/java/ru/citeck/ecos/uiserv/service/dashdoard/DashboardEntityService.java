@@ -19,6 +19,7 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
 
     private static final String META_KEY = "key";
     private static final String META_TYPE = "type";
+    private static final String META_USER = "user";
 
     public DashboardEntityService(ObjectMapper objectMapper, FileService fileService) {
         super(DashboardDTO.class, FileType.DASHBOARD);
@@ -52,6 +53,7 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
         result.setKey(entity.getKey());
         result.setType(entity.getType());
         result.setConfig(entity.getConfig());
+        result.setUser(entity.getUser());
 
         writeToFile(result);
         return result;
@@ -61,6 +63,7 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
         Map<String, String> metadata = new HashMap<>();
         metadata.put(META_KEY, entity.getKey());
         metadata.put(META_TYPE, entity.getType());
+        metadata.put(META_USER, entity.getUser());
         fileService.deployFileOverride(type, entity.getId(), null, toJson(entity), metadata);
     }
 
