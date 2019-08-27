@@ -147,9 +147,3 @@ jhipster:
 # ===================================================================
 
 # application:
-
-alfresco:
-    ribbon:
-        #If you do not specify a class, listOfServers is ignored if eureka is present.
-        NIWSServerListClassName: com.netflix.loadbalancer.ConfigurationBasedServerList
-        listOfServers: host.docker.internal:8080
