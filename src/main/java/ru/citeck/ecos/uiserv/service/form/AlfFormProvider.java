@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.service.form;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordMeta;
@@ -13,6 +14,7 @@ import ru.citeck.ecos.records2.request.query.RecordsQuery;
 
 import java.util.Collections;
 
+@Slf4j
 @Component
 public class AlfFormProvider implements FormProvider, MutableFormProvider {
 
@@ -40,7 +42,14 @@ public class AlfFormProvider implements FormProvider, MutableFormProvider {
     @Override
     public EcosFormModel getFormById(String id) {
         RecordRef ref = RecordRef.valueOf("alfresco@eform@" + id);
-        return recordsService.getMeta(ref, EcosFormModel.class);
+
+        EcosFormModel meta = null;
+        try {
+            meta = recordsService.getMeta(ref, EcosFormModel.class);
+        } catch (Exception e) {
+            log.warn("Form can't be resolved. id: " + id, e);
+        }
+        return meta;
     }
 
     @Override

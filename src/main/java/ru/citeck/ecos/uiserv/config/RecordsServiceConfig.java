@@ -93,6 +93,14 @@ public class RecordsServiceConfig {
 
     @LoadBalanced
     @Bean
+    public RestTemplate microRestTemplate() {
+        return restTemplateBuilder.requestFactory(SkipSslVerificationHttpRequestFactory.class)
+            .rootUri("http:/")
+            .build();
+    }
+
+    @LoadBalanced
+    @Bean
     public RestTemplate alfrescoRestTemplate() {
         return restTemplateBuilder
             .requestFactory(SkipSslVerificationHttpRequestFactory.class)

@@ -195,3 +195,8 @@ uiserv:
 
 #alfresco:
 #    schema: https
+
+spring.rabbitmq:
+    host: rabbitmq
+    username: admin
+    password: admin
