@@ -31,7 +31,7 @@ public class EcosModulesConfig {
         this.amqpTemplate = amqpTemplate;
     }
 
-    @RabbitListener(queues = {EcosAppQueues.PUBLISH_PREFIX + FormModule.TYPE})
+    //@RabbitListener(queues = {EcosAppQueues.PUBLISH_PREFIX + FormModule.TYPE})
     public void deployForm(ModulePublishMsg msg) {
 
         ModulePublishResultMsg result = new ModulePublishResultMsg();
