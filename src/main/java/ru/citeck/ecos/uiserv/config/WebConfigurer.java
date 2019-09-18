@@ -102,8 +102,8 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
         CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
         filter.setIncludeQueryString(true);
         filter.setIncludePayload(true);
+        filter.setIncludeHeaders(true);
         filter.setMaxPayloadLength(10000);
-        filter.setIncludeHeaders(false);
         filter.setAfterMessagePrefix("REQUEST DATA : ");
         return filter;
     }
