@@ -17,6 +17,8 @@ import java.util.*;
 @Service
 public class DashboardEntityService extends AbstractBaseEntityService<DashboardDTO> {
 
+    private static final String TYPE_REFIX = "type_";
+
     private static final String META_KEY = "key";
     private static final String META_TYPE = "type";
     private static final String META_USER = "user";
@@ -43,7 +45,11 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
         if (type == null) {
             type = "case-details";
         }
-        return super.getByKey(type, key);
+        Optional<DashboardDTO> result = super.getByKey(type, key);
+        if (!result.isPresent() && key.startsWith(TYPE_REFIX)) {
+            result = super.getByKey(type, key.substring(TYPE_REFIX.length()));
+        }
+        return result;
     }
 
     private DashboardDTO saveWithId(String id, DashboardDTO entity) {
