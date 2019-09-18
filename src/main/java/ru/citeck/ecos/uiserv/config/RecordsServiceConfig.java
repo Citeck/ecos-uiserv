@@ -16,8 +16,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriTemplateHandler;
+import ru.citeck.ecos.predicate.PredicateService;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.RecordsServiceFactory;
+import ru.citeck.ecos.records2.meta.RecordsMetaService;
 import ru.citeck.ecos.records2.request.rest.RestHandler;
 import ru.citeck.ecos.uiserv.service.form.*;
 
@@ -127,12 +129,6 @@ public class RecordsServiceConfig {
     }
 
     @Bean
-    public RecordsService recordsService() {
-        final RecordsServiceFactory factory = new RecordsServiceFactory();
-        return factory.createRecordsService();
-    }
-
-    @Bean
     public EcosFormService formService(NormalFormProvider normalFormProvider, Collection<FormProvider> providers,
                                        @Lazy RecordsService outgoingRecordsService) {
         final EcosFormServiceImpl result = new EcosFormServiceImpl();
@@ -140,11 +136,6 @@ public class RecordsServiceConfig {
         result.setRecordsService(outgoingRecordsService);
         providers.forEach(result::register);
         return result;
-    }
-
-    @Bean
-    public RestHandler formRestQueryHandler(RecordsService recordsService) {
-        return new RestHandler(recordsService);
     }
 
     //Basically copied from org.springframework.boot.actuate.autoconfigure.cloudfoundry.servlet.SkipSslVerificationHttpRequestFactory
@@ -180,6 +171,34 @@ public class RecordsServiceConfig {
 
             public void checkServerTrusted(X509Certificate[] chain, String authType) {
             }
+        }
+    }
+
+    @Configuration
+    public static class RecordsServiceFactoryConfig extends RecordsServiceFactory {
+
+        @Bean
+        @Override
+        protected RestHandler createRestHandler() {
+            return super.createRestHandler();
+        }
+
+        @Bean
+        @Override
+        protected RecordsService createRecordsService() {
+            return super.createRecordsService();
+        }
+
+        @Bean
+        @Override
+        public PredicateService createPredicateService() {
+            return super.createPredicateService();
+        }
+
+        @Bean
+        @Override
+        public RecordsMetaService createRecordsMetaService() {
+            return super.createRecordsMetaService();
         }
     }
 }
