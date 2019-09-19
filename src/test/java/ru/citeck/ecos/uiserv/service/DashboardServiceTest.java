@@ -52,7 +52,8 @@ public class DashboardServiceTest {
     public void getByKey() {
         List<DashboardDTO> found = dashboards.stream()
             .map(dashboardDTO -> dashboardService.getByKey(dashboardDTO.getType(),
-                                                           dashboardDTO.getKey()).get())
+                dashboardDTO.getKey(),
+                dashboardDTO.getUser()).get())
             .collect(Collectors.toList());
         assertThat(found, is(dashboards));
     }
@@ -60,9 +61,10 @@ public class DashboardServiceTest {
     @Test
     public void getByKeys() {
         List<DashboardDTO> found = dashboards.stream()
-            .map(dashboardDTO -> dashboardService.getByKeys(dashboardDTO.getType(),
-                Arrays.asList("some-key", dashboardDTO.getKey(), "undefined-key")
-            ).get())
+            .map(dashboardDTO -> dashboardService.getByKeys(
+                dashboardDTO.getType(),
+                Arrays.asList("some-key", dashboardDTO.getKey(), "undefined-key"),
+                dashboardDTO.getUser()).get())
             .collect(Collectors.toList());
         assertThat(found, is(dashboards));
     }

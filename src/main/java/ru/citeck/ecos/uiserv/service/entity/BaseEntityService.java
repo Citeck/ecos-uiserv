@@ -18,9 +18,9 @@ public interface BaseEntityService<T> {
 
     Optional<T> getById(String id);
 
-    Optional<T> getByKey(String type, String key);
+    Optional<T> getByKey(String type, String key, String user);
 
-    Optional<T> getByKeys(String type, List<String> keys);
+    Optional<T> getByKeys(String type, List<String> keys, String user);
 
     Optional<T> getByRecord(RecordRef recordRef);
 }
