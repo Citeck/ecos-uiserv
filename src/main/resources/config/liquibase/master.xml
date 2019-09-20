@@ -20,6 +20,7 @@
     <include file="config/liquibase/changelog/20190509163730_added_contentType_to_FileVersion.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20190513103730_added_userTheme.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20190520115930_added_file_metadata.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20190919144957_added_actions.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
 </databaseChangeLog>
