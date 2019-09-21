@@ -41,6 +41,11 @@ public class DashboardServiceTest {
     }
 
     @Test
+    public void createTestActionsSize() {
+        assertThat(dashboards.size(), is(3));
+    }
+
+    @Test
     public void getById() {
         List<DashboardDTO> found = dashboards.stream()
             .map(dashboardDTO -> dashboardService.getById(dashboardDTO.getId()).get())
@@ -52,7 +57,7 @@ public class DashboardServiceTest {
     public void getByKey() {
         List<DashboardDTO> found = dashboards.stream()
             .map(dashboardDTO -> dashboardService.getByKey(dashboardDTO.getType(),
-                                                           dashboardDTO.getKey()).get())
+                dashboardDTO.getKey()).get())
             .collect(Collectors.toList());
         assertThat(found, is(dashboards));
     }

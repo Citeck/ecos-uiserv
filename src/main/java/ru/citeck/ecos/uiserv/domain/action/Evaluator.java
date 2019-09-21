@@ -1,13 +1,25 @@
 package ru.citeck.ecos.uiserv.domain.action;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.NullNode;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import ru.citeck.ecos.uiserv.domain.BaseEntity;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Lob;
+import javax.persistence.Table;
+
+/**
+ * @author Roman Makarskiy
+ */
 @Data
-public class Evaluator {
+@Entity
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
+@Table(name = "evaluators")
+public class Evaluator extends BaseEntity {
 
-    private String id;
-    private JsonNode config = NullNode.getInstance();
+    @Lob
+    @Column
+    private String configJSON;
 
 }

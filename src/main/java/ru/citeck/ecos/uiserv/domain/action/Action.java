@@ -4,10 +4,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ru.citeck.ecos.uiserv.domain.BaseEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
+/**
+ * @author Roman Makarskiy
+ */
 @Data
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
@@ -15,12 +16,14 @@ import javax.persistence.Table;
 public class Action extends BaseEntity {
 
     private String type;
-    private String key;
+    private String icon;
 
-    @Column(columnDefinition = "TEXT")
+    @Lob
+    @Column
     private String configJSON;
 
-    @Column(columnDefinition = "TEXT")
-    private String evaluatorJSON;
+    @ManyToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @JoinColumn(name = "evaluator_id")
+    private Evaluator evaluator;
 
 }
