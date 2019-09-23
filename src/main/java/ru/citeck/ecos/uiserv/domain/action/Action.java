@@ -2,7 +2,6 @@ package ru.citeck.ecos.uiserv.domain.action;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import ru.citeck.ecos.uiserv.domain.BaseEntity;
 
 import javax.persistence.*;
 
@@ -11,20 +10,23 @@ import javax.persistence.*;
  */
 @Data
 @Entity
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 @Table(name = "actions")
-public class Action extends BaseEntity {
+public class Action {
+
+    @Id
+    private String id;
 
     private String title;
     private String type;
     private String icon;
 
     @Lob
-    @Column
+    @Column(name = "config_json")
     private String configJSON;
 
     @ManyToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
-    @JoinColumn(name = "evaluator_id")
+    @JoinColumn(name = "evaluator")
     private Evaluator evaluator;
 
 }

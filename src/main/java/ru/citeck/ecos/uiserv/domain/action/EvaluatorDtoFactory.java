@@ -12,14 +12,14 @@ class EvaluatorDtoFactory {
 
     static Evaluator fromDto(EvaluatorDTO evaluatorDTO) {
         Evaluator evaluator = new Evaluator();
-        evaluator.setId(evaluatorDTO.getId());
+        evaluator.setEvaluatorId(evaluatorDTO.getId());
         evaluator.setConfigJSON(nodeAsString(evaluatorDTO.getConfig()));
         return evaluator;
     }
 
     static EvaluatorDTO fromEvaluator(Evaluator evaluator) {
         EvaluatorDTO evaluatorDTO = new EvaluatorDTO();
-        evaluatorDTO.setId(evaluator.getId());
+        evaluatorDTO.setId(evaluator.getEvaluatorId());
         evaluatorDTO.setConfig(fromString(evaluator.getConfigJSON()));
         return evaluatorDTO;
     }
