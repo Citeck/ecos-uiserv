@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDTO;
 import ru.citeck.ecos.uiserv.domain.action.dto.EvaluatorDTO;
-import ru.citeck.ecos.uiserv.service.action.ActionService;
+import ru.citeck.ecos.uiserv.service.action.ActionEntityService;
 
 import java.io.IOException;
 import java.util.*;
@@ -27,13 +27,13 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
-public class ActionServiceTest {
+public class ActionEntityServiceTest {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private List<ActionDTO> actions = new ArrayList<>();
 
-    private ActionService actionService;
+    private ActionEntityService actionEntityService;
 
     @Before
     public void setup() throws IOException {
@@ -84,8 +84,8 @@ public class ActionServiceTest {
 
         actionDTO.setEvaluator(evaluatorDTO);
 
-        actionService.create(actionDTO);
-        ActionDTO found = actionService.getById(actionId).get();
+        actionEntityService.create(actionDTO);
+        ActionDTO found = actionEntityService.getById(actionId).get();
 
         assertThat(found, is(actionDTO));
     }
@@ -97,7 +97,7 @@ public class ActionServiceTest {
         actionDTO.setIcon("fire.png");
         actionDTO.setType("fire");
 
-        ActionDTO created = actionService.create(actionDTO);
+        ActionDTO created = actionEntityService.create(actionDTO);
 
         assertTrue(StringUtils.isNotBlank(created.getId()));
     }
@@ -131,12 +131,12 @@ public class ActionServiceTest {
 
         actionDTO.setEvaluator(evaluatorDTO);
 
-        actionService.create(actionDTO);
+        actionEntityService.create(actionDTO);
 
         actionDTO.setIcon("new-change-permission.png");
 
-        ActionDTO update = actionService.update(actionDTO);
-        ActionDTO updatedFound = actionService.getById(update.getId()).get();
+        ActionDTO update = actionEntityService.update(actionDTO);
+        ActionDTO updatedFound = actionEntityService.getById(update.getId()).get();
 
         assertThat(updatedFound, is(update));
     }
@@ -148,7 +148,7 @@ public class ActionServiceTest {
         actionDTO.setType("copy");
         actionDTO.setIcon("copy.png");
 
-        Throwable thrown = Assertions.catchThrowable(() -> actionService.update(actionDTO));
+        Throwable thrown = Assertions.catchThrowable(() -> actionEntityService.update(actionDTO));
         assertEquals("Cannot update entity with blank id", thrown.getMessage());
     }
 
@@ -160,20 +160,20 @@ public class ActionServiceTest {
     @Test
     public void getById() {
         List<ActionDTO> found = actions.stream()
-            .map(actionDTO -> actionService.getById(actionDTO.getId()).get())
+            .map(actionDTO -> actionEntityService.getById(actionDTO.getId()).get())
             .collect(Collectors.toList());
         assertThat(found, is(actions));
     }
 
     @Test
     public void getByKey() {
-        Throwable thrown = Assertions.catchThrowable(() -> actionService.getByKey("type", "key"));
+        Throwable thrown = Assertions.catchThrowable(() -> actionEntityService.getByKey("type", "key"));
         assertEquals("Unsupported operation", thrown.getMessage());
     }
 
     @Test
     public void getByKeys() {
-        Throwable thrown = Assertions.catchThrowable(() -> actionService.getByKeys("type",
+        Throwable thrown = Assertions.catchThrowable(() -> actionEntityService.getByKeys("type",
             Arrays.asList("key1", "key2")));
         assertEquals("Unsupported operation", thrown.getMessage());
     }
@@ -184,12 +184,12 @@ public class ActionServiceTest {
         actionDTO.setTitle("Change");
         actionDTO.setType("change");
 
-        ActionDTO created = actionService.create(actionDTO);
+        ActionDTO created = actionEntityService.create(actionDTO);
         String id = created.getId();
 
-        actionService.delete(id);
+        actionEntityService.delete(id);
 
-        Optional<ActionDTO> mustBeEmpty = actionService.getById(id);
+        Optional<ActionDTO> mustBeEmpty = actionEntityService.getById(id);
 
         assertThat(mustBeEmpty, is(Optional.empty()));
     }
@@ -197,7 +197,7 @@ public class ActionServiceTest {
     @Test
     public void deleteNotExistsEntity() {
         final String id = UUID.randomUUID().toString();
-        Throwable thrown = Assertions.catchThrowable(() -> actionService.delete(id));
+        Throwable thrown = Assertions.catchThrowable(() -> actionEntityService.delete(id));
 
         assertThat(thrown.getMessage(), is(String.format(
             "No class ru.citeck.ecos.uiserv.domain.action.Action entity with id %s exists!", id)));
@@ -265,11 +265,11 @@ public class ActionServiceTest {
         actions.add(printAction);
         actions.add(moveAction);
 
-        actions.forEach(actionDto -> actionService.create(actionDto));
+        actions.forEach(actionDto -> actionEntityService.create(actionDto));
     }
 
     @Autowired
-    public void setActionService(ActionService actionService) {
-        this.actionService = actionService;
+    public void setActionEntityService(ActionEntityService actionEntityService) {
+        this.actionEntityService = actionEntityService;
     }
 }
