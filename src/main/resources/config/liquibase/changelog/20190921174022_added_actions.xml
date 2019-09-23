@@ -7,6 +7,7 @@
             </column>
             <column name="configjson" type="TEXT"/>
             <column name="icon" type="VARCHAR(255)"/>
+            <column name="title" type="VARCHAR(255)"/>
             <column name="type" type="VARCHAR(255)"/>
             <column name="evaluator_id" type="VARCHAR(255)"/>
         </createTable>

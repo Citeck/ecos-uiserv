@@ -46,6 +46,7 @@ public class ActionServiceTest {
 
         ActionDTO actionDTO = new ActionDTO();
         actionDTO.setId(actionId);
+        actionDTO.setTitle("Delete");
         actionDTO.setIcon("delete.png");
         actionDTO.setType("delete");
         actionDTO.setConfig(OBJECT_MAPPER.readValue("{\n" +
@@ -92,6 +93,7 @@ public class ActionServiceTest {
     @Test
     public void createWithoutId() {
         ActionDTO actionDTO = new ActionDTO();
+        actionDTO.setIcon("Fire");
         actionDTO.setIcon("fire.png");
         actionDTO.setType("fire");
 
@@ -106,6 +108,7 @@ public class ActionServiceTest {
 
         ActionDTO actionDTO = new ActionDTO();
         actionDTO.setId(actionId);
+        actionDTO.setTitle("Change permission");
         actionDTO.setIcon("change-permission.png");
         actionDTO.setType("change-permission");
         actionDTO.setConfig(OBJECT_MAPPER.readValue("[\n" +
@@ -141,6 +144,7 @@ public class ActionServiceTest {
     @Test
     public void updateWithoutId() {
         ActionDTO actionDTO = new ActionDTO();
+        actionDTO.setTitle("Copy");
         actionDTO.setType("copy");
         actionDTO.setIcon("copy.png");
 
@@ -177,6 +181,7 @@ public class ActionServiceTest {
     @Test
     public void delete() {
         ActionDTO actionDTO = new ActionDTO();
+        actionDTO.setTitle("Change");
         actionDTO.setType("change");
 
         ActionDTO created = actionService.create(actionDTO);
@@ -202,6 +207,7 @@ public class ActionServiceTest {
     private void createTestActions() throws IOException {
         ActionDTO fireAction = new ActionDTO();
         fireAction.setId(UUID.randomUUID().toString());
+        fireAction.setTitle("Fire");
         fireAction.setIcon("fire.png");
         fireAction.setType("fire");
         fireAction.setConfig(OBJECT_MAPPER.readValue("{\n" +
@@ -226,6 +232,7 @@ public class ActionServiceTest {
 
         ActionDTO printAction = new ActionDTO();
         printAction.setId(UUID.randomUUID().toString());
+        printAction.setTitle("Print");
         printAction.setIcon("print.png");
         printAction.setType("print");
         printAction.setConfig(OBJECT_MAPPER.readValue("[\n" +
@@ -240,8 +247,9 @@ public class ActionServiceTest {
 
         ActionDTO moveAction = new ActionDTO();
         moveAction.setId(UUID.randomUUID().toString());
-        moveAction.setIcon("fire.png");
-        moveAction.setType("fire");
+        moveAction.setTitle("Move");
+        moveAction.setIcon("move.png");
+        moveAction.setType("move");
 
         EvaluatorDTO moveActionEvaluatorDTO = new EvaluatorDTO();
         moveActionEvaluatorDTO.setId("has-edit-permission");

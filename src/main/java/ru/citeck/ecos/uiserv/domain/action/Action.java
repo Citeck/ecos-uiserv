@@ -15,6 +15,7 @@ import javax.persistence.*;
 @Table(name = "actions")
 public class Action extends BaseEntity {
 
+    private String title;
     private String type;
     private String icon;
 

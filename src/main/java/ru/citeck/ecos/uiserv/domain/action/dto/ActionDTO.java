@@ -12,6 +12,7 @@ import ru.citeck.ecos.uiserv.domain.EntityDTO;
 public class ActionDTO implements EntityDTO {
 
     private String id;
+    private String title;
     private String type;
     private String icon;
     private JsonNode config = NullNode.getInstance();

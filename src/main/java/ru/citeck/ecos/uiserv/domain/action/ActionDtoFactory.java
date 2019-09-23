@@ -14,6 +14,7 @@ public class ActionDtoFactory {
         ActionDTO dto = new ActionDTO();
 
         dto.setId(action.getId());
+        dto.setTitle(action.getTitle());
         dto.setType(action.getType());
         dto.setIcon(action.getIcon());
         dto.setConfig(fromString(action.getConfigJSON()));
@@ -29,6 +30,7 @@ public class ActionDtoFactory {
         Action action = new Action();
 
         action.setId(actionDTO.getId());
+        action.setTitle(actionDTO.getTitle());
         action.setType(actionDTO.getType());
         action.setIcon(actionDTO.getIcon());
         action.setConfigJSON(nodeAsString(actionDTO.getConfig()));
