@@ -10,7 +10,7 @@ import javax.persistence.*;
  */
 @Data
 @Entity
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode
 @Table(name = "evaluators")
 public class Evaluator {
 

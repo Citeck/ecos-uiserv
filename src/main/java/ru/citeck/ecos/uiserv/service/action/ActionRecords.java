@@ -12,7 +12,7 @@ import ru.citeck.ecos.uiserv.service.entity.AbstractEntityRecords;
 public class ActionRecords extends AbstractEntityRecords<ActionDTO> {
 
     public static final String ID = "action";
-;
+
     @Autowired
     public ActionRecords(ActionService actionService) {
         setId(ID);

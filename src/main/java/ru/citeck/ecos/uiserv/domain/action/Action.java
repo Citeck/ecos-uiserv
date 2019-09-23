@@ -10,7 +10,7 @@ import javax.persistence.*;
  */
 @Data
 @Entity
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode
 @Table(name = "actions")
 public class Action {
 
@@ -25,7 +25,7 @@ public class Action {
     @Column(name = "config_json")
     private String configJSON;
 
-    @ManyToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "evaluator")
     private Evaluator evaluator;
 
