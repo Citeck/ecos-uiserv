@@ -1,0 +1,28 @@
+[
+    {
+        "id": "default-view",
+        "type": "view",
+        "icon": "icon-on",
+        "title": "grid.inline-tools.show"
+    },
+    {
+        "id": "default-download",
+        "type": "download",
+        "icon": "icon-download",
+        "title": "grid.inline-tools.download"
+    },
+    {
+        "id": "default-edit",
+        "type": "edit",
+        "icon": "icon-edit",
+        "title": "icon-delete",
+        "config": {
+            "theme": "danger"
+        }
+    },
+    {
+        "id": "default-move-to-lines",
+        "type": "move-to-lines",
+        "icon": "icon-big-arrow"
+    }
+]
