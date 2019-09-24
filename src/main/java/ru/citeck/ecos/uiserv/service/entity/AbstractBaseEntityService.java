@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.service.entity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.domain.EntityDTO;
 import ru.citeck.ecos.uiserv.domain.File;
@@ -52,31 +53,42 @@ public abstract class AbstractBaseEntityService<T extends EntityDTO> implements 
     }
 
     @Override
-    public Optional<T> getByKey(String type, String key) {
+    public Optional<T> getByKey(String type, String key, String user) {
         List<File> found = fileService.find("key", Collections.singletonList(key));
         if (found.isEmpty()) {
             return Optional.empty();
         }
 
-        List<T> entities = found.stream().map(this::fromJson).filter(t ->
-            Objects.equals(t.getType(), type)
-        ).collect(Collectors.toList());
+        List<T> entities = found.stream()
+            .map(this::fromJson)
+            .filter(t -> Objects.equals(t.getType(), type))
+            .filter(t -> {
+                if (user != null) {
+                    if (user.isEmpty()) {
+                        return StringUtils.isEmpty(t.getUser());
+                    }
+                    return Objects.equals(t.getUser(), user);
+                } else {
+                    return true;
+                }
+            })
+            .collect(Collectors.toList());
 
         if (entities.size() > 1) {
             log.warn(String.format("More than one entity <%s> found by type: '%s' and key: '%s'",
-                                   typeParameterClass, type, key));
+                typeParameterClass, type, key));
         }
         return entities.stream().findFirst();
     }
 
     @Override
-    public Optional<T> getByKeys(String type, List<String> keys) {
+    public Optional<T> getByKeys(String type, List<String> keys, String user) {
         if (CollectionUtils.isEmpty(keys)) {
             return Optional.empty();
         }
 
         return keys.stream()
-            .map(key -> getByKey(type, key))
+            .map(key -> getByKey(type, key, user))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .findFirst();

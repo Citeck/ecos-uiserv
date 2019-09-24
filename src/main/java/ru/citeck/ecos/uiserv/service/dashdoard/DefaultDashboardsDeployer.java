@@ -25,7 +25,7 @@ public class DefaultDashboardsDeployer {
     }
 
     private void deployEmptyDashboard(String type, String key) {
-        Optional<DashboardDTO> existing = entityService.getByKey(type, key);
+        Optional<DashboardDTO> existing = entityService.getByKey(type, key, null);
         if (!existing.isPresent()) {
             DashboardDTO entity = new DashboardDTO();
             entity.setId(UUID.randomUUID().toString());

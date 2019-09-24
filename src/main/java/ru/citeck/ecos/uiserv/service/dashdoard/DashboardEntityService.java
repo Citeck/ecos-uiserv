@@ -31,8 +31,14 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
 
     @Override
     public DashboardDTO create(DashboardDTO entity) {
-        String id = StringUtils.isNotBlank(entity.getId()) ? entity.getId() : UUID.randomUUID().toString();
-        return saveWithId(id, entity);
+        Optional<DashboardDTO> optional = getByKey(entity.getType(), entity.getKey(), entity.getUser());
+        if (optional.isPresent()) {
+            entity.setId(optional.get().getId());
+            return update(entity);
+        } else {
+            String id = StringUtils.isNotBlank(entity.getId()) ? entity.getId() : UUID.randomUUID().toString();
+            return saveWithId(id, entity);
+        }
     }
 
     @Override
@@ -41,13 +47,16 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
     }
 
     @Override
-    public Optional<DashboardDTO> getByKey(String type, String key) {
+    public Optional<DashboardDTO> getByKey(String type, String key, String user) {
         if (type == null) {
             type = "case-details";
         }
-        Optional<DashboardDTO> result = super.getByKey(type, key);
+        Optional<DashboardDTO> result = super.getByKey(type, key, user);
+        if (key == null) {
+            throw new IllegalArgumentException("Key must be specified");
+        }
         if (!result.isPresent() && key.startsWith(TYPE_REFIX)) {
-            result = super.getByKey(type, key.substring(TYPE_REFIX.length()));
+            result = super.getByKey(type, key.substring(TYPE_REFIX.length()), user);
         }
         return result;
     }

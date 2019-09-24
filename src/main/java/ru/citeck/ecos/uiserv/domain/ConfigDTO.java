@@ -24,4 +24,9 @@ public class ConfigDTO implements EntityDTO {
     public String getType() {
         return null;
     }
+
+    @Override
+    public String getUser() {
+        return null;
+    }
 }

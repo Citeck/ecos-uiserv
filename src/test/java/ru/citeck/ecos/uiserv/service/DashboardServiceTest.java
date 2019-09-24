@@ -57,7 +57,8 @@ public class DashboardServiceTest {
     public void getByKey() {
         List<DashboardDTO> found = dashboards.stream()
             .map(dashboardDTO -> dashboardService.getByKey(dashboardDTO.getType(),
-                dashboardDTO.getKey()).get())
+                dashboardDTO.getKey(),
+                dashboardDTO.getUser()).get())
             .collect(Collectors.toList());
         assertThat(found, is(dashboards));
     }
@@ -65,9 +66,10 @@ public class DashboardServiceTest {
     @Test
     public void getByKeys() {
         List<DashboardDTO> found = dashboards.stream()
-            .map(dashboardDTO -> dashboardService.getByKeys(dashboardDTO.getType(),
-                Arrays.asList("some-key", dashboardDTO.getKey(), "undefined-key")
-            ).get())
+            .map(dashboardDTO -> dashboardService.getByKeys(
+                dashboardDTO.getType(),
+                Arrays.asList("some-key", dashboardDTO.getKey(), "undefined-key"),
+                dashboardDTO.getUser()).get())
             .collect(Collectors.toList());
         assertThat(found, is(dashboards));
     }
@@ -119,7 +121,7 @@ public class DashboardServiceTest {
         assertThat(dto.getConfig(), is(saved.getConfig()));
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void saveWithoutKey() throws IOException {
         String id = UUID.randomUUID().toString();
 
@@ -134,7 +136,7 @@ public class DashboardServiceTest {
         DashboardDTO saved = dashboardService.create(dto);
         DashboardDTO found = dashboardService.getById(id).get();
 
-        assertThat(saved, is(found));
+//        assertThat(saved, is(found));
     }
 
     @Test

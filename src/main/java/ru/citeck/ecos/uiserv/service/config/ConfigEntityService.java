@@ -69,12 +69,12 @@ public class ConfigEntityService extends AbstractBaseEntityService<ConfigDTO> {
     }
 
     @Override
-    public Optional<ConfigDTO> getByKey(String type, String key) {
+    public Optional<ConfigDTO> getByKey(String type, String key, String user) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<ConfigDTO> getByKeys(String type, List<String> keys) {
+    public Optional<ConfigDTO> getByKeys(String type, List<String> keys, String user) {
         return Optional.empty();
     }
 }
