@@ -72,7 +72,7 @@ public class ActionRecords extends AbstractEntityRecords<ActionDTO> {
 
         switch (mode) {
             case MODE_JOURNAL:
-                actions = actionService.getJournalActions(record, query.getMode(), query.getScope());
+                actions = actionService.getJournalActions(record, query.getScope());
                 break;
             case MODE_CARD:
                 actions = actionService.getCardActions();
