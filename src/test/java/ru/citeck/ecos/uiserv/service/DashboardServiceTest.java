@@ -116,7 +116,7 @@ public class DashboardServiceTest {
         assertThat(dto.getConfig(), is(saved.getConfig()));
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void saveWithoutKey() throws IOException {
         String id = UUID.randomUUID().toString();
 
@@ -131,7 +131,7 @@ public class DashboardServiceTest {
         DashboardDTO saved = dashboardService.create(dto);
         DashboardDTO found = dashboardService.getById(id).get();
 
-        assertThat(saved, is(found));
+//        assertThat(saved, is(found));
     }
 
     @Test
