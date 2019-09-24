@@ -73,12 +73,12 @@ public class ActionEntityService extends AbstractBaseEntityService<ActionDTO> {
     }
 
     @Override
-    public Optional<ActionDTO> getByKey(String type, String key) {
+    public Optional<ActionDTO> getByKey(String type, String key, String user) {
         throw new RuntimeException("Unsupported operation");
     }
 
     @Override
-    public Optional<ActionDTO> getByKeys(String type, List<String> keys) {
+    public Optional<ActionDTO> getByKeys(String type, List<String> keys, String user) {
         throw new RuntimeException("Unsupported operation");
     }
 

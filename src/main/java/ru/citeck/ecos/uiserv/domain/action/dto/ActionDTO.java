@@ -22,4 +22,9 @@ public class ActionDTO implements EntityDTO {
     public String getKey() {
         return null;
     }
+
+    @Override
+    public String getUser() {
+        return null;
+    }
 }

@@ -167,14 +167,14 @@ public class ActionEntityServiceTest {
 
     @Test
     public void getByKey() {
-        Throwable thrown = Assertions.catchThrowable(() -> actionEntityService.getByKey("type", "key"));
+        Throwable thrown = Assertions.catchThrowable(() -> actionEntityService.getByKey("type", "key", "user"));
         assertEquals("Unsupported operation", thrown.getMessage());
     }
 
     @Test
     public void getByKeys() {
         Throwable thrown = Assertions.catchThrowable(() -> actionEntityService.getByKeys("type",
-            Arrays.asList("key1", "key2")));
+            Arrays.asList("key1", "key2"), "user"));
         assertEquals("Unsupported operation", thrown.getMessage());
     }
 
