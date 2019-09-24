@@ -3,7 +3,13 @@
         "id": "default-view",
         "type": "view",
         "icon": "icon-on",
-        "title": "grid.inline-tools.show"
+        "title": "grid.inline-tools.show",
+        "evaluator": {
+            "id": "record-permission",
+            "config": {
+                "permission": "Read"
+            }
+        }
     },
     {
         "id": "default-download",
@@ -12,12 +18,30 @@
         "title": "grid.inline-tools.download"
     },
     {
+        "id": "default-delete",
+        "type": "remove",
+        "icon": "icon-delete",
+        "title": "grid.inline-tools.delete",
+        "config": {
+            "theme": "danger"
+        },
+        "evaluator": {
+            "id": "record-permission",
+            "config": {
+                "permission": "Delete"
+            }
+        }
+    },
+    {
         "id": "default-edit",
         "type": "edit",
         "icon": "icon-edit",
-        "title": "icon-delete",
-        "config": {
-            "theme": "danger"
+        "title": "grid.inline-tools.edit",
+        "evaluator": {
+            "id": "record-permission",
+            "config": {
+                "permission": "Write"
+            }
         }
     },
     {

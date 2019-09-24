@@ -106,9 +106,9 @@ jhipster:
                 enabled: false
                 update-interval: 3
                 url: http://localhost:8180/mancenter
-    # CORS is disabled by default on microservices, as you should access them through a gateway.
-    # If you want to enable it, please uncomment the configuration below.
-    # cors:
+        # CORS is disabled by default on microservices, as you should access them through a gateway.
+        # If you want to enable it, please uncomment the configuration below.
+        # cors:
         # allowed-origins: "*"
         # allowed-methods: "*"
         # allowed-headers: "*"

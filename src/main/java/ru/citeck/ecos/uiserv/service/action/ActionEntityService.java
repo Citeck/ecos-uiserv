@@ -13,6 +13,8 @@ import ru.citeck.ecos.uiserv.service.entity.AbstractBaseEntityService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * @author Roman Makarskiy
@@ -60,6 +62,15 @@ public class ActionEntityService extends AbstractBaseEntityService<ActionDTO> {
         ActionDTO actionDTO = ActionDtoFactory.fromAction(actionOpt.get());
 
         return Optional.of(actionDTO);
+    }
+
+    public List<ActionDTO> findAllById(List<String> ids) {
+        Iterable<Action> allById = actionRepository.findAllById(ids);
+
+        return StreamSupport
+            .stream(allById.spliterator(), false)
+            .map(ActionDtoFactory::fromAction)
+            .collect(Collectors.toList());
     }
 
     @Override

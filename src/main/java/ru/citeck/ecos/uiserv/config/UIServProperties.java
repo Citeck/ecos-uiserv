@@ -8,12 +8,16 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @Component
 @ConfigurationProperties(prefix = "uiserv")
-public class UIServConfigProperties {
+public class UIServProperties {
+
+    @Getter
+    private final Action action = new Action();
 
     @Setter @Getter
     private Map<String, Config> config = Collections.emptyMap();
@@ -34,4 +38,14 @@ public class UIServConfigProperties {
         private String description;
         private String value;
     }
+
+    @Getter
+    @Setter
+    public static class Action {
+
+        private List<String> defaultJournalActions = UIServDefault.Action.DEFAULT_JOURNAL_ACTIONS;
+        private String getAlfJournalUrlEndpoint = UIServDefault.Action.GET_ALF_JOURNAL_URL_ENDPOINT;
+
+    }
+
 }
