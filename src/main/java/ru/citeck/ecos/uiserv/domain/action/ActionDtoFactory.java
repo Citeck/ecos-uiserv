@@ -85,4 +85,17 @@ public class ActionDtoFactory {
         return new ArrayList<>(Arrays.asList(actions));
     }
 
+    public static List<ActionDTO> fromJsonNode(JsonNode jsonNode) {
+        try {
+            ActionDTO[] actionDTOS = OBJECT_MAPPER.treeToValue(jsonNode, ActionDTO[].class);
+            if (actionDTOS == null) {
+                return Collections.emptyList();
+            }
+
+            return new ArrayList<>(Arrays.asList(actionDTOS));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed convert jsonNode to ActionDTO", e);
+        }
+    }
+
 }

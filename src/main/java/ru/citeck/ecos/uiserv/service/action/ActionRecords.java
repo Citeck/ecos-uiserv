@@ -75,7 +75,7 @@ public class ActionRecords extends AbstractEntityRecords<ActionDTO> {
                 actions = actionService.getJournalActions(record, query.getScope());
                 break;
             case MODE_CARD:
-                actions = actionService.getCardActions();
+                actions = actionService.getCardActions(record);
                 break;
             default:
                 throw new IllegalArgumentException(String.format("Mode: <%s> not supported", mode));
