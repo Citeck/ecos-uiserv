@@ -5,7 +5,7 @@
         "icon": "icon-on",
         "title": "grid.inline-tools.show",
         "evaluator": {
-            "id": "record-permission",
+            "id": "record-has-permission",
             "config": {
                 "permission": "Read"
             }
@@ -26,7 +26,7 @@
             "theme": "danger"
         },
         "evaluator": {
-            "id": "record-permission",
+            "id": "record-has-permission",
             "config": {
                 "permission": "Delete"
             }
@@ -38,15 +38,10 @@
         "icon": "icon-edit",
         "title": "grid.inline-tools.edit",
         "evaluator": {
-            "id": "record-permission",
+            "id": "record-has-permission",
             "config": {
                 "permission": "Write"
             }
         }
-    },
-    {
-        "id": "default-move-to-lines",
-        "type": "move-to-lines",
-        "icon": "icon-big-arrow"
     }
 ]

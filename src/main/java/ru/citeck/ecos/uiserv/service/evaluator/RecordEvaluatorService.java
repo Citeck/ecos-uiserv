@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.service.evaluator;
 
+import lombok.NonNull;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -16,14 +17,10 @@ public class RecordEvaluatorService implements ApplicationContextAware {
 
     private ApplicationContext context;
 
-    public boolean evaluate(Evaluated evaluated, RecordRef recordRef) {
-        if (evaluated == null) {
-            return true;
-        }
-
+    public boolean evaluate(@NonNull Evaluated evaluated, @NonNull RecordRef recordRef) {
         String id = evaluated.getId();
         if (StringUtils.isBlank(id)) {
-            return true;
+            throw new IllegalArgumentException("Evaluated id cannot be empty");
         }
 
         RecordEvaluator bean = context.getBean(id, RecordEvaluator.class);

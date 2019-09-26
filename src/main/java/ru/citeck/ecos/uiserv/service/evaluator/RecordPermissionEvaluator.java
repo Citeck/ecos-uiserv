@@ -10,7 +10,7 @@ import ru.citeck.ecos.records2.exception.RecordsException;
 /**
  * @author Roman Makarskiy
  */
-@Component("record-permission")
+@Component("record-has-permission")
 public class RecordPermissionEvaluator implements RecordEvaluator {
 
     private static final String PERMISSION_ATT_PATTERN = ".att(n:\"permissions\"){has(n:\"%s\")}";
