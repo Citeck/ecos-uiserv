@@ -41,6 +41,11 @@ public class DashboardServiceTest {
     }
 
     @Test
+    public void createTestActionsSize() {
+        assertThat(dashboards.size(), is(3));
+    }
+
+    @Test
     public void getById() {
         List<DashboardDTO> found = dashboards.stream()
             .map(dashboardDTO -> dashboardService.getById(dashboardDTO.getId()).get())

@@ -21,7 +21,10 @@ import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.RecordsServiceFactory;
 import ru.citeck.ecos.records2.meta.RecordsMetaService;
 import ru.citeck.ecos.records2.request.rest.RestHandler;
-import ru.citeck.ecos.uiserv.service.form.*;
+import ru.citeck.ecos.uiserv.service.form.EcosFormService;
+import ru.citeck.ecos.uiserv.service.form.EcosFormServiceImpl;
+import ru.citeck.ecos.uiserv.service.form.FormProvider;
+import ru.citeck.ecos.uiserv.service.form.NormalFormProvider;
 
 import javax.net.ssl.*;
 import javax.servlet.http.HttpServletRequest;

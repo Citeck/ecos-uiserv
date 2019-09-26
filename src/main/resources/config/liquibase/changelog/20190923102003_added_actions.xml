@@ -1,0 +1,30 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="Romancha (generated)" id="1569234010795-1">
+        <createTable tableName="actions">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="config_json" type="TEXT"/>
+            <column name="icon" type="VARCHAR(255)"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="type" type="VARCHAR(255)"/>
+            <column name="evaluator" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="Romancha (generated)" id="1569234010795-2">
+        <createTable tableName="evaluators">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="evaluatorsPK"/>
+            </column>
+            <column name="config_json" type="TEXT"/>
+            <column name="evaluator_id" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="Romancha (generated)" id="1569234010795-3">
+        <addPrimaryKey columnNames="id" constraintName="actionsPK" tableName="actions"/>
+    </changeSet>
+    <changeSet author="Romancha (generated)" id="1569234010795-4">
+        <addForeignKeyConstraint baseColumnNames="evaluator" baseTableName="actions" constraintName="FK1owjxnwar3218wyvjw8nqy9so" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="evaluators"/>
+    </changeSet>
+</databaseChangeLog>
