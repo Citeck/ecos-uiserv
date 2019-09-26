@@ -15,7 +15,13 @@
         "id": "default-download",
         "type": "download",
         "icon": "icon-download",
-        "title": "grid.inline-tools.download"
+        "title": "grid.inline-tools.download",
+        "evaluator": {
+            "id": "record-has-attribute",
+            "config": {
+                "attribute": "_content"
+            }
+        }
     },
     {
         "id": "default-delete",

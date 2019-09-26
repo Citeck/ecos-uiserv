@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.service.evaluator;
+package ru.citeck.ecos.uiserv.service.evaluator.evaluators;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,19 +6,21 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.exception.RecordsException;
+import ru.citeck.ecos.uiserv.service.evaluator.RecordEvaluator;
 
 /**
  * @author Roman Makarskiy
  */
 @Component("record-has-permission")
-public class RecordPermissionEvaluator implements RecordEvaluator {
+public class RecordHasPermissionEvaluator implements RecordEvaluator {
 
     private static final String PERMISSION_ATT_PATTERN = ".att(n:\"permissions\"){has(n:\"%s\")}";
+    private static final String PERMISSION_CONFIG_ATT = "permission";
 
     private final RecordsService recordsService;
 
     @Autowired
-    public RecordPermissionEvaluator(RecordsService recordsService) {
+    public RecordHasPermissionEvaluator(RecordsService recordsService) {
         this.recordsService = recordsService;
     }
 
@@ -27,7 +29,7 @@ public class RecordPermissionEvaluator implements RecordEvaluator {
         String permission;
 
         if (config instanceof JsonNode) {
-            JsonNode permissionNode = ((JsonNode) config).get("permission");
+            JsonNode permissionNode = ((JsonNode) config).get(PERMISSION_CONFIG_ATT);
             if (permissionNode == null || permissionNode.isNull() || permissionNode.isMissingNode()) {
                 throw new IllegalArgumentException("You need to specify a permission kind, for evaluating. Config:"
                     + config.toString());
