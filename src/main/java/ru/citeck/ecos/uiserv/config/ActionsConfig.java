@@ -18,27 +18,26 @@ import java.io.InputStream;
 @Configuration
 public class ActionsConfig {
 
-    private static final String DEFAULT_ACTION_CLASSPATH = "/action/default-actions.json";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final ActionEntityService actionEntityService;
+    private final UIServProperties properties;
 
-    public ActionsConfig(ActionEntityService actionEntityService) {
+    public ActionsConfig(ActionEntityService actionEntityService, UIServProperties properties) {
         this.actionEntityService = actionEntityService;
+        this.properties = properties;
     }
 
     @PostConstruct
     public void deployDefaultAction() {
+        String classPath = properties.getAction().getDefaultActionsClasspath();
         String info = "\n======================== Deploy default action ======================\n" +
-            "Classpath: " + DEFAULT_ACTION_CLASSPATH + "\n";
+            "Classpath: " + classPath + "\n";
 
-        try (InputStream defaultActions = new ClassPathResource(DEFAULT_ACTION_CLASSPATH).getInputStream()) {
+        try (InputStream defaultActions = new ClassPathResource(classPath)
+            .getInputStream()) {
 
             ActionDTO[] actions = OBJECT_MAPPER.readValue(defaultActions, ActionDTO[].class);
-            if (actions == null) {
-                info += "No default actions found\n";
-                return;
-            }
 
             info += String.format("Found %s default actions", actions.length) + "\n";
 
@@ -48,7 +47,7 @@ public class ActionsConfig {
             }
 
         } catch (IOException e) {
-            throw new RuntimeException("Failed get default actions from classpath: " + DEFAULT_ACTION_CLASSPATH);
+            throw new RuntimeException("Failed get default actions from classpath: " + classPath);
         }
 
         info += "====================== Default actions deployed ======================";

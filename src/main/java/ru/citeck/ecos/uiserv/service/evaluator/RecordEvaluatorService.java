@@ -17,7 +17,11 @@ public class RecordEvaluatorService implements ApplicationContextAware {
 
     private ApplicationContext context;
 
-    public boolean evaluate(@NonNull Evaluated evaluated, @NonNull RecordRef recordRef) {
+    public boolean evaluate(Evaluated evaluated, @NonNull RecordRef recordRef) {
+        if (evaluated == null) {
+            return true;
+        }
+
         String id = evaluated.getId();
         if (StringUtils.isBlank(id)) {
             throw new IllegalArgumentException("Evaluated id cannot be empty");

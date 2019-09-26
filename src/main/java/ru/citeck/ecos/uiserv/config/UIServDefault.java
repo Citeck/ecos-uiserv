@@ -20,6 +20,8 @@ public class UIServDefault {
             "default-delete", "default-edit");
 
         public static final String GET_ALF_JOURNAL_URL_ENDPOINT = "/share/proxy/alfresco/api/journals/config?journalId=";
+
+        public static final String DEFAULT_ACTIONS_CLASSPATH = "/action/default-actions.json";
     }
 
 }

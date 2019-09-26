@@ -47,6 +47,10 @@ public class ActionService {
         this.properties = properties;
     }
 
+    public List<ActionDTO> getDefaultJournalActions() {
+        return actionEntityService.findAllById(properties.getAction().getDefaultJournalActions());
+    }
+
     public List<ActionDTO> getCardActions(RecordRef record) {
         JsonNode attribute = recordsService.getAttribute(setDefaultSourceId(record), RECORD_ACTIONS_ATT_SCHEMA);
         return ActionDtoFactory.fromJsonNode(attribute);
@@ -67,12 +71,10 @@ public class ActionService {
 
         List<ActionDTO> result = CollectionUtils.isNotEmpty(fromAlf) ? fromAlf : getDefaultJournalActions();
 
-        result = result
+        return result
             .stream()
             .filter(actionDTO -> recordEvaluatorService.evaluate(actionDTO.getEvaluator(), setDefaultSourceId(record)))
             .collect(Collectors.toList());
-
-        return result;
     }
 
     private RecordRef setDefaultSourceId(RecordRef record) {
@@ -122,10 +124,6 @@ public class ActionService {
         }
 
         return action;
-    }
-
-    private List<ActionDTO> getDefaultJournalActions() {
-        return actionEntityService.findAllById(properties.getAction().getDefaultJournalActions());
     }
 
 }

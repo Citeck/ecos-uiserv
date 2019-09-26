@@ -45,6 +45,7 @@ public class UIServProperties {
 
         private List<String> defaultJournalActions = UIServDefault.Action.DEFAULT_JOURNAL_ACTIONS;
         private String getAlfJournalUrlEndpoint = UIServDefault.Action.GET_ALF_JOURNAL_URL_ENDPOINT;
+        private String defaultActionsClasspath = UIServDefault.Action.DEFAULT_ACTIONS_CLASSPATH;
 
     }
 
