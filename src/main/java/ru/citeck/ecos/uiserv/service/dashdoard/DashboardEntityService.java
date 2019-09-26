@@ -31,6 +31,10 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
 
     @Override
     public DashboardDTO create(DashboardDTO entity) {
+        if (StringUtils.isBlank(entity.getKey())) {
+            throw new IllegalArgumentException("Key is mandatory for creating dashboard");
+        }
+
         Optional<DashboardDTO> optional = getByKey(entity.getType(), entity.getKey(), entity.getUser());
         if (optional.isPresent()) {
             entity.setId(optional.get().getId());
@@ -52,9 +56,6 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
             type = "case-details";
         }
         Optional<DashboardDTO> result = super.getByKey(type, key, user);
-        if (key == null) {
-            throw new IllegalArgumentException("Key must be specified");
-        }
         if (!result.isPresent() && key.startsWith(TYPE_REFIX)) {
             result = super.getByKey(type, key.substring(TYPE_REFIX.length()), user);
         }
