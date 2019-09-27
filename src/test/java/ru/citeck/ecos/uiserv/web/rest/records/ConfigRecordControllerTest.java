@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.web.rest.dashboard;
+package ru.citeck.ecos.uiserv.web.rest.records;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
