@@ -13,7 +13,7 @@ timestamps {
     }
     stage('Running JUnit Test') {
       withMaven(mavenLocalRepo: '/opt/jenkins/.m2/repository', tempBinDir: '') {
-        sh "clean test -Dskip.npm"
+        sh "mvn clean test -Dskip.npm"
       }
       junit '**/target/surefire-reports/*.xml'
     }
