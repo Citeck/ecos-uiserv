@@ -16,6 +16,10 @@ timestamps {
         sh "mvn clean test -Dskip.npm"
       }
       junit '**/target/surefire-reports/*.xml'
+      AbstractTestResultAction testResultAction = currentBuild.rawBuild.getAction(AbstractTestResultAction.class)
+      if (testResultAction != null) {
+          echo "Tests: ${testResultAction.failCount} / ${testResultAction.failureDiffString} failures of ${testResultAction.totalCount}.\n\n" 
+      }
     }
     def project_version = readMavenPom().getVersion().toLowerCase()
     try {
