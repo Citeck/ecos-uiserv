@@ -1,8 +1,6 @@
 timestamps {
   node {
-    stage('Running JUnit Test') {
-      build 'JUnit micro - uiserv'
-    }
+    mattermostSend endpoint: 'https://mm.citeck.ru/hooks/9ytch3uox3retkfypuq7xi3yyr', channel: "build_notifications", color: 'good', message: " :arrow_forward: Build info - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
     stage('Checkout SCM') {
       checkout([
         $class: 'GitSCM',
@@ -13,9 +11,14 @@ timestamps {
         userRemoteConfigs: [[credentialsId: 'bc074014-bab1-4fb0-b5a4-4cfa9ded5e66',url: 'git@bitbucket.org:citeck/ecos-uiserv.git']]
       ])
     }
+    stage('Running JUnit Test') {
+      withMaven(mavenLocalRepo: '/opt/jenkins/.m2/repository', tempBinDir: '') {
+        sh "clean test -Dskip.npm"
+      }
+      junit '**/target/surefire-reports/*.xml'
+    }
     def project_version = readMavenPom().getVersion().toLowerCase()
     try {
-      mattermostSend endpoint: 'https://mm.citeck.ru/hooks/9ytch3uox3retkfypuq7xi3yyr', channel: "build_notifications", color: 'good', message: " :arrow_forward: Build info - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
       stage('Build project artifacts') {
         withMaven(mavenLocalRepo: '/opt/jenkins/.m2/repository', tempBinDir: '') {
           sh "mvn clean package -Pdev,logToFile -DskipTests=true -Djib.docker.image.tag=${project_version} jib:dockerBuild"
