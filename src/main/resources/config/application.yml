@@ -192,6 +192,8 @@ uiserv:
     config:
         tabs-enabled:
             value: true
+        language-switcher-enabled:
+            value: true
 
 #alfresco:
 #    schema: https
