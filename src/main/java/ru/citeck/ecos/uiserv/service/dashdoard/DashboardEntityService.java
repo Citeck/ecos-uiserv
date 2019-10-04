@@ -47,6 +47,9 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
 
     @Override
     public DashboardDTO update(DashboardDTO entity) {
+        if (entity.getId() == null) {
+            return create(entity);
+        }
         return saveWithId(entity.getId(), entity);
     }
 
