@@ -5,7 +5,7 @@ timestamps {
       stage('Checkout SCM') {
         checkout([
           $class: 'GitSCM',
-          branches: [[name: 'master']],
+          branches: [[name: '${env.BRANCH_NAME}']],
           doGenerateSubmoduleConfigurations: false,
           extensions: [],
           submoduleCfg: [],
@@ -16,7 +16,7 @@ timestamps {
         withMaven(mavenLocalRepo: '/opt/jenkins/.m2/repository', tempBinDir: '') {
           sh "mvn clean test -Dskip.npm"
         }
-        junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+        junit '**/target/surefire-reports/*.xml'
       }
       def project_version = readMavenPom().getVersion().toLowerCase()
       stage('Build project artifacts') {

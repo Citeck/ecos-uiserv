@@ -94,12 +94,19 @@ public abstract class AbstractEntityRecords<T extends EntityDTO> extends CrudRec
         if (query.key == null) {
             query.key = "DEFAULT";
         }
+        if (query.user.isEmpty()) {
+            query.user = null;
+        }
         Optional<T> entityDTO = Optional.empty();
 
         if (StringUtils.isNotBlank(query.key)) {
-            entityDTO = entityService.getByKeys(query.type, Arrays.stream(query.key.split(","))
+            List<String> keys = Arrays.stream(query.key.split(","))
                 .filter(StringUtils::isNotBlank)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
+            entityDTO = entityService.getByKeys(query.type, keys, query.user);
+            if (!entityDTO.isPresent()) {
+                entityDTO = entityService.getByKeys(query.type, keys, null);
+            }
         } else if (query.record != null) {
             entityDTO = entityService.getByRecord(query.record);
         }

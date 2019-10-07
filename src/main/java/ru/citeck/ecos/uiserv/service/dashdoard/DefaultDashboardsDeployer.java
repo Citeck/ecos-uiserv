@@ -21,10 +21,11 @@ public class DefaultDashboardsDeployer {
         deployEmptyDashboard(DashboardConstants.TYPE_USER_DASHBOARD, "DEFAULT");
         deployEmptyDashboard(DashboardConstants.TYPE_SITE_DASHBOARD, "DEFAULT");
         deployEmptyDashboard(DashboardConstants.TYPE_CASE_DETAILS, "DEFAULT");
+        deployEmptyDashboard(DashboardConstants.TYPE_PROFILE_DETAILS, "DEFAULT");
     }
 
     private void deployEmptyDashboard(String type, String key) {
-        Optional<DashboardDTO> existing = entityService.getByKey(type, key);
+        Optional<DashboardDTO> existing = entityService.getByKey(type, key, null);
         if (!existing.isPresent()) {
             DashboardDTO entity = new DashboardDTO();
             entity.setId(UUID.randomUUID().toString());

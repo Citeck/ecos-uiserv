@@ -171,6 +171,7 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
     }
 
     public static class EcosFormModelDownstream extends EcosFormModel {
+
         private String displayName;
 
         @DisplayName

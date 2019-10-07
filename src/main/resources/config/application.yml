@@ -191,7 +191,14 @@ application:
 uiserv:
     config:
         tabs-enabled:
-            value: false
+            value: true
+        language-switcher-enabled:
+            value: true
 
 #alfresco:
 #    schema: https
+
+spring.rabbitmq:
+    host: rabbitmq
+    username: admin
+    password: admin

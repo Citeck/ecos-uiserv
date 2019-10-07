@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -41,6 +43,11 @@ public class DashboardServiceTest {
     }
 
     @Test
+    public void createTestActionsSize() {
+        assertThat(dashboards.size(), is(3));
+    }
+
+    @Test
     public void getById() {
         List<DashboardDTO> found = dashboards.stream()
             .map(dashboardDTO -> dashboardService.getById(dashboardDTO.getId()).get())
@@ -52,7 +59,8 @@ public class DashboardServiceTest {
     public void getByKey() {
         List<DashboardDTO> found = dashboards.stream()
             .map(dashboardDTO -> dashboardService.getByKey(dashboardDTO.getType(),
-                                                           dashboardDTO.getKey()).get())
+                dashboardDTO.getKey(),
+                dashboardDTO.getUser()).get())
             .collect(Collectors.toList());
         assertThat(found, is(dashboards));
     }
@@ -60,9 +68,10 @@ public class DashboardServiceTest {
     @Test
     public void getByKeys() {
         List<DashboardDTO> found = dashboards.stream()
-            .map(dashboardDTO -> dashboardService.getByKeys(dashboardDTO.getType(),
-                Arrays.asList("some-key", dashboardDTO.getKey(), "undefined-key")
-            ).get())
+            .map(dashboardDTO -> dashboardService.getByKeys(
+                dashboardDTO.getType(),
+                Arrays.asList("some-key", dashboardDTO.getKey(), "undefined-key"),
+                dashboardDTO.getUser()).get())
             .collect(Collectors.toList());
         assertThat(found, is(dashboards));
     }
@@ -114,22 +123,18 @@ public class DashboardServiceTest {
         assertThat(dto.getConfig(), is(saved.getConfig()));
     }
 
-    @Test
+    @Test()
     public void saveWithoutKey() throws IOException {
-        String id = UUID.randomUUID().toString();
-
         DashboardDTO dto = new DashboardDTO();
-        dto.setId(id);
+        dto.setId(UUID.randomUUID().toString());
         dto.setConfig(objectMapper.readValue("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"TOP\"\n" +
             "  }\n" +
             "}", JsonNode.class));
 
-        DashboardDTO saved = dashboardService.create(dto);
-        DashboardDTO found = dashboardService.getById(id).get();
-
-        assertThat(saved, is(found));
+        Throwable thrown = Assertions.catchThrowable(() -> dashboardService.create(dto));
+        assertEquals("Key is mandatory for creating dashboard", thrown.getMessage());
     }
 
     @Test

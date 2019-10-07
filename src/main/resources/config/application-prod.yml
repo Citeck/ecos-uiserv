@@ -154,8 +154,3 @@ jhipster:
 # ===================================================================
 
 # application:
-
-alfresco:
-    ribbon:
-        NIWSServerListClassName: com.netflix.loadbalancer.ConfigurationBasedServerList
-        listOfServers: 127.0.0.1:58080 #расчет на работу в docker
