@@ -363,7 +363,7 @@
         <dependency>
             <groupId>ru.citeck.ecos.community</groupId>
             <artifactId>ecos-records</artifactId>
-            <version>1.7.0-SNAPSHOT</version>
+            <version>1.7.0</version>
         </dependency>
 
         <dependency>
@@ -381,7 +381,7 @@
         <dependency>
             <groupId>ru.citeck.ecos.community</groupId>
             <artifactId>ecos-apps-lib</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
 
         <dependency>
