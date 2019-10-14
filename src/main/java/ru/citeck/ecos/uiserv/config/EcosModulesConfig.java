@@ -4,16 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import ru.citeck.ecos.apps.EcosAppsApiFactory;
-import ru.citeck.ecos.apps.app.module.api.ModulePublishMsg;
-import ru.citeck.ecos.apps.app.module.type.impl.dashboard.DashboardModule;
-import ru.citeck.ecos.apps.app.module.type.impl.form.FormModule;
+import ru.citeck.ecos.apps.app.module.type.dashboard.DashboardModule;
+import ru.citeck.ecos.apps.app.module.type.form.FormModule;
 import ru.citeck.ecos.uiserv.domain.DashboardDTO;
 import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;
 import ru.citeck.ecos.uiserv.service.form.EcosFormModel;
 import ru.citeck.ecos.uiserv.service.form.EcosFormService;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
 
 @Slf4j
 @Configuration
@@ -35,31 +33,19 @@ public class EcosModulesConfig {
 
     @PostConstruct
     public void init() {
-        apiFactory.getModuleApi().onModulePublished(FormModule.TYPE, this::deployForm);
-        apiFactory.getModuleApi().onModulePublished(DashboardModule.TYPE, this::deployDashboard);
+        apiFactory.getModuleApi().onModulePublished(FormModule.class, this::deployForm);
+        apiFactory.getModuleApi().onModulePublished(DashboardModule.class, this::deployDashboard);
     }
 
-    public void deployForm(ModulePublishMsg msg) throws IOException {
-
-        byte[] formData = msg.getData();
-
-        if (formData == null) {
-            throw new RuntimeException("Form can't be deployed. Data is not received");
-        }
-
-        EcosFormModel formModel = mapper.readValue(formData, EcosFormModel.class);
+    public void deployForm(FormModule formModule) {
+        //todo: remove conversion
+        EcosFormModel formModel = mapper.convertValue(formModule, EcosFormModel.class);
         formService.save(formModel);
     }
 
-    public void deployDashboard(ModulePublishMsg msg) throws IOException {
-
-        byte[] dashboardData = msg.getData();
-
-        if (dashboardData == null) {
-            throw new RuntimeException("Dashboard can't be deployed. Data is not received");
-        }
-
-        DashboardDTO dashboardDTO = mapper.readValue(dashboardData, DashboardDTO.class);
+    public void deployDashboard(DashboardModule dashboardModule) {
+        //todo: remove conversion
+        DashboardDTO dashboardDTO = mapper.convertValue(dashboardModule, DashboardDTO.class);
         dashboardEntityService.update(dashboardDTO);
     }
 }
