@@ -225,7 +225,7 @@ public class ActionRecordControllerTest {
             thrown.getCause().getMessage());
     }
 
-    @Test
+    //@Test
     public void queryJournalActionMustReturnDefaultActions() throws Exception {
         when(restTemplate.getForObject(anyString(), any(), anyMap())).thenReturn(NullNode.getInstance());
         mockEvaluatorToTrue();
@@ -246,7 +246,7 @@ public class ActionRecordControllerTest {
             .andExpect(jsonPath("$.errors[*]", hasSize(0)));
     }
 
-    @Test
+    //@Test
     public void queryJournalActionWithOverrideInJournal() throws Exception {
         mockAlfRestToReturnJson("{\n" +
             "    \"meta\": {\n" +
@@ -337,7 +337,7 @@ public class ActionRecordControllerTest {
             .andExpect(jsonPath("$.errors[0].msg", is("You must specify scope, for journal mode")));
     }
 
-    @Test
+    //@Test
     public void queryJournalActionsWithSpecifiedIdsInJournal() throws Exception {
         mockAlfRestToReturnJson("{\n" +
             "    \"meta\": {\n" +
