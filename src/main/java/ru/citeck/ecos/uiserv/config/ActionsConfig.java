@@ -28,7 +28,7 @@ public class ActionsConfig {
         this.properties = properties;
     }
 
-    @PostConstruct
+    //@PostConstruct
     public void deployDefaultAction() {
         String classPath = properties.getAction().getDefaultActionsClasspath();
         String info = "\n======================== Deploy default action ======================\n" +
@@ -54,6 +54,4 @@ public class ActionsConfig {
 
         log.info(info);
     }
-
-
 }
