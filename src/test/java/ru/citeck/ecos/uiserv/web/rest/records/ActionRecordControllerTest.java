@@ -260,12 +260,12 @@ public class ActionRecordControllerTest {
             "                \"type\": \"trash-remove\",\n" +
             "                \"icon\": \"icon-trash-delete\",\n" +
             "                \"title\": \"Trash delete\",\n" +
-            "                \"params\": {\n" +
+            "                \"config\": {\n" +
             "                    \"theme\": \"no-danger\"\n" +
             "                },\n" +
             "                \"evaluator\": {\n" +
             "                    \"id\": \"record-has-permission\",\n" +
-            "                    \"params\": {\n" +
+            "                    \"config\": {\n" +
             "                        \"permission\": \"trash-delete\"\n" +
             "                    }\n" +
             "                }\n" +
@@ -388,7 +388,7 @@ public class ActionRecordControllerTest {
             "                \"type\": \"custom-action\",\n" +
             "                \"evaluator\": {\n" +
             "                    \"id\": \"record-has-permission\",\n" +
-            "                    \"params\": {\n" +
+            "                    \"config\": {\n" +
             "                        \"permission\": \"Read\"\n" +
             "                    }\n" +
             "                }\n" +

@@ -87,7 +87,7 @@ public class ActionServiceTest {
             "        \"icon\": null,\n" +
             "        \"title\": \"userActions.contract.property.approvalCancelation\",\n" +
             "        \"type\": \"CREATE_NODE\",\n" +
-            "        \"params\": {\n" +
+            "        \"config\": {\n" +
             "            \"destinationAssoc\": \"iEvent:additionalDataItems\",\n" +
             "            \"destination\": \"workspace://SpacesStore/some-destination\",\n" +
             "            \"nodeType\": \"ctrEvent:cancelApproval\"\n" +
@@ -99,7 +99,7 @@ public class ActionServiceTest {
             "        \"icon\": null,\n" +
             "        \"title\": \"Тестовое действие\",\n" +
             "        \"type\": \"REQUEST\",\n" +
-            "        \"params\": {\n" +
+            "        \"config\": {\n" +
             "            \"requestMethod\": \"POST\",\n" +
             "            \"context\": \"PROXY_URI\",\n" +
             "            \"url\": \"citeck/event/fire-event?eventRef=workspace://SpacesStore/fire-event\",\n" +
@@ -140,7 +140,7 @@ public class ActionServiceTest {
             "                \"icon\": null,\n" +
             "                \"title\": \"userActions.contract.property.approvalCancelation\",\n" +
             "                \"type\": \"CREATE_NODE\",\n" +
-            "                \"params\": {\n" +
+            "                \"config\": {\n" +
             "                    \"destinationAssoc\": \"iEvent:additionalDataItems\",\n" +
             "                    \"destination\": \"workspace://SpacesStore/some-destination\",\n" +
             "                    \"nodeType\": \"ctrEvent:cancelApproval\"\n" +
@@ -202,7 +202,7 @@ public class ActionServiceTest {
             "        \"actions\": [\n" +
             "            {\n" +
             "                \"id\": \"" + id + "\",\n" +
-            "                \"params\": {\n" +
+            "                \"config\": {\n" +
             "                    \"size\": 20\n" +
             "                }\n" +
             "            }\n" +
