@@ -7,7 +7,6 @@ import org.springframework.core.io.ClassPathResource;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDTO;
 import ru.citeck.ecos.uiserv.service.action.ActionEntityService;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -21,9 +20,9 @@ public class ActionsConfig {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final ActionEntityService actionEntityService;
-    private final UIServProperties properties;
+    private final UiServProperties properties;
 
-    public ActionsConfig(ActionEntityService actionEntityService, UIServProperties properties) {
+    public ActionsConfig(ActionEntityService actionEntityService, UiServProperties properties) {
         this.actionEntityService = actionEntityService;
         this.properties = properties;
     }
@@ -31,27 +30,27 @@ public class ActionsConfig {
     //@PostConstruct
     public void deployDefaultAction() {
         String classPath = properties.getAction().getDefaultActionsClasspath();
-        String info = "\n======================== Deploy default action ======================\n" +
-            "Classpath: " + classPath + "\n";
+        StringBuilder info = new StringBuilder("\n======================== Deploy default action ======================\n" +
+            "Classpath: " + classPath + "\n");
 
         try (InputStream defaultActions = new ClassPathResource(classPath)
             .getInputStream()) {
 
             ActionDTO[] actions = OBJECT_MAPPER.readValue(defaultActions, ActionDTO[].class);
 
-            info += String.format("Found %s default actions", actions.length) + "\n";
+            info.append(String.format("Found %s default actions", actions.length)).append("\n");
 
             for (ActionDTO actionDTO : actions) {
                 actionEntityService.create(actionDTO);
-                info += "Added default action:" + actionDTO + "\n";
+                info.append("Added default action:").append(actionDTO).append("\n");
             }
 
         } catch (IOException e) {
             throw new RuntimeException("Failed get default actions from classpath: " + classPath);
         }
 
-        info += "====================== Default actions deployed ======================";
+        info.append("====================== Default actions deployed ======================");
 
-        log.info(info);
+        log.info(info.toString());
     }
 }

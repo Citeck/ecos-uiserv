@@ -13,12 +13,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
+import ru.citeck.ecos.apps.app.module.type.evaluator.EvaluatorDTO;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.config.UIServProperties;
+import ru.citeck.ecos.uiserv.config.UiServProperties;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDTO;
-import ru.citeck.ecos.uiserv.domain.action.dto.EvaluatorDTO;
 import ru.citeck.ecos.uiserv.service.action.ActionEntityService;
 import ru.citeck.ecos.uiserv.service.action.ActionService;
 import ru.citeck.ecos.uiserv.service.evaluator.RecordEvaluatorService;
@@ -46,7 +46,7 @@ public class ActionServiceTest {
     @Autowired
     private ActionService actionService;
     @Autowired
-    private UIServProperties properties;
+    private UiServProperties properties;
 
     @Autowired
     private ActionEntityService actionEntityService;

@@ -8,15 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import ru.citeck.ecos.apps.app.module.type.evaluator.EvaluatorDTO;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.uiserv.config.UIServProperties;
+import ru.citeck.ecos.uiserv.config.UiServProperties;
 import ru.citeck.ecos.uiserv.domain.action.ActionDtoFactory;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDTO;
-import ru.citeck.ecos.uiserv.domain.action.dto.EvaluatorDTO;
 import ru.citeck.ecos.uiserv.service.evaluator.RecordEvaluatorService;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -34,12 +36,12 @@ public class ActionService {
     private final RestTemplate alfRestTemplate;
     private final ActionEntityService actionEntityService;
 
-    private final UIServProperties properties;
+    private final UiServProperties properties;
 
     @Autowired
     public ActionService(RecordsService recordsService, RecordEvaluatorService recordEvaluatorService,
                          @Qualifier("alfrescoRestTemplate") RestTemplate alfRestTemplate,
-                         ActionEntityService actionEntityService, UIServProperties properties) {
+                         ActionEntityService actionEntityService, UiServProperties properties) {
         this.recordsService = recordsService;
         this.recordEvaluatorService = recordEvaluatorService;
         this.alfRestTemplate = alfRestTemplate;

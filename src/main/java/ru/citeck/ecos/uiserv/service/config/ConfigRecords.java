@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
-import ru.citeck.ecos.uiserv.config.UIServProperties;
+import ru.citeck.ecos.uiserv.config.UiServProperties;
 import ru.citeck.ecos.uiserv.domain.ConfigDTO;
 import ru.citeck.ecos.uiserv.domain.EntityDTO;
 import ru.citeck.ecos.uiserv.service.entity.AbstractEntityRecords;
@@ -24,11 +24,11 @@ public class ConfigRecords extends AbstractEntityRecords<ConfigDTO> {
 
     public static final String ID = "config";
 
-    private UIServProperties properties;
+    private UiServProperties properties;
 
     @Autowired
     public ConfigRecords(ConfigEntityService entityService,
-                         UIServProperties properties) {
+                         UiServProperties properties) {
         setId(ID);
         this.entityService = entityService;
         this.properties = properties;

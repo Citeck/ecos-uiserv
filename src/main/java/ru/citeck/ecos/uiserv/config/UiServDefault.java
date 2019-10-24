@@ -6,9 +6,9 @@ import java.util.List;
 /**
  * @author Roman Makarskiy
  */
-public class UIServDefault {
+public class UiServDefault {
 
-    private UIServDefault() {
+    private UiServDefault() {
     }
 
     public static class Action {
