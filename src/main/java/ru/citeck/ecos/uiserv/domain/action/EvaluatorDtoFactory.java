@@ -1,6 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.action;
 
-import ru.citeck.ecos.uiserv.domain.action.dto.EvaluatorDTO;
+import ru.citeck.ecos.apps.app.module.type.evaluator.EvaluatorDTO;
 
 import static ru.citeck.ecos.uiserv.domain.action.NodeConverter.fromString;
 import static ru.citeck.ecos.uiserv.domain.action.NodeConverter.nodeAsString;

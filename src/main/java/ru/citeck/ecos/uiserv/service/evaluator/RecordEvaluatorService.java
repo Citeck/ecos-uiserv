@@ -6,8 +6,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
+import ru.citeck.ecos.apps.app.module.type.evaluator.EvaluatorDTO;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.uiserv.service.Evaluated;
 
 /**
  * @author Roman Makarskiy
@@ -17,7 +17,7 @@ public class RecordEvaluatorService implements ApplicationContextAware {
 
     private ApplicationContext context;
 
-    public boolean evaluate(Evaluated evaluated, @NonNull RecordRef recordRef) {
+    public boolean evaluate(EvaluatorDTO evaluated, @NonNull RecordRef recordRef) {
         if (evaluated == null) {
             return true;
         }

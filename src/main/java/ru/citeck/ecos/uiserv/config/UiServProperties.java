@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Component
 @ConfigurationProperties(prefix = "uiserv")
-public class UIServProperties {
+public class UiServProperties {
 
     @Getter
     private final Action action = new Action();
@@ -43,9 +43,9 @@ public class UIServProperties {
     @Setter
     public static class Action {
 
-        private List<String> defaultJournalActions = UIServDefault.Action.DEFAULT_JOURNAL_ACTIONS;
-        private String getAlfJournalUrlEndpoint = UIServDefault.Action.GET_ALF_JOURNAL_URL_ENDPOINT;
-        private String defaultActionsClasspath = UIServDefault.Action.DEFAULT_ACTIONS_CLASSPATH;
+        private List<String> defaultJournalActions = UiServDefault.Action.DEFAULT_JOURNAL_ACTIONS;
+        private String getAlfJournalUrlEndpoint = UiServDefault.Action.GET_ALF_JOURNAL_URL_ENDPOINT;
+        private String defaultActionsClasspath = UiServDefault.Action.DEFAULT_ACTIONS_CLASSPATH;
 
     }
 

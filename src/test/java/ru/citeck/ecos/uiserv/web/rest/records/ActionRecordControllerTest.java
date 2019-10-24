@@ -14,12 +14,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.RestTemplate;
+import ru.citeck.ecos.apps.app.module.type.evaluator.EvaluatorDTO;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.request.rest.RestHandler;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.config.UIServProperties;
+import ru.citeck.ecos.uiserv.config.UiServProperties;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDTO;
-import ru.citeck.ecos.uiserv.domain.action.dto.EvaluatorDTO;
 import ru.citeck.ecos.uiserv.service.action.ActionEntityService;
 import ru.citeck.ecos.uiserv.service.evaluator.RecordEvaluatorService;
 import ru.citeck.ecos.uiserv.web.rest.RecordsApi;
@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,7 +39,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.assertj.core.api.Assertions.catchThrowable;
 
 /**
  * @author Roman Makarskiy
@@ -94,7 +94,7 @@ public class ActionRecordControllerTest {
     @Autowired
     private RecordsService recordsService;
     @Autowired
-    private UIServProperties props;
+    private UiServProperties props;
 
     @MockBean
     @Qualifier("alfrescoRestTemplate")

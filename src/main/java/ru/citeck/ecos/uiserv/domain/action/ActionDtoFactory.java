@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDTO;
-import ru.citeck.ecos.uiserv.domain.action.dto.EvaluatorDTO;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,9 +18,7 @@ import static ru.citeck.ecos.uiserv.domain.action.NodeConverter.nodeAsString;
  */
 public class ActionDtoFactory {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-        .addMixIn(ActionDTO.class, ParamsActionMixIn.class)
-        .addMixIn(EvaluatorDTO.class, ParamsActionMixIn.class);
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private static final String PARAM_META = "meta";
     private static final String PARAM_ACTIONS = "actions";
