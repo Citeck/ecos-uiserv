@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import ru.citeck.ecos.apps.EcosAppsApiFactory;
 import ru.citeck.ecos.apps.app.module.type.dashboard.DashboardModule;
 import ru.citeck.ecos.apps.app.module.type.form.FormModule;
-import ru.citeck.ecos.uiserv.domain.DashboardDTO;
+import ru.citeck.ecos.uiserv.domain.DashboardDto;
 import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;
 import ru.citeck.ecos.uiserv.service.form.EcosFormModel;
 import ru.citeck.ecos.uiserv.service.form.EcosFormService;
@@ -45,7 +45,7 @@ public class EcosModulesConfig {
 
     public void deployDashboard(DashboardModule dashboardModule) {
         //todo: remove conversion
-        DashboardDTO dashboardDTO = mapper.convertValue(dashboardModule, DashboardDTO.class);
+        DashboardDto dashboardDTO = mapper.convertValue(dashboardModule, DashboardDto.class);
         dashboardEntityService.update(dashboardDTO);
     }
 }

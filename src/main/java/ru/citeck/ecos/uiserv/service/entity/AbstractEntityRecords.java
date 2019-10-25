@@ -10,13 +10,13 @@ import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.CrudRecordsDAO;
-import ru.citeck.ecos.uiserv.domain.EntityDTO;
+import ru.citeck.ecos.uiserv.domain.EntityDto;
 import ru.citeck.ecos.uiserv.service.RecordNotFoundException;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class AbstractEntityRecords<T extends EntityDTO> extends CrudRecordsDAO<T> {
+public abstract class AbstractEntityRecords<T extends EntityDto> extends CrudRecordsDAO<T> {
 
     protected BaseEntityService<T> entityService;
 

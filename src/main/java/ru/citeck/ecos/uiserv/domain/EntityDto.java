@@ -1,6 +1,6 @@
 package ru.citeck.ecos.uiserv.domain;
 
-public interface EntityDTO {
+public interface EntityDto {
 
     String getId();
 

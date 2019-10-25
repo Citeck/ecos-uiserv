@@ -2,7 +2,6 @@ package ru.citeck.ecos.uiserv.web.rest.records;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +10,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.request.rest.RestHandler;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.DashboardDTO;
+import ru.citeck.ecos.uiserv.domain.DashboardDto;
 import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;
 import ru.citeck.ecos.uiserv.web.rest.TestEntityRecordUtil;
 import ru.citeck.ecos.uiserv.web.rest.TestUtil;
@@ -108,10 +106,10 @@ public class DashboardRecordControllerTest {
             "  \t]\n" +
             "}";
 
-        DashboardDTO dto = new DashboardDTO();
+        DashboardDto dto = new DashboardDto();
         dto.setKey(key);
 
-        DashboardDTO createdDto = new DashboardDTO();
+        DashboardDto createdDto = new DashboardDto();
         createdDto.setKey(key);
         createdDto.setId(id);
 
@@ -136,11 +134,11 @@ public class DashboardRecordControllerTest {
             "  \t]\n" +
             "}";
 
-        DashboardDTO dto = new DashboardDTO();
+        DashboardDto dto = new DashboardDto();
         dto.setKey(key);
         dto.setId(id);
 
-        DashboardDTO createdDto = new DashboardDTO();
+        DashboardDto createdDto = new DashboardDto();
         createdDto.setKey(key);
         createdDto.setId(id);
 
@@ -209,8 +207,8 @@ public class DashboardRecordControllerTest {
         assertEquals("Entity with id <" + nonExistsId + "> not found!", thrown.getCause().getMessage());
     }
 
-    private DashboardDTO getTestDtoForQueryWithId(String id) throws IOException {
-        DashboardDTO dto = new DashboardDTO();
+    private DashboardDto getTestDtoForQueryWithId(String id) throws IOException {
+        DashboardDto dto = new DashboardDto();
         dto.setKey("main-dashboard");
         dto.setId(id);
 

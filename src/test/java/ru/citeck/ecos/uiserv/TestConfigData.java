@@ -6,7 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import ru.citeck.ecos.uiserv.domain.ConfigDTO;
+import ru.citeck.ecos.uiserv.domain.ConfigDto;
 import ru.citeck.ecos.uiserv.service.config.ConfigEntityService;
 
 import java.util.ArrayList;
@@ -16,12 +16,12 @@ import java.util.List;
 @Configuration
 public class TestConfigData {
 
-    public static List<ConfigDTO> testConfigs =  new ArrayList<>();
+    public static List<ConfigDto> testConfigs =  new ArrayList<>();
 
     @Bean
     public CommandLineRunner dataLoader(ConfigEntityService configEntityService, ObjectMapper objectMapper) {
         return args -> {
-            ConfigDTO syncConfig = new ConfigDTO();
+            ConfigDto syncConfig = new ConfigDto();
             syncConfig.setId("sync-id");
             syncConfig.setTitle("Sync config");
             syncConfig.setDescription("Global sync settings");
@@ -30,7 +30,7 @@ public class TestConfigData {
                 "  \"cron\": \"0,3,12 0 0 ? * * *\"\n" +
                 "}", JsonNode.class));
 
-            ConfigDTO displayAllGroupConfig = new ConfigDTO();
+            ConfigDto displayAllGroupConfig = new ConfigDto();
             displayAllGroupConfig.setTitle("Display all group config");
             displayAllGroupConfig.setDescription("Users and groups that will be shown to the group");
             displayAllGroupConfig.setId("display-all-group-id");
@@ -53,7 +53,7 @@ public class TestConfigData {
                 "  ]\n" +
                 "}", JsonNode.class));
 
-            ConfigDTO emailNotificationsConfig = new ConfigDTO();
+            ConfigDto emailNotificationsConfig = new ConfigDto();
             emailNotificationsConfig.setId("email-notifications-enabled");
             emailNotificationsConfig.setValue(objectMapper.readValue("{\n" +
                 "  \"enabled\": true\n" +
