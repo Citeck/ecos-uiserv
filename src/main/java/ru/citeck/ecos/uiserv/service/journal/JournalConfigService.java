@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.uiserv.config.RecordsServiceConfig;
 import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.file.FileService;
@@ -128,8 +127,7 @@ public class JournalConfigService {
                 attributesEdges.put(attribute, ".edge(n:\"" + attribute + "\"){" + nameset + "}");
             }
 
-            final RecordRef recordRef = RecordRef.valueOf(RecordsServiceConfig.RECORDS_DAO_ID + "@" + sourceId +
-                "@" + "");
+            final RecordRef recordRef = RecordRef.valueOf("alfresco/@" + sourceId + "@");
             RecordMeta attInfoMeta = recordsService.getAttributes(recordRef, attributesEdges);
 
             Map<String, T> result = new HashMap<>();

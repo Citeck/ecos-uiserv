@@ -1,5 +1,7 @@
 package ru.citeck.ecos.uiserv;
 
+import ru.citeck.ecos.apps.spring.EcosAppsFactoryConfig;
+import ru.citeck.ecos.records2.spring.RecordsServiceFactoryConfig;
 import ru.citeck.ecos.uiserv.config.ApplicationProperties;
 import ru.citeck.ecos.uiserv.config.DefaultProfileUtil;
 
@@ -21,7 +23,11 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackageClasses = {
+    Application.class,
+    RecordsServiceFactoryConfig.class,
+    EcosAppsFactoryConfig.class
+})
 @EnableConfigurationProperties({LiquibaseProperties.class, ApplicationProperties.class})
 @EnableDiscoveryClient
 public class Application {

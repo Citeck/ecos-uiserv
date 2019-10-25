@@ -1,28 +1,14 @@
 package ru.citeck.ecos.uiserv.web.rest.records;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.NullNode;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.client.RestTemplate;
-import ru.citeck.ecos.apps.app.module.type.evaluator.EvaluatorDTO;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.request.rest.RestHandler;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.config.UiServProperties;
-import ru.citeck.ecos.uiserv.domain.action.dto.ActionDTO;
-import ru.citeck.ecos.uiserv.service.action.ActionEntityService;
 import ru.citeck.ecos.uiserv.service.evaluator.RecordEvaluatorService;
-import ru.citeck.ecos.uiserv.web.rest.RecordsApi;
 import ru.citeck.ecos.uiserv.web.rest.TestEntityRecordUtil;
 import ru.citeck.ecos.uiserv.web.rest.TestUtil;
 
@@ -47,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Application.class)
 public class ActionRecordControllerTest {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    /*private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private static final String FIRE_ACTION_ID = "fire-action";
     private static final String PRINT_ACTION_ID = "print-action";
@@ -453,7 +439,7 @@ public class ActionRecordControllerTest {
     }
 
     private void createTestData() throws IOException {
-        ActionDTO fireAction = new ActionDTO();
+        ActionDto fireAction = new ActionDto();
         fireAction.setId(FIRE_ACTION_ID);
         fireAction.setTitle("Fire");
         fireAction.setIcon("fire.png");
@@ -468,17 +454,17 @@ public class ActionRecordControllerTest {
             "  }\n" +
             "}", JsonNode.class));
 
-        EvaluatorDTO evaluatorDTO = new EvaluatorDTO();
-        evaluatorDTO.setId("has-fire-permission");
-        evaluatorDTO.setConfig(OBJECT_MAPPER.readValue("[\n" +
+        EvaluatorDto EvaluatorDto = new EvaluatorDto();
+        EvaluatorDto.setId("has-fire-permission");
+        EvaluatorDto.setConfig(OBJECT_MAPPER.readValue("[\n" +
             "  true,\n" +
             "  false,\n" +
             "  \"experiment\"\n" +
             "]", JsonNode.class));
 
-        fireAction.setEvaluator(evaluatorDTO);
+        fireAction.setEvaluator(EvaluatorDto);
 
-        ActionDTO printAction = new ActionDTO();
+        ActionDto printAction = new ActionDto();
         printAction.setId(PRINT_ACTION_ID);
         printAction.setTitle("Print");
         printAction.setIcon("print.png");
@@ -493,23 +479,23 @@ public class ActionRecordControllerTest {
             "  \"only\"\n" +
             "]", JsonNode.class));
 
-        ActionDTO moveAction = new ActionDTO();
+        ActionDto moveAction = new ActionDto();
         moveAction.setId(MOVE_ACTION_ID);
         moveAction.setTitle("Move");
         moveAction.setIcon("move.png");
         moveAction.setType("move");
 
-        EvaluatorDTO moveActionEvaluatorDTO = new EvaluatorDTO();
-        moveActionEvaluatorDTO.setId("has-edit-permission");
-        moveActionEvaluatorDTO.setConfig(OBJECT_MAPPER.readValue("[\n" +
+        EvaluatorDto moveActionEvaluatorDto = new EvaluatorDto();
+        moveActionEvaluatorDto.setId("has-edit-permission");
+        moveActionEvaluatorDto.setConfig(OBJECT_MAPPER.readValue("[\n" +
             "  true,\n" +
             "  false,\n" +
             "  \"experiment\"\n" +
             "]", JsonNode.class));
 
-        moveAction.setEvaluator(moveActionEvaluatorDTO);
+        moveAction.setEvaluator(moveActionEvaluatorDto);
 
-        ActionDTO forDeleteAction = new ActionDTO();
+        ActionDto forDeleteAction = new ActionDto();
         moveAction.setId(FORE_DELETE_ACTION_ID);
         moveAction.setTitle("For delete");
         moveAction.setIcon("for_delete.png");
@@ -528,5 +514,5 @@ public class ActionRecordControllerTest {
     private void mockAlfRestToReturnJson(String json) throws IOException {
         when(restTemplate.getForObject(anyString(), any(), anyMap())).thenReturn(OBJECT_MAPPER.readValue(json,
             JsonNode.class));
-    }
+    }*/
 }
