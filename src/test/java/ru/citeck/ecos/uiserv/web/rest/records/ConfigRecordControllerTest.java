@@ -17,7 +17,6 @@ import ru.citeck.ecos.records2.request.rest.RestHandler;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.ConfigDTO;
 import ru.citeck.ecos.uiserv.service.config.ConfigEntityService;
-import ru.citeck.ecos.uiserv.web.rest.RecordsApi;
 import ru.citeck.ecos.uiserv.web.rest.TestEntityRecordUtil;
 import ru.citeck.ecos.uiserv.web.rest.TestUtil;
 
@@ -60,10 +59,10 @@ public class ConfigRecordControllerTest {
 
     @Before
     public void setup() {
-        RecordsApi recordsApi = new RecordsApi(restQueryHandler, recordsService);
+/*        RecordsApi recordsApi = new RecordsApi(restQueryHandler, recordsService);
         this.mockRecordsApi = MockMvcBuilders
             .standaloneSetup(recordsApi)
-            .build();
+            .build();*/
     }
 
     @Test

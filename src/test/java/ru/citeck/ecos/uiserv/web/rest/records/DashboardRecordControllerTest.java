@@ -17,7 +17,6 @@ import ru.citeck.ecos.records2.request.rest.RestHandler;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.DashboardDTO;
 import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;
-import ru.citeck.ecos.uiserv.web.rest.RecordsApi;
 import ru.citeck.ecos.uiserv.web.rest.TestEntityRecordUtil;
 import ru.citeck.ecos.uiserv.web.rest.TestUtil;
 
@@ -57,14 +56,14 @@ public class DashboardRecordControllerTest {
 
     @MockBean
     private DashboardEntityService mockDashboardService;
-
+/*
     @Before
     public void setup() {
         RecordsApi recordsApi = new RecordsApi(restQueryHandler, recordsService);
         this.mockRecordsApi = MockMvcBuilders
             .standaloneSetup(recordsApi)
             .build();
-    }
+    }*/
 
     @Test
     public void query() throws Exception {

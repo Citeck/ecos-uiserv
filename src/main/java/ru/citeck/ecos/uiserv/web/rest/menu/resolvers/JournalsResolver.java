@@ -5,14 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.records2.request.query.QueryConsistency;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
-import ru.citeck.ecos.uiserv.config.RecordsServiceConfig;
 import ru.citeck.ecos.uiserv.web.rest.menu.dto.Element;
 
 import java.util.Arrays;
@@ -113,7 +110,7 @@ public class JournalsResolver {
             return Collections.emptyList();
 
         RecordsQuery query = new RecordsQuery();
-        query.setSourceId(RecordsServiceConfig.RECORDS_DAO_ID);
+        query.setSourceId("alfresco/");
         query.setQuery(String.format("TYPE:\"journal:journalsList\" AND =cm:name:\"%s\"",
             journalList));
         query.setLanguage("fts-alfresco");
