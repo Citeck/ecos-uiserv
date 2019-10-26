@@ -37,8 +37,6 @@ eureka:
             git-version: ${git.commit.id.describe:}
             git-commit: ${git.commit.id.abbrev:}
             git-branch: ${git.branch:}
-        hostname: host.docker.internal
-        ip-address: host.docker.internal
 ribbon:
     eureka:
         enabled: true
