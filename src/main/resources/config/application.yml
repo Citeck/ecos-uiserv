@@ -37,6 +37,8 @@ eureka:
             git-version: ${git.commit.id.describe:}
             git-commit: ${git.commit.id.abbrev:}
             git-branch: ${git.branch:}
+        hostname: host.docker.internal
+        ip-address: host.docker.internal
 ribbon:
     eureka:
         enabled: true
@@ -194,6 +196,13 @@ uiserv:
             value: true
         language-switcher-enabled:
             value: true
+    ecos-records:
+        apps:
+            alfresco:
+                rec-base-url: /alfresco/s/citeck/ecos/records/
+                rec-user-base-url: /share/proxy/alfresco/citeck/ecos/records/
+
+
 
 #alfresco:
 #    schema: https
