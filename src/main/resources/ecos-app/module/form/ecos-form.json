@@ -1,6 +1,6 @@
 {
     "id": "ECOS_FORM",
-    "title": "Form",
+    "title": "Form ui",
     "description": "Form to edit other forms",
     "formKey": "module_form",
     "formMode": null,
