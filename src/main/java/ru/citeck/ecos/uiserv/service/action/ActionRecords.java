@@ -21,7 +21,7 @@ import java.util.*;
  */
 @Component
 public class ActionRecords extends LocalRecordsDAO
-    implements RecordsQueryWithMetaLocalDAO<ActionRecords.RecordActions> {
+                           implements RecordsQueryWithMetaLocalDAO<ActionRecords.RecordActions> {
 
     public static final String ID = "action";
 
@@ -31,6 +31,45 @@ public class ActionRecords extends LocalRecordsDAO
     public ActionRecords(RecordsService recordsService) {
         setId(ID);
         this.recordsService = recordsService;
+    }
+
+    private List<ActionDto> getActions() {
+
+        List<ActionDto> result = new ArrayList<>();
+
+        ActionDto action = new ActionDto();
+        action.setName("grid.inline-tools.edit");
+        action.setIcon("icon-edit");
+        action.setType("edit");
+        action.setKey("dao.edit");
+
+        result.add(action);
+
+        action = new ActionDto();
+        action.setName("grid.inline-tools.show");
+        action.setIcon("icon-on");
+        action.setType("view");
+        action.setKey("dto.view");
+
+        result.add(action);
+
+        action = new ActionDto();
+        action.setName("grid.inline-tools.download");
+        action.setIcon("icon-download");
+        action.setType("download");
+        action.setKey("dto.download");
+
+        result.add(action);
+
+        action = new ActionDto();
+        action.setName("grid.inline-tools.delete");
+        action.setIcon("icon-delete");
+        action.setType("delete");
+        action.setKey("dto.delete");
+
+        result.add(action);
+
+        return result;
     }
 
     @Override
@@ -69,6 +108,8 @@ public class ActionRecords extends LocalRecordsDAO
             } else {
                 actions.setActions(Collections.emptyList());
             }
+
+            actions.setActions(getActions());//todo: temp
 
             resultList.add(actions);
         }

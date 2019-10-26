@@ -11,11 +11,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.request.rest.RestHandler;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.ConfigDTO;
+import ru.citeck.ecos.uiserv.domain.ConfigDto;
 import ru.citeck.ecos.uiserv.service.config.ConfigEntityService;
 import ru.citeck.ecos.uiserv.web.rest.TestEntityRecordUtil;
 import ru.citeck.ecos.uiserv.web.rest.TestUtil;
@@ -124,12 +123,12 @@ public class ConfigRecordControllerTest {
             "  ]\n" +
             "}";
 
-        ConfigDTO dto = new ConfigDTO();
+        ConfigDto dto = new ConfigDto();
         dto.setId(id);
         dto.setTitle(title);
         dto.setDescription(description);
 
-        ConfigDTO createdDto = new ConfigDTO();
+        ConfigDto createdDto = new ConfigDto();
         createdDto.setId(id);
         createdDto.setTitle(title);
         createdDto.setDescription(description);
@@ -155,10 +154,10 @@ public class ConfigRecordControllerTest {
             "  \t]\n" +
             "}";
 
-        ConfigDTO dto = new ConfigDTO();
+        ConfigDto dto = new ConfigDto();
         dto.setId(id);
 
-        ConfigDTO createdDto = new ConfigDTO();
+        ConfigDto createdDto = new ConfigDto();
         createdDto.setId(id);
 
         when(configEntityService.getById(id)).thenReturn(Optional.of(dto));
@@ -225,8 +224,8 @@ public class ConfigRecordControllerTest {
         assertEquals("Parameter 'id' is mandatory for config record", thrown.getCause().getMessage());
     }
 
-    private ConfigDTO getTestDtoForQueryWithId(String id) throws IOException {
-        ConfigDTO dto = new ConfigDTO();
+    private ConfigDto getTestDtoForQueryWithId(String id) throws IOException {
+        ConfigDto dto = new ConfigDto();
         dto.setTitle("test-config-title");
         dto.setDescription("test-config-description");
         dto.setId(id);

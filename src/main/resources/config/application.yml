@@ -202,6 +202,11 @@ uiserv:
 
 
 
+ecos-app:
+    id: ecos-uiserv
+    version: 1.4.0
+    name: UI Server
+
 #alfresco:
 #    schema: https
 

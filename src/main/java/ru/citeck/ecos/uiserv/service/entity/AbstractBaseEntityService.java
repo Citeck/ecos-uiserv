@@ -5,7 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.uiserv.domain.EntityDTO;
+import ru.citeck.ecos.uiserv.domain.EntityDto;
 import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.file.FileService;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * @author Roman Makarskiy
  */
 @Log4j2
-public abstract class AbstractBaseEntityService<T extends EntityDTO> implements BaseEntityService<T> {
+public abstract class AbstractBaseEntityService<T extends EntityDto> implements BaseEntityService<T> {
 
     private final Class<T> typeParameterClass;
 

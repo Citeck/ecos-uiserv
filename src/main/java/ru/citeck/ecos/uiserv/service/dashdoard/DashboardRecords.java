@@ -2,14 +2,14 @@ package ru.citeck.ecos.uiserv.service.dashdoard;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.citeck.ecos.uiserv.domain.DashboardDTO;
+import ru.citeck.ecos.uiserv.domain.DashboardDto;
 import ru.citeck.ecos.uiserv.service.entity.AbstractEntityRecords;
 
 /**
  * @author Roman Makarskiy
  */
 @Component
-public class DashboardRecords extends AbstractEntityRecords<DashboardDTO> {
+public class DashboardRecords extends AbstractEntityRecords<DashboardDto> {
 
     public static final String ID = "dashboard";
 
@@ -20,7 +20,7 @@ public class DashboardRecords extends AbstractEntityRecords<DashboardDTO> {
     }
 
     @Override
-    protected DashboardDTO getEmpty() {
-        return new DashboardDTO();
+    protected DashboardDto getEmpty() {
+        return new DashboardDto();
     }
 }

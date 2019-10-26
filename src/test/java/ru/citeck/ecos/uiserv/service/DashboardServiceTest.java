@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.DashboardDTO;
+import ru.citeck.ecos.uiserv.domain.DashboardDto;
 import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ import static org.junit.Assert.assertThat;
 @SpringBootTest(classes = Application.class)
 public class DashboardServiceTest {
 
-    private List<DashboardDTO> dashboards = new ArrayList<>();
+    private List<DashboardDto> dashboards = new ArrayList<>();
 
     @Autowired
     private DashboardEntityService dashboardService;
@@ -49,7 +49,7 @@ public class DashboardServiceTest {
 
     @Test
     public void getById() {
-        List<DashboardDTO> found = dashboards.stream()
+        List<DashboardDto> found = dashboards.stream()
             .map(dashboardDTO -> dashboardService.getById(dashboardDTO.getId()).get())
             .collect(Collectors.toList());
         assertThat(found, is(dashboards));
@@ -57,7 +57,7 @@ public class DashboardServiceTest {
 
     @Test
     public void getByKey() {
-        List<DashboardDTO> found = dashboards.stream()
+        List<DashboardDto> found = dashboards.stream()
             .map(dashboardDTO -> dashboardService.getByKey(dashboardDTO.getType(),
                 dashboardDTO.getKey(),
                 dashboardDTO.getUser()).get())
@@ -67,7 +67,7 @@ public class DashboardServiceTest {
 
     @Test
     public void getByKeys() {
-        List<DashboardDTO> found = dashboards.stream()
+        List<DashboardDto> found = dashboards.stream()
             .map(dashboardDTO -> dashboardService.getByKeys(
                 dashboardDTO.getType(),
                 Arrays.asList("some-key", dashboardDTO.getKey(), "undefined-key"),
@@ -91,7 +91,7 @@ public class DashboardServiceTest {
     public void save() throws IOException {
         String id = UUID.randomUUID().toString();
 
-        DashboardDTO dto = new DashboardDTO();
+        DashboardDto dto = new DashboardDto();
         dto.setKey("test-key");
         dto.setId(id);
         dto.setConfig(objectMapper.readValue("{\n" +
@@ -100,15 +100,15 @@ public class DashboardServiceTest {
             "  }\n" +
             "}", JsonNode.class));
 
-        DashboardDTO saved = dashboardService.create(dto);
-        DashboardDTO found = dashboardService.getById(id).get();
+        DashboardDto saved = dashboardService.create(dto);
+        DashboardDto found = dashboardService.getById(id).get();
 
         assertThat(found, is(saved));
     }
 
     @Test
     public void saveWithoutId() throws IOException {
-        DashboardDTO dto = new DashboardDTO();
+        DashboardDto dto = new DashboardDto();
         dto.setKey("test-key");
         dto.setConfig(objectMapper.readValue("{\n" +
             "  \"menu\": {\n" +
@@ -116,7 +116,7 @@ public class DashboardServiceTest {
             "  }\n" +
             "}", JsonNode.class));
 
-        DashboardDTO saved = dashboardService.create(dto);
+        DashboardDto saved = dashboardService.create(dto);
 
         assertThat(dto.getKey(), is(saved.getKey()));
         assertThat(saved.getId(), notNullValue());
@@ -125,7 +125,7 @@ public class DashboardServiceTest {
 
     @Test()
     public void saveWithoutKey() throws IOException {
-        DashboardDTO dto = new DashboardDTO();
+        DashboardDto dto = new DashboardDto();
         dto.setId(UUID.randomUUID().toString());
         dto.setConfig(objectMapper.readValue("{\n" +
             "  \"menu\": {\n" +
@@ -141,12 +141,12 @@ public class DashboardServiceTest {
     public void saveWithoutConfig() {
         String id = UUID.randomUUID().toString();
 
-        DashboardDTO dto = new DashboardDTO();
+        DashboardDto dto = new DashboardDto();
         dto.setId(id);
         dto.setKey("some-test-key");
 
-        DashboardDTO saved = dashboardService.create(dto);
-        DashboardDTO found = dashboardService.getById(id).get();
+        DashboardDto saved = dashboardService.create(dto);
+        DashboardDto found = dashboardService.getById(id).get();
 
         assertThat(saved, is(found));
     }
@@ -155,7 +155,7 @@ public class DashboardServiceTest {
     public void mutate() throws IOException {
         String id = UUID.randomUUID().toString();
 
-        DashboardDTO dto = new DashboardDTO();
+        DashboardDto dto = new DashboardDto();
         dto.setId(id);
         dto.setKey("sun-key");
         dto.setConfig(objectMapper.readValue("{\n" +
@@ -166,7 +166,7 @@ public class DashboardServiceTest {
 
         dashboardService.create(dto);
 
-        DashboardDTO found = dashboardService.getById(id).get();
+        DashboardDto found = dashboardService.getById(id).get();
         found.setKey("board-test-key");
         found.setConfig(objectMapper.readValue("{\n" +
             "  \"menu\": {\n" +
@@ -174,8 +174,8 @@ public class DashboardServiceTest {
             "  }\n" +
             "}", JsonNode.class));
 
-        DashboardDTO mutated = dashboardService.update(found);
-        DashboardDTO mutatedFound = dashboardService.getById(id).get();
+        DashboardDto mutated = dashboardService.update(found);
+        DashboardDto mutatedFound = dashboardService.getById(id).get();
 
         assertThat(mutated, is(mutatedFound));
     }
@@ -184,7 +184,7 @@ public class DashboardServiceTest {
     public void delete() throws IOException {
         String id = UUID.randomUUID().toString();
 
-        DashboardDTO dto = new DashboardDTO();
+        DashboardDto dto = new DashboardDto();
         dto.setKey("down");
         dto.setId(id);
         dto.setConfig(objectMapper.readValue("{\n" +
@@ -193,20 +193,20 @@ public class DashboardServiceTest {
             "  }\n" +
             "}", JsonNode.class));
 
-        DashboardDTO saved = dashboardService.create(dto);
-        DashboardDTO found = dashboardService.getById(id).get();
+        DashboardDto saved = dashboardService.create(dto);
+        DashboardDto found = dashboardService.getById(id).get();
 
         assertThat(found, is(saved));
 
         dashboardService.delete(id);
 
-        Optional<DashboardDTO> mustBeEmpty = dashboardService.getById(id);
+        Optional<DashboardDto> mustBeEmpty = dashboardService.getById(id);
 
         assertThat(mustBeEmpty, is(Optional.empty()));
     }
 
     private void createTestDashboards() throws IOException {
-        DashboardDTO mainDashboard = new DashboardDTO();
+        DashboardDto mainDashboard = new DashboardDto();
         mainDashboard.setKey("main-dashboard");
         mainDashboard.setId("main-dashboard-id");
         mainDashboard.setType("user-dashboard");
@@ -219,7 +219,7 @@ public class DashboardServiceTest {
             "  }\n" +
             "}", JsonNode.class));
 
-        DashboardDTO contractDashboard = new DashboardDTO();
+        DashboardDto contractDashboard = new DashboardDto();
         contractDashboard.setKey("contract-dashboard");
         contractDashboard.setId("contract-dashboard-id");
         contractDashboard.setType("case-details");
@@ -239,7 +239,7 @@ public class DashboardServiceTest {
             "    \"email\": \"nina.bradley@zensus.io\"\n" +
             "  }", JsonNode.class));
 
-        DashboardDTO siteDashboard = new DashboardDTO();
+        DashboardDto siteDashboard = new DashboardDto();
         siteDashboard.setKey("site-dashboard");
         siteDashboard.setId("site-dashboard-id");
         siteDashboard.setType("site-dashboard");

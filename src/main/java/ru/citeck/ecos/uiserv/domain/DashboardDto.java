@@ -8,7 +8,7 @@ import lombok.Data;
  * @author Roman Makarskiy
  */
 @Data
-public class DashboardDTO implements EntityDTO {
+public class DashboardDto implements EntityDto {
 
     private String id;
     private String key;
