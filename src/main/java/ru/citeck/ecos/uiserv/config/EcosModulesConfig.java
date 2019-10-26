@@ -38,12 +38,14 @@ public class EcosModulesConfig {
     }
 
     public void deployForm(FormModule formModule) {
+        log.info("Form module received: " + formModule.getId() + " " + formModule.getFormKey());
         //todo: remove conversion
         EcosFormModel formModel = mapper.convertValue(formModule, EcosFormModel.class);
         formService.save(formModel);
     }
 
     public void deployDashboard(DashboardModule dashboardModule) {
+        log.info("Dashboard module received: " + dashboardModule.getId() + " " + dashboardModule.getKey());
         //todo: remove conversion
         DashboardDto dashboardDTO = mapper.convertValue(dashboardModule, DashboardDto.class);
         dashboardEntityService.update(dashboardDTO);
