@@ -33,45 +33,6 @@ public class ActionRecords extends LocalRecordsDAO
         this.recordsService = recordsService;
     }
 
-    private List<ActionDto> getActions() {
-
-        List<ActionDto> result = new ArrayList<>();
-
-        ActionDto action = new ActionDto();
-        action.setName("grid.inline-tools.edit");
-        action.setIcon("icon-edit");
-        action.setType("edit");
-        action.setKey("dao.edit");
-
-        result.add(action);
-
-        action = new ActionDto();
-        action.setName("grid.inline-tools.show");
-        action.setIcon("icon-on");
-        action.setType("view");
-        action.setKey("dto.view");
-
-        result.add(action);
-
-        action = new ActionDto();
-        action.setName("grid.inline-tools.download");
-        action.setIcon("icon-download");
-        action.setType("download");
-        action.setKey("dto.download");
-
-        result.add(action);
-
-        action = new ActionDto();
-        action.setName("grid.inline-tools.delete");
-        action.setIcon("icon-delete");
-        action.setType("delete");
-        action.setKey("dto.delete");
-
-        result.add(action);
-
-        return result;
-    }
-
     @Override
     public RecordsQueryResult<ActionRecords.RecordActions> getMetaValues(RecordsQuery recordsQuery) {
 
@@ -109,8 +70,6 @@ public class ActionRecords extends LocalRecordsDAO
                 actions.setActions(Collections.emptyList());
             }
 
-            actions.setActions(getActions());//todo: temp
-
             resultList.add(actions);
         }
 
@@ -124,7 +83,7 @@ public class ActionRecords extends LocalRecordsDAO
     public static class RecordActionsMeta {
         @MetaAtt("_etype")
         private String type;
-        @MetaAtt("_actions")
+        @MetaAtt("_actions[]")
         private List<ActionDto> actions;
     }
 
