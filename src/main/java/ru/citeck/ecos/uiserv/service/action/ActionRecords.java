@@ -15,6 +15,7 @@ import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
 import ru.citeck.ecos.records2.source.dao.local.RecordsQueryWithMetaLocalDAO;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Roman Makarskiy
@@ -65,7 +66,13 @@ public class ActionRecords extends LocalRecordsDAO
             actions.setRecord(ref.toString());
 
             if (meta.getActions() != null) {
-                actions.setActions(meta.getActions());
+                //temp filter until filters is not in types
+                List<ActionDto> filteredActions = meta.getActions()
+                    .stream()
+                    .filter(a -> !a.getKey().equals("dao.delete"))
+                    .collect(Collectors.toList());
+
+                actions.setActions(filteredActions);
             } else {
                 actions.setActions(Collections.emptyList());
             }
