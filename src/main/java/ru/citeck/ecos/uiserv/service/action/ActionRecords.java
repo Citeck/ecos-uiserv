@@ -69,7 +69,7 @@ public class ActionRecords extends LocalRecordsDAO
                 //temp filter until filters is not in types
                 List<ActionDto> filteredActions = meta.getActions()
                     .stream()
-                    .filter(a -> !a.getKey().equals("dao.delete"))
+                    .filter(a -> !"dao.delete".equals(a.getKey()))
                     .collect(Collectors.toList());
 
                 actions.setActions(filteredActions);
