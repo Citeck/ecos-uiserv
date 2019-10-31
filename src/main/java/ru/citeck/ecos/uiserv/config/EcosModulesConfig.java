@@ -35,6 +35,14 @@ public class EcosModulesConfig {
     public void init() {
         apiFactory.getModuleApi().onModulePublished(FormModule.class, this::deployForm);
         apiFactory.getModuleApi().onModulePublished(DashboardModule.class, this::deployDashboard);
+
+        apiFactory.getModuleApi().onModuleDeleted(FormModule.class, this::deleteForm);
+        apiFactory.getModuleApi().onModuleDeleted(DashboardModule.class, this::deleteDashboard);
+    }
+
+    public void deleteForm(String formId) {
+        log.info("Form module deleted: " + formId);
+        formService.delete(formId);
     }
 
     public void deployForm(FormModule formModule) {
@@ -42,6 +50,11 @@ public class EcosModulesConfig {
         //todo: remove conversion
         EcosFormModel formModel = mapper.convertValue(formModule, EcosFormModel.class);
         formService.save(formModel);
+    }
+
+    public void deleteDashboard(String dashboardId) {
+        log.info("Dashboard module deleted: " + dashboardId);
+        dashboardEntityService.delete(dashboardId);
     }
 
     public void deployDashboard(DashboardModule dashboardModule) {
