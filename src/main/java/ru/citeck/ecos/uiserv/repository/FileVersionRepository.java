@@ -5,6 +5,7 @@ import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileVersion;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -14,7 +15,11 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 @Repository
 public interface FileVersionRepository extends JpaRepository<FileVersion, Long> {
-   // Optional<MenuConfigVersion> findTopByMenuConfigOrderByOrdinalDesc(File menuConfig);
+
+    // Optional<MenuConfigVersion> findTopByMenuConfigOrderByOrdinalDesc(File menuConfig);
+
    Optional<FileVersion> findOneByFileAndOrdinal(File file, long ordinal);
    Optional<FileVersion> findTopByFileAndProductVersionIsNotNullOrderByOrdinalDesc(File file);
+
+   List<FileVersion> findAllByFileId(long id);
 }

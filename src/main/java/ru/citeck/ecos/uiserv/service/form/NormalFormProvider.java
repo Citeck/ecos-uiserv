@@ -73,7 +73,6 @@ public class NormalFormProvider implements FormProvider, MutableFormProvider {
 
     @Override
     public void delete(String formId) {
-        fileService.deployFileOverride(FileType.FORM, formId, null, null, null)
-            .getFileId();
+        fileService.delete(FileType.FORM, formId);
     }
 }
