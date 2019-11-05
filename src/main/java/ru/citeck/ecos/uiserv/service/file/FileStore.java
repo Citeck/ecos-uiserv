@@ -2,27 +2,34 @@ package ru.citeck.ecos.uiserv.service.file;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
+import com.netflix.discovery.converters.Auto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.domain.FileVersion;
 import ru.citeck.ecos.uiserv.domain.Translated;
+import ru.citeck.ecos.uiserv.repository.FileMetaRepository;
 import ru.citeck.ecos.uiserv.repository.FileRepository;
 import ru.citeck.ecos.uiserv.repository.FileVersionRepository;
 import ru.citeck.ecos.uiserv.repository.TranslatedRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Component
 public class FileStore {
+
     @Autowired
     private FileRepository repository;
 
     @Autowired
     private FileVersionRepository versionRepository;
+
+    @Autowired
+    private FileMetaRepository metaRepository;
 
     @Autowired
     private TranslatedRepository crutches;
@@ -48,8 +55,8 @@ public class FileStore {
         final Optional<File> file = v.flatMap(repository::findById);
         //todo this requires loading bytes[] to determine if the file is considered hidden or not;
         // need some other flag instead and keep bytes[] lazy-loaded
-        return file.map(File::getFileVersion).flatMap(ver -> Optional.ofNullable(ver.getBytes()))
-            .flatMap(bytes -> file);
+        file.map(File::getFileVersion).flatMap(ver -> Optional.ofNullable(ver.getBytes())).flatMap(bytes -> file);
+        return file;
     }
 
     public Optional<File> loadFile(long fileId) {
@@ -111,5 +118,17 @@ public class FileStore {
         return file.map(File::getId)
             .flatMap(id -> Optional.ofNullable(
                 entityManager.find(File.class, id, LockModeType.PESSIMISTIC_WRITE)));
+    }
+
+    @Transactional
+    public void deleteFile(FileType fileType, String fileId) {
+
+        Optional<File> file = repository.findByTypeAndFileId(fileType, fileId);
+
+        file.ifPresent(f -> {
+            metaRepository.deleteAll(metaRepository.findByFile(f));
+            versionRepository.deleteAll(versionRepository.findAllByFileId(f.getId()))
+            repository.delete(f);
+        });
     }
 }
