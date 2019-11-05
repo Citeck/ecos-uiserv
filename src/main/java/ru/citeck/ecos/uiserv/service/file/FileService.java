@@ -214,4 +214,8 @@ public class FileService {
             .filter(file -> file.getFileVersion().getBytes() != null)
             .collect(Collectors.toList());
     }
+
+    public void delete(FileType fileType, String fileId) {
+        fileStore.deleteFile(fileType, fileId);
+    }
 }

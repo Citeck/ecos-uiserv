@@ -2,7 +2,6 @@ package ru.citeck.ecos.uiserv.service.file;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
-import com.netflix.discovery.converters.Auto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.uiserv.domain.File;
@@ -55,8 +54,8 @@ public class FileStore {
         final Optional<File> file = v.flatMap(repository::findById);
         //todo this requires loading bytes[] to determine if the file is considered hidden or not;
         // need some other flag instead and keep bytes[] lazy-loaded
-        file.map(File::getFileVersion).flatMap(ver -> Optional.ofNullable(ver.getBytes())).flatMap(bytes -> file);
-        return file;
+        return file.map(File::getFileVersion).flatMap(ver -> Optional.ofNullable(ver.getBytes()))
+            .flatMap(bytes -> file);
     }
 
     public Optional<File> loadFile(long fileId) {
@@ -127,7 +126,7 @@ public class FileStore {
 
         file.ifPresent(f -> {
             metaRepository.deleteAll(metaRepository.findByFile(f));
-            versionRepository.deleteAll(versionRepository.findAllByFileId(f.getId()))
+            versionRepository.deleteAll(versionRepository.findAllByFileId(f.getId()));
             repository.delete(f);
         });
     }
