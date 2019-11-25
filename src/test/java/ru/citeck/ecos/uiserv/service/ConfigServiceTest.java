@@ -11,7 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.TestConfigData;
-import ru.citeck.ecos.uiserv.domain.ConfigDTO;
+import ru.citeck.ecos.uiserv.domain.ConfigDto;
 import ru.citeck.ecos.uiserv.service.config.ConfigEntityService;
 
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class ConfigServiceTest {
     public void getById() {
         assertThat(TestConfigData.testConfigs.size(), is(3));
 
-        List<ConfigDTO> found = TestConfigData.testConfigs.stream()
+        List<ConfigDto> found = TestConfigData.testConfigs.stream()
             .map(dto -> configEntityService.getById(dto.getId()).get())
             .collect(Collectors.toList());
 
@@ -64,7 +64,7 @@ public class ConfigServiceTest {
     public void create() throws IOException {
         String id = UUID.randomUUID().toString();
 
-        ConfigDTO dto = new ConfigDTO();
+        ConfigDto dto = new ConfigDto();
         dto.setTitle("Some title");
         dto.setDescription("Some description");
         dto.setId(id);
@@ -74,8 +74,8 @@ public class ConfigServiceTest {
             "  }\n" +
             "}", JsonNode.class));
 
-        ConfigDTO saved = configEntityService.create(dto);
-        ConfigDTO found = configEntityService.getById(id).get();
+        ConfigDto saved = configEntityService.create(dto);
+        ConfigDto found = configEntityService.getById(id).get();
 
         assertThat(found, is(saved));
     }
@@ -84,7 +84,7 @@ public class ConfigServiceTest {
     public void createMultipleWithEqualsId() throws IOException {
         String id = "same-id";
 
-        ConfigDTO topConfig = new ConfigDTO();
+        ConfigDto topConfig = new ConfigDto();
         topConfig.setTitle("Some title");
         topConfig.setDescription("Some description");
         topConfig.setId(id);
@@ -94,7 +94,7 @@ public class ConfigServiceTest {
             "  }\n" +
             "}", JsonNode.class));
 
-        ConfigDTO downConfig = new ConfigDTO();
+        ConfigDto downConfig = new ConfigDto();
         downConfig.setTitle("Some title");
         downConfig.setDescription("Some description");
         downConfig.setId(id);
@@ -114,7 +114,7 @@ public class ConfigServiceTest {
 
     @Test
     public void saveWithoutId() throws IOException {
-        ConfigDTO dto = new ConfigDTO();
+        ConfigDto dto = new ConfigDto();
         dto.setTitle("Some title");
         dto.setDescription("Some description");
         dto.setValue(objectMapper.readValue("{\n" +
@@ -132,7 +132,7 @@ public class ConfigServiceTest {
     public void saveIdAndValue() throws IOException {
         String id = UUID.randomUUID().toString();
 
-        ConfigDTO dto = new ConfigDTO();
+        ConfigDto dto = new ConfigDto();
         dto.setId(id);
         dto.setValue(objectMapper.readValue("{\n" +
             "  \"menu\": {\n" +
@@ -140,8 +140,8 @@ public class ConfigServiceTest {
             "  }\n" +
             "}", JsonNode.class));
 
-        ConfigDTO saved = configEntityService.create(dto);
-        ConfigDTO found = configEntityService.getById(id).get();
+        ConfigDto saved = configEntityService.create(dto);
+        ConfigDto found = configEntityService.getById(id).get();
 
         assertThat(saved, is(found));
     }
@@ -150,11 +150,11 @@ public class ConfigServiceTest {
     public void saveOnlyId() {
         String id = UUID.randomUUID().toString();
 
-        ConfigDTO dto = new ConfigDTO();
+        ConfigDto dto = new ConfigDto();
         dto.setId(id);
 
-        ConfigDTO saved = configEntityService.create(dto);
-        ConfigDTO found = configEntityService.getById(id).get();
+        ConfigDto saved = configEntityService.create(dto);
+        ConfigDto found = configEntityService.getById(id).get();
 
         assertThat(saved, is(found));
     }
@@ -163,7 +163,7 @@ public class ConfigServiceTest {
     public void mutate() throws IOException {
         String id = UUID.randomUUID().toString();
 
-        ConfigDTO dto = new ConfigDTO();
+        ConfigDto dto = new ConfigDto();
         dto.setId(id);
         dto.setTitle("Some title");
         dto.setDescription("Some description");
@@ -175,15 +175,15 @@ public class ConfigServiceTest {
 
         configEntityService.create(dto);
 
-        ConfigDTO found = configEntityService.getById(id).get();
+        ConfigDto found = configEntityService.getById(id).get();
         found.setValue(objectMapper.readValue("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"DOWN\"\n" +
             "  }\n" +
             "}", JsonNode.class));
 
-        ConfigDTO mutated = configEntityService.update(found);
-        ConfigDTO mutatedFound = configEntityService.getById(id).get();
+        ConfigDto mutated = configEntityService.update(found);
+        ConfigDto mutatedFound = configEntityService.getById(id).get();
 
         assertThat(mutated, is(mutatedFound));
     }
@@ -192,7 +192,7 @@ public class ConfigServiceTest {
     public void delete() throws IOException {
         String id = UUID.randomUUID().toString();
 
-        ConfigDTO dto = new ConfigDTO();
+        ConfigDto dto = new ConfigDto();
         dto.setTitle("Some title");
         dto.setDescription("Some description");
         dto.setId(id);
@@ -202,14 +202,14 @@ public class ConfigServiceTest {
             "  }\n" +
             "}", JsonNode.class));
 
-        ConfigDTO saved = configEntityService.create(dto);
-        ConfigDTO found = configEntityService.getById(id).get();
+        ConfigDto saved = configEntityService.create(dto);
+        ConfigDto found = configEntityService.getById(id).get();
 
         assertThat(found, is(saved));
 
         configEntityService.delete(id);
 
-        Optional<ConfigDTO> mustBeEmpty = configEntityService.getById(id);
+        Optional<ConfigDto> mustBeEmpty = configEntityService.getById(id);
 
         assertThat(mustBeEmpty, is(Optional.empty()));
     }

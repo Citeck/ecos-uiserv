@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
-import ru.citeck.ecos.uiserv.config.UIServProperties;
-import ru.citeck.ecos.uiserv.domain.ConfigDTO;
-import ru.citeck.ecos.uiserv.domain.EntityDTO;
+import ru.citeck.ecos.uiserv.config.UiServProperties;
+import ru.citeck.ecos.uiserv.domain.ConfigDto;
+import ru.citeck.ecos.uiserv.domain.EntityDto;
 import ru.citeck.ecos.uiserv.service.entity.AbstractEntityRecords;
 
 import java.util.ArrayList;
@@ -20,32 +20,32 @@ import java.util.Optional;
  * @author Roman Makarskiy
  */
 @Component
-public class ConfigRecords extends AbstractEntityRecords<ConfigDTO> {
+public class ConfigRecords extends AbstractEntityRecords<ConfigDto> {
 
     public static final String ID = "config";
 
-    private UIServProperties properties;
+    private UiServProperties properties;
 
     @Autowired
     public ConfigRecords(ConfigEntityService entityService,
-                         UIServProperties properties) {
+                         UiServProperties properties) {
         setId(ID);
         this.entityService = entityService;
         this.properties = properties;
     }
 
     @Override
-    public RecordsMutResult save(List<ConfigDTO> values) {
+    public RecordsMutResult save(List<ConfigDto> values) {
         RecordsMutResult recordsMutResult = new RecordsMutResult();
         values.forEach(entityDTO -> {
-            EntityDTO saved;
+            EntityDto saved;
             String id = entityDTO.getId();
 
             if (StringUtils.isBlank(id)) {
                 throw new IllegalArgumentException("Parameter 'id' is mandatory for config record");
             }
 
-            Optional<ConfigDTO> found = entityService.getById(id);
+            Optional<ConfigDto> found = entityService.getById(id);
             if (found.isPresent()) {
                 saved = entityService.update(entityDTO);
             } else {
@@ -59,8 +59,8 @@ public class ConfigRecords extends AbstractEntityRecords<ConfigDTO> {
     }
 
     @Override
-    public List<ConfigDTO> getValuesToMutate(List<RecordRef> records) {
-        List<ConfigDTO> result = new ArrayList<>();
+    public List<ConfigDto> getValuesToMutate(List<RecordRef> records) {
+        List<ConfigDto> result = new ArrayList<>();
         for (RecordRef recordRef : records) {
             String id = recordRef.getId();
             if (StringUtils.isBlank(id)) {
@@ -68,11 +68,11 @@ public class ConfigRecords extends AbstractEntityRecords<ConfigDTO> {
                 continue;
             }
 
-            Optional<ConfigDTO> found = entityService.getById(id);
+            Optional<ConfigDto> found = entityService.getById(id);
             if (found.isPresent()) {
                 result.add(found.get());
             } else {
-                ConfigDTO dto = new ConfigDTO();
+                ConfigDto dto = new ConfigDto();
                 dto.setId(id);
                 result.add(dto);
             }
@@ -81,8 +81,8 @@ public class ConfigRecords extends AbstractEntityRecords<ConfigDTO> {
     }
 
     @Override
-    public List<ConfigDTO> getMetaValues(List<RecordRef> records) {
-        List<ConfigDTO> result = new ArrayList<>();
+    public List<ConfigDto> getMetaValues(List<RecordRef> records) {
+        List<ConfigDto> result = new ArrayList<>();
         for (RecordRef recordRef : records) {
             String id = recordRef.getId();
             if (StringUtils.isBlank(id)) {
@@ -94,14 +94,14 @@ public class ConfigRecords extends AbstractEntityRecords<ConfigDTO> {
         return result;
     }
 
-    private ConfigDTO getConfigDtoById(String id) {
-        Optional<ConfigDTO> found = entityService.getById(id);
+    private ConfigDto getConfigDtoById(String id) {
+        Optional<ConfigDto> found = entityService.getById(id);
         return found.orElseGet(() -> getConfigFromProps(id).orElseGet(this::getEmpty));
     }
 
-    private Optional<ConfigDTO> getConfigFromProps(String id) {
+    private Optional<ConfigDto> getConfigFromProps(String id) {
         return properties.getProperty(id).map(v -> {
-            ConfigDTO config = new ConfigDTO();
+            ConfigDto config = new ConfigDto();
             config.setId(id);
             config.setTitle(v.getTitle());
             config.setDescription(v.getDescription());
@@ -111,7 +111,7 @@ public class ConfigRecords extends AbstractEntityRecords<ConfigDTO> {
     }
 
     @Override
-    protected ConfigDTO getEmpty() {
-        return new ConfigDTO();
+    protected ConfigDto getEmpty() {
+        return new ConfigDto();
     }
 }

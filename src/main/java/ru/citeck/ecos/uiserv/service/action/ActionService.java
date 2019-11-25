@@ -10,13 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.uiserv.config.UIServProperties;
-import ru.citeck.ecos.uiserv.domain.action.ActionDtoFactory;
-import ru.citeck.ecos.uiserv.domain.action.dto.ActionDTO;
-import ru.citeck.ecos.uiserv.domain.action.dto.EvaluatorDTO;
+import ru.citeck.ecos.uiserv.config.UiServProperties;
 import ru.citeck.ecos.uiserv.service.evaluator.RecordEvaluatorService;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
 @Service
 public class ActionService {
 
-    private static final String RECORD_ACTIONS_ATT_SCHEMA = "_actions?json";
+   /* private static final String RECORD_ACTIONS_ATT_SCHEMA = "_actions?json";
     private static final String DEFAULT_SOURCE_ID = "alfresco";
 
     private final RecordsService recordsService;
@@ -34,12 +33,12 @@ public class ActionService {
     private final RestTemplate alfRestTemplate;
     private final ActionEntityService actionEntityService;
 
-    private final UIServProperties properties;
+    private final UiServProperties properties;
 
     @Autowired
     public ActionService(RecordsService recordsService, RecordEvaluatorService recordEvaluatorService,
                          @Qualifier("alfrescoRestTemplate") RestTemplate alfRestTemplate,
-                         ActionEntityService actionEntityService, UIServProperties properties) {
+                         ActionEntityService actionEntityService, UiServProperties properties) {
         this.recordsService = recordsService;
         this.recordEvaluatorService = recordEvaluatorService;
         this.alfRestTemplate = alfRestTemplate;
@@ -47,16 +46,16 @@ public class ActionService {
         this.properties = properties;
     }
 
-    public List<ActionDTO> getDefaultJournalActions() {
+    public List<ActionDto> getDefaultJournalActions() {
         return actionEntityService.findAllById(properties.getAction().getDefaultJournalActions());
     }
 
-    public List<ActionDTO> getCardActions(RecordRef record) {
+    public List<ActionDto> getCardActions(RecordRef record) {
         JsonNode attribute = recordsService.getAttribute(setDefaultSourceId(record), RECORD_ACTIONS_ATT_SCHEMA);
         return ActionDtoFactory.fromJsonNode(attribute);
     }
 
-    public List<ActionDTO> getJournalActions(RecordRef record, String scope) {
+    public List<ActionDto> getJournalActions(RecordRef record, String scope) {
         if (StringUtils.isBlank(scope)) {
             throw new IllegalArgumentException("You must specify scope, for journal mode");
         }
@@ -64,16 +63,16 @@ public class ActionService {
         JsonNode forObject = alfRestTemplate.getForObject(properties.getAction().getGetAlfJournalUrlEndpoint() +
             scope, JsonNode.class, new HashMap<>());
 
-        List<ActionDTO> fromAlf = ActionDtoFactory.fromAlfJournalActions(forObject)
+        List<ActionDto> fromAlf = ActionDtoFactory.fromAlfJournalActions(forObject)
             .stream()
             .map(this::merge)
             .collect(Collectors.toList());
 
-        List<ActionDTO> result = CollectionUtils.isNotEmpty(fromAlf) ? fromAlf : getDefaultJournalActions();
+        List<ActionDto> result = CollectionUtils.isNotEmpty(fromAlf) ? fromAlf : getDefaultJournalActions();
 
         return result
             .stream()
-            .filter(actionDTO -> recordEvaluatorService.evaluate(actionDTO.getEvaluator(), setDefaultSourceId(record)))
+            .filter(ActionDto -> recordEvaluatorService.evaluate(ActionDto.getEvaluator(), setDefaultSourceId(record)))
             .collect(Collectors.toList());
     }
 
@@ -84,18 +83,18 @@ public class ActionService {
         return RecordRef.create(record.getAppName(), DEFAULT_SOURCE_ID, record.getId());
     }
 
-    private ActionDTO merge(ActionDTO externalAction) {
+    private ActionDto merge(ActionDto externalAction) {
         String id = externalAction.getId();
         if (StringUtils.isBlank(id)) {
             return externalAction;
         }
 
-        Optional<ActionDTO> servAction = actionEntityService.getById(id);
+        Optional<ActionDto> servAction = actionEntityService.getById(id);
         if (!servAction.isPresent()) {
             return externalAction;
         }
 
-        ActionDTO action = servAction.get();
+        ActionDto action = servAction.get();
 
         String externalTitle = externalAction.getTitle();
         if (StringUtils.isNotBlank(externalTitle)) {
@@ -118,12 +117,12 @@ public class ActionService {
             action.setConfig(externalActionConfig);
         }
 
-        EvaluatorDTO externalEvaluator = externalAction.getEvaluator();
+        EvaluatorDto externalEvaluator = externalAction.getEvaluator();
         if (externalEvaluator != null) {
             action.setEvaluator(externalEvaluator);
         }
 
         return action;
     }
-
+*/
 }

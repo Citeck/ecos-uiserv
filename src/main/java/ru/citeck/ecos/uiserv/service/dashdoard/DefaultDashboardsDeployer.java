@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.service.dashdoard;
 
 import org.springframework.stereotype.Component;
-import ru.citeck.ecos.uiserv.domain.DashboardDTO;
+import ru.citeck.ecos.uiserv.domain.DashboardDto;
 
 import javax.annotation.PostConstruct;
 import java.util.Optional;
@@ -25,9 +25,9 @@ public class DefaultDashboardsDeployer {
     }
 
     private void deployEmptyDashboard(String type, String key) {
-        Optional<DashboardDTO> existing = entityService.getByKey(type, key, null);
+        Optional<DashboardDto> existing = entityService.getByKey(type, key, null);
         if (!existing.isPresent()) {
-            DashboardDTO entity = new DashboardDTO();
+            DashboardDto entity = new DashboardDto();
             entity.setId(UUID.randomUUID().toString());
             entity.setKey(key);
             entity.setType(type);

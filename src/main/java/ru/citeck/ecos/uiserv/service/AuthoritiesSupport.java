@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
-import ru.citeck.ecos.uiserv.config.RecordsServiceConfig;
 
 import java.util.List;
 
@@ -30,7 +29,7 @@ public class AuthoritiesSupport {
 
     private PersonAtts queryPerson(String username) {
         return recordsService.getMeta(
-            RecordRef.valueOf(RecordsServiceConfig.RECORDS_DAO_ID + "@" + "people" + "@" + username),
+            RecordRef.valueOf("alfresco/people@" + username),
             PersonAtts.class);
     }
 

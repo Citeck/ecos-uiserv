@@ -8,21 +8,27 @@ import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.domain.FileVersion;
 import ru.citeck.ecos.uiserv.domain.Translated;
+import ru.citeck.ecos.uiserv.repository.FileMetaRepository;
 import ru.citeck.ecos.uiserv.repository.FileRepository;
 import ru.citeck.ecos.uiserv.repository.FileVersionRepository;
 import ru.citeck.ecos.uiserv.repository.TranslatedRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Component
 public class FileStore {
+
     @Autowired
     private FileRepository repository;
 
     @Autowired
     private FileVersionRepository versionRepository;
+
+    @Autowired
+    private FileMetaRepository metaRepository;
 
     @Autowired
     private TranslatedRepository crutches;
@@ -111,5 +117,17 @@ public class FileStore {
         return file.map(File::getId)
             .flatMap(id -> Optional.ofNullable(
                 entityManager.find(File.class, id, LockModeType.PESSIMISTIC_WRITE)));
+    }
+
+    @Transactional
+    public void deleteFile(FileType fileType, String fileId) {
+
+        Optional<File> file = repository.findByTypeAndFileId(fileType, fileId);
+
+        file.ifPresent(f -> {
+            metaRepository.deleteAll(metaRepository.findByFile(f));
+            versionRepository.deleteAll(versionRepository.findAllByFileId(f.getId()));
+            repository.delete(f);
+        });
     }
 }

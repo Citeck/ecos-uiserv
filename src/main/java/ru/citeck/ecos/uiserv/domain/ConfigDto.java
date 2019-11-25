@@ -1,25 +1,27 @@
-package ru.citeck.ecos.uiserv.domain.action.dto;
+package ru.citeck.ecos.uiserv.domain;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import lombok.Data;
-import ru.citeck.ecos.uiserv.domain.EntityDTO;
 
 /**
  * @author Roman Makarskiy
  */
 @Data
-public class ActionDTO implements EntityDTO {
+public class ConfigDto implements EntityDto {
 
     private String id;
     private String title;
-    private String type;
-    private String icon;
-    private JsonNode config = NullNode.getInstance();
-    private EvaluatorDTO evaluator;
+    private String description;
+    private JsonNode value = NullNode.getInstance();
 
     @Override
     public String getKey() {
+        return null;
+    }
+
+    @Override
+    public String getType() {
         return null;
     }
 

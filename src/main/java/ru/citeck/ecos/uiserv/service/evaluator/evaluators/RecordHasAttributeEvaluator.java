@@ -7,6 +7,9 @@ import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.exception.RecordsException;
 import ru.citeck.ecos.uiserv.service.evaluator.RecordEvaluator;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * @author Roman Makarskiy
  */
@@ -45,5 +48,15 @@ public class RecordHasAttributeEvaluator implements RecordEvaluator {
         }
 
         return result.asBoolean();
+    }
+
+    @Override
+    public Map<String, String> getAttributes(Object config) {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Class getConfigType() {
+        return Object.class;
     }
 }

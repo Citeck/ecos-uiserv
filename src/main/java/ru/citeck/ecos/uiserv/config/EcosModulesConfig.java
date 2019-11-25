@@ -2,15 +2,13 @@ package ru.citeck.ecos.uiserv.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.Configuration;
-import ru.citeck.ecos.apps.module.type.impl.dashboard.DashboardModule;
-import ru.citeck.ecos.apps.module.type.impl.form.FormModule;
-import ru.citeck.ecos.apps.queue.EcosAppQueues;
-import ru.citeck.ecos.apps.queue.ModulePublishMsg;
-import ru.citeck.ecos.apps.queue.ModulePublishResultMsg;
-import ru.citeck.ecos.uiserv.domain.DashboardDTO;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
+import ru.citeck.ecos.apps.EcosAppsApiFactory;
+import ru.citeck.ecos.apps.app.module.type.dashboard.DashboardModule;
+import ru.citeck.ecos.apps.app.module.type.form.FormModule;
+import ru.citeck.ecos.uiserv.domain.DashboardDto;
 import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;
 import ru.citeck.ecos.uiserv.service.form.EcosFormModel;
 import ru.citeck.ecos.uiserv.service.form.EcosFormService;
@@ -21,71 +19,57 @@ public class EcosModulesConfig {
 
     private EcosFormService formService;
     private ObjectMapper mapper = new ObjectMapper();
-    private AmqpTemplate amqpTemplate;
+    private EcosAppsApiFactory apiFactory;
 
     private DashboardEntityService dashboardEntityService;
 
+    private boolean initialized = false;
+
     public EcosModulesConfig(EcosFormService formService,
-                             AmqpTemplate amqpTemplate,
-                             DashboardEntityService dashboardEntityService) {
+                             DashboardEntityService dashboardEntityService,
+                             EcosAppsApiFactory apiFactory) {
+        this.apiFactory = apiFactory;
         this.formService = formService;
-        this.amqpTemplate = amqpTemplate;
         this.dashboardEntityService = dashboardEntityService;
     }
 
-    @RabbitListener(queues = {EcosAppQueues.MODULE_TYPE_PUBLISH_PREFIX + FormModule.TYPE})
-    public void deployForm(ModulePublishMsg msg) {
+    @EventListener
+    public void onApplicationEvent(ContextRefreshedEvent event) {
 
-        ModulePublishResultMsg result = new ModulePublishResultMsg();
-        result.setRevId(msg.getRevId());
-
-        try {
-
-            byte[] formData = msg.getData();
-
-            if (formData == null) {
-                throw new RuntimeException("Form can't be deployed. Data is not received");
-            }
-
-            EcosFormModel formModel = mapper.readValue(formData, EcosFormModel.class);
-            formService.save(formModel);
-
-            result.setSuccess(true);
-
-        } catch (Exception e) {
-
-            result.setMsg(e.getMessage());
-            result.setSuccess(false);
+        if (initialized) {
+            return;
         }
 
-        amqpTemplate.convertAndSend(EcosAppQueues.PUBLISH_RESULT_ID, result);
+        apiFactory.getModuleApi().onModulePublished(FormModule.class, this::deployForm);
+        apiFactory.getModuleApi().onModulePublished(DashboardModule.class, this::deployDashboard);
+
+        apiFactory.getModuleApi().onModuleDeleted(FormModule.class, this::deleteForm);
+        apiFactory.getModuleApi().onModuleDeleted(DashboardModule.class, this::deleteDashboard);
+
+        initialized = true;
     }
 
-    @RabbitListener(queues = {EcosAppQueues.MODULE_TYPE_PUBLISH_PREFIX + DashboardModule.TYPE})
-    public void deployDashboard(ModulePublishMsg msg) {
+    public void deleteForm(String formId) {
+        log.info("Form module deleted: " + formId);
+        formService.delete(formId);
+    }
 
-        ModulePublishResultMsg result = new ModulePublishResultMsg();
-        result.setRevId(msg.getRevId());
+    public void deployForm(FormModule formModule) {
+        log.info("Form module received: " + formModule.getId() + " " + formModule.getFormKey());
+        //todo: remove conversion
+        EcosFormModel formModel = mapper.convertValue(formModule, EcosFormModel.class);
+        formService.save(formModel);
+    }
 
-        try {
+    public void deleteDashboard(String dashboardId) {
+        log.info("Dashboard module deleted: " + dashboardId);
+        dashboardEntityService.delete(dashboardId);
+    }
 
-            byte[] dashboardData = msg.getData();
-
-            if (dashboardData == null) {
-                throw new RuntimeException("Dashboard can't be deployed. Data is not received");
-            }
-
-            DashboardDTO dashboardDTO = mapper.readValue(dashboardData, DashboardDTO.class);
-            dashboardEntityService.update(dashboardDTO);
-
-            result.setSuccess(true);
-
-        } catch (Exception e) {
-
-            result.setMsg(e.getMessage());
-            result.setSuccess(false);
-        }
-
-        amqpTemplate.convertAndSend(EcosAppQueues.PUBLISH_RESULT_ID, result);
+    public void deployDashboard(DashboardModule dashboardModule) {
+        log.info("Dashboard module received: " + dashboardModule.getId() + " " + dashboardModule.getKey());
+        //todo: remove conversion
+        DashboardDto dashboardDTO = mapper.convertValue(dashboardModule, DashboardDto.class);
+        dashboardEntityService.update(dashboardDTO);
     }
 }
