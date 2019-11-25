@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.service.form;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileType;
@@ -11,7 +12,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class NormalFormProvider implements FormProvider, MutableFormProvider {
@@ -26,9 +29,22 @@ public class NormalFormProvider implements FormProvider, MutableFormProvider {
             return null;
         }
         if (found.size() > 1) {
-            throw new RuntimeException("More than one form found by key: " + formKey);
+            String forms = found.stream()
+                                .map(this::getFormId)
+                                .collect(Collectors.joining("', '"));
+            log.warn("More than one form found by key: " + formKey + " forms: '" + forms + "'");
         }
         return fromJson(found.iterator().next());
+    }
+
+    private String getFormId(File file) {
+        try {
+            EcosFormModel model = fromJson(file);
+            return model.getId();
+        } catch (Exception e) {
+            log.warn("Form parsing error", e);
+            return "IncorrectFile[id='" + file.getId() + "':'" + file.getFileId() + "']";
+        }
     }
 
     @Override
