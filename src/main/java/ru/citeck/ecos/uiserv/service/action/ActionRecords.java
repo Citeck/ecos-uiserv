@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.service.action;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.base.Strings;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,8 +14,10 @@ import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.request.result.RecordsResult;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
 import ru.citeck.ecos.records2.source.dao.local.RecordsQueryWithMetaLocalDAO;
+import ru.citeck.ecos.records2.utils.StringUtils;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -39,6 +42,7 @@ public class ActionRecords extends LocalRecordsDAO
 
         ActionsQuery query = recordsQuery.getQuery(ActionsQuery.class);
 
+
         List<RecordRef> recordRefs = new ArrayList<>();
         Map<RecordRef, RecordRef> refsMapping = new HashMap<>();
 
@@ -54,6 +58,19 @@ public class ActionRecords extends LocalRecordsDAO
 
         RecordsResult<RecordActionsMeta> metaResult = recordsService.getMeta(recordRefs, RecordActionsMeta.class);
 
+        //check _etype, load additional actions from Ecos Type service
+        //Use set to get rid of duplicates
+        Set<RecordRef> recordsToQueryType = new HashSet<>();
+        metaResult.getRecords().forEach(r -> {
+            if (StringUtils.isNotBlank(r.type)) {
+                recordsToQueryType.add(RecordRef.create("emodel","type", r.type));
+            }
+        });
+        RecordsResult<TypeActionsMeta> manyTypesActions = recordsService.getMeta(recordsToQueryType, TypeActionsMeta.class);
+
+        Map<String, List<ActionDto>> manyTypesActionsMap = new HashMap<>();
+        manyTypesActions.getRecords().forEach(r -> manyTypesActionsMap.put(r.type, r.actions));
+
         List<RecordActions> resultList = new ArrayList<>();
 
         int idx = 0;
@@ -65,14 +82,13 @@ public class ActionRecords extends LocalRecordsDAO
 
             actions.setRecord(ref.toString());
 
-            if (meta.getActions() != null) {
-                //temp filter until filters is not in types
-                List<ActionDto> filteredActions = meta.getActions()
-                    .stream()
-                    .filter(a -> !"dao.delete".equals(a.getKey()))
-                    .collect(Collectors.toList());
+            if (meta.type != null && manyTypesActionsMap.containsKey(meta.type)) {
 
-                actions.setActions(filteredActions);
+                actions.setActions(filterActions(
+                    manyTypesActionsMap.get(meta.type),
+                    meta.getActions()));
+            } else if (meta.getActions() != null) {
+                actions.setActions(meta.getActions());
             } else {
                 actions.setActions(Collections.emptyList());
             }
@@ -80,15 +96,50 @@ public class ActionRecords extends LocalRecordsDAO
             resultList.add(actions);
         }
 
-        RecordsQueryResult<RecordActions> result = new RecordsQueryResult<>();
-        result.setRecords(resultList);
+        RecordsQueryResult<RecordActions> queryResult = new RecordsQueryResult<>();
+        queryResult.setRecords(resultList);
 
-        return result;
+        return queryResult;
+    }
+
+    private List<ActionDto> filterActions(List<ActionDto> typeActions, List<ActionDto> metaActions) {
+        List<ActionDto> filteredActions = new ArrayList<>();
+        typeActions.forEach(typeAction -> {
+            if ("record-actions".equals(typeAction.getType())) {
+                JsonNode typeActionConfigKey = typeAction.getConfig().get("key");
+                if (typeActionConfigKey != null && !typeActionConfigKey.isNull()) {
+                    Pattern configKeyPattern = Pattern.compile(
+                        typeActionConfigKey.asText()
+                        .replace(".","\\.")
+                        .replace("*", "[^.]+")
+                        .replace("#", ".*"));
+
+                    metaActions.forEach(recordAction -> {
+                        if (configKeyPattern.matcher(recordAction.getKey()).matches()) {
+                            filteredActions.add(recordAction);
+                        }
+                    });
+                } else {
+                    filteredActions.addAll(metaActions);
+                }
+            } else {
+                filteredActions.add(typeAction);
+            }
+        });
+        return filteredActions;
     }
 
     @Data
     public static class RecordActionsMeta {
         @MetaAtt("_etype")
+        private String type;
+        @MetaAtt("_actions[]")
+        private List<ActionDto> actions;
+    }
+
+    @Data
+    public static class TypeActionsMeta {
+        @MetaAtt(".id")
         private String type;
         @MetaAtt("_actions[]")
         private List<ActionDto> actions;
