@@ -81,29 +81,29 @@ public class ActionRecordsTest {
         // Second action should be filtered out because of its "key": "print-form.html"
         // not matching "config": {"key": "dao.*"}
         ActionRecords.RecordActionsMeta a1 = OBJECT_MAPPER.readValue(
-        "{\n" +
-            "        \"type\": \"test-ecos-type3\", \n" +
-            "        \"actions\": [\n" +
-            "            {\n" +
-            "                \"id\": \"uiserv/action@1\",\n" +
-            "                \"key\": \"dao.edit\",\n" +
-            "                \"name\": \"userActions.contract.property.approvalCancelation\",\n" +
-            "                \"type\": \"CREATE_NODE\",\n" +
-            "                \"config\": {\n" +
-            "                    \"nodeType\": \"ctrEvent:cancelApproval\"\n" +
-            "                }\n" +
-            "            },\n" +
-            "            {\n" +
-            "                \"id\": \"uiserv/action@2\",\n" +
-            "                \"key\": \"print-form.html\",\n" +
-            "                \"name\": \"userActions.contract.property.approvalApprovement\",\n" +
-            "                \"type\": \"CREATE_NODE\",\n" +
-            "                \"config\": {\n" +
-            "                    \"nodeType\": \"ctrEvent:approveApproval\"\n" +
-            "                }\n" +
-            "            }\n" +
-            "        ]\n" +
-            "}",
+            "{\n" +
+                "        \"type\": \"test-ecos-type3\", \n" +
+                "        \"actions\": [\n" +
+                "            {\n" +
+                "                \"id\": \"uiserv/action@1\",\n" +
+                "                \"key\": \"dao.edit\",\n" +
+                "                \"name\": \"userActions.contract.property.approvalCancelation\",\n" +
+                "                \"type\": \"CREATE_NODE\",\n" +
+                "                \"config\": {\n" +
+                "                    \"nodeType\": \"ctrEvent:cancelApproval\"\n" +
+                "                }\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"uiserv/action@2\",\n" +
+                "                \"key\": \"print-form.html\",\n" +
+                "                \"name\": \"userActions.contract.property.approvalApprovement\",\n" +
+                "                \"type\": \"CREATE_NODE\",\n" +
+                "                \"config\": {\n" +
+                "                    \"nodeType\": \"ctrEvent:approveApproval\"\n" +
+                "                }\n" +
+                "            }\n" +
+                "        ]\n" +
+                "}",
             ActionRecords.RecordActionsMeta.class);
 
         ActionRecords.TypeActionsMeta t1 = OBJECT_MAPPER.readValue(
@@ -138,7 +138,6 @@ public class ActionRecordsTest {
                 "  ]\n" +
                 "}",
             ActionRecords.TypeActionsMeta.class);
-
 
 
         when(recordsService.getMeta(anyCollection(), eq(ActionRecords.RecordActionsMeta.class)))
@@ -248,7 +247,6 @@ public class ActionRecordsTest {
                 "  ]\n" +
                 "}",
             ActionRecords.TypeActionsMeta.class);
-
 
 
         when(recordsService.getMeta(anyCollection(), eq(ActionRecords.RecordActionsMeta.class)))
@@ -362,7 +360,6 @@ public class ActionRecordsTest {
                 "  ]\n" +
                 "}",
             ActionRecords.TypeActionsMeta.class);
-
 
 
         when(recordsService.getMeta(anyCollection(), eq(ActionRecords.RecordActionsMeta.class)))
@@ -485,7 +482,6 @@ public class ActionRecordsTest {
                 "  ]\n" +
                 "}",
             ActionRecords.TypeActionsMeta.class);
-
 
 
         when(recordsService.getMeta(anyCollection(), eq(ActionRecords.RecordActionsMeta.class)))
