@@ -42,7 +42,6 @@ public class ActionRecords extends LocalRecordsDAO
 
         ActionsQuery query = recordsQuery.getQuery(ActionsQuery.class);
 
-
         List<RecordRef> recordRefs = new ArrayList<>();
         Map<RecordRef, RecordRef> refsMapping = new HashMap<>();
 
@@ -63,7 +62,7 @@ public class ActionRecords extends LocalRecordsDAO
         Set<RecordRef> recordsToQueryType = new HashSet<>();
         metaResult.getRecords().forEach(r -> {
             if (StringUtils.isNotBlank(r.type)) {
-                recordsToQueryType.add(RecordRef.create("emodel","type", r.type));
+                recordsToQueryType.add(RecordRef.create("emodel", "type", r.type));
             }
         });
         RecordsResult<TypeActionsMeta> manyTypesActions = recordsService.getMeta(recordsToQueryType, TypeActionsMeta.class);
@@ -110,9 +109,9 @@ public class ActionRecords extends LocalRecordsDAO
                 if (typeActionConfigKey != null && !typeActionConfigKey.isNull()) {
                     Pattern configKeyPattern = Pattern.compile(
                         typeActionConfigKey.asText()
-                        .replace(".","\\.")
-                        .replace("*", "[^.]+")
-                        .replace("#", ".*"));
+                            .replace(".", "\\.")
+                            .replace("*", "[^.]+")
+                            .replace("#", ".*"));
 
                     metaActions.forEach(recordAction -> {
                         if (configKeyPattern.matcher(recordAction.getKey()).matches()) {
