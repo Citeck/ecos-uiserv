@@ -13,7 +13,6 @@ import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.config.UiServProperties;
-import ru.citeck.ecos.uiserv.service.action.ActionService;
 import ru.citeck.ecos.uiserv.service.evaluator.RecordEvaluatorService;
 
 import java.io.IOException;
@@ -27,8 +26,8 @@ public class ActionServiceTest {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    @Autowired
-    private ActionService actionService;
+//    @Autowired
+//    private ActionService actionService;
     @Autowired
     private UiServProperties properties;
 
