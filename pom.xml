@@ -337,6 +337,10 @@
             <groupId>org.springframework.amqp</groupId>
             <artifactId>spring-rabbit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>ru.citeck.ecos.community</groupId>
+            <artifactId>ecos-apps-lib-spring</artifactId>
+        </dependency>
 
         <!-- jhipster-needle-maven-add-dependency -->
     </dependencies>
