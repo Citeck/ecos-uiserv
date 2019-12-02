@@ -40,6 +40,10 @@ public class ActionRecordsTest {
     @MockBean
     private RecordsService recordsService;
 
+    @Test
+    public void simpleAction() throws IOException {
+    }
+
 /*
 
     @Test
