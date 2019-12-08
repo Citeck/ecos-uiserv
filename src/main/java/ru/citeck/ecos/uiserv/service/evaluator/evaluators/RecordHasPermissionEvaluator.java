@@ -1,11 +1,8 @@
 package ru.citeck.ecos.uiserv.service.evaluator.evaluators;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records2.exception.RecordsException;
 import ru.citeck.ecos.uiserv.service.evaluator.RecordEvaluator;
 
 import java.util.Collections;
@@ -14,52 +11,51 @@ import java.util.Map;
 /**
  * @author Roman Makarskiy
  */
-@Component("record-has-permission")
-public class RecordHasPermissionEvaluator implements RecordEvaluator {
+@Component
+public class RecordHasPermissionEvaluator implements RecordEvaluator<RecordHasPermissionEvaluator.Config,
+                                                                     RecordHasPermissionEvaluator.Meta> {
 
     private static final String PERMISSION_ATT_PATTERN = ".att(n:\"permissions\"){has(n:\"%s\")}";
-    private static final String PERMISSION_CONFIG_ATT = "permission";
+    private static final String HAS_PERM_PROP = "hasPermission";
 
-    private final RecordsService recordsService;
-
-    @Autowired
-    public RecordHasPermissionEvaluator(RecordsService recordsService) {
-        this.recordsService = recordsService;
+    @Override
+    public boolean evaluate(Config config, Meta meta) {
+        return meta.hasPermission == null || Boolean.TRUE.equals(meta.hasPermission);
     }
 
     @Override
-    public boolean evaluate(Object config, RecordRef record) {
-        String permission;
+    public Map<String, String> getMetaAttributes(Config config) {
 
-        if (config instanceof JsonNode) {
-            JsonNode permissionNode = ((JsonNode) config).get(PERMISSION_CONFIG_ATT);
-            if (permissionNode == null || permissionNode.isNull() || permissionNode.isMissingNode()) {
-                throw new IllegalArgumentException("You need to specify a permission kind, for evaluating. Config:"
-                    + config.toString());
-            }
-
-            permission = permissionNode.asText();
-        } else {
-            throw new IllegalArgumentException("Unsupported format of config");
+        if (StringUtils.isBlank(config.permission)) {
+            throw new IllegalArgumentException("You need to specify a permission for evaluating. Config:"
+                + config.toString());
         }
 
-        String permissionAttrSchema = String.format(PERMISSION_ATT_PATTERN, permission);
-        JsonNode attribute = recordsService.getAttribute(record, permissionAttrSchema);
-        if (attribute == null || attribute.isNull() || attribute.isMissingNode()) {
-            throw new RecordsException(String.format("Failed get permission attribute from record <%s>," +
-                " attribute schema: <%s>", record, permissionAttrSchema));
-        }
-
-        return attribute.asBoolean();
+        return Collections.singletonMap(HAS_PERM_PROP, String.format(PERMISSION_ATT_PATTERN, config.permission));
     }
 
     @Override
-    public Map<String, String> getAttributes(Object config) {
-        return Collections.emptyMap();
+    public Class<Config> getConfigType() {
+        return Config.class;
     }
 
     @Override
-    public Class getConfigType() {
-        return Object.class;
+    public Class<Meta> getMetaType() {
+        return Meta.class;
+    }
+
+    @Override
+    public String getId() {
+        return "has-permission";
+    }
+
+    @Data
+    public static class Config {
+        private String permission;
+    }
+
+    @Data
+    public static class Meta {
+        private Boolean hasPermission;
     }
 }
