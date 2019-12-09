@@ -45,8 +45,5 @@ public class UiServProperties {
 
         private List<String> defaultJournalActions = UiServDefault.Action.DEFAULT_JOURNAL_ACTIONS;
         private String getAlfJournalUrlEndpoint = UiServDefault.Action.GET_ALF_JOURNAL_URL_ENDPOINT;
-        private String defaultActionsClasspath = UiServDefault.Action.DEFAULT_ACTIONS_CLASSPATH;
-
     }
-
 }
