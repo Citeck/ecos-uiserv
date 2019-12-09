@@ -1,0 +1,12 @@
+{
+    "id": "content-download",
+    "key": "content.download",
+    "name": "Скачать",
+    "type": "download",
+    "evaluator": {
+        "id": "has-attribute",
+        "config": {
+            "attribute": "_content"
+        }
+    }
+}

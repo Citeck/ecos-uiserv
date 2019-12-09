@@ -1,12 +1,12 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-    <changeSet author="citeck" id="20191209000000">
+    <changeSet author="citeck" id="20191209000001">
 
-        <delete tableName="evaluator" />
+        <dropPrimaryKey tableName="actions" constraintName="actionsPK" />
+
+        <delete tableName="evaluators" />
         <delete tableName="actions" />
-
-        <dropPrimaryKey tableName="actions" />
 
         <renameColumn tableName="actions" oldColumnName="id" newColumnName="ext_id" />
         <renameColumn tableName="actions" oldColumnName="title" newColumnName="name" />
@@ -14,7 +14,7 @@
         <addColumn tableName="actions">
 
             <column name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_actions_id" />
+                <constraints nullable="false" />
             </column>
             <column name="key" type="VARCHAR(32)" />
 
@@ -25,7 +25,9 @@
 
         </addColumn>
 
-        <addColumn tableName="evaluator">
+        <addPrimaryKey tableName="actions" columnNames="id" constraintName="pk_actions_id" />
+
+        <addColumn tableName="evaluators">
             <column name="inverse" type="BOOLEAN">
                 <constraints nullable="false" />
             </column>

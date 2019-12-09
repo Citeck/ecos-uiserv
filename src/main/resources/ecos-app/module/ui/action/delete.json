@@ -1,0 +1,12 @@
+{
+    "id": "delete",
+    "key": "crud.delete",
+    "name": "Удалить",
+    "type": "delete",
+    "evaluator": {
+        "id": "has-permission",
+        "config": {
+            "permission": "Write"
+        }
+    }
+}

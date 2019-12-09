@@ -5,7 +5,7 @@ import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.apps.app.module.ModuleRef;
-import ru.citeck.ecos.apps.app.module.type.ui.action.ActionDto;
+import ru.citeck.ecos.apps.app.module.type.ui.action.ActionModule;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
@@ -33,11 +33,13 @@ public class ActionRecords extends LocalRecordsDAO
     public static final String ID = "action";
 
     private RecordsService recordsService;
+    private ActionService actionService;
 
     @Autowired
-    public ActionRecords(RecordsService recordsService) {
+    public ActionRecords(RecordsService recordsService, ActionService actionService) {
         setId(ID);
         this.recordsService = recordsService;
+        this.actionService = actionService;
     }
 
     @Override
@@ -66,7 +68,7 @@ public class ActionRecords extends LocalRecordsDAO
         List<RecordActions> resultList = new ArrayList<>();
 
         for (RecordInfo info : recordsInfo) {
-            List<ActionDto> actions = filterActions(info.getTypeActionsRefs(), info.getRecordActions());
+            List<ActionModule> actions = filterActions(info.getTypeActions(), info.getRecordActions());
             if (actions == null) {
                 actions = Collections.emptyList();
             }
@@ -99,35 +101,43 @@ public class ActionRecords extends LocalRecordsDAO
 
     private void fillTypeActions(List<RecordInfo> recordsInfo) {
 
-        List<RecordRef> typesToQueryActions = recordsInfo
-            .stream()
-            .filter(rec -> rec.getType() != null)
-            .map(RecordInfo::getType)
-            .distinct()
-            .collect(Collectors.toList());
+        Map<RecordRef, List<RecordInfo>> recordsByType = new HashMap<>();
 
-        RecordsResult<ActionsRefMeta> typesActionsResult = recordsService.getMeta(typesToQueryActions, ActionsRefMeta.class);
+        for (RecordInfo info : recordsInfo) {
+            RecordRef type = info.getType();
+            if (type != null) {
+                recordsByType.computeIfAbsent(type, k -> new ArrayList<>()).add(info);
+            }
+        }
+
+        List<RecordRef> typesRefs = new ArrayList<>(recordsByType.keySet());
+        RecordsResult<ActionsRefMeta> typesActionsResult = recordsService.getMeta(typesRefs, ActionsRefMeta.class);
+
         List<ActionsRefMeta> typesActions = typesActionsResult.getRecords();
 
+        Map<RecordRef, List<ActionModule>> actions = new HashMap<>();
         for (int i = 0; i < typesActions.size(); i++) {
-            if (i < typesToQueryActions.size()) {
-                RecordRef typeRef = typesToQueryActions.get(i);
 
+            ActionsRefMeta typeActions = typesActions.get(i);
+            RecordRef typeRef = typesRefs.get(i);
 
+            List<RecordRef> records = recordsByType.get(typeRef)
+                .stream()
+                .map(RecordInfo::getRecordRef)
+                .collect(Collectors.toList());
 
-                for (RecordInfo info : recordsInfo) {
-                    if (Objects.equals(typeRef, info.getType())) {
-                        info.setTypeActionsRefs(typesActions.get(i).getActions());
-                    }
-                }
-            }
+            actions.putAll(actionService.getActions(records, typeActions.getActions()));
+        }
+
+        for (RecordInfo info : recordsInfo) {
+            info.setTypeActions(actions.get(info.getRecordRef()));
         }
     }
 
     private void fillRecordActions(List<RecordInfo> recordsInfo) {
 
         List<RecordRef> recordsToQueryActions = recordsInfo.stream().filter(info ->
-            info.getTypeActionsRefs() == null || info.getTypeActionsRefs()
+            info.getTypeActions() == null || info.getTypeActions()
                        .stream()
                        .anyMatch(a -> RECORD_ACTIONS_TYPE.equals(a.getType()))
         ).map(RecordInfo::getRecordRef).collect(Collectors.toList());
@@ -147,14 +157,14 @@ public class ActionRecords extends LocalRecordsDAO
         }
     }
 
-    private List<ActionDto> filterActions(List<ActionDto> typeActions, List<ActionDto> recordActions) {
+    private List<ActionModule> filterActions(List<ActionModule> typeActions, List<ActionModule> recordActions) {
         if (typeActions == null) {
             return recordActions;
         }
         if (typeActions.isEmpty()) {
             return Collections.emptyList();
         }
-        List<ActionDto> filteredActions = new ArrayList<>();
+        List<ActionModule> filteredActions = new ArrayList<>();
         typeActions.forEach(typeAction -> {
             if ("record-actions".equals(typeAction.getType())) {
                 JsonNode typeActionConfigKey = typeAction.getConfig().get("key");
@@ -192,7 +202,7 @@ public class ActionRecords extends LocalRecordsDAO
     @Data
     public static class ActionsDtoMeta {
         @MetaAtt("_actions[]")
-        private List<ActionDto> actions;
+        private List<ActionModule> actions;
     }
 
     @Data
@@ -213,16 +223,16 @@ public class ActionRecords extends LocalRecordsDAO
         private String id = UUID.randomUUID().toString();
 
         private String record;
-        private List<ActionDto> actions;
+        private List<ActionModule> actions;
     }
 
     @Data
     private static class RecordInfo {
 
-        private RecordRef recordRef;
+        private final RecordRef recordRef;
         private RecordRef type;
-        private List<ActionDto> recordActions;
-        private List<ModuleRef> typeActionsRefs;
+        private List<ActionModule> recordActions = Collections.emptyList();
+        private List<ActionModule> typeActions = Collections.emptyList();
 
         public RecordInfo(RecordRef recordRef) {
             this.recordRef = recordRef;
