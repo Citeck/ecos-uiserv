@@ -94,7 +94,7 @@ public abstract class AbstractEntityRecords<T extends EntityDto> extends CrudRec
         if (query.key == null) {
             query.key = "DEFAULT";
         }
-        if (query.user.isEmpty()) {
+        if (StringUtils.isEmpty(query.user)) {
             query.user = null;
         }
         Optional<T> entityDTO = Optional.empty();
