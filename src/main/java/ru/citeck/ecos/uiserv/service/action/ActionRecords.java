@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.service.action;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -167,7 +168,8 @@ public class ActionRecords extends LocalRecordsDAO
         List<ActionModule> filteredActions = new ArrayList<>();
         typeActions.forEach(typeAction -> {
             if ("record-actions".equals(typeAction.getType())) {
-                JsonNode typeActionConfigKey = typeAction.getConfig().get("key");
+                ObjectNode config = typeAction.getConfig();
+                JsonNode typeActionConfigKey = config != null ? config.get("key") : null;
                 if (typeActionConfigKey != null && !typeActionConfigKey.isNull()) {
                     Pattern configKeyPattern = Pattern.compile(
                         typeActionConfigKey.asText()
