@@ -35,9 +35,10 @@ public class NormalFormProvider implements FormProvider, MutableFormProvider {
             String forms = found.stream()
                                 .map(this::getFormId)
                                 .collect(Collectors.joining("', '"));
-            log.warn("More than one form found by key: " + formKey + " forms: '" + forms + "'");
+            log.warn("More than one form found by key: {} forms: '{}'",
+                formKey, forms);
         }
-        return fromJson(found.iterator().next());
+        return fromJson(found.get(0));
     }
 
     @Override
