@@ -9,10 +9,7 @@ import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.entity.AbstractBaseEntityService;
 import ru.citeck.ecos.uiserv.service.file.FileService;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Roman Makarskiy
@@ -20,7 +17,7 @@ import java.util.UUID;
 @Service
 public class DashboardEntityService extends AbstractBaseEntityService<DashboardDto> {
 
-    private static final String TYPE_REFIX = "type_";
+    private static final String TYPE_PREFIX = "type_";
 
     private static final String META_KEY = "key";
     private static final String META_TYPE = "type";
@@ -62,10 +59,16 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
             type = "case-details";
         }
         Optional<DashboardDto> result = super.getByKey(type, key, user);
-        if (!result.isPresent() && key.startsWith(TYPE_REFIX)) {
-            result = super.getByKey(type, key.substring(TYPE_REFIX.length()), user);
+        if (!result.isPresent() && key.startsWith(TYPE_PREFIX)) {
+            result = super.getByKey(type, key.substring(TYPE_PREFIX.length()), user);
         }
         return result;
+    }
+
+    public Optional<DashboardDto> getByUser(String user) {
+        return fileService.find("user", Collections.singletonList(user)).stream()
+            .map(f -> super.fromJson(f))
+            .findFirst();
     }
 
     private DashboardDto saveWithId(String id, DashboardDto entity) {
