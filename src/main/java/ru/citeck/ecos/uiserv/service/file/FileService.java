@@ -7,26 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.citeck.ecos.uiserv.domain.File;
-import ru.citeck.ecos.uiserv.domain.FileMeta;
-import ru.citeck.ecos.uiserv.domain.FileType;
-import ru.citeck.ecos.uiserv.domain.FileVersion;
+import ru.citeck.ecos.uiserv.domain.*;
 import ru.citeck.ecos.uiserv.repository.FileMetaRepository;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,12 +25,16 @@ import java.util.zip.ZipInputStream;
 @Transactional
 @Slf4j
 public class FileService {
-    private static int MAX_SIZE = 10*1024*1024;
+    private static final int MAX_SIZE = 10*1024*1024;
 
     private volatile Map<FileType, FileMetadataExtractor> fileMetadataExtractors;
 
-    @Autowired
-    private FileMetaRepository fileMetaRepository;
+    private final FileMetaRepository fileMetaRepository;
+
+    public FileService(FileMetaRepository fileMetaRepository, FileStore fileStore) {
+        this.fileMetaRepository = fileMetaRepository;
+        this.fileStore = fileStore;
+    }
 
     @Autowired
     private void setFileMetadataExtractors(Collection<FileMetadataExtractorInfo> extractors) {
@@ -74,17 +66,16 @@ public class FileService {
         }
     }
 
-    private enum KNOWN_LANGUAGE {EN, RU};
+    private enum KNOWN_LANGUAGE {EN, RU}
 
     private final static Map<FileType, String> extensionMap = new ConcurrentHashMap<>();
-    {
+    static {
         extensionMap.put(FileType.MENU, ".xml");
         extensionMap.put(FileType.JOURNALCFG, ".json");
         extensionMap.put(FileType.JOURNALPREFS, ".json");
     }
 
-    @Autowired
-    private FileStore fileStore;
+    private final FileStore fileStore;
 
     public File deployStandardFile(FileType fileType, String fileId, String contentType, byte[] bytes, long productVersion) {
         return deployStandardFile(fileType, fileId, contentType, bytes, productVersion, false /*isRevert*/);
@@ -206,8 +197,76 @@ public class FileService {
                     criteriaBuilder.equal(root.get("key"), metaKey),
                     root.get("value").in(metaValues.toArray()));
             });
-        return asses.stream()
+        List<File> foundFiles = asses.stream()
             .map(FileMeta::getFile)
+            //we must not return hidden files! i.e. ones deployed as empty bytes[].
+            //we could skip this check by just stripping metadata when hiding a file, but we want the metadata to be
+            //  preserved so that later we'll be able to upload another version of a file (not changing metadata).
+            .filter(file -> file.getFileVersion().getBytes() != null)
+            .distinct()
+            .collect(Collectors.toList());
+        final Map<File, String> formModeKeyForFoundFiles = fileMetaRepository.findAll(
+            (Root<FileMeta> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) -> {
+                return criteriaBuilder.and(
+                    criteriaBuilder.equal(root.get("key"), "keyMode"),
+                    root.get("file").in(foundFiles));
+            })
+            .stream()
+            .collect(Collectors.toMap(FileMeta::getFile, FileMeta::getValue));
+        foundFiles.sort((o1, o2) ->
+            Comparator.nullsFirst(String::compareTo).compare(
+                formModeKeyForFoundFiles.get(o1),
+                formModeKeyForFoundFiles.get(o2)));
+        return foundFiles;
+    }
+
+    public List<File> findByMeta(Map<String, String> metaKeyValuePairs) {
+        // a number of subsequent 'findAll()' is used - one findAll() for every provided 'metaKey==metaValue' pair,
+        // joining with previous selection by 'in (previousSelection)'.
+        // something like "select where 'meta1=value1' and file in (select where 'meta2=value2' and file in (select ...))"
+        Iterator<String> metaKeysIterator = metaKeyValuePairs.keySet().iterator();
+        if (!metaKeysIterator.hasNext()) {
+            throw new IllegalArgumentException("At least one 'key==value' condition should be provided");
+        }
+        String metaKey = metaKeysIterator.next();
+        String metaValue = metaKeyValuePairs.get(metaKey);
+        List<File> fileList = fileMetaRepository.findAll(
+            (Root<FileMeta> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) -> {
+                //root.fetch("file", JoinType.LEFT); //join just for eager loading, "file" is not used in this query
+                Predicate keyIsEqual = criteriaBuilder.equal(root.get("key"), metaKey);
+                Predicate valueIsEqual = metaValue != null ?
+                    criteriaBuilder.equal(root.get("value"), metaValue) :
+                    criteriaBuilder.or(
+                        criteriaBuilder.isNull(root.get("value")),
+                        criteriaBuilder.equal(root.get("value"), ""));
+                return criteriaBuilder.and(keyIsEqual, valueIsEqual);
+            })
+            .stream()
+            .map(FileMeta::getFile)
+            .collect(Collectors.toList());
+
+        while (metaKeysIterator.hasNext()) {
+            final String additionalMetaKey = metaKeysIterator.next();
+            final String additionalMetaValue = metaKeyValuePairs.get(additionalMetaKey);
+            final List<File> previouslySelectedFiles = fileList;
+
+            fileList = fileMetaRepository.findAll(
+                (Root<FileMeta> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) -> {
+                    //root.fetch("file", JoinType.LEFT); //join just for eager loading, "file" is not used in this query
+                    Predicate keyIsEqueal = criteriaBuilder.equal(root.get("key"), additionalMetaKey);
+                    Predicate valueIsEqual = (additionalMetaValue != null) ?
+                        criteriaBuilder.equal(root.get("value"), additionalMetaValue) :
+                        criteriaBuilder.or(
+                            criteriaBuilder.isNull(root.get("value")),
+                            criteriaBuilder.equal(root.get("value"), ""));
+                    return criteriaBuilder.and(keyIsEqueal, valueIsEqual, root.get("file").in(previouslySelectedFiles));
+                })
+                .stream()
+                .map(FileMeta::getFile)
+                .collect(Collectors.toList());
+        }
+
+        return fileList.stream()
             //we must not return hidden files! i.e. ones deployed as empty bytes[].
             //we could skip this check by just stripping metadata when hiding a file, but we want the metadata to be
             //  preserved so that later we'll be able to upload another version of a file (not changing metadata).
