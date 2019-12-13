@@ -9,7 +9,10 @@ import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.entity.AbstractBaseEntityService;
 import ru.citeck.ecos.uiserv.service.file.FileService;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author Roman Makarskiy
@@ -63,12 +66,6 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
             result = super.getByKey(type, key.substring(TYPE_PREFIX.length()), user);
         }
         return result;
-    }
-
-    public Optional<DashboardDto> getByUser(String user) {
-        return fileService.find("user", Collections.singletonList(user)).stream()
-            .map(f -> super.fromJson(f))
-            .findFirst();
     }
 
     private DashboardDto saveWithId(String id, DashboardDto entity) {

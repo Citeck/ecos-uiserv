@@ -29,17 +29,22 @@ public class DashboardRecords extends AbstractEntityRecords<DashboardDto> {
     public RecordsMutResult save(List<DashboardDto> values) {
         RecordsMutResult recordsMutResult = new RecordsMutResult();
         values.forEach(dto -> {
-            DashboardDto saved;
-            String id = dto.getId();
 
-            if (StringUtils.isBlank(id)) {
+            if (StringUtils.isBlank(dto.getId())) {
                 throw new IllegalArgumentException("Parameter 'id' is mandatory for config record");
             }
 
-            String user = dto.getUser();
-            Optional<DashboardDto> found = ((DashboardEntityService) entityService).getByUser(user);
-            if (found.isPresent() || dto.getUser() == null) {
-                saved = entityService.update(dto);
+            Optional<DashboardDto> optionalDashboardDto = entityService.getByKey(
+                dto.getType(),
+                dto.getKey(),
+                dto.getUser()
+            );
+
+            DashboardDto saved;
+            if (optionalDashboardDto.isPresent()) {
+                DashboardDto storedDashboardDto = optionalDashboardDto.get();
+                storedDashboardDto.setConfig(dto.getConfig());
+                saved = entityService.update(storedDashboardDto);
             } else {
                 saved = entityService.create(dto);
             }

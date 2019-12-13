@@ -94,7 +94,7 @@ public abstract class AbstractBaseEntityService<T extends EntityDto> implements 
     @Override
     public abstract Optional<T> getByRecord(RecordRef recordRef);
 
-    protected T fromJson(File file) {
+    private T fromJson(File file) {
         try {
             return objectMapper.readValue(file.getFileVersion().getBytes(), typeParameterClass);
         } catch (IOException e) {
