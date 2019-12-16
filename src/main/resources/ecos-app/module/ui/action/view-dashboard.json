@@ -1,0 +1,6 @@
+{
+    "id": "view-dashboard",
+    "key": "crud.view.dashboard",
+    "name": "Просмотреть",
+    "type": "view"
+}

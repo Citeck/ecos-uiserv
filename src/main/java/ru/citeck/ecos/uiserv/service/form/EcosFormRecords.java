@@ -21,7 +21,6 @@ import ru.citeck.ecos.records2.source.dao.local.CrudRecordsDAO;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 @Component
 @RequiredArgsConstructor
 public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormModelDownstream> {

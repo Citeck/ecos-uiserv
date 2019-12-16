@@ -13,7 +13,7 @@ services:
         depends_on:
             - gateway-app
     gateway-app:
-        image: nexus.citeck.ru/ecos-gateway:1.4.0
+        image: nexus.citeck.ru/ecos-gateway:1.5.0
         environment:
             - _JAVA_OPTIONS=-Xmx512m -Xms256m
             - SPRING_PROFILES_ACTIVE=prod,swagger
@@ -39,7 +39,7 @@ services:
             # See https://www.jhipster.tech/microservices-architecture/#registry_app_configuration
         environment:
             - _JAVA_OPTIONS=-Xmx512m -Xms256m
-            - SPRING_PROFILES_ACTIVE=dev,swagger
+            - SPRING_PROFILES_ACTIVE=prod,swagger
             - SPRING_SECURITY_USER_PASSWORD=admin
             - JHIPSTER_REGISTRY_PASSWORD=admin
             - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_TYPE=native

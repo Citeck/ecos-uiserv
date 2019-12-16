@@ -1,10 +1,8 @@
 package ru.citeck.ecos.uiserv.service.evaluator.evaluators;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records2.exception.RecordsException;
 import ru.citeck.ecos.uiserv.service.evaluator.RecordEvaluator;
 
 import java.util.Collections;
@@ -13,50 +11,51 @@ import java.util.Map;
 /**
  * @author Roman Makarskiy
  */
-@Component("record-has-attribute")
-public class RecordHasAttributeEvaluator implements RecordEvaluator {
+@Component
+public class RecordHasAttributeEvaluator implements RecordEvaluator<RecordHasAttributeEvaluator.Config,
+                                                                    RecordHasAttributeEvaluator.Meta> {
 
     private static final String HAS_ATTRIBUTE_PATTERN = ".has(n:\"%s\")";
+    private static final String HAS_ATT_META_FIELD = "hasAtt";
 
-    private final RecordsService recordsService;
-
-    public RecordHasAttributeEvaluator(RecordsService recordsService) {
-        this.recordsService = recordsService;
+    @Override
+    public boolean evaluate(Config config, Meta meta) {
+        return Boolean.TRUE.equals(meta.hasAtt);
     }
 
     @Override
-    public boolean evaluate(Object config, RecordRef record) {
-        String attribute;
+    public Map<String, String> getMetaAttributes(Config config) {
 
-        if (config instanceof JsonNode) {
-            JsonNode attributeNode = ((JsonNode) config).get("attribute");
-            if (attributeNode == null || attributeNode.isNull() || attributeNode.isMissingNode()) {
-                throw new IllegalArgumentException("You need to specify a attribute, for evaluating. Config:"
-                    + config.toString());
-            }
-
-            attribute = attributeNode.asText();
-        } else {
-            throw new IllegalArgumentException("Unsupported format of config");
+        if (StringUtils.isBlank(config.attribute)) {
+            throw new IllegalArgumentException("You need to specify a attribute, for evaluating. Config:"
+                + config.toString());
         }
 
-        String attrSchema = String.format(HAS_ATTRIBUTE_PATTERN, attribute);
-        JsonNode result = recordsService.getAttribute(record, attrSchema);
-        if (result == null || result.isNull() || result.isMissingNode()) {
-            throw new RecordsException(String.format("Failed get attribute from record <%s>," +
-                " attribute schema: <%s>", record, attrSchema));
-        }
-
-        return result.asBoolean();
+        return Collections.singletonMap(HAS_ATT_META_FIELD, String.format(HAS_ATTRIBUTE_PATTERN, config.attribute));
     }
 
     @Override
-    public Map<String, String> getAttributes(Object config) {
-        return Collections.emptyMap();
+    public Class<Meta> getMetaType() {
+        return Meta.class;
     }
 
     @Override
-    public Class getConfigType() {
-        return Object.class;
+    public String getId() {
+        return "has-attribute";
+    }
+
+    @Override
+    public Class<Config> getConfigType() {
+        return Config.class;
+    }
+
+    @Data
+    public static class Config {
+        private String attribute;
+    }
+
+    @Data
+    public static class Meta {
+        private Boolean hasAtt;
     }
 }

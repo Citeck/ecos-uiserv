@@ -1,128 +1,200 @@
 package ru.citeck.ecos.uiserv.service.action;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import ru.citeck.ecos.apps.app.module.ModuleRef;
+import ru.citeck.ecos.apps.app.module.type.ui.action.ActionModule;
+import ru.citeck.ecos.apps.app.module.type.ui.action.EvaluatorDto;
+import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.uiserv.config.UiServProperties;
+import ru.citeck.ecos.records2.request.result.RecordsResult;
+import ru.citeck.ecos.uiserv.domain.ActionEntity;
+import ru.citeck.ecos.uiserv.domain.EvaluatorEntity;
+import ru.citeck.ecos.uiserv.repository.ActionRepository;
 import ru.citeck.ecos.uiserv.service.evaluator.RecordEvaluatorService;
+import ru.citeck.ecos.uiserv.service.evaluator.evaluators.AlwaysTrueEvaluator;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * @author Roman Makarskiy
- */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ActionService {
 
-   /* private static final String RECORD_ACTIONS_ATT_SCHEMA = "_actions?json";
-    private static final String DEFAULT_SOURCE_ID = "alfresco";
-
+    private final RecordEvaluatorService evaluatorService;
+    private final ActionRepository actionRepository;
     private final RecordsService recordsService;
-    private final RecordEvaluatorService recordEvaluatorService;
-    private final RestTemplate alfRestTemplate;
-    private final ActionEntityService actionEntityService;
 
-    private final UiServProperties properties;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
-    @Autowired
-    public ActionService(RecordsService recordsService, RecordEvaluatorService recordEvaluatorService,
-                         @Qualifier("alfrescoRestTemplate") RestTemplate alfRestTemplate,
-                         ActionEntityService actionEntityService, UiServProperties properties) {
-        this.recordsService = recordsService;
-        this.recordEvaluatorService = recordEvaluatorService;
-        this.alfRestTemplate = alfRestTemplate;
-        this.actionEntityService = actionEntityService;
-        this.properties = properties;
+    public void updateAction(ActionModule action) {
+        ActionEntity actionEntity = dtoToEntity(action);
+        actionRepository.save(actionEntity);
     }
 
-    public List<ActionDto> getDefaultJournalActions() {
-        return actionEntityService.findAllById(properties.getAction().getDefaultJournalActions());
-    }
-
-    public List<ActionDto> getCardActions(RecordRef record) {
-        JsonNode attribute = recordsService.getAttribute(setDefaultSourceId(record), RECORD_ACTIONS_ATT_SCHEMA);
-        return ActionDtoFactory.fromJsonNode(attribute);
-    }
-
-    public List<ActionDto> getJournalActions(RecordRef record, String scope) {
-        if (StringUtils.isBlank(scope)) {
-            throw new IllegalArgumentException("You must specify scope, for journal mode");
+    public void deleteAction(String id) {
+        ActionEntity action = actionRepository.findByExtId(id);
+        if (action != null) {
+            actionRepository.delete(action);
         }
+    }
 
-        JsonNode forObject = alfRestTemplate.getForObject(properties.getAction().getGetAlfJournalUrlEndpoint() +
-            scope, JsonNode.class, new HashMap<>());
+    public Map<RecordRef, List<ActionModule>> getActions(List<RecordRef> recordRefs, List<ModuleRef> actions) {
 
-        List<ActionDto> fromAlf = ActionDtoFactory.fromAlfJournalActions(forObject)
-            .stream()
-            .map(this::merge)
+        List<ActionModule> actionsModules = actions.stream()
+            .map(a -> Optional.ofNullable(actionRepository.findByExtId(a.getId())))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(this::entityToDto)
             .collect(Collectors.toList());
 
-        List<ActionDto> result = CollectionUtils.isNotEmpty(fromAlf) ? fromAlf : getDefaultJournalActions();
+        List<EvaluatorDto> evaluators = actionsModules.stream()
+            .map(a -> {
+                EvaluatorDto evaluatorDto;
+                if (a.getEvaluator() == null) {
+                    evaluatorDto = new EvaluatorDto();
+                    evaluatorDto.setId(AlwaysTrueEvaluator.ID);
+                } else {
+                    evaluatorDto = a.getEvaluator();
+                }
+                return evaluatorDto;
+            }).collect(Collectors.toList());
 
-        return result
-            .stream()
-            .filter(ActionDto -> recordEvaluatorService.evaluate(ActionDto.getEvaluator(), setDefaultSourceId(record)))
-            .collect(Collectors.toList());
+        List<Map<String, String>> metaAttributes = evaluatorService.getMetaAttributes(evaluators);
+        Set<String> attsToRequest = new HashSet<>();
+
+        metaAttributes.forEach(atts -> attsToRequest.addAll(atts.values()));
+
+        List<RecordMeta> recordsMeta;
+        if (!attsToRequest.isEmpty()) {
+            RecordsResult<RecordMeta> recordsRes = recordsService.getAttributes(recordRefs, attsToRequest);
+            recordsMeta = recordsRes.getRecords();
+        } else {
+            recordsMeta = recordRefs.stream().map(RecordMeta::new).collect(Collectors.toList());
+        }
+
+        Map<RecordRef, List<ActionModule>> actionsByRecord = new HashMap<>();
+
+        for (int i = 0; i < recordRefs.size(); i++) {
+
+            RecordMeta meta = recordsMeta.get(i);
+            List<ObjectNode> evaluatorsMeta = new ArrayList<>();
+
+            for (Map<String, String> metaAtts : metaAttributes) {
+                ObjectNode evalMeta = JsonNodeFactory.instance.objectNode();
+                metaAtts.forEach((k, v) -> evalMeta.set(k, meta.get(v)));
+                evaluatorsMeta.add(evalMeta);
+            }
+
+            List<Boolean> evalResult = evaluatorService.evaluate(evaluators, evaluatorsMeta);
+            List<ActionModule> recordActions = new ArrayList<>();
+            for (int j = 0; j < actionsModules.size(); j++) {
+                if (evalResult.get(j)) {
+                    recordActions.add(actionsModules.get(j));
+                }
+            }
+
+            actionsByRecord.put(recordRefs.get(i), recordActions);
+        }
+
+        return actionsByRecord;
     }
 
-    private RecordRef setDefaultSourceId(RecordRef record) {
-        if (StringUtils.isNotBlank(record.getSourceId())) {
-            return record;
-        }
-        return RecordRef.create(record.getAppName(), DEFAULT_SOURCE_ID, record.getId());
-    }
+    private ActionModule entityToDto(ActionEntity actionEntity) {
 
-    private ActionDto merge(ActionDto externalAction) {
-        String id = externalAction.getId();
-        if (StringUtils.isBlank(id)) {
-            return externalAction;
-        }
+        ActionModule action = new ActionModule();
+        action.setId(actionEntity.getExtId());
+        action.setIcon(actionEntity.getIcon());
+        action.setName(actionEntity.getName());
+        action.setKey(actionEntity.getKey());
+        action.setType(actionEntity.getType());
 
-        Optional<ActionDto> servAction = actionEntityService.getById(id);
-        if (!servAction.isPresent()) {
-            return externalAction;
-        }
-
-        ActionDto action = servAction.get();
-
-        String externalTitle = externalAction.getTitle();
-        if (StringUtils.isNotBlank(externalTitle)) {
-            action.setTitle(externalTitle);
+        String configJson = actionEntity.getConfigJson();
+        if (configJson != null) {
+            try {
+                action.setConfig((ObjectNode) objectMapper.readTree(configJson));
+            } catch (IOException e) {
+                log.error("Error", e);
+            }
         }
 
-        String externalType = externalAction.getType();
-        if (StringUtils.isNotBlank(externalType)) {
-            action.setType(externalType);
-        }
+        EvaluatorEntity evaluator = actionEntity.getEvaluator();
+        if (evaluator != null) {
+            EvaluatorDto evaluatorDto = new EvaluatorDto();
+            evaluatorDto.setId(evaluator.getEvaluatorId());
+            evaluatorDto.setInverse(evaluator.isInverse());
 
-        String externalIcon = externalAction.getIcon();
-        if (StringUtils.isNotBlank(externalIcon)) {
-            action.setIcon(externalIcon);
-        }
+            configJson = evaluator.getConfigJson();
+            if (configJson != null) {
+                try {
+                    evaluatorDto.setConfig((ObjectNode) objectMapper.readTree(configJson));
+                } catch (IOException e) {
+                    log.error("Error", e);
+                }
+            }
 
-        JsonNode externalActionConfig = externalAction.getConfig();
-        if (externalActionConfig != null && !externalActionConfig.isMissingNode()
-            && !externalActionConfig.isNull() && externalActionConfig.size() > 0) {
-            action.setConfig(externalActionConfig);
-        }
-
-        EvaluatorDto externalEvaluator = externalAction.getEvaluator();
-        if (externalEvaluator != null) {
-            action.setEvaluator(externalEvaluator);
+            action.setEvaluator(evaluatorDto);
         }
 
         return action;
     }
-*/
+
+    private ActionEntity dtoToEntity(ActionModule action) {
+
+        ActionEntity actionEntity = actionRepository.findByExtId(action.getId());
+        if (actionEntity == null) {
+            actionEntity = new ActionEntity();
+            actionEntity.setExtId(action.getId());
+        }
+
+        actionEntity.setIcon(action.getIcon());
+        actionEntity.setKey(action.getKey());
+        actionEntity.setName(action.getName());
+        actionEntity.setType(action.getType());
+
+        if (action.getConfig() != null) {
+            try {
+                actionEntity.setConfigJson(objectMapper.writeValueAsString(action.getConfig()));
+            } catch (JsonProcessingException e) {
+                log.error("Error", e);
+                actionEntity.setConfigJson(null);
+            }
+        } else {
+            actionEntity.setConfigJson(null);
+        }
+
+        EvaluatorDto evaluator = action.getEvaluator();
+        if (evaluator != null) {
+
+            EvaluatorEntity evaluatorEntity = actionEntity.getEvaluator();
+            if (evaluatorEntity == null) {
+                evaluatorEntity = new EvaluatorEntity();
+            }
+            if (evaluator.getConfig() != null) {
+                try {
+                    evaluatorEntity.setConfigJson(objectMapper.writeValueAsString(evaluator.getConfig()));
+                } catch (JsonProcessingException e) {
+                    log.error("Error", e);
+                    evaluatorEntity.setConfigJson(null);
+                }
+            } else {
+                evaluatorEntity.setConfigJson(null);
+            }
+
+            evaluatorEntity.setEvaluatorId(evaluator.getId());
+            evaluatorEntity.setInverse(evaluator.isInverse());
+
+            actionEntity.setEvaluator(evaluatorEntity);
+        }
+
+        return actionEntity;
+    }
 }

@@ -174,9 +174,6 @@ jhipster:
 # Application specific properties
 # Add your own application properties here, see the ApplicationProperties class
 # to have type-safe configuration, like in the JHipsterProperties above
-#
-# More documentation is available at:
-# https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
 application:
@@ -194,6 +191,13 @@ uiserv:
             value: true
         language-switcher-enabled:
             value: true
+    ecos-records:
+        apps:
+            alfresco:
+                rec-base-url: /alfresco/s/citeck/ecos/records/
+                rec-user-base-url: /share/proxy/alfresco/citeck/ecos/records/
+
+
 
 ecos-app:
     id: ecos-uiserv
