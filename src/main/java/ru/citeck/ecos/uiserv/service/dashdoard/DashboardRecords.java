@@ -10,6 +10,7 @@ import ru.citeck.ecos.uiserv.service.entity.AbstractEntityRecords;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Roman Makarskiy
@@ -27,32 +28,30 @@ public class DashboardRecords extends AbstractEntityRecords<DashboardDto> {
 
     @Override
     public RecordsMutResult save(List<DashboardDto> values) {
+
+        List<RecordMeta> records = values.stream()
+            .map(this::convertDashboardDtoToRecordMeta)
+            .collect(Collectors.toList());
+
         RecordsMutResult recordsMutResult = new RecordsMutResult();
-        values.forEach(dto -> {
-
-            if (StringUtils.isBlank(dto.getId())) {
-                throw new IllegalArgumentException("Parameter 'id' is mandatory for config record");
-            }
-
-            Optional<DashboardDto> optionalDashboardDto = entityService.getByKey(
-                dto.getType(),
-                dto.getKey(),
-                dto.getUser()
-            );
-
-            DashboardDto saved;
-            if (optionalDashboardDto.isPresent()) {
-                DashboardDto storedDashboardDto = optionalDashboardDto.get();
-                storedDashboardDto.setConfig(dto.getConfig());
-                saved = entityService.update(storedDashboardDto);
-            } else {
-                saved = entityService.create(dto);
-            }
-
-            RecordMeta recordMeta = new RecordMeta(saved.getId());
-            recordsMutResult.addRecord(recordMeta);
-        });
+        recordsMutResult.setRecords(records);
         return recordsMutResult;
+    }
+
+    private RecordMeta convertDashboardDtoToRecordMeta(DashboardDto dto) {
+
+        DashboardDto saved;
+
+        Optional<DashboardDto> optionalDashboardDto = entityService.getByKey(dto.getType(), dto.getKey(), dto.getUser());
+        if (optionalDashboardDto.isPresent()) {
+            DashboardDto storedDashboardDto = optionalDashboardDto.get();
+            storedDashboardDto.setConfig(dto.getConfig());
+            saved = entityService.update(storedDashboardDto);
+        } else {
+            saved = entityService.create(dto);
+        }
+
+        return new RecordMeta(saved.getId());
     }
 
     @Override
