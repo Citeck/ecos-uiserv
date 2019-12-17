@@ -129,6 +129,8 @@ public class DashboardRecordControllerTest {
     public void mutate() throws Exception {
         final String id = UUID.randomUUID().toString();
         String key = "new-dashboard";
+        String type = "type";
+        String user = "user";
 
         String json = "{\n" +
             "  \"records\": [\n" +
@@ -144,13 +146,16 @@ public class DashboardRecordControllerTest {
         DashboardDto dto = new DashboardDto();
         dto.setKey(key);
         dto.setId(id);
+        dto.setType(type);
+        dto.setUser(user);
 
-        DashboardDto createdDto = new DashboardDto();
-        createdDto.setKey(key);
-        createdDto.setId(id);
+        DashboardDto updatedDto = new DashboardDto();
+        updatedDto.setKey(key);
+        updatedDto.setId(id);
 
         when(mockDashboardService.getById(id)).thenReturn(Optional.of(dto));
-        when(mockDashboardService.update(dto)).thenReturn(createdDto);
+        when(mockDashboardService.getByKey(type, key, user)).thenReturn(Optional.of(dto));
+        when(mockDashboardService.update(dto)).thenReturn(updatedDto);
 
         TestEntityRecordUtil.performMutateAndCheckResponseId(json, RECORD_ID_AT + id, mockRecordsApi);
     }
