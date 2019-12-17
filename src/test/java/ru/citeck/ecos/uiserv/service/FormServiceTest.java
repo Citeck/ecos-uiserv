@@ -1,8 +1,6 @@
 package ru.citeck.ecos.uiserv.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +10,10 @@ import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.service.form.EcosFormModel;
 import ru.citeck.ecos.uiserv.service.form.EcosFormService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
@@ -49,6 +44,7 @@ public class FormServiceTest {
 
         assertThat(formService.getFormById(id), is(Optional.of(model)));
     }
+
     @Test
     public void testFormModeSearch() {
         EcosFormModel modelA = new EcosFormModel();
@@ -81,26 +77,19 @@ public class FormServiceTest {
 
         assertThat(
             formService.getFormByKey("K"),
-            is(Optional.of(modelA)) );
+            is(Optional.of(modelA)));
         assertThat(
             formService.getFormByKeyAndMode("K", "X"),
-            is(Optional.of(modelB)) );
+            is(Optional.of(modelB)));
         assertThat(
             formService.getFormByKeyAndMode("K", "Y"),
-            is(Optional.of(modelC)) );
+            is(Optional.of(modelC)));
         assertThat(
             formService.getFormByKeyAndMode("K", "Z"),
-            is(Optional.empty()) );
-        assertThat(
-            formService.getFormByKeyAndMode("K", null),
-            is(Optional.of(modelA)) );
-        assertThat(
-            formService.getFormByKeyAndMode("K", ""),
-            is(Optional.of(modelA)) );
-
+            is(Optional.empty()));
         formService.delete(modelA.getId());
         assertThat(
             formService.getFormByKey("K"),
-            is(Optional.of(modelB)) );
+            is(Optional.of(modelB)));
     }
 }
