@@ -1,6 +1,5 @@
 package ru.citeck.ecos.uiserv.service.dashdoard;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordMeta;
@@ -30,7 +29,7 @@ public class DashboardRecords extends AbstractEntityRecords<DashboardDto> {
     public RecordsMutResult save(List<DashboardDto> values) {
 
         List<RecordMeta> records = values.stream()
-            .map(this::convertDashboardDtoToRecordMeta)
+            .map(this::save)
             .collect(Collectors.toList());
 
         RecordsMutResult recordsMutResult = new RecordsMutResult();
@@ -38,7 +37,7 @@ public class DashboardRecords extends AbstractEntityRecords<DashboardDto> {
         return recordsMutResult;
     }
 
-    private RecordMeta convertDashboardDtoToRecordMeta(DashboardDto dto) {
+    private RecordMeta save(DashboardDto dto) {
 
         DashboardDto saved;
 
