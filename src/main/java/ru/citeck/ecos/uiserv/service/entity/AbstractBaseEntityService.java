@@ -3,7 +3,6 @@ package ru.citeck.ecos.uiserv.service.entity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.domain.EntityDto;
 import ru.citeck.ecos.uiserv.domain.File;
@@ -61,16 +60,14 @@ public abstract class AbstractBaseEntityService<T extends EntityDto> implements 
 
         List<T> entities = found.stream()
             .map(this::fromJson)
-            .filter(t -> Objects.equals(t.getType(), type))
             .filter(t -> {
-                if (user != null) {
-                    if (user.isEmpty()) {
-                        return StringUtils.isEmpty(t.getUser());
+                if (Objects.equals(t.getType(), type)) {
+                    if (user == null) {
+                        return t.getUser() == null;
                     }
                     return Objects.equals(t.getUser(), user);
-                } else {
-                    return true;
                 }
+                return false;
             })
             .collect(Collectors.toList());
 
