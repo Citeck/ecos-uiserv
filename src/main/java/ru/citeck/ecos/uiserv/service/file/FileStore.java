@@ -8,7 +8,6 @@ import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.domain.FileVersion;
 import ru.citeck.ecos.uiserv.domain.Translated;
-import ru.citeck.ecos.uiserv.repository.FileMetaRepository;
 import ru.citeck.ecos.uiserv.repository.FileRepository;
 import ru.citeck.ecos.uiserv.repository.FileVersionRepository;
 import ru.citeck.ecos.uiserv.repository.TranslatedRepository;
@@ -16,6 +15,7 @@ import ru.citeck.ecos.uiserv.repository.TranslatedRepository;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.transaction.Transactional;
+import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -26,9 +26,6 @@ public class FileStore {
 
     @Autowired
     private FileVersionRepository versionRepository;
-
-    @Autowired
-    private FileMetaRepository metaRepository;
 
     @Autowired
     private TranslatedRepository crutches;
@@ -62,7 +59,8 @@ public class FileStore {
         return repository.findById(fileId);
     }
 
-    public File saveFile(FileType fileType, String fileId, String contentType, byte[] bytes, long ordinal, Long productVersion,
+    public File saveFile(FileType fileType, String fileId, String contentType, byte[] bytes,
+                         Map<String, String> meta, long ordinal, Long productVersion,
                          boolean isRevert, boolean skipThisVersion) {
         final IMap<String, String> map = cache.getMap("file/" + fileType);
         map.remove(fileId);
@@ -82,6 +80,7 @@ public class FileStore {
         cfg.setFileId(fileId);
         cfg.setLatestOrdinal(ordinal);
         cfg.setType(fileType);
+        cfg.setFileMeta(meta);
         cfg = repository.save(cfg);
 
         if (!skipThisVersion) {
@@ -125,7 +124,6 @@ public class FileStore {
         Optional<File> file = repository.findByTypeAndFileId(fileType, fileId);
 
         file.ifPresent(f -> {
-            metaRepository.deleteAll(metaRepository.findByFile(f));
             versionRepository.deleteAll(versionRepository.findAllByFileId(f.getId()));
             repository.delete(f);
         });

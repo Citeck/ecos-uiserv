@@ -8,25 +8,16 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.uiserv.domain.File;
-import ru.citeck.ecos.uiserv.domain.FileMeta;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.domain.FileVersion;
-import ru.citeck.ecos.uiserv.repository.FileMetaRepository;
+import ru.citeck.ecos.uiserv.domain.File_;
+import ru.citeck.ecos.uiserv.repository.FileRepository;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,12 +28,16 @@ import java.util.zip.ZipInputStream;
 @Transactional
 @Slf4j
 public class FileService {
-    private static int MAX_SIZE = 10*1024*1024;
+    private static final int MAX_SIZE = 10*1024*1024;
 
     private volatile Map<FileType, FileMetadataExtractor> fileMetadataExtractors;
 
-    @Autowired
-    private FileMetaRepository fileMetaRepository;
+    private final FileRepository fileRepository;
+
+    public FileService(FileRepository fileRepository, FileStore fileStore) {
+        this.fileRepository = fileRepository;
+        this.fileStore = fileStore;
+    }
 
     @Autowired
     private void setFileMetadataExtractors(Collection<FileMetadataExtractorInfo> extractors) {
@@ -74,22 +69,22 @@ public class FileService {
         }
     }
 
-    private enum KNOWN_LANGUAGE {EN, RU};
+    private enum KNOWN_LANGUAGE {EN, RU}
 
     private final static Map<FileType, String> extensionMap = new ConcurrentHashMap<>();
-    {
+    static {
         extensionMap.put(FileType.MENU, ".xml");
         extensionMap.put(FileType.JOURNALCFG, ".json");
         extensionMap.put(FileType.JOURNALPREFS, ".json");
     }
 
-    @Autowired
-    private FileStore fileStore;
+    private final FileStore fileStore;
 
     public File deployStandardFile(FileType fileType, String fileId, String contentType, byte[] bytes, long productVersion) {
         return deployStandardFile(fileType, fileId, contentType, bytes, productVersion, false /*isRevert*/);
     }
 
+    @SuppressWarnings("unchecked")
     private File deployStandardFile(FileType fileType, String fileId, String contentType, byte[] bytes, long productVersion,
                                                  boolean isRevert) {
         final Optional<File> ocfg = fileStore.loadFile(fileType, fileId);
@@ -98,7 +93,7 @@ public class FileService {
         final Optional<FileVersion> activeVersion = ocfg.flatMap(cfg -> Optional.ofNullable(cfg.getFileVersion()));
         final boolean activateThisVersion = activeVersion.map(x -> x.getProductVersion() != null)
             .orElse(true);
-        return fileStore.saveFile(fileType, fileId, contentType, bytes,
+        return fileStore.saveFile(fileType, fileId, contentType, bytes, Collections.EMPTY_MAP,
             lastOrdinal+1, productVersion, isRevert, !activateThisVersion);
     }
 
@@ -125,18 +120,9 @@ public class FileService {
         final Optional<File> ocfg = fileStore.loadFile(fileType, fileId);
         final long lastOrdinal = ocfg.flatMap(x -> Optional.ofNullable(x.getLatestOrdinal()))
             .orElse(0L);
-        final File deployed = fileStore.saveFile(fileType, fileId, contentType, bytes,
+
+        return fileStore.saveFile(fileType, fileId, contentType, bytes, metadata,
             lastOrdinal+1, null /*productVersion*/, false/*isRevert*/, false);
-
-        if (metadata != null) {
-            fileMetaRepository.findByFile(deployed).forEach(fileMetaRepository::delete);
-            fileMetaRepository.flush(); //it's important that deletion happens before inserts!
-            metadata.entrySet().stream()
-                .map(entry -> new FileMeta(deployed, entry.getKey(), entry.getValue()))
-                .forEach(fileMetaRepository::save);
-        }
-
-        return deployed;
     }
 
     public Optional<File> loadFile(FileType fileType, String fileId) {
@@ -199,19 +185,22 @@ public class FileService {
     //If at some moment we'll really need to find by multiple keys, we'll probably better off by
     //making metadata a document and storing it in some search engine, than using DB-based search
     public List<File> find(String metaKey, List<String> metaValues) {
-        final List<FileMeta> asses = fileMetaRepository.findAll(
-            (Root<FileMeta> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) -> {
-                root.fetch("file", JoinType.LEFT); //join just for eager loading, "file" is not used in this query
+        if (metaValues.size() == 0) {
+            return Collections.emptyList();
+        }
+        final List<File> asses = fileRepository.findAll(
+            (Root<File> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) -> {
+                MapJoin<File, String, String> fileMeta = root.join(File_.fileMeta, JoinType.INNER);
                 return criteriaBuilder.and(
-                    criteriaBuilder.equal(root.get("key"), metaKey),
-                    root.get("value").in(metaValues.toArray()));
+                    criteriaBuilder.equal(fileMeta.key(), metaKey),
+                    fileMeta.value().in(metaValues.toArray()));
             });
         return asses.stream()
-            .map(FileMeta::getFile)
             //we must not return hidden files! i.e. ones deployed as empty bytes[].
             //we could skip this check by just stripping metadata when hiding a file, but we want the metadata to be
             //  preserved so that later we'll be able to upload another version of a file (not changing metadata).
             .filter(file -> file.getFileVersion().getBytes() != null)
+            .distinct()
             .collect(Collectors.toList());
     }
 
