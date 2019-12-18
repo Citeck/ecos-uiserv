@@ -12,8 +12,6 @@ public interface EcosFormService {
 
     Optional<EcosFormModel> getFormByKey(List<String> formKeys);
 
-    Optional<EcosFormModel> getFormByKeyAndMode(String formKey, String formMode);
-
     List<EcosFormModel> getFormsByKeys(List<String> formKeys);
 
     Optional<EcosFormModel> getFormByRecord(RecordRef record, Boolean isViewMode);

@@ -57,20 +57,6 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
-    public Optional<EcosFormModel> getFormByKeyAndMode(String formKey, String formMode) {
-        EcosFormModel form = null;
-
-        for (FormProvider provider : providers) {
-            form = provider.getFormByKeyAndMode(formKey, formMode);
-            if (form != null) {
-                break;
-            }
-        }
-
-        return Optional.ofNullable(form);
-    }
-
-    @Override
     public List<EcosFormModel> getFormsByKeys(List<String> formKeys) {
         if (CollectionUtils.isEmpty(formKeys)) {
             return new ArrayList<>();
