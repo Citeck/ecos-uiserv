@@ -104,9 +104,7 @@ public class NormalFormProvider implements FormProvider, MutableFormProvider {
     public void save(EcosFormModel model) {
         Map<String, String> modelMeta = new HashMap<>();
         modelMeta.put("formKey", model.getFormKey());
-        if (model.getFormMode() != null) {
-            modelMeta.put("formMode", model.getFormMode());
-        }
+        modelMeta.put("formMode", model.getFormMode());
 
         fileService.deployFileOverride(FileType.FORM, model.getId(), null, toJson(model),
             modelMeta);
