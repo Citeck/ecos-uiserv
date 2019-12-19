@@ -23,6 +23,8 @@
     <include file="config/liquibase/changelog/20190923102003_added_actions.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20191208000000_remove_old_actions.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20191209000000_actions_update.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20191219000000_file_meta_as_map.xml" relativeToChangelogFile="false"/>
+
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
 </databaseChangeLog>

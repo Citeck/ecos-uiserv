@@ -4,14 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.records2.utils.StringUtils;
 import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.file.FileService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,12 +30,47 @@ public class NormalFormProvider implements FormProvider, MutableFormProvider {
             return null;
         }
         if (found.size() > 1) {
-            String forms = found.stream()
-                                .map(this::getFormId)
-                                .collect(Collectors.joining("', '"));
-            log.warn("More than one form found by key: " + formKey + " forms: '" + forms + "'");
+            String forms = found
+                .stream()
+                .map(this::getFormId)
+                .collect(Collectors.joining("', '"));
+            log.warn("More than one form found by key: {} forms: '{}'",
+                formKey, forms);
+
+            File foundFile = found
+                .stream()
+                .sorted((o1, o2) ->
+                    Comparator.nullsFirst(String::compareTo).compare(
+                        o1.getFileMeta().get("formMode"),
+                        o2.getFileMeta().get("formMode")))
+                .collect(Collectors.toList())
+                .get(0);
+            return fromJson(foundFile);
         }
-        return fromJson(found.iterator().next());
+        return fromJson(found.get(0));
+    }
+
+    @Override
+    public EcosFormModel getFormByKeyAndMode(String formKey, String formMode) {
+        List<File> found = fileService.find("formKey", Collections.singletonList(formKey));
+
+        Predicate<File> formModeFilter = StringUtils.isBlank(formMode) ?
+            file -> StringUtils.isBlank(file.getFileMeta().get("formMode")) :
+            file -> formMode.equals(file.getFileMeta().get("formMode"));
+
+        found.removeIf(formModeFilter.negate());
+
+        if (found.isEmpty()) {
+            return null;
+        }
+        if (found.size() > 1) {
+            String forms = found.stream()
+                .map(this::getFormId)
+                .collect(Collectors.joining("', '"));
+            log.warn("More than one form found by (key, mode): ({}, {}) forms: '{}'",
+                formKey, formMode, forms);
+        }
+        return fromJson(found.get(0));
     }
 
     private String getFormId(File file) {
@@ -78,8 +114,14 @@ public class NormalFormProvider implements FormProvider, MutableFormProvider {
 
     @Override
     public void save(EcosFormModel model) {
+        Map<String, String> modelMeta = new HashMap<>();
+        modelMeta.put("formKey", model.getFormKey());
+        if (model.getFormMode() != null) {
+            modelMeta.put("formMode", model.getFormMode());
+        }
+
         fileService.deployFileOverride(FileType.FORM, model.getId(), null, toJson(model),
-            Collections.singletonMap("formKey", model.getFormKey()));
+            modelMeta);
     }
 
     @Override

@@ -7,9 +7,9 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
-
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -25,10 +25,12 @@ public class File implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
     @SequenceGenerator(name = "sequenceGenerator")
+    @Getter @Setter
     private Long id;
 
     @NotNull
     @Column(name = "file_id", nullable = false)
+    @Getter @Setter
     private String fileId;
 
     /* This points to "active" (currently used) version of menu; however "active" does
@@ -37,56 +39,24 @@ public class File implements Serializable {
         those "standard" version are not becoming "active" until the custom override is reverted. */
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     //@JoinColumn(name = "menu_config_version_id")
+    @Getter @Setter
     private FileVersion fileVersion;
 
     @Column
+    @Getter @Setter
     private Long latestOrdinal;
 
     @Column
     @Enumerated(EnumType.STRING)
-    @Getter
-    @Setter
+    @Getter @Setter
     private FileType type;
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFileId() {
-        return fileId;
-    }
-
-    public File fileId(String fileId) {
-        this.fileId = fileId;
-        return this;
-    }
-
-    public void setFileId(String fileId) {
-        this.fileId = fileId;
-    }
-
-    public FileVersion getFileVersion() {
-        return fileVersion;
-    }
-
-    public void setFileVersion(FileVersion fileVersion) {
-        this.fileVersion = fileVersion;
-    }
-
-    public Long getLatestOrdinal() {
-        return latestOrdinal;
-    }
-
-    public void setLatestOrdinal(Long latestOrdinal) {
-        this.latestOrdinal = latestOrdinal;
-    }
-
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "file_meta", joinColumns = {@JoinColumn(name = "file_id", referencedColumnName = "id")})
+    @MapKeyColumn(name = "key")
+    @Column(name = "value")
+    @Getter @Setter
+    private Map<String, String> fileMeta;
 
     @Override
     public boolean equals(Object o) {
