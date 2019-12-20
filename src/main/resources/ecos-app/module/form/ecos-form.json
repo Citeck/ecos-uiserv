@@ -253,7 +253,7 @@
                 "validate": {
                     "customMessage": "",
                     "json": "",
-                    "required": true,
+                    "required": false,
                     "custom": "",
                     "customPrivate": false,
                     "minLength": "",
