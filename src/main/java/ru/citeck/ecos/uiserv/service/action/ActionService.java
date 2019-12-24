@@ -2,23 +2,19 @@ package ru.citeck.ecos.uiserv.service.action;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.apps.app.module.ModuleRef;
 import ru.citeck.ecos.apps.app.module.type.ui.action.ActionModule;
-import ru.citeck.ecos.apps.app.module.type.ui.action.EvaluatorDto;
-import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records2.request.result.RecordsResult;
+import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
+import ru.citeck.ecos.records2.evaluator.RecordEvaluatorService;
+import ru.citeck.ecos.records2.evaluator.evaluators.AlwaysTrueEvaluator;
 import ru.citeck.ecos.uiserv.domain.ActionEntity;
 import ru.citeck.ecos.uiserv.domain.EvaluatorEntity;
 import ru.citeck.ecos.uiserv.repository.ActionRepository;
-import ru.citeck.ecos.uiserv.service.evaluator.RecordEvaluatorService;
-import ru.citeck.ecos.uiserv.service.evaluator.evaluators.AlwaysTrueEvaluator;
 
 import java.io.IOException;
 import java.util.*;
@@ -29,9 +25,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ActionService {
 
-    private final RecordEvaluatorService evaluatorService;
+    private final RecordEvaluatorService evaluatorsService;
     private final ActionRepository actionRepository;
-    private final RecordsService recordsService;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -56,53 +51,33 @@ public class ActionService {
             .map(this::entityToDto)
             .collect(Collectors.toList());
 
-        List<EvaluatorDto> evaluators = actionsModules.stream()
+        List<RecordEvaluatorDto> evaluators = actionsModules.stream()
             .map(a -> {
-                EvaluatorDto evaluatorDto;
+                RecordEvaluatorDto RecordEvaluatorDto;
                 if (a.getEvaluator() == null) {
-                    evaluatorDto = new EvaluatorDto();
-                    evaluatorDto.setId(AlwaysTrueEvaluator.ID);
+                    RecordEvaluatorDto = new RecordEvaluatorDto();
+                    RecordEvaluatorDto.setType(AlwaysTrueEvaluator.TYPE);
                 } else {
-                    evaluatorDto = a.getEvaluator();
+                    RecordEvaluatorDto = a.getEvaluator();
                 }
-                return evaluatorDto;
+                return RecordEvaluatorDto;
             }).collect(Collectors.toList());
 
-        List<Map<String, String>> metaAttributes = evaluatorService.getMetaAttributes(evaluators);
-        Set<String> attsToRequest = new HashSet<>();
-
-        metaAttributes.forEach(atts -> attsToRequest.addAll(atts.values()));
-
-        List<RecordMeta> recordsMeta;
-        if (!attsToRequest.isEmpty()) {
-            RecordsResult<RecordMeta> recordsRes = recordsService.getAttributes(recordRefs, attsToRequest);
-            recordsMeta = recordsRes.getRecords();
-        } else {
-            recordsMeta = recordRefs.stream().map(RecordMeta::new).collect(Collectors.toList());
-        }
-
+        Map<RecordRef, List<Boolean>> evalResultByRecord = evaluatorsService.evaluate(recordRefs, evaluators);
         Map<RecordRef, List<ActionModule>> actionsByRecord = new HashMap<>();
 
-        for (int i = 0; i < recordRefs.size(); i++) {
+        for (RecordRef recordRef : recordRefs) {
 
-            RecordMeta meta = recordsMeta.get(i);
-            List<ObjectNode> evaluatorsMeta = new ArrayList<>();
-
-            for (Map<String, String> metaAtts : metaAttributes) {
-                ObjectNode evalMeta = JsonNodeFactory.instance.objectNode();
-                metaAtts.forEach((k, v) -> evalMeta.set(k, meta.get(v)));
-                evaluatorsMeta.add(evalMeta);
-            }
-
-            List<Boolean> evalResult = evaluatorService.evaluate(evaluators, evaluatorsMeta);
+            List<Boolean> evalResult = evalResultByRecord.get(recordRef);
             List<ActionModule> recordActions = new ArrayList<>();
+
             for (int j = 0; j < actionsModules.size(); j++) {
                 if (evalResult.get(j)) {
                     recordActions.add(actionsModules.get(j));
                 }
             }
 
-            actionsByRecord.put(recordRefs.get(i), recordActions);
+            actionsByRecord.put(recordRef, recordActions);
         }
 
         return actionsByRecord;
@@ -128,8 +103,9 @@ public class ActionService {
 
         EvaluatorEntity evaluator = actionEntity.getEvaluator();
         if (evaluator != null) {
-            EvaluatorDto evaluatorDto = new EvaluatorDto();
+            RecordEvaluatorDto evaluatorDto = new RecordEvaluatorDto();
             evaluatorDto.setId(evaluator.getEvaluatorId());
+            evaluatorDto.setType(evaluator.getType());
             evaluatorDto.setInverse(evaluator.isInverse());
 
             configJson = evaluator.getConfigJson();
@@ -171,7 +147,7 @@ public class ActionService {
             actionEntity.setConfigJson(null);
         }
 
-        EvaluatorDto evaluator = action.getEvaluator();
+        RecordEvaluatorDto evaluator = action.getEvaluator();
         if (evaluator != null) {
 
             EvaluatorEntity evaluatorEntity = actionEntity.getEvaluator();
@@ -190,6 +166,7 @@ public class ActionService {
             }
 
             evaluatorEntity.setEvaluatorId(evaluator.getId());
+            evaluatorEntity.setType(evaluator.getType());
             evaluatorEntity.setInverse(evaluator.isInverse());
 
             actionEntity.setEvaluator(evaluatorEntity);
