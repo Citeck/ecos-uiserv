@@ -60,6 +60,9 @@ public class ActionService {
                 } else {
                     RecordEvaluatorDto = a.getEvaluator();
                 }
+                if (a.getType() == null) {
+                    a.setType(a.getId());
+                }
                 return RecordEvaluatorDto;
             }).collect(Collectors.toList());
 
