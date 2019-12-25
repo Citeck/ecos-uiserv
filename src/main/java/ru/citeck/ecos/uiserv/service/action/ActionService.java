@@ -11,6 +11,7 @@ import ru.citeck.ecos.apps.app.module.type.ui.action.ActionModule;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluatorService;
+import ru.citeck.ecos.records2.evaluator.evaluators.AlwaysFalseEvaluator;
 import ru.citeck.ecos.records2.evaluator.evaluators.AlwaysTrueEvaluator;
 import ru.citeck.ecos.uiserv.domain.ActionEntity;
 import ru.citeck.ecos.uiserv.domain.EvaluatorEntity;
@@ -53,17 +54,22 @@ public class ActionService {
 
         List<RecordEvaluatorDto> evaluators = actionsModules.stream()
             .map(a -> {
-                RecordEvaluatorDto RecordEvaluatorDto;
+                RecordEvaluatorDto recordEvaluatorDto;
                 if (a.getEvaluator() == null) {
-                    RecordEvaluatorDto = new RecordEvaluatorDto();
-                    RecordEvaluatorDto.setType(AlwaysTrueEvaluator.TYPE);
+                    recordEvaluatorDto = new RecordEvaluatorDto();
+                    recordEvaluatorDto.setType(AlwaysTrueEvaluator.TYPE);
                 } else {
-                    RecordEvaluatorDto = a.getEvaluator();
+                    recordEvaluatorDto = a.getEvaluator();
                 }
-                if (a.getType() == null) {
-                    a.setType(a.getId());
+                if (recordEvaluatorDto.getType() == null) {
+                    recordEvaluatorDto.setType(recordEvaluatorDto.getId());
                 }
-                return RecordEvaluatorDto;
+                if (recordEvaluatorDto.getType() == null) {
+                    log.error("Evaluator type is null: '" + recordEvaluatorDto + "'. " +
+                              "Replace it with Always False Evaluator. Action: " + a);
+                    recordEvaluatorDto.setType(AlwaysFalseEvaluator.TYPE);
+                }
+                return recordEvaluatorDto;
             }).collect(Collectors.toList());
 
         Map<RecordRef, List<Boolean>> evalResultByRecord = evaluatorsService.evaluate(recordRefs, evaluators);
