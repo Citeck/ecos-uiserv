@@ -4,7 +4,7 @@
     "name": "Скачать",
     "type": "download",
     "evaluator": {
-        "id": "has-attribute",
+        "type": "has-attribute",
         "config": {
             "attribute": "_content"
         }

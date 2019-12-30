@@ -4,7 +4,7 @@
     "name": "Редактировать",
     "type": "edit",
     "evaluator": {
-        "id": "has-permission",
+        "type": "has-permission",
         "config": {
             "permission": "Write"
         }
