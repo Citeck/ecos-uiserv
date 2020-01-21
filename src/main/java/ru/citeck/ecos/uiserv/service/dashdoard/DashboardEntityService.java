@@ -37,7 +37,6 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
         if (StringUtils.isBlank(entity.getKey())) {
             throw new IllegalArgumentException("Key is mandatory for creating dashboard");
         }
-
         Optional<DashboardDto> optional = getByKey(entity.getType(), entity.getKey(), entity.getUser());
         if (optional.isPresent()) {
             entity.setId(optional.get().getId());

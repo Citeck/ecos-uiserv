@@ -7,14 +7,19 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import ru.citeck.ecos.apps.EcosAppsApiFactory;
-import ru.citeck.ecos.apps.app.module.type.dashboard.DashboardModule;
+import ru.citeck.ecos.apps.app.module.type.ui.dashboard.DashboardModule;
 import ru.citeck.ecos.apps.app.module.type.form.FormModule;
 import ru.citeck.ecos.apps.app.module.type.ui.action.ActionModule;
 import ru.citeck.ecos.uiserv.domain.DashboardDto;
 import ru.citeck.ecos.uiserv.service.action.ActionService;
 import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;
+import ru.citeck.ecos.uiserv.service.dashdoard.DashboardRecords;
 import ru.citeck.ecos.uiserv.service.form.EcosFormModel;
 import ru.citeck.ecos.uiserv.service.form.EcosFormService;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Configuration
@@ -27,6 +32,7 @@ public class EcosModulesConfig {
     private final EcosAppsApiFactory apiFactory;
     private final DashboardEntityService dashboardEntityService;
     private final ActionService actionService;
+    private final DashboardRecords dashboardRecords;
 
     private boolean initialized = false;
 
@@ -63,7 +69,6 @@ public class EcosModulesConfig {
 
     public void deployForm(FormModule formModule) {
         log.info("Form module received: " + formModule.getId() + " " + formModule.getFormKey());
-        //todo: remove conversion
         EcosFormModel formModel = mapper.convertValue(formModule, EcosFormModel.class);
         formService.save(formModel);
     }
@@ -74,9 +79,42 @@ public class EcosModulesConfig {
     }
 
     public void deployDashboard(DashboardModule dashboardModule) {
+
         log.info("Dashboard module received: " + dashboardModule.getId() + " " + dashboardModule.getKey());
-        //todo: remove conversion
-        DashboardDto dashboardDTO = mapper.convertValue(dashboardModule, DashboardDto.class);
-        dashboardEntityService.update(dashboardDTO);
+        DashboardDto dto = mapper.convertValue(dashboardModule, DashboardDto.class);
+
+        boolean newModuleHasConfig = dashboardModule.getConfig() != null && dashboardModule.getConfig().size() > 0;
+
+        List<DashboardDto> dashboards = dashboardEntityService.getAllByKey(
+            dto.getType(),
+            dto.getKey(),
+            dto.getUser()
+        );
+
+        if (!dashboards.isEmpty()) {
+
+            Optional<DashboardDto> currentDto = dashboards.stream()
+                .filter(d -> Objects.equals(d.getId(), dto.getId()))
+                .findFirst();
+
+            if (currentDto.isPresent()) {
+                if (newModuleHasConfig) {
+                    currentDto.get().setConfig(dto.getConfig());
+                    dashboardEntityService.update(currentDto.get());
+                }
+            } else {
+                if (!newModuleHasConfig) {
+                    dashboards.stream()
+                        .filter(d -> d.getConfig() != null && d.getConfig().size() > 0)
+                        .findFirst()
+                        .ifPresent(d -> dto.setConfig(d.getConfig()));
+                }
+                dashboards.forEach(d -> dashboardEntityService.delete(d.getId()));
+                dashboardEntityService.create(dto);
+            }
+        } else {
+            dashboardEntityService.create(dto);
+        }
+        dashboardRecords.wasPublished(dto);
     }
 }

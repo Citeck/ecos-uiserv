@@ -1,0 +1,7 @@
+{
+    "id": "user-dashboard-default",
+    "key": "DEFAULT",
+    "type": "user-dashboard",
+    "user": null,
+    "config": {}
+}

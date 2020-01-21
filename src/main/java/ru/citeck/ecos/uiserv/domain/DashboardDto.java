@@ -15,4 +15,15 @@ public class DashboardDto implements EntityDto {
     private String type;
     private String user;
     private JsonNode config = NullNode.getInstance();
+
+    public DashboardDto() {
+    }
+
+    public DashboardDto(DashboardDto other) {
+        this.id = other.id;
+        this.key = other.key;
+        this.type = other.type;
+        this.user = other.user;
+        this.config = other.config;
+    }
 }

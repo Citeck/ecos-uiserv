@@ -197,7 +197,10 @@ uiserv:
                 rec-base-url: /alfresco/s/citeck/ecos/records/
                 rec-user-base-url: /share/proxy/alfresco/citeck/ecos/records/
 
-
+eapps:
+    ribbon:
+        listOfServers: localhost:8089
+        NIWSServerListClassName: com.netflix.loadbalancer.ConfigurationBasedServerList
 
 ecos-app:
     id: ecos-uiserv

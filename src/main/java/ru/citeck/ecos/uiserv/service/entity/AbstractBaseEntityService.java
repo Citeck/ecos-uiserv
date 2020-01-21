@@ -52,13 +52,11 @@ public abstract class AbstractBaseEntityService<T extends EntityDto> implements 
     }
 
     @Override
-    public Optional<T> getByKey(String type, String key, String user) {
-        List<File> found = fileService.find("key", Collections.singletonList(key));
-        if (found.isEmpty()) {
-            return Optional.empty();
-        }
+    public List<T> getAllByKey(String type, String key, String user) {
 
-        List<T> entities = found.stream()
+        List<File> found = fileService.find("key", Collections.singletonList(key));
+
+        return found.stream()
             .map(this::fromJson)
             .filter(t -> {
                 if (Objects.equals(t.getType(), type)) {
@@ -70,6 +68,12 @@ public abstract class AbstractBaseEntityService<T extends EntityDto> implements 
                 return false;
             })
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<T> getByKey(String type, String key, String user) {
+
+        List<T> entities = getAllByKey(type, key, user);
 
         if (entities.size() > 1) {
             log.warn(String.format("More than one entity <%s> found by type: '%s' and key: '%s'",
