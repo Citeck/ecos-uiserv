@@ -1,0 +1,30 @@
+{
+    "id": "edit-in-onlyoffice",
+    "key": "edit.onlyoffice",
+    "name": "Редактировать в OnlyOffice",
+    "type": "open-url",
+    "config": {
+        "url": "/share/page/onlyoffice-edit?nodeRef=${recordRef}&new="
+    },
+    "evaluator": {
+        "type": "predicate",
+        "config": {
+            "predicate": {
+                "t": "and",
+                "val": [
+                    {
+                        "t": "in",
+                        "att": "_content.mimetype?str",
+                        "val": [
+                            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                            "text/plain",
+                            "text/csv"
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+}
