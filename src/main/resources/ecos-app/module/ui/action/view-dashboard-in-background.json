@@ -1,6 +1,5 @@
 {
     "id": "view-dashboard-in-background",
     "key": "crud.view.dashboard.background",
-    "name": "Просмотреть",
     "type": "open-in-background"
 }

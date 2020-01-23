@@ -63,13 +63,18 @@ public class ActionRecords extends LocalRecordsDAO
 
         List<RecordInfo> recordsInfo = recordRefs.stream().map(RecordInfo::new).collect(Collectors.toList());
         fillRecordsType(recordsInfo);
-        fillTypeActions(recordsInfo);
+        if (query.actions != null) {
+            fillExplicitActions(recordsInfo, query.actions);
+        } else {
+            fillActionsFromType(recordsInfo);
+        }
         fillRecordActions(recordsInfo);
 
         List<RecordActions> resultList = new ArrayList<>();
 
         for (RecordInfo info : recordsInfo) {
-            List<ActionModule> actions = filterActions(info.getTypeActions(), info.getRecordActions());
+
+            List<ActionModule> actions = expandResultActions(info.getResultActions(), info.getRecordActions());
             if (actions == null) {
                 actions = Collections.emptyList();
             }
@@ -100,7 +105,18 @@ public class ActionRecords extends LocalRecordsDAO
         }
     }
 
-    private void fillTypeActions(List<RecordInfo> recordsInfo) {
+    private void fillExplicitActions(List<RecordInfo> recordsInfo, List<ModuleRef> actions) {
+
+        Map<RecordRef, List<ActionModule>> actionsByRecord = actionService.getActions(recordsInfo.stream()
+            .map(RecordInfo::getRecordRef)
+            .collect(Collectors.toList()), actions);
+
+        recordsInfo.forEach(info ->
+            info.setResultActions(actionsByRecord.getOrDefault(info.getRecordRef(), Collections.emptyList()))
+        );
+    }
+
+    private void fillActionsFromType(List<RecordInfo> recordsInfo) {
 
         Map<RecordRef, List<RecordInfo>> recordsByType = new HashMap<>();
 
@@ -131,14 +147,14 @@ public class ActionRecords extends LocalRecordsDAO
         }
 
         for (RecordInfo info : recordsInfo) {
-            info.setTypeActions(actions.get(info.getRecordRef()));
+            info.setResultActions(actions.get(info.getRecordRef()));
         }
     }
 
     private void fillRecordActions(List<RecordInfo> recordsInfo) {
 
         List<RecordRef> recordsToQueryActions = recordsInfo.stream().filter(info ->
-            info.getTypeActions() == null || info.getTypeActions()
+            info.getResultActions() == null || info.getResultActions()
                        .stream()
                        .anyMatch(a -> RECORD_ACTIONS_TYPE.equals(a.getType()))
         ).map(RecordInfo::getRecordRef).collect(Collectors.toList());
@@ -158,17 +174,17 @@ public class ActionRecords extends LocalRecordsDAO
         }
     }
 
-    private List<ActionModule> filterActions(List<ActionModule> typeActions, List<ActionModule> recordActions) {
-        if (typeActions == null) {
+    private List<ActionModule> expandResultActions(List<ActionModule> resultActions, List<ActionModule> recordActions) {
+        if (resultActions == null) {
             return recordActions;
         }
-        if (typeActions.isEmpty()) {
+        if (resultActions.isEmpty()) {
             return Collections.emptyList();
         }
         List<ActionModule> filteredActions = new ArrayList<>();
-        typeActions.forEach(typeAction -> {
-            if ("record-actions".equals(typeAction.getType())) {
-                ObjectNode config = typeAction.getConfig();
+        resultActions.forEach(action -> {
+            if ("record-actions".equals(action.getType())) {
+                ObjectNode config = action.getConfig();
                 JsonNode typeActionConfigKey = config != null ? config.get("key") : null;
                 if (typeActionConfigKey != null && !typeActionConfigKey.isNull()) {
                     Pattern configKeyPattern = Pattern.compile(
@@ -189,7 +205,7 @@ public class ActionRecords extends LocalRecordsDAO
                     filteredActions.addAll(recordActions);
                 }
             } else {
-                filteredActions.add(typeAction);
+                filteredActions.add(action);
             }
         });
         return filteredActions;
@@ -216,7 +232,7 @@ public class ActionRecords extends LocalRecordsDAO
     @Data
     public static class ActionsQuery {
         private List<RecordRef> records;
-        private JsonNode predicate;
+        private List<ModuleRef> actions;
     }
 
     @Data
@@ -234,7 +250,7 @@ public class ActionRecords extends LocalRecordsDAO
         private final RecordRef recordRef;
         private RecordRef type;
         private List<ActionModule> recordActions = Collections.emptyList();
-        private List<ActionModule> typeActions = Collections.emptyList();
+        private List<ActionModule> resultActions = Collections.emptyList();
 
         public RecordInfo(RecordRef recordRef) {
             this.recordRef = recordRef;

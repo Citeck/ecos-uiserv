@@ -1,7 +1,6 @@
 {
     "id": "content-download",
     "key": "content.download",
-    "name": "Скачать",
     "type": "download",
     "evaluator": {
         "type": "has-attribute",

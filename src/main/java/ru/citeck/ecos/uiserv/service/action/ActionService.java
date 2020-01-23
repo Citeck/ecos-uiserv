@@ -43,14 +43,25 @@ public class ActionService {
         }
     }
 
+    private List<ActionModule> getActionModules(List<ModuleRef> actionRefs) {
+
+        List<ActionModule> result = new ArrayList<>();
+
+        for (ModuleRef ref : actionRefs) {
+            ActionEntity entity = actionRepository.findByExtId(ref.getId());
+            if (entity == null) {
+                log.error("Action doesn't exists: " + ref);
+            } else {
+                result.add(entityToDto(entity));
+            }
+        }
+
+        return result;
+    }
+
     public Map<RecordRef, List<ActionModule>> getActions(List<RecordRef> recordRefs, List<ModuleRef> actions) {
 
-        List<ActionModule> actionsModules = actions.stream()
-            .map(a -> Optional.ofNullable(actionRepository.findByExtId(a.getId())))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(this::entityToDto)
-            .collect(Collectors.toList());
+        List<ActionModule> actionsModules = getActionModules(actions);
 
         List<RecordEvaluatorDto> evaluators = actionsModules.stream()
             .map(a -> {
