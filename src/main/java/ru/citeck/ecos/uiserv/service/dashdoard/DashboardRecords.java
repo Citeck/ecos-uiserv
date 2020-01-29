@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.apps.app.module.EappsModuleService;
@@ -91,14 +92,20 @@ public class DashboardRecords extends AbstractEntityRecords<DashboardDto> {
             toSave.getUser()
         );
         if (optDashboardDto.isPresent()) {
+
             DashboardDto newDto = optDashboardDto.get();
             newDto.setConfig(toSave.getConfig());
             toSave = newDto;
-        } else {
+
+        } else if (!StringUtils.isBlank(toSave.getId())) {
             optDashboardDto = entityService.getById(toSave.getId());
             if (optDashboardDto.isPresent()) {
-                toSave.setId(UUID.randomUUID().toString());
+                toSave.setId("");
             }
+        }
+
+        if (StringUtils.isBlank(toSave.getId())) {
+            toSave.setId(UUID.randomUUID().toString());
         }
 
         ObjectNode dashboardModuleData = objectMapper.valueToTree(toSave);
