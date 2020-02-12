@@ -109,10 +109,19 @@
                     <label>menu.item.data-lists</label>
                     <icon>data-lists</icon>
                     <param name="hideEmpty">true</param>
-                    <action type="PAGE_LINK">
-                        <param name="pageId">journals2/list/main</param>
-                    </action>
                     <items>
+                        <item id="HEADER_COMMON_DATA_LISTS">
+                            <label>menu.item.common-data-lists</label>
+                            <icon>data-lists</icon>
+                            <action type="PAGE_LINK">
+                                <param name="pageId">journals2/list/main</param>
+                            </action>
+                            <items>
+                                <resolver id="JOURNALS">
+                                    <param name="listId">global-main</param>
+                                </resolver>
+                            </items>
+                        </item>
                         <resolver id="USER_SITES_REFERENCES">
                             <item>
                                 <icon>data-lists</icon>
@@ -125,7 +134,6 @@
                         </resolver>
                     </items>
                 </item>
-
             </items>
         </item>
         <item id="HEADER_MORE_TOOLS_GROUP">

@@ -4,7 +4,7 @@
     "name": "Удалить",
     "type": "delete",
     "evaluator": {
-        "id": "has-permission",
+        "type": "has-permission",
         "config": {
             "permission": "Write"
         }

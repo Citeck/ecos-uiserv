@@ -18,6 +18,9 @@ public class EvaluatorEntity {
     @Column(name = "evaluator_id")
     private String evaluatorId;
 
+    @Column(name = "type")
+    private String type;
+
     @Lob
     @Column(name = "config_json")
     private String configJson;

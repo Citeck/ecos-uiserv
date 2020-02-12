@@ -20,7 +20,7 @@ import java.util.UUID;
 @Service
 public class DashboardEntityService extends AbstractBaseEntityService<DashboardDto> {
 
-    private static final String TYPE_REFIX = "type_";
+    private static final String TYPE_PREFIX = "type_";
 
     private static final String META_KEY = "key";
     private static final String META_TYPE = "type";
@@ -37,7 +37,6 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
         if (StringUtils.isBlank(entity.getKey())) {
             throw new IllegalArgumentException("Key is mandatory for creating dashboard");
         }
-
         Optional<DashboardDto> optional = getByKey(entity.getType(), entity.getKey(), entity.getUser());
         if (optional.isPresent()) {
             entity.setId(optional.get().getId());
@@ -62,8 +61,8 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
             type = "case-details";
         }
         Optional<DashboardDto> result = super.getByKey(type, key, user);
-        if (!result.isPresent() && key.startsWith(TYPE_REFIX)) {
-            result = super.getByKey(type, key.substring(TYPE_REFIX.length()), user);
+        if (!result.isPresent() && key.startsWith(TYPE_PREFIX)) {
+            result = super.getByKey(type, key.substring(TYPE_PREFIX.length()), user);
         }
         return result;
     }

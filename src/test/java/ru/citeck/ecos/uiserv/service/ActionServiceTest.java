@@ -11,9 +11,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
+import ru.citeck.ecos.records2.evaluator.RecordEvaluatorService;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.config.UiServProperties;
-import ru.citeck.ecos.uiserv.service.evaluator.RecordEvaluatorService;
 
 import java.io.IOException;
 

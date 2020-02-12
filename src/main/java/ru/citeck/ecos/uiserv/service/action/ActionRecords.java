@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.service.action;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -48,33 +49,37 @@ public class ActionRecords extends LocalRecordsDAO
 
         ActionsQuery query = recordsQuery.getQuery(ActionsQuery.class);
 
-        List<RecordRef> recordRefs = new ArrayList<>();
-        Map<RecordRef, RecordRef> refsMapping = new HashMap<>();
+        List<RecordInfo> recordsInfo = query.getRecords()
+            .stream()
+            .map(RecordInfo::new)
+            .collect(Collectors.toList());
 
-        for (RecordRef ref : query.getRecords()) {
-            if (!ref.getAppName().isEmpty()) {
-                recordRefs.add(ref);
-            } else {
-                RecordRef refWithApp = ref.addAppName("alfresco");
-                refsMapping.put(refWithApp, ref);
-                recordRefs.add(refWithApp);
-            }
+        if (query.actions != null) {
+            recordsInfo.forEach(info -> {
+                if (info.actionIds == null) {
+                    info.actionIds = new ArrayList<>();
+                }
+                info.actionIds.addAll(query.actions);
+            });
         }
 
-        List<RecordInfo> recordsInfo = recordRefs.stream().map(RecordInfo::new).collect(Collectors.toList());
-        fillRecordsType(recordsInfo);
-        fillTypeActions(recordsInfo);
+        fillActionsFromType(recordsInfo.stream()
+            .filter(info -> info.actionIds == null)
+            .collect(Collectors.toList()));
+
+        expandActionIds(recordsInfo);
         fillRecordActions(recordsInfo);
 
         List<RecordActions> resultList = new ArrayList<>();
 
         for (RecordInfo info : recordsInfo) {
-            List<ActionModule> actions = filterActions(info.getTypeActions(), info.getRecordActions());
+
+            List<ActionModule> actions = expandResultActions(info.getResultActions(), info.getRecordActions());
             if (actions == null) {
                 actions = Collections.emptyList();
             }
             RecordActions recordActions = new RecordActions();
-            recordActions.setRecord(refsMapping.getOrDefault(info.getRecordRef(), info.getRecordRef()).toString());
+            recordActions.setRecord(info.getOriginalRecordRef().toString());
             recordActions.setActions(actions);
             resultList.add(recordActions);
         }
@@ -100,7 +105,41 @@ public class ActionRecords extends LocalRecordsDAO
         }
     }
 
-    private void fillTypeActions(List<RecordInfo> recordsInfo) {
+    private void expandActionIds(List<RecordInfo> recordsInfo) {
+
+        Map<Set<ModuleRef>, List<RecordInfo>> recordsByActionsList = new HashMap<>();
+
+        recordsInfo.forEach(info -> {
+            if (info.getActionIds() != null && !info.getActionIds().isEmpty()) {
+                Set<ModuleRef> key = new HashSet<>(info.getActionIds());
+                recordsByActionsList.computeIfAbsent(key, ids -> new ArrayList<>()).add(info);
+            }
+        });
+
+        recordsByActionsList.forEach((actions, records) -> {
+
+            List<RecordRef> refs = records.stream()
+                .map(RecordInfo::getRecordRef)
+                .collect(Collectors.toList());
+
+            Map<RecordRef, List<ActionModule>> actionsRes = actionService.getActions(refs, new ArrayList<>(actions));
+
+            records.forEach(info -> {
+                List<ActionModule> recordActions = new ArrayList<>(actionsRes.get(info.getRecordRef()));
+                recordActions.sort((a0, a1) -> {
+                    List<ModuleRef> recordActionIds = info.getActionIds();
+                    int idx0 = recordActionIds.indexOf(ModuleRef.create("ui/action", a0.getId()));
+                    int idx1 = recordActionIds.indexOf(ModuleRef.create("ui/action", a1.getId()));
+                    return Integer.compare(idx0, idx1);
+                });
+                info.setResultActions(recordActions);
+            });
+        });
+    }
+
+    private void fillActionsFromType(List<RecordInfo> recordsInfo) {
+
+        fillRecordsType(recordsInfo);
 
         Map<RecordRef, List<RecordInfo>> recordsByType = new HashMap<>();
 
@@ -116,34 +155,25 @@ public class ActionRecords extends LocalRecordsDAO
 
         List<ActionsRefMeta> typesActions = typesActionsResult.getRecords();
 
-        Map<RecordRef, List<ActionModule>> actions = new HashMap<>();
         for (int i = 0; i < typesActions.size(); i++) {
-
             ActionsRefMeta typeActions = typesActions.get(i);
             RecordRef typeRef = typesRefs.get(i);
-
-            List<RecordRef> records = recordsByType.get(typeRef)
-                .stream()
-                .map(RecordInfo::getRecordRef)
-                .collect(Collectors.toList());
-
-            actions.putAll(actionService.getActions(records, typeActions.getActions()));
-        }
-
-        for (RecordInfo info : recordsInfo) {
-            info.setTypeActions(actions.get(info.getRecordRef()));
+            recordsByType.get(typeRef).forEach(info -> info.setActionIds(typeActions.getActions()));
         }
     }
 
     private void fillRecordActions(List<RecordInfo> recordsInfo) {
 
         List<RecordRef> recordsToQueryActions = recordsInfo.stream().filter(info ->
-            info.getTypeActions() == null || info.getTypeActions()
+                   info.getActionIds() == null
+                || info.getResultActions() == null
+                || info.getResultActions()
                        .stream()
                        .anyMatch(a -> RECORD_ACTIONS_TYPE.equals(a.getType()))
         ).map(RecordInfo::getRecordRef).collect(Collectors.toList());
 
-        RecordsResult<ActionsDtoMeta> actionsResult = recordsService.getMeta(recordsToQueryActions, ActionsDtoMeta.class);
+        RecordsResult<ActionsDtoMeta> actionsResult = recordsService.getMeta(recordsToQueryActions,
+                                                                             ActionsDtoMeta.class);
         List<ActionsDtoMeta> actions = actionsResult.getRecords();
 
         for (int i = 0; i < actions.size(); i++) {
@@ -158,17 +188,17 @@ public class ActionRecords extends LocalRecordsDAO
         }
     }
 
-    private List<ActionModule> filterActions(List<ActionModule> typeActions, List<ActionModule> recordActions) {
-        if (typeActions == null) {
+    private List<ActionModule> expandResultActions(List<ActionModule> resultActions, List<ActionModule> recordActions) {
+        if (resultActions == null) {
             return recordActions;
         }
-        if (typeActions.isEmpty()) {
+        if (resultActions.isEmpty()) {
             return Collections.emptyList();
         }
         List<ActionModule> filteredActions = new ArrayList<>();
-        typeActions.forEach(typeAction -> {
-            if ("record-actions".equals(typeAction.getType())) {
-                ObjectNode config = typeAction.getConfig();
+        resultActions.forEach(action -> {
+            if ("record-actions".equals(action.getType())) {
+                ObjectNode config = action.getConfig();
                 JsonNode typeActionConfigKey = config != null ? config.get("key") : null;
                 if (typeActionConfigKey != null && !typeActionConfigKey.isNull()) {
                     Pattern configKeyPattern = Pattern.compile(
@@ -189,7 +219,7 @@ public class ActionRecords extends LocalRecordsDAO
                     filteredActions.addAll(recordActions);
                 }
             } else {
-                filteredActions.add(typeAction);
+                filteredActions.add(action);
             }
         });
         return filteredActions;
@@ -215,8 +245,8 @@ public class ActionRecords extends LocalRecordsDAO
 
     @Data
     public static class ActionsQuery {
-        private List<RecordRef> records;
-        private JsonNode predicate;
+        private List<JsonNode> records;
+        private List<ModuleRef> actions;
     }
 
     @Data
@@ -232,12 +262,36 @@ public class ActionRecords extends LocalRecordsDAO
     private static class RecordInfo {
 
         private final RecordRef recordRef;
-        private RecordRef type;
-        private List<ActionModule> recordActions = Collections.emptyList();
-        private List<ActionModule> typeActions = Collections.emptyList();
+        private final RecordRef originalRecordRef;
 
-        public RecordInfo(RecordRef recordRef) {
-            this.recordRef = recordRef;
+        private RecordRef type;
+
+        private List<ActionModule> recordActions = Collections.emptyList();
+        private List<ActionModule> resultActions = Collections.emptyList();
+
+        private List<ModuleRef> actionIds;
+
+        public RecordInfo(JsonNode record) {
+
+            if (record instanceof TextNode) {
+                originalRecordRef = RecordRef.valueOf(record.asText());
+            } else if (record instanceof ObjectNode) {
+                originalRecordRef = RecordRef.valueOf(record.get("record").asText());
+                if (record.has("actions")) {
+                    actionIds = new ArrayList<>();
+                    record.get("actions").forEach(action -> {
+                        actionIds.add(ModuleRef.valueOf(action.asText()));
+                    });
+                }
+            } else {
+                throw new IllegalArgumentException("Incorrect record info: " + record);
+            }
+
+            if (!originalRecordRef.getAppName().isEmpty()) {
+                recordRef = originalRecordRef;
+            } else {
+                recordRef = originalRecordRef.addAppName("alfresco");
+            }
         }
     }
 }

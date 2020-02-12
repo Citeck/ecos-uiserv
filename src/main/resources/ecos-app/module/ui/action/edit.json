@@ -1,10 +1,10 @@
 {
     "id": "edit",
     "key": "crud.edit",
-    "name": "Редактировать",
+    "name": "Редактировать Свойства",
     "type": "edit",
     "evaluator": {
-        "id": "has-permission",
+        "type": "has-permission",
         "config": {
             "permission": "Write"
         }

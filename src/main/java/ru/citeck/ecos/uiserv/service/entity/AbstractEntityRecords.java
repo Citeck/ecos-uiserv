@@ -36,23 +36,7 @@ public abstract class AbstractEntityRecords<T extends EntityDto> extends CrudRec
 
     protected abstract T getEmpty();
 
-    @Override
-    public RecordsMutResult save(List<T> values) {
-        RecordsMutResult recordsMutResult = new RecordsMutResult();
-        values.forEach(entityDTO -> {
-            T saved;
-
-            if (StringUtils.isBlank(entityDTO.getId())) {
-                saved = entityService.create(entityDTO);
-            } else {
-                saved = entityService.update(entityDTO);
-            }
-
-            RecordMeta recordMeta = new RecordMeta(saved.getId());
-            recordsMutResult.addRecord(recordMeta);
-        });
-        return recordsMutResult;
-    }
+    public abstract RecordsMutResult save(List<T> values);
 
     @Override
     public RecordsDelResult delete(RecordsDeletion deletion) {
