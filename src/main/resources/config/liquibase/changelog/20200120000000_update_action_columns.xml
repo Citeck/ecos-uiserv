@@ -9,4 +9,15 @@
 
     </changeSet>
 
+    <changeSet author="citeck" id="20200212000000">
+
+        <modifyDataType columnName="key"
+                        newDataType="VARCHAR(255)"
+                        tableName="actions" />
+
+        <modifyDataType columnName="ext_id"
+                        newDataType="VARCHAR(512)"
+                        tableName="actions" />
+    </changeSet>
+
 </databaseChangeLog>
