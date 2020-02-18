@@ -12,14 +12,9 @@ import ru.citeck.ecos.apps.app.module.type.form.FormModule;
 import ru.citeck.ecos.apps.app.module.type.ui.action.ActionModule;
 import ru.citeck.ecos.uiserv.domain.DashboardDto;
 import ru.citeck.ecos.uiserv.service.action.ActionService;
-import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;
-import ru.citeck.ecos.uiserv.service.dashdoard.DashboardRecords;
+import ru.citeck.ecos.uiserv.service.dashdoard.DashboardService;
 import ru.citeck.ecos.uiserv.service.form.EcosFormModel;
 import ru.citeck.ecos.uiserv.service.form.EcosFormService;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j
 @Configuration
@@ -30,9 +25,8 @@ public class EcosModulesConfig {
 
     private final EcosFormService formService;
     private final EcosAppsApiFactory apiFactory;
-    private final DashboardEntityService dashboardEntityService;
+    private final DashboardService dashboardService;
     private final ActionService actionService;
-    private final DashboardRecords dashboardRecords;
 
     private boolean initialized = false;
 
@@ -75,7 +69,7 @@ public class EcosModulesConfig {
 
     public void deleteDashboard(String dashboardId) {
         log.info("Dashboard module deleted: " + dashboardId);
-        dashboardEntityService.delete(dashboardId);
+        dashboardService.removeDashboard(dashboardId);
     }
 
     public void deployDashboard(DashboardModule dashboardModule) {
@@ -83,38 +77,6 @@ public class EcosModulesConfig {
         log.info("Dashboard module received: " + dashboardModule.getId() + " " + dashboardModule.getKey());
         DashboardDto dto = mapper.convertValue(dashboardModule, DashboardDto.class);
 
-        boolean newModuleHasConfig = dashboardModule.getConfig() != null && dashboardModule.getConfig().size() > 0;
-
-        List<DashboardDto> dashboards = dashboardEntityService.getAllByKey(
-            dto.getType(),
-            dto.getKey(),
-            dto.getUser()
-        );
-
-        if (!dashboards.isEmpty()) {
-
-            Optional<DashboardDto> currentDto = dashboards.stream()
-                .filter(d -> Objects.equals(d.getId(), dto.getId()))
-                .findFirst();
-
-            if (currentDto.isPresent()) {
-                if (newModuleHasConfig) {
-                    currentDto.get().setConfig(dto.getConfig());
-                    dashboardEntityService.update(currentDto.get());
-                }
-            } else {
-                if (!newModuleHasConfig) {
-                    dashboards.stream()
-                        .filter(d -> d.getConfig() != null && d.getConfig().size() > 0)
-                        .findFirst()
-                        .ifPresent(d -> dto.setConfig(d.getConfig()));
-                }
-                dashboards.forEach(d -> dashboardEntityService.delete(d.getId()));
-                dashboardEntityService.create(dto);
-            }
-        } else {
-            dashboardEntityService.create(dto);
-        }
-        dashboardRecords.wasPublished(dto);
+        dashboardService.saveDashboard(dto);
     }
 }

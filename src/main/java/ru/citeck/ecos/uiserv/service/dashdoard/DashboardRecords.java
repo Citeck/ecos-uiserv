@@ -1,136 +1,125 @@
 package ru.citeck.ecos.uiserv.service.dashdoard;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.citeck.ecos.apps.app.module.EappsModuleService;
-import ru.citeck.ecos.apps.app.module.type.ui.dashboard.DashboardModule;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
+import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
+import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
+import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
 import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
+import ru.citeck.ecos.records2.request.query.RecordsQuery;
+import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
+import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
+import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDAO;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDAO;
 import ru.citeck.ecos.uiserv.domain.DashboardDto;
-import ru.citeck.ecos.uiserv.service.entity.AbstractEntityRecords;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-/**
- * @author Roman Makarskiy
- */
 @Slf4j
 @Component
-public class DashboardRecords extends AbstractEntityRecords<DashboardDto> {
+public class DashboardRecords extends LocalRecordsDAO
+                              implements LocalRecordsQueryWithMetaDAO<DashboardDto>,
+                                         LocalRecordsMetaDAO<DashboardDto>,
+                                         MutableRecordsLocalDAO<DashboardDto> {
 
     public static final String ID = "dashboard";
 
     private static final long PUBLISH_TIMEOUT_MS = 10_000;
 
-    private final RecordsService recordsService;
-
-    private final String dashboardTypeId;
-    private final Map<String, CompletableFuture<String>> publishWaitingMap = new ConcurrentHashMap<>();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final DashboardService dashboardService;
 
     @Autowired
-    public DashboardRecords(DashboardEntityService entityService,
-                            EappsModuleService eappsModuleService,
+    public DashboardRecords(DashboardService dashboardService,
                             RecordsService recordsService) {
         setId(ID);
-        this.entityService = entityService;
+        this.dashboardService = dashboardService;
         this.recordsService = recordsService;
-        dashboardTypeId = eappsModuleService.getTypeId(DashboardModule.class);
+    }
+
+    @Override
+    public RecordsDelResult delete(RecordsDeletion recordsDeletion) {
+        throw new UnsupportedOperationException("Delete is not supported");
+    }
+
+    @Override
+    public List<DashboardDto> getValuesToMutate(List<RecordRef> list) {
+        return list.stream()
+            .map(this::getDashboardByRef)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public RecordsQueryResult<DashboardDto> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
+
+        String language = recordsQuery.getLanguage();
+        if (StringUtils.isNotBlank(language)) {
+            throw new IllegalArgumentException("This records source does not support query via language");
+        }
+
+        Query query = recordsQuery.getQuery(Query.class);
+
+        if (StringUtils.isBlank(query.key) || StringUtils.isBlank(query.type)) {
+            return new RecordsQueryResult<>();
+        }
+
+        List<String> keys = Arrays.asList(query.key.split(","));
+        Optional<DashboardDto> dashboard = dashboardService.getFirstDashboardByKeys(query.type, keys, query.user);
+
+        return dashboard.map(RecordsQueryResult::of).orElseGet(RecordsQueryResult::new);
+    }
+
+    @Override
+    public List<DashboardDto> getLocalRecordsMeta(List<RecordRef> list, MetaField metaField) {
+        return list.stream()
+            .map(this::getDashboardByRef)
+            .collect(Collectors.toList());
+    }
+
+    private DashboardDto getDashboardByRef(RecordRef ref) {
+
+        if (ref.getId().isEmpty()) {
+            return new DashboardDto();
+        }
+
+        return dashboardService.getDashboardById(ref.getId())
+            .orElseThrow(() -> new IllegalArgumentException("Dashboard with id '" + ref + "' is not found!"));
     }
 
     @Override
     public RecordsMutResult save(List<DashboardDto> values) {
 
-        List<String> records = values.stream()
-            .map(this::save)
+        List<RecordMeta> resultMeta = values.stream()
+            .map(dashboardService::saveDashboardWithEapps)
+            .map(f -> getDashboardFromFuture(f, values))
+            .map(f -> new RecordMeta(RecordRef.valueOf(f.getId())))
             .collect(Collectors.toList());
 
-        long waitingTime = System.currentTimeMillis() + PUBLISH_TIMEOUT_MS;
-        for (String record : records) {
-            try {
-                Future<String> future = publishWaitingMap.get(record);
-                if (future != null) {
-                    future.get(PUBLISH_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-                }
-            } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                log.error("Publish waiting failed. Values: " + values, e);
-            }
-            if (System.currentTimeMillis() > waitingTime) {
-                log.error("Publish waiting failed by timeout. "
-                    + "Waiting timeout = " + waitingTime
-                    + " actual time: " + System.currentTimeMillis()
-                    + " Values: " + values);
-            }
-        }
-
-        RecordsMutResult recordsMutResult = new RecordsMutResult();
-        recordsMutResult.setRecords(records.stream()
-            .map(RecordMeta::new)
-            .collect(Collectors.toList()));
-        return recordsMutResult;
+        RecordsMutResult result = new RecordsMutResult();
+        result.setRecords(resultMeta);
+        return result;
     }
 
-    private String save(DashboardDto dto) {
-
-        DashboardDto toSave = new DashboardDto(dto);
-
-        Optional<DashboardDto> optDashboardDto = entityService.getByKey(
-            toSave.getType(),
-            toSave.getKey(),
-            toSave.getUser()
-        );
-        if (optDashboardDto.isPresent()) {
-
-            DashboardDto newDto = optDashboardDto.get();
-            newDto.setConfig(toSave.getConfig());
-            toSave = newDto;
-
-        } else if (!StringUtils.isBlank(toSave.getId())) {
-            optDashboardDto = entityService.getById(toSave.getId());
-            if (optDashboardDto.isPresent()) {
-                toSave.setId("");
-            }
-        }
-
-        if (StringUtils.isBlank(toSave.getId())) {
-            toSave.setId(UUID.randomUUID().toString());
-        }
-
-        ObjectNode dashboardModuleData = objectMapper.valueToTree(toSave);
-        dashboardModuleData.set("module_id", TextNode.valueOf(toSave.getId()));
-
-        String recordLocalId = dashboardTypeId + "$";
-        RecordMeta meta = new RecordMeta(RecordRef.create("eapps", "module", recordLocalId));
-        meta.setAttributes(dashboardModuleData);
-
-        publishWaitingMap.put(toSave.getId(), new CompletableFuture<>());
-        recordsService.mutate(meta);
-
-        return toSave.getId();
-    }
-
-    public void wasPublished(DashboardDto dto) {
-        CompletableFuture<String> future = publishWaitingMap.get(dto.getId());
-        if (future != null) {
-            future.complete(dto.getId());
-            publishWaitingMap.remove(dto.getId());
+    private DashboardDto getDashboardFromFuture(Future<DashboardDto> future, List<DashboardDto> values) {
+        try {
+            return future.get(PUBLISH_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            throw new RuntimeException("Publish waiting failed. Values: " + values, e);
         }
     }
 
-    @Override
-    protected DashboardDto getEmpty() {
-        return new DashboardDto();
+    @Data
+    private static class Query {
+        private String key;
+        private String type;
+        private String user;
     }
 }

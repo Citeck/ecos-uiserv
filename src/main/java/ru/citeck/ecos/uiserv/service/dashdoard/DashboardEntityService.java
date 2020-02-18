@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.service.dashdoard;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.domain.DashboardDto;
@@ -18,6 +19,7 @@ import java.util.UUID;
  * @author Roman Makarskiy
  */
 @Service
+@Deprecated
 public class DashboardEntityService extends AbstractBaseEntityService<DashboardDto> {
 
     private static final String TYPE_PREFIX = "type_";
