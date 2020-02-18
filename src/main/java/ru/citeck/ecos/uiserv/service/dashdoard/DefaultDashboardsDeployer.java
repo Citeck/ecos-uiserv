@@ -1,27 +1,35 @@
 package ru.citeck.ecos.uiserv.service.dashdoard;
 
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.uiserv.domain.DashboardDto;
 
-import javax.annotation.PostConstruct;
 import java.util.Optional;
-import java.util.UUID;
 
 @Component
 public class DefaultDashboardsDeployer {
 
     private DashboardEntityService entityService;
 
+    private boolean initialized = false;
+
     public DefaultDashboardsDeployer(DashboardEntityService entityService) {
         this.entityService = entityService;
     }
 
-    @PostConstruct
-    void init() {
+    @EventListener
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+
+        if (initialized) {
+            return;
+        }
         deployEmptyDashboard(DashboardConstants.TYPE_USER_DASHBOARD, "DEFAULT");
         deployEmptyDashboard(DashboardConstants.TYPE_SITE_DASHBOARD, "DEFAULT");
         deployEmptyDashboard(DashboardConstants.TYPE_CASE_DETAILS, "DEFAULT");
         deployEmptyDashboard(DashboardConstants.TYPE_PROFILE_DETAILS, "DEFAULT");
+
+        initialized = true;
     }
 
     private void deployEmptyDashboard(String type, String key) {
