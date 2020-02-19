@@ -9,6 +9,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import ru.citeck.ecos.records2.objdata.ObjectData;
+import ru.citeck.ecos.records2.utils.json.JsonUtils;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.DashboardDto;
 import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;
@@ -94,11 +96,11 @@ public class DashboardServiceTest {
         DashboardDto dto = new DashboardDto();
         dto.setKey("test-key");
         dto.setId(id);
-        dto.setConfig(objectMapper.readValue("{\n" +
+        dto.setConfig(JsonUtils.read("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"TOP\"\n" +
             "  }\n" +
-            "}", JsonNode.class));
+            "}", ObjectData.class));
 
         DashboardDto saved = dashboardService.create(dto);
         DashboardDto found = dashboardService.getById(id).get();
@@ -110,11 +112,11 @@ public class DashboardServiceTest {
     public void saveWithoutId() throws IOException {
         DashboardDto dto = new DashboardDto();
         dto.setKey("test-key");
-        dto.setConfig(objectMapper.readValue("{\n" +
+        dto.setConfig(JsonUtils.read("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"TOP\"\n" +
             "  }\n" +
-            "}", JsonNode.class));
+            "}", ObjectData.class));
 
         DashboardDto saved = dashboardService.create(dto);
 
@@ -127,11 +129,11 @@ public class DashboardServiceTest {
     public void saveWithoutKey() throws IOException {
         DashboardDto dto = new DashboardDto();
         dto.setId(UUID.randomUUID().toString());
-        dto.setConfig(objectMapper.readValue("{\n" +
+        dto.setConfig(JsonUtils.read("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"TOP\"\n" +
             "  }\n" +
-            "}", JsonNode.class));
+            "}", ObjectData.class));
 
         Throwable thrown = Assertions.catchThrowable(() -> dashboardService.create(dto));
         assertEquals("Key is mandatory for creating dashboard", thrown.getMessage());
@@ -158,21 +160,21 @@ public class DashboardServiceTest {
         DashboardDto dto = new DashboardDto();
         dto.setId(id);
         dto.setKey("sun-key");
-        dto.setConfig(objectMapper.readValue("{\n" +
+        dto.setConfig(JsonUtils.read("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"TOP\"\n" +
             "  }\n" +
-            "}", JsonNode.class));
+            "}", ObjectData.class));
 
         dashboardService.create(dto);
 
         DashboardDto found = dashboardService.getById(id).get();
         found.setKey("board-test-key");
-        found.setConfig(objectMapper.readValue("{\n" +
+        found.setConfig(JsonUtils.read("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"DOWN\"\n" +
             "  }\n" +
-            "}", JsonNode.class));
+            "}", ObjectData.class));
 
         DashboardDto mutated = dashboardService.update(found);
         DashboardDto mutatedFound = dashboardService.getById(id).get();
@@ -187,11 +189,11 @@ public class DashboardServiceTest {
         DashboardDto dto = new DashboardDto();
         dto.setKey("down");
         dto.setId(id);
-        dto.setConfig(objectMapper.readValue("{\n" +
+        dto.setConfig(JsonUtils.read("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"TOP\"\n" +
             "  }\n" +
-            "}", JsonNode.class));
+            "}", ObjectData.class));
 
         DashboardDto saved = dashboardService.create(dto);
         DashboardDto found = dashboardService.getById(id).get();
@@ -210,20 +212,20 @@ public class DashboardServiceTest {
         mainDashboard.setKey("main-dashboard");
         mainDashboard.setId("main-dashboard-id");
         mainDashboard.setType("user-dashboard");
-        mainDashboard.setConfig(objectMapper.readValue("{\n" +
+        mainDashboard.setConfig(JsonUtils.read("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"TOP\"\n" +
             "  },\n" +
             "  \"layout\": {\n" +
             "    \"type\": \"2-columns-big-small\"\n" +
             "  }\n" +
-            "}", JsonNode.class));
+            "}", ObjectData.class));
 
         DashboardDto contractDashboard = new DashboardDto();
         contractDashboard.setKey("contract-dashboard");
         contractDashboard.setId("contract-dashboard-id");
         contractDashboard.setType("case-details");
-        contractDashboard.setConfig(objectMapper.readValue("{\n" +
+        contractDashboard.setConfig(JsonUtils.read("{\n" +
             "    \"_id\": \"5cf91d01f2f927246c3098db\",\n" +
             "    \"index\": 0,\n" +
             "    \"guid\": \"3c30824c-0163-4446-a649-e2af4c3174e3\",\n" +
@@ -237,20 +239,20 @@ public class DashboardServiceTest {
             "    },\n" +
             "    \"company\": \"ZENSUS\",\n" +
             "    \"email\": \"nina.bradley@zensus.io\"\n" +
-            "  }", JsonNode.class));
+            "  }", ObjectData.class));
 
         DashboardDto siteDashboard = new DashboardDto();
         siteDashboard.setKey("site-dashboard");
         siteDashboard.setId("site-dashboard-id");
         siteDashboard.setType("site-dashboard");
-        siteDashboard.setConfig(objectMapper.readValue("{\n" +
+        siteDashboard.setConfig(JsonUtils.read("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"LEFT\"\n" +
             "  },\n" +
             "  \"layout\": {\n" +
             "    \"type\": \"small\"\n" +
             "  }\n" +
-            "}", JsonNode.class));
+            "}", ObjectData.class));
 
         dashboards.add(mainDashboard);
         dashboards.add(contractDashboard);

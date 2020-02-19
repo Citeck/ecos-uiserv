@@ -2,7 +2,6 @@ package ru.citeck.ecos.uiserv.service.action;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,11 +12,12 @@ import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluatorService;
 import ru.citeck.ecos.records2.evaluator.evaluators.AlwaysFalseEvaluator;
 import ru.citeck.ecos.records2.evaluator.evaluators.AlwaysTrueEvaluator;
+import ru.citeck.ecos.records2.objdata.ObjectData;
+import ru.citeck.ecos.records2.utils.json.JsonUtils;
 import ru.citeck.ecos.uiserv.domain.ActionEntity;
 import ru.citeck.ecos.uiserv.domain.EvaluatorEntity;
 import ru.citeck.ecos.uiserv.repository.ActionRepository;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -114,11 +114,7 @@ public class ActionService {
 
         String configJson = actionEntity.getConfigJson();
         if (configJson != null) {
-            try {
-                action.setConfig((ObjectNode) objectMapper.readTree(configJson));
-            } catch (IOException e) {
-                log.error("Error", e);
-            }
+            action.setConfig(JsonUtils.convert(configJson, ObjectData.class));
         }
 
         EvaluatorEntity evaluator = actionEntity.getEvaluator();
@@ -130,11 +126,7 @@ public class ActionService {
 
             configJson = evaluator.getConfigJson();
             if (configJson != null) {
-                try {
-                    evaluatorDto.setConfig((ObjectNode) objectMapper.readTree(configJson));
-                } catch (IOException e) {
-                    log.error("Error", e);
-                }
+                evaluatorDto.setConfig(JsonUtils.convert(configJson, ObjectData.class));
             }
 
             action.setEvaluator(evaluatorDto);

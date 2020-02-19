@@ -14,8 +14,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.request.rest.RestHandler;
-import ru.citeck.ecos.records2.spring.RecordsRestApi;
-import ru.citeck.ecos.records2.spring.RecordsServiceFactoryConfig;
+import ru.citeck.ecos.records2.spring.web.rest.RecordsRestApi;
+import ru.citeck.ecos.records2.spring.config.RecordsServiceFactoryConfiguration;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.ConfigDto;
 import ru.citeck.ecos.uiserv.service.config.ConfigEntityService;
@@ -57,7 +57,7 @@ public class ConfigRecordControllerTest {
     private RecordsService recordsService;
 
     @Autowired
-    private RecordsServiceFactoryConfig factoryConfig;
+    private RecordsServiceFactoryConfiguration factoryConfig;
 
     @MockBean
     private ConfigEntityService configEntityService;

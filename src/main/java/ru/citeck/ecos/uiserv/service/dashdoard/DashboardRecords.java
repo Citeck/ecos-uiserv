@@ -31,6 +31,7 @@ public class DashboardRecords extends LocalRecordsDAO
                                          LocalRecordsMetaDAO<DashboardDto>,
                                          MutableRecordsLocalDAO<DashboardDto> {
 
+    private static final String DEFAULT_KEY = "DEFAULT";
     public static final String ID = "dashboard";
 
     private static final long PUBLISH_TIMEOUT_MS = 10_000;
@@ -67,8 +68,12 @@ public class DashboardRecords extends LocalRecordsDAO
 
         Query query = recordsQuery.getQuery(Query.class);
 
-        if (StringUtils.isBlank(query.key) || StringUtils.isBlank(query.type)) {
+        if (StringUtils.isBlank(query.type)) {
             return new RecordsQueryResult<>();
+        }
+
+        if (StringUtils.isBlank(query.key)) {
+            query.key = DEFAULT_KEY;
         }
 
         List<String> keys = Arrays.asList(query.key.split(","));

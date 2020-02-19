@@ -10,12 +10,12 @@ import java.util.Optional;
 @Component
 public class DefaultDashboardsDeployer {
 
-    private DashboardEntityService entityService;
+    private DashboardService dashboardService;
 
     private boolean initialized = false;
 
-    public DefaultDashboardsDeployer(DashboardEntityService entityService) {
-        this.entityService = entityService;
+    public DefaultDashboardsDeployer(DashboardService dashboardService) {
+        this.dashboardService = dashboardService;
     }
 
     @EventListener
@@ -33,13 +33,13 @@ public class DefaultDashboardsDeployer {
     }
 
     private void deployEmptyDashboard(String type, String key) {
-        Optional<DashboardDto> existing = entityService.getByKey(type, key, null);
+        Optional<DashboardDto> existing = dashboardService.getDashboard(type, key, null);
         if (!existing.isPresent()) {
             DashboardDto entity = new DashboardDto();
             entity.setId(type + "-default");
             entity.setKey(key);
             entity.setType(type);
-            entityService.create(entity);
+            dashboardService.saveDashboard(entity);
         }
     }
 }

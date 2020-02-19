@@ -3,7 +3,6 @@ package ru.citeck.ecos.uiserv.service.journal;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -16,11 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
+import ru.citeck.ecos.records2.objdata.DataValue;
+import ru.citeck.ecos.records2.utils.json.JsonUtils;
 import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.file.FileService;
 import ru.citeck.ecos.uiserv.service.file.FileViewCaching;
 
+import java.beans.FeatureDescriptor;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +39,7 @@ public class JournalConfigService {
 
     public JournalConfigService(FileService fileService, @Lazy Mapper mapper) {
         this.mapper = mapper;
-        this.caching = new FileViewCaching<JournalConfigDownstream>(
+        this.caching = new FileViewCaching<>(
             key -> fileService.loadFile(FileType.JOURNALCFG, key),
             mapper::unmarshalFile);
     }
@@ -119,7 +121,7 @@ public class JournalConfigService {
             //todo RecordsMetaService has its own way to do that, but this will have to wait
             final List<String> propNames = Stream.of(BeanUtils.getPropertyDescriptors(attInfoClass))
                 .filter(x -> !x.getName().equals("class")) //todo wrong! But doing this right is way too difficult
-                .map(x -> x.getName()).collect(Collectors.toList());
+                .map(FeatureDescriptor::getName).collect(Collectors.toList());
 
             Map<String, String> attributesEdges = new HashMap<>();
             final String nameset = String.join(",", propNames);
@@ -136,13 +138,9 @@ public class JournalConfigService {
 
                 T info = null;
 
-                JsonNode attInfoNode = attInfoMeta.get(attribute);
-                if (attInfoNode instanceof ObjectNode) {
-                    try {
-                        info = objectMapper.treeToValue(attInfoNode, attInfoClass);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
+                DataValue attInfoNode = attInfoMeta.get(attribute);
+                if (attInfoNode.isObject()) {
+                    info = JsonUtils.convert(attInfoNode, attInfoClass);
                 }
 
                 result.put(attribute, info);

@@ -12,6 +12,8 @@ import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
+import ru.citeck.ecos.records2.objdata.DataValue;
+import ru.citeck.ecos.records2.objdata.ObjectData;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.request.result.RecordsResult;
@@ -198,8 +200,8 @@ public class ActionRecords extends LocalRecordsDAO
         List<ActionModule> filteredActions = new ArrayList<>();
         resultActions.forEach(action -> {
             if ("record-actions".equals(action.getType())) {
-                ObjectNode config = action.getConfig();
-                JsonNode typeActionConfigKey = config != null ? config.get("key") : null;
+                ObjectData config = action.getConfig();
+                DataValue typeActionConfigKey = config != null ? config.get("key") : null;
                 if (typeActionConfigKey != null && !typeActionConfigKey.isNull()) {
                     Pattern configKeyPattern = Pattern.compile(
                         typeActionConfigKey.asText()

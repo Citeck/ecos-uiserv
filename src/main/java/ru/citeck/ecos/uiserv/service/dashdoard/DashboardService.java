@@ -177,7 +177,12 @@ public class DashboardService {
         entity.setExtId(dto.getId());
         entity.setAuthority(dto.getAuthority());
         entity.setType(dto.getType());
-        entity.setKey(dto.getKey());
+
+        if (StringUtils.isBlank(dto.getKey())) {
+            entity.setKey("DEFAULT");
+        } else {
+            entity.setKey(dto.getKey());
+        }
 
         return entity;
     }
