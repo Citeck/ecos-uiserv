@@ -3,7 +3,7 @@ package ru.citeck.ecos.uiserv.service.dashdoard;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import ru.citeck.ecos.uiserv.domain.DashboardDto;
+import ru.citeck.ecos.uiserv.domain.OldDashboardDto;
 
 import java.util.Optional;
 
@@ -18,7 +18,7 @@ public class DefaultDashboardsDeployer {
         this.dashboardService = dashboardService;
     }
 
-    @EventListener
+  /*  @EventListener
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
         if (initialized) {
@@ -33,13 +33,13 @@ public class DefaultDashboardsDeployer {
     }
 
     private void deployEmptyDashboard(String type, String key) {
-        Optional<DashboardDto> existing = dashboardService.getDashboard(type, key, null);
+        Optional<OldDashboardDto> existing = dashboardService.getDashboard(type, key, null);
         if (!existing.isPresent()) {
-            DashboardDto entity = new DashboardDto();
+            OldDashboardDto entity = new OldDashboardDto();
             entity.setId(type + "-default");
             entity.setKey(key);
             entity.setType(type);
             dashboardService.saveDashboard(entity);
         }
-    }
+    }*/
 }

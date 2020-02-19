@@ -10,9 +10,9 @@
             </column>
 
             <column name="ext_id" type="VARCHAR" />
-            <column name="key" type="VARCHAR" />
-            <column name="type" type="VARCHAR(32)" />
+            <column name="type_ref" type="VARCHAR(512)" />
             <column name="authority" type="VARCHAR(64)" />
+            <column name="priority" type="REAL" />
             <column name="config" type="BYTEA" />
 
             <column name="created_date" type="TIMESTAMP" />
@@ -21,10 +21,6 @@
             <column name="last_modified_by" type="VARCHAR(50)" />
 
         </createTable>
-
-        <addUniqueConstraint tableName="dashboards"
-                             columnNames="type,key,authority"
-                             constraintName="uc_dashboards_type_key_authority" />
 
     </changeSet>
 

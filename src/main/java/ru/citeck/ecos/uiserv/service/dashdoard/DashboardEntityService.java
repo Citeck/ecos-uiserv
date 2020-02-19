@@ -2,10 +2,9 @@ package ru.citeck.ecos.uiserv.service.dashdoard;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.uiserv.domain.DashboardDto;
+import ru.citeck.ecos.uiserv.domain.OldDashboardDto;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.entity.AbstractBaseEntityService;
 import ru.citeck.ecos.uiserv.service.file.FileService;
@@ -20,7 +19,7 @@ import java.util.UUID;
  */
 @Service
 @Deprecated
-public class DashboardEntityService extends AbstractBaseEntityService<DashboardDto> {
+public class DashboardEntityService extends AbstractBaseEntityService<OldDashboardDto> {
 
     private static final String TYPE_PREFIX = "type_";
 
@@ -29,17 +28,17 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
     private static final String META_USER = "user";
 
     public DashboardEntityService(ObjectMapper objectMapper, FileService fileService) {
-        super(DashboardDto.class, FileType.DASHBOARD);
+        super(OldDashboardDto.class, FileType.DASHBOARD);
         this.objectMapper = objectMapper;
         this.fileService = fileService;
     }
 
     @Override
-    public DashboardDto create(DashboardDto entity) {
+    public OldDashboardDto create(OldDashboardDto entity) {
         if (StringUtils.isBlank(entity.getKey())) {
             throw new IllegalArgumentException("Key is mandatory for creating dashboard");
         }
-        Optional<DashboardDto> optional = getByKey(entity.getType(), entity.getKey(), entity.getUser());
+        Optional<OldDashboardDto> optional = getByKey(entity.getType(), entity.getKey(), entity.getUser());
         if (optional.isPresent()) {
             entity.setId(optional.get().getId());
             return update(entity);
@@ -50,7 +49,7 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
     }
 
     @Override
-    public DashboardDto update(DashboardDto entity) {
+    public OldDashboardDto update(OldDashboardDto entity) {
         if (entity.getId() == null) {
             return create(entity);
         }
@@ -58,19 +57,19 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
     }
 
     @Override
-    public Optional<DashboardDto> getByKey(String type, String key, String user) {
+    public Optional<OldDashboardDto> getByKey(String type, String key, String user) {
         if (type == null) {
             type = "case-details";
         }
-        Optional<DashboardDto> result = super.getByKey(type, key, user);
+        Optional<OldDashboardDto> result = super.getByKey(type, key, user);
         if (!result.isPresent() && key.startsWith(TYPE_PREFIX)) {
             result = super.getByKey(type, key.substring(TYPE_PREFIX.length()), user);
         }
         return result;
     }
 
-    private DashboardDto saveWithId(String id, DashboardDto entity) {
-        DashboardDto result = new DashboardDto();
+    private OldDashboardDto saveWithId(String id, OldDashboardDto entity) {
+        OldDashboardDto result = new OldDashboardDto();
 
         result.setId(id);
         result.setKey(entity.getKey());
@@ -82,7 +81,7 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
         return result;
     }
 
-    private void writeToFile(DashboardDto entity) {
+    private void writeToFile(OldDashboardDto entity) {
         Map<String, String> metadata = new HashMap<>();
         metadata.put(META_KEY, entity.getKey());
         metadata.put(META_TYPE, entity.getType());
@@ -91,7 +90,7 @@ public class DashboardEntityService extends AbstractBaseEntityService<DashboardD
     }
 
     @Override
-    public Optional<DashboardDto> getByRecord(RecordRef recordRef) {
+    public Optional<OldDashboardDto> getByRecord(RecordRef recordRef) {
         return Optional.empty();
     }
 }

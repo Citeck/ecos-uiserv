@@ -17,9 +17,9 @@ public class DashboardEntity extends AbstractAuditingEntity {
 
     @Column(name = "ext_id")
     private String extId;
-    private String key;
-    private String type;
+    private String typeRef;
     private String authority;
+    private float priority;
     private byte[] config;
 
     @Override

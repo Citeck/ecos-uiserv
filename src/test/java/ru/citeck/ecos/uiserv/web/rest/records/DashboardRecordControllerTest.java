@@ -19,7 +19,7 @@ import ru.citeck.ecos.records2.spring.web.rest.RecordsRestApi;
 import ru.citeck.ecos.records2.spring.config.RecordsServiceFactoryConfiguration;
 import ru.citeck.ecos.records2.utils.json.JsonUtils;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.DashboardDto;
+import ru.citeck.ecos.uiserv.domain.OldDashboardDto;
 import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;
 import ru.citeck.ecos.uiserv.web.rest.TestEntityRecordUtil;
 import ru.citeck.ecos.uiserv.web.rest.TestUtil;
@@ -115,10 +115,10 @@ public class DashboardRecordControllerTest {
             "  \t]\n" +
             "}";
 
-        DashboardDto dto = new DashboardDto();
+        OldDashboardDto dto = new OldDashboardDto();
         dto.setKey(key);
 
-        DashboardDto createdDto = new DashboardDto();
+        OldDashboardDto createdDto = new OldDashboardDto();
         createdDto.setKey(key);
         createdDto.setId(id);
 
@@ -145,13 +145,13 @@ public class DashboardRecordControllerTest {
             "  \t]\n" +
             "}";
 
-        DashboardDto dto = new DashboardDto();
+        OldDashboardDto dto = new OldDashboardDto();
         dto.setKey(key);
         dto.setId(id);
         dto.setType(type);
         dto.setUser(user);
 
-        DashboardDto updatedDto = new DashboardDto();
+        OldDashboardDto updatedDto = new OldDashboardDto();
         updatedDto.setKey(key);
         updatedDto.setId(id);
 
@@ -221,8 +221,8 @@ public class DashboardRecordControllerTest {
         assertEquals("Entity with id <" + nonExistsId + "> not found!", thrown.getCause().getMessage());
     }
 
-    private DashboardDto getTestDtoForQueryWithId(String id) throws IOException {
-        DashboardDto dto = new DashboardDto();
+    private OldDashboardDto getTestDtoForQueryWithId(String id) throws IOException {
+        OldDashboardDto dto = new OldDashboardDto();
         dto.setKey("main-dashboard");
         dto.setId(id);
 

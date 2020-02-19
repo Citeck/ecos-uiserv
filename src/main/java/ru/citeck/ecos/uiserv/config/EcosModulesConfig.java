@@ -10,6 +10,7 @@ import ru.citeck.ecos.apps.EcosAppsApiFactory;
 import ru.citeck.ecos.apps.app.module.type.ui.dashboard.DashboardModule;
 import ru.citeck.ecos.apps.app.module.type.form.FormModule;
 import ru.citeck.ecos.apps.app.module.type.ui.action.ActionModule;
+import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.domain.DashboardDto;
 import ru.citeck.ecos.uiserv.service.action.ActionService;
 import ru.citeck.ecos.uiserv.service.dashdoard.DashboardService;
@@ -72,10 +73,16 @@ public class EcosModulesConfig {
         dashboardService.removeDashboard(dashboardId);
     }
 
-    public void deployDashboard(DashboardModule dashboardModule) {
+    public void deployDashboard(DashboardModule module) {
 
-        log.info("Dashboard module received: " + dashboardModule.getId() + " " + dashboardModule.getKey());
-        DashboardDto dto = mapper.convertValue(dashboardModule, DashboardDto.class);
+        log.info("Dashboard module received: " + module.getId() + " " + module.getTypeRef());
+
+        DashboardDto dto = new DashboardDto();
+        dto.setPriority(module.getPriority());
+        dto.setId(module.getId());
+        dto.setConfig(module.getConfig());
+        dto.setTypeRef(RecordRef.create("emodel", "type", module.getTypeRef().getId()));
+        dto.setAuthority(module.getAuthority());
 
         dashboardService.saveDashboard(dto);
     }
