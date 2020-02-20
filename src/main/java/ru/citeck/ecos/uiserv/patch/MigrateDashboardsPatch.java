@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.patch;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Component
 @DependsOn("liquibase")
 @RequiredArgsConstructor
@@ -52,42 +54,47 @@ public class MigrateDashboardsPatch {
             String key = d.getKey();
             boolean wasAdded = false;
 
-            if (key != null) {
+            try {
 
-                DashboardModule module = new DashboardModule();
-                module.setId(UUID.randomUUID().toString());
-                module.setConfig(d.getConfig());
-                module.setAuthority(d.getUser());
+                if (key != null) {
 
-                if (key.startsWith(KEY_TYPE_PREFIX)) {
+                    DashboardModule module = new DashboardModule();
+                    module.setId(UUID.randomUUID().toString());
+                    module.setConfig(d.getConfig());
+                    module.setAuthority(d.getUser());
 
-                    key = key.substring(KEY_TYPE_PREFIX.length());
-                    ModuleRef typeRef = ModuleRef.create("model/type", key);
+                    if (key.startsWith(KEY_TYPE_PREFIX)) {
 
-                    module.setTypeRef(typeRef);
+                        key = key.substring(KEY_TYPE_PREFIX.length());
+                        ModuleRef typeRef = ModuleRef.create("model/type", key);
 
-                    modules.add(module);
-                    wasAdded = true;
+                        module.setTypeRef(typeRef);
 
-                } else if (key.equals("DEFAULT")) {
-
-                    String type = d.getType();
-
-                    if ("user-dashboard".equals(type)) {
-
-                        module.setId("user-dashboard");
-                        module.setTypeRef(ModuleRef.create("model/type", "user-dashboard"));
                         modules.add(module);
                         wasAdded = true;
 
-                    } else if ("case-details".equals(type)) {
+                    } else if (key.equals("DEFAULT")) {
 
-                        module.setTypeRef(ModuleRef.create("model/type", "base"));
-                        module.setId("base-type-dashboard");
-                        modules.add(module);
-                        wasAdded = true;
+                        String type = d.getType();
+
+                        if ("user-dashboard".equals(type)) {
+
+                            module.setId("user-dashboard");
+                            module.setTypeRef(ModuleRef.create("model/type", "user-dashboard"));
+                            modules.add(module);
+                            wasAdded = true;
+
+                        } else if ("case-details".equals(type)) {
+
+                            module.setTypeRef(ModuleRef.create("model/type", "base"));
+                            module.setId("base-type-dashboard");
+                            modules.add(module);
+                            wasAdded = true;
+                        }
                     }
                 }
+            } catch (Exception e) {
+                log.error("Dashboard processing exception", e);
             }
             if (!wasAdded) {
                 status.skippedDashboards.add(key + " " + d.getType());
