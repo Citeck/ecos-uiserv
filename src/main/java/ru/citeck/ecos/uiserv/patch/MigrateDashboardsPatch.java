@@ -16,9 +16,7 @@ import ru.citeck.ecos.uiserv.domain.OldDashboardDto;
 import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -44,7 +42,7 @@ public class MigrateDashboardsPatch {
 
         PatchStatus status = new PatchStatus();
 
-        List<DashboardModule> modules = new ArrayList<>();
+        Map<String, DashboardModule> modules = new HashMap<>();
 
         List<OldDashboardDto> dashboards = dashboardEntityService.getAll();
         status.total = dashboards.size();
@@ -70,7 +68,7 @@ public class MigrateDashboardsPatch {
 
                         module.setTypeRef(typeRef);
 
-                        modules.add(module);
+                        modules.put(module.getId(), module);
                         wasAdded = true;
 
                     } else if (key.equals("DEFAULT")) {
@@ -81,14 +79,14 @@ public class MigrateDashboardsPatch {
 
                             module.setId("user-dashboard");
                             module.setTypeRef(ModuleRef.create("model/type", "user-dashboard"));
-                            modules.add(module);
+                            modules.put(module.getId(), module);
                             wasAdded = true;
 
                         } else if ("case-details".equals(type)) {
 
                             module.setTypeRef(ModuleRef.create("model/type", "base"));
                             module.setId("base-type-dashboard");
-                            modules.add(module);
+                            modules.put(module.getId(), module);
                             wasAdded = true;
                         }
                     }
@@ -102,14 +100,14 @@ public class MigrateDashboardsPatch {
             }
         });
 
-        modules.forEach(m -> status.migrated.add(m.getId() + " (" + m.getTypeRef() + ")"));
+        modules.values().forEach(m -> status.migrated.add(m.getId() + " (" + m.getTypeRef() + ")"));
 
         status.deployed = modules.size();
 
         EcosAppImpl app = new EcosAppImpl();
         app.setVersion(new EcosAppVersion("1.0.0"));
         app.setId("uiserv-dashboard-patch");
-        app.setModules(new ArrayList<>(modules));
+        app.setModules(new ArrayList<>(modules.values()));
         app.setName("uiserv-dashboard-patch");
         app.setSystem(true);
 
