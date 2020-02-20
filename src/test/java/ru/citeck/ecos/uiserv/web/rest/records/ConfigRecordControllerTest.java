@@ -97,16 +97,16 @@ public class ConfigRecordControllerTest {
 
             .andExpect(jsonPath("$.attributes.value.links[*]", hasSize(3)))
 
-            .andExpect(jsonPath("$.attributes.value.links[0].label", is("Журнал")))
+            .andExpect(jsonPath("$.attributes.value.links[0].label", is("Journal")))
             .andExpect(jsonPath("$.attributes.value.links[0].position", is(0)))
             .andExpect(jsonPath("$.attributes.value.links[0].link", is("/share/page/journals")))
 
-            .andExpect(jsonPath("$.attributes.value.links[1].label", is("Журнал дашборда и еще " +
-                "много-много текста в этой ссылке")))
+            .andExpect(jsonPath("$.attributes.value.links[1].label", is("Journal of dashboard and many " +
+                "text in this line")))
             .andExpect(jsonPath("$.attributes.value.links[1].position", is(1)))
             .andExpect(jsonPath("$.attributes.value.links[1].link", is("/share/page/journalsDashboard")))
 
-            .andExpect(jsonPath("$.attributes.value.links[2].label", is("Настройка дашборда")))
+            .andExpect(jsonPath("$.attributes.value.links[2].label", is("Dashboard setup")))
             .andExpect(jsonPath("$.attributes.value.links[2].position", is(2)))
             .andExpect(jsonPath("$.attributes.value.links[2].link", is("/dashboard/settings")));
     }
@@ -240,17 +240,17 @@ public class ConfigRecordControllerTest {
             "          \"type\": \"TOP\",\n" +
             "          \"links\": [\n" +
             "            {\n" +
-            "              \"label\": \"Журнал\",\n" +
+            "              \"label\": \"Journal\",\n" +
             "              \"position\": 0,\n" +
             "              \"link\": \"/share/page/journals\"\n" +
             "            },\n" +
             "            {\n" +
-            "              \"label\": \"Журнал дашборда и еще много-много текста в этой ссылке\",\n" +
+            "              \"label\": \"Journal of dashboard and many text in this line\",\n" +
             "              \"position\": 1,\n" +
             "              \"link\": \"/share/page/journalsDashboard\"\n" +
             "            },\n" +
             "            {\n" +
-            "              \"label\": \"Настройка дашборда\",\n" +
+            "              \"label\": \"Dashboard setup\",\n" +
             "              \"position\": 2,\n" +
             "              \"link\": \"/dashboard/settings\"\n" +
             "            }\n" +
