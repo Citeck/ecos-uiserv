@@ -27,5 +27,6 @@
     <include file="changelog/20191224000000_add_evaluator_type.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20200120000000_update_action_columns.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20200218000000_dashboards_table.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20200220000000_ecos_meta_table.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

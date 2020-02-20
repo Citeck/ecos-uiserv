@@ -20,6 +20,8 @@ public interface BaseEntityService<T> {
 
     Optional<T> getByKey(String type, String key, String user);
 
+    List<T> getAll();
+
     List<T> getAllByKey(String type, String key, String user);
 
     Optional<T> getByKeys(String type, List<String> keys, String user);

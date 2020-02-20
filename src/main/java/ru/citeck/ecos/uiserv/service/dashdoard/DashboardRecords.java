@@ -61,7 +61,12 @@ public class DashboardRecords extends LocalRecordsDAO
             }
         }
 
-        Optional<DashboardDto> dashboard = dashboardService.getDashboard(query.getTypeRef(), query.getUser());
+        Optional<DashboardDto> dashboard = dashboardService.getForAuthority(
+            query.getTypeRef(),
+            query.getAuthority(),
+            query.expandType,
+            query.includeForAll
+        );
 
         return dashboard.map(RecordsQueryResult::of).orElseGet(RecordsQueryResult::new);
     }
@@ -87,6 +92,8 @@ public class DashboardRecords extends LocalRecordsDAO
     private static class Query {
         private RecordRef recordRef;
         private RecordRef typeRef;
-        private String user;
+        private String authority;
+        private boolean expandType = true;
+        private boolean includeForAll = true;
     }
 }

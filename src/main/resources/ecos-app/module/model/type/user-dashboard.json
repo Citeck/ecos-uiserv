@@ -1,6 +1,9 @@
 {
     "id": "user-dashboard",
-    "name": "User dashboard333",
+    "name": {
+        "en": "User dashboard",
+        "ru": "Пользовательский дашборд"
+    },
     "dashboardType": "user-dashboard",
     "system": true
 }

@@ -52,6 +52,14 @@ public abstract class AbstractBaseEntityService<T extends EntityDto> implements 
     }
 
     @Override
+    public List<T> getAll() {
+        return fileService.findByType(type)
+            .stream()
+            .map(this::fromJson)
+            .collect(Collectors.toList());
+    }
+
+    @Override
     public List<T> getAllByKey(String type, String key, String user) {
 
         List<File> found = fileService.find("key", Collections.singletonList(key));

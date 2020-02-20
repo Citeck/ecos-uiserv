@@ -34,8 +34,12 @@ public class DashboardService {
         return repo.findByExtId(id).map(this::mapToDto);
     }
 
-    public Optional<DashboardDto> getDashboard(RecordRef type, String user) {
-        return getDashboardEntity(type, user).map(this::mapToDto);
+    public Optional<DashboardDto> getForAuthority(RecordRef type,
+                                                  String user,
+                                                  boolean expandType,
+                                                  boolean includeForAll) {
+
+        return getEntityForUser(type, user, expandType, includeForAll).map(this::mapToDto);
     }
 
     public DashboardDto saveDashboard(DashboardDto dashboard) {
@@ -48,19 +52,22 @@ public class DashboardService {
         repo.findByExtId(id).ifPresent(repo::delete);
     }
 
-    private Optional<DashboardEntity> getDashboardEntity(RecordRef type, String user) {
+    private Optional<DashboardEntity> getEntityForUser(RecordRef type,
+                                                       String user,
+                                                       boolean expandType,
+                                                       boolean includeForAll) {
 
         List<String> authorities = StringUtils.isNotBlank(user) ?
             Collections.singletonList(user) : Collections.emptyList();
 
-        List<DashboardEntity> dashboards = findDashboardsByType(type.toString(), authorities);
+        List<DashboardEntity> dashboards = findDashboardsByType(type.toString(), authorities, includeForAll);
 
-        if (dashboards.isEmpty()) {
+        if (dashboards.isEmpty() && expandType) {
 
             DataValue parents = recordsService.getAttribute(type, "parents[]?id");
             for (DataValue parent : parents) {
                 if (parent.isTextual()) {
-                    dashboards = findDashboardsByType(parent.asText(), authorities);
+                    dashboards = findDashboardsByType(parent.asText(), authorities, includeForAll);
                     if (!dashboards.isEmpty()) {
                         break;
                     }
@@ -71,16 +78,22 @@ public class DashboardService {
         return dashboards.stream().findFirst();
     }
 
-    private List<DashboardEntity> findDashboardsByType(String type, List<String> authorities) {
+    private List<DashboardEntity> findDashboardsByType(String type, List<String> authorities, boolean includeForAll) {
 
         if (!authorities.isEmpty()) {
 
             PageRequest page = PageRequest.of(0, 1);
-            return repo.findForAuthorities(type, authorities, page);
+            List<DashboardEntity> dashboards = repo.findForAuthorities(type, authorities, page);
+            if (dashboards.isEmpty() && includeForAll) {
+                dashboards = repo.findByTypeRefForAll(type)
+                    .map(Collections::singletonList)
+                    .orElse(Collections.emptyList());
+            }
+            return dashboards;
 
         } else {
 
-            Optional<DashboardEntity> entity = repo.findByTypeRef(type);
+            Optional<DashboardEntity> entity = repo.findByTypeRefForAll(type);
             return entity.map(Collections::singletonList).orElse(Collections.emptyList());
         }
     }
@@ -102,6 +115,15 @@ public class DashboardService {
 
         DashboardEntity entity = repo.findByExtId(dto.getId())
             .orElseGet(DashboardEntity::new);
+
+        if (entity.getId() != null &&
+            (!Objects.equals(entity.getAuthority(), dto.getAuthority())
+                || !Objects.equals(entity.getTypeRef(), String.valueOf(dto.getTypeRef())))) {
+
+            throw new RuntimeException("Dashboard collision. Entity: " + entity.getId()
+                + " " + entity.getAuthority()  + " "+ entity.getTypeRef() + " "
+                + " dto: " + dto.getAuthority() + " " + dto.getTypeRef());
+        }
 
         if (dto.getConfig() != null && dto.getConfig().size() > 0) {
             entity.setConfig(JsonUtils.toBytes(dto.getConfig()));

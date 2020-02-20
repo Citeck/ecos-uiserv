@@ -182,6 +182,10 @@ public class FileService {
         return new FileBundle(fileBytes, Collections.unmodifiableMap(translations));
     }
 
+    public List<File> findByType(FileType type) {
+        return fileRepository.findByType(type);
+    }
+
     //If at some moment we'll really need to find by multiple keys, we'll probably better off by
     //making metadata a document and storing it in some search engine, than using DB-based search
     public List<File> find(String metaKey, List<String> metaValues) {

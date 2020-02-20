@@ -1,5 +1,5 @@
 {
-    "id": "user-dashboard-default",
+    "id": "user-dashboard",
     "typeRef": "model/type$user-dashboard",
     "config": {
         "mobile": [

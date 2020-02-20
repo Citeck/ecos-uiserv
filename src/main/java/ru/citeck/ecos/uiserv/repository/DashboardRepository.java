@@ -14,11 +14,13 @@ import java.util.Optional;
 public interface DashboardRepository extends JpaRepository<DashboardEntity, Long> {
 
     @Query("SELECT dashboard FROM DashboardEntity dashboard " +
-           "WHERE dashboard.typeRef = ?1 AND (dashboard.authority IN ?2 OR dashboard.authority IS NULL) " +
+           "WHERE dashboard.typeRef = ?1 AND dashboard.authority IN ?2 " +
            "ORDER BY dashboard.priority desc")
     List<DashboardEntity> findForAuthorities(String typeRef, List<String> authorities, PageRequest page);
 
-    Optional<DashboardEntity> findByTypeRef(String typeRef);
+    @Query("SELECT dashboard FROM DashboardEntity dashboard " +
+        "WHERE dashboard.typeRef = ?1 AND dashboard.authority IS NULL")
+    Optional<DashboardEntity> findByTypeRefForAll(String typeRef);
 
     Optional<DashboardEntity> findByExtId(String extId);
 }

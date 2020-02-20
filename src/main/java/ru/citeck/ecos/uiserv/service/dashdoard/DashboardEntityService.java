@@ -9,10 +9,7 @@ import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.entity.AbstractBaseEntityService;
 import ru.citeck.ecos.uiserv.service.file.FileService;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Roman Makarskiy

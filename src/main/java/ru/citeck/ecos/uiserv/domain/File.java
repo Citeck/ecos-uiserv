@@ -37,7 +37,7 @@ public class File implements Serializable {
         not necessarily mean "last" (with greatest ordinal number), there might exist some
         "standard" versions installed after latest "override" version, and in that case
         those "standard" version are not becoming "active" until the custom override is reverted. */
-    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     //@JoinColumn(name = "menu_config_version_id")
     @Getter @Setter
     private FileVersion fileVersion;
