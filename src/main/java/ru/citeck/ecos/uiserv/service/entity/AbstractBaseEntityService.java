@@ -55,7 +55,15 @@ public abstract class AbstractBaseEntityService<T extends EntityDto> implements 
     public List<T> getAll() {
         return fileService.findByType(type)
             .stream()
-            .map(this::fromJson)
+            .map(f -> {
+                try {
+                    return Optional.ofNullable(fromJson(f));
+                } catch (Exception e) {
+                    return Optional.<T>empty();
+                }
+            })
+            .filter(Optional::isPresent)
+            .map(Optional::get)
             .collect(Collectors.toList());
     }
 
