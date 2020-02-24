@@ -8,8 +8,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.citeck.ecos.records2.objdata.ObjectData;
-import ru.citeck.ecos.records2.utils.json.JsonUtils;
+import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.OldDashboardDto;
 import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;
@@ -95,7 +95,7 @@ public class DashboardServiceTest {
         OldDashboardDto dto = new OldDashboardDto();
         dto.setKey("test-key");
         dto.setId(id);
-        dto.setConfig(JsonUtils.read("{\n" +
+        dto.setConfig(Json.getMapper().read("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"TOP\"\n" +
             "  }\n" +
@@ -111,7 +111,7 @@ public class DashboardServiceTest {
     public void saveWithoutId() throws IOException {
         OldDashboardDto dto = new OldDashboardDto();
         dto.setKey("test-key");
-        dto.setConfig(JsonUtils.read("{\n" +
+        dto.setConfig(Json.getMapper().read("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"TOP\"\n" +
             "  }\n" +
@@ -128,7 +128,7 @@ public class DashboardServiceTest {
     public void saveWithoutKey() throws IOException {
         OldDashboardDto dto = new OldDashboardDto();
         dto.setId(UUID.randomUUID().toString());
-        dto.setConfig(JsonUtils.read("{\n" +
+        dto.setConfig(Json.getMapper().read("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"TOP\"\n" +
             "  }\n" +
@@ -159,7 +159,7 @@ public class DashboardServiceTest {
         OldDashboardDto dto = new OldDashboardDto();
         dto.setId(id);
         dto.setKey("sun-key");
-        dto.setConfig(JsonUtils.read("{\n" +
+        dto.setConfig(Json.getMapper().read("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"TOP\"\n" +
             "  }\n" +
@@ -169,7 +169,7 @@ public class DashboardServiceTest {
 
         OldDashboardDto found = dashboardService.getById(id).get();
         found.setKey("board-test-key");
-        found.setConfig(JsonUtils.read("{\n" +
+        found.setConfig(Json.getMapper().read("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"DOWN\"\n" +
             "  }\n" +
@@ -188,7 +188,7 @@ public class DashboardServiceTest {
         OldDashboardDto dto = new OldDashboardDto();
         dto.setKey("down");
         dto.setId(id);
-        dto.setConfig(JsonUtils.read("{\n" +
+        dto.setConfig(Json.getMapper().read("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"TOP\"\n" +
             "  }\n" +
@@ -211,7 +211,7 @@ public class DashboardServiceTest {
         mainDashboard.setKey("main-dashboard");
         mainDashboard.setId("main-dashboard-id");
         mainDashboard.setType("user-dashboard");
-        mainDashboard.setConfig(JsonUtils.read("{\n" +
+        mainDashboard.setConfig(Json.getMapper().read("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"TOP\"\n" +
             "  },\n" +
@@ -224,7 +224,7 @@ public class DashboardServiceTest {
         contractDashboard.setKey("contract-dashboard");
         contractDashboard.setId("contract-dashboard-id");
         contractDashboard.setType("case-details");
-        contractDashboard.setConfig(JsonUtils.read("{\n" +
+        contractDashboard.setConfig(Json.getMapper().read("{\n" +
             "    \"_id\": \"5cf91d01f2f927246c3098db\",\n" +
             "    \"index\": 0,\n" +
             "    \"guid\": \"3c30824c-0163-4446-a649-e2af4c3174e3\",\n" +
@@ -244,7 +244,7 @@ public class DashboardServiceTest {
         siteDashboard.setKey("site-dashboard");
         siteDashboard.setId("site-dashboard-id");
         siteDashboard.setType("site-dashboard");
-        siteDashboard.setConfig(JsonUtils.read("{\n" +
+        siteDashboard.setConfig(Json.getMapper().read("{\n" +
             "  \"menu\": {\n" +
             "    \"type\": \"LEFT\"\n" +
             "  },\n" +

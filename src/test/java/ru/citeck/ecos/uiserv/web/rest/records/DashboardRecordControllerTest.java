@@ -12,13 +12,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records2.objdata.ObjectData;
+import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.request.rest.RestHandler;
 import ru.citeck.ecos.records2.spring.web.rest.RecordsRestApi;
 import ru.citeck.ecos.records2.spring.config.RecordsServiceFactoryConfiguration;
-import ru.citeck.ecos.records2.utils.json.JsonUtils;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.DashboardDto;
 import ru.citeck.ecos.uiserv.service.dashdoard.DashboardService;
@@ -272,7 +272,7 @@ public class DashboardRecordControllerTest {
             "  }\n" +
             "}";
         JsonNode config = mapper.readValue(configJson, JsonNode.class);
-        dto.setConfig(JsonUtils.convert(config, ObjectData.class));
+        dto.setConfig(Json.getMapper().convert(config, ObjectData.class));
         return dto;
     }
 

@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import ru.citeck.ecos.commons.data.DataValue;
+import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records2.objdata.DataValue;
-import ru.citeck.ecos.records2.objdata.ObjectData;
-import ru.citeck.ecos.records2.utils.json.JsonUtils;
 import ru.citeck.ecos.uiserv.domain.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.DashboardEntity;
 import ru.citeck.ecos.uiserv.repository.DashboardRepository;
@@ -104,7 +104,7 @@ public class DashboardService {
 
         dto.setId(entity.getExtId());
         dto.setAuthority(entity.getAuthority());
-        dto.setConfig(JsonUtils.read(entity.getConfig(), ObjectData.class));
+        dto.setConfig(Json.getMapper().read(entity.getConfig(), ObjectData.class));
         dto.setPriority(entity.getPriority());
         dto.setTypeRef(RecordRef.valueOf(entity.getTypeRef()));
 
@@ -126,7 +126,7 @@ public class DashboardService {
         }
 
         if (dto.getConfig() != null && dto.getConfig().size() > 0) {
-            entity.setConfig(JsonUtils.toBytes(dto.getConfig()));
+            entity.setConfig(Json.getMapper().toBytes(dto.getConfig()));
         }
 
         entity.setExtId(dto.getId());

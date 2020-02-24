@@ -7,13 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.apps.app.module.ModuleRef;
 import ru.citeck.ecos.apps.app.module.type.ui.action.ActionModule;
+import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluatorService;
 import ru.citeck.ecos.records2.evaluator.evaluators.AlwaysFalseEvaluator;
 import ru.citeck.ecos.records2.evaluator.evaluators.AlwaysTrueEvaluator;
-import ru.citeck.ecos.records2.objdata.ObjectData;
-import ru.citeck.ecos.records2.utils.json.JsonUtils;
+import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.uiserv.domain.ActionEntity;
 import ru.citeck.ecos.uiserv.domain.EvaluatorEntity;
 import ru.citeck.ecos.uiserv.repository.ActionRepository;
@@ -114,7 +114,7 @@ public class ActionService {
 
         String configJson = actionEntity.getConfigJson();
         if (configJson != null) {
-            action.setConfig(JsonUtils.convert(configJson, ObjectData.class));
+            action.setConfig(Json.getMapper().convert(configJson, ObjectData.class));
         }
 
         EvaluatorEntity evaluator = actionEntity.getEvaluator();
@@ -126,7 +126,7 @@ public class ActionService {
 
             configJson = evaluator.getConfigJson();
             if (configJson != null) {
-                evaluatorDto.setConfig(JsonUtils.convert(configJson, ObjectData.class));
+                evaluatorDto.setConfig(Json.getMapper().convert(configJson, ObjectData.class));
             }
 
             action.setEvaluator(evaluatorDto);

@@ -1,6 +1,5 @@
 package ru.citeck.ecos.uiserv.service.journal;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
@@ -12,11 +11,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records2.objdata.DataValue;
-import ru.citeck.ecos.records2.utils.json.JsonUtils;
+import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.file.FileService;
@@ -140,7 +139,7 @@ public class JournalConfigService {
 
                 DataValue attInfoNode = attInfoMeta.get(attribute);
                 if (attInfoNode.isObject()) {
-                    info = JsonUtils.convert(attInfoNode, attInfoClass);
+                    info = Json.getMapper().convert(attInfoNode, attInfoClass);
                 }
 
                 result.put(attribute, info);
