@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.patch;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,7 +72,7 @@ public class MigrateDashboardsPatch {
                         modules.put(module.getId(), module);
                         wasAdded = true;
 
-                    } else if (key.equals("DEFAULT")) {
+                    } else if (key.equals("DEFAULT") && StringUtils.isEmpty(module.getAuthority())) {
 
                         String type = d.getType();
 
