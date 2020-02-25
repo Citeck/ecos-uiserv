@@ -69,7 +69,7 @@ public class IsAdminEvaluatorTest extends LocalRecordsDAO implements LocalRecord
         private boolean isAdmin = true;
 
         @Override
-        public Object getAttribute(String name, MetaField field) throws Exception {
+        public Object getAttribute(String name, MetaField field) {
             return isAdmin;
         }
     }

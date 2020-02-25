@@ -1,26 +1,24 @@
 package ru.citeck.ecos.uiserv.records.evaluator;
 
 import lombok.Data;
+import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluator;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
-import ru.citeck.ecos.records2.utils.StringUtils;
 
-import java.util.Collections;
-import java.util.Map;
-
-public class IsAdminEvaluator implements RecordEvaluator<Map<String, String>, IsAdminEvaluator.Meta,
+@Component
+public class IsAdminEvaluator implements RecordEvaluator<Class<IsAdminEvaluator.Meta>, IsAdminEvaluator.Meta,
     IsAdminEvaluator.Config> {
 
     private static final String TYPE = "is-admin";
 
     @Override
-    public Map<String, String> getMetaToRequest(Config config) {
-        return Collections.singletonMap("admin", "$user.isAdmin?bool");
+    public Class<Meta> getMetaToRequest(Config config) {
+        return Meta.class;
     }
 
     @Override
     public boolean evaluate(Meta meta, Config config) {
-        return meta.isAdmin;
+        return Boolean.TRUE.equals(meta.isAdmin);
     }
 
     @Override
@@ -35,6 +33,6 @@ public class IsAdminEvaluator implements RecordEvaluator<Map<String, String>, Is
     @Data
     public static class Meta {
         @MetaAtt("$user.isAdmin?bool")
-        private boolean isAdmin;
+        private Boolean isAdmin;
     }
 }

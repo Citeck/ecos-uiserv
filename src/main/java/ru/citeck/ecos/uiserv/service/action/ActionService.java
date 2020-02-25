@@ -18,7 +18,10 @@ import ru.citeck.ecos.uiserv.domain.ActionEntity;
 import ru.citeck.ecos.uiserv.domain.EvaluatorEntity;
 import ru.citeck.ecos.uiserv.repository.ActionRepository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -77,13 +80,16 @@ public class ActionService {
                 }
                 if (recordEvaluatorDto.getType() == null) {
                     log.error("Evaluator type is null: '" + recordEvaluatorDto + "'. " +
-                              "Replace it with Always False Evaluator. Action: " + a);
+                        "Replace it with Always False Evaluator. Action: " + a);
                     recordEvaluatorDto.setType(AlwaysFalseEvaluator.TYPE);
                 }
                 return recordEvaluatorDto;
             }).collect(Collectors.toList());
 
-        Map<RecordRef, List<Boolean>> evalResultByRecord = evaluatorsService.evaluate(recordRefs, evaluators);
+        Map<String, RecordRef> model = new HashMap<>();
+        model.put("user", RecordRef.valueOf("alfresco/people@${currentUsername}"));
+
+        Map<RecordRef, List<Boolean>> evalResultByRecord = evaluatorsService.evaluate(recordRefs, evaluators, model);
         Map<RecordRef, List<ActionModule>> actionsByRecord = new HashMap<>();
 
         for (RecordRef recordRef : recordRefs) {
