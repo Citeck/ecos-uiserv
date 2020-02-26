@@ -17,11 +17,9 @@ import ru.citeck.ecos.records2.utils.json.JsonUtils;
 import ru.citeck.ecos.uiserv.domain.ActionEntity;
 import ru.citeck.ecos.uiserv.domain.EvaluatorEntity;
 import ru.citeck.ecos.uiserv.repository.ActionRepository;
+import ru.citeck.ecos.uiserv.security.SecurityUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -87,7 +85,9 @@ public class ActionService {
             }).collect(Collectors.toList());
 
         Map<String, RecordRef> model = new HashMap<>();
-        model.put("user", RecordRef.valueOf("alfresco/people@${currentUsername}"));
+
+        Optional<String> optionalUsername = SecurityUtils.getCurrentUserLogin();
+        optionalUsername.ifPresent(s -> model.put("user", RecordRef.valueOf("alfresco/people@${" + s + "}")));
 
         Map<RecordRef, List<Boolean>> evalResultByRecord = evaluatorsService.evaluate(recordRefs, evaluators, model);
         Map<RecordRef, List<ActionModule>> actionsByRecord = new HashMap<>();
