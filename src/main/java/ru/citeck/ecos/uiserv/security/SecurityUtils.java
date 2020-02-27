@@ -39,7 +39,7 @@ public final class SecurityUtils {
     public static String getCurrentUserLoginFromRequestContext() {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null) {
-            return (String)requestAttributes.getAttribute(REQUEST_USERNAME_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
+            return (String) requestAttributes.getAttribute(REQUEST_USERNAME_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
         }
         return null;
     }

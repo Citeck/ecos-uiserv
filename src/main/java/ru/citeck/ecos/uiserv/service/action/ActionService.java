@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
 import ru.citeck.ecos.apps.app.module.ModuleRef;
 import ru.citeck.ecos.apps.app.module.type.ui.action.ActionModule;
 import ru.citeck.ecos.records2.RecordRef;
@@ -21,7 +19,10 @@ import ru.citeck.ecos.uiserv.domain.EvaluatorEntity;
 import ru.citeck.ecos.uiserv.repository.ActionRepository;
 import ru.citeck.ecos.uiserv.security.SecurityUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
