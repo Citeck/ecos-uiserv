@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 import ru.citeck.ecos.apps.app.module.ModuleRef;
 import ru.citeck.ecos.apps.app.module.type.ui.action.ActionModule;
 import ru.citeck.ecos.records2.RecordRef;
@@ -86,8 +88,8 @@ public class ActionService {
 
         Map<String, RecordRef> model = new HashMap<>();
 
-        Optional<String> optionalUsername = SecurityUtils.getCurrentUserLogin();
-        optionalUsername.ifPresent(s -> model.put("user", RecordRef.valueOf("alfresco/people@${" + s + "}")));
+        String requestUsername = SecurityUtils.getCurrentUserLoginFromRequestContext();
+        model.put("user", RecordRef.valueOf("alfresco/people@${" + requestUsername + "}"));
 
         Map<RecordRef, List<Boolean>> evalResultByRecord = evaluatorsService.evaluate(recordRefs, evaluators, model);
         Map<RecordRef, List<ActionModule>> actionsByRecord = new HashMap<>();
