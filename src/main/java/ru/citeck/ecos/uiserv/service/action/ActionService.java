@@ -90,7 +90,7 @@ public class ActionService {
         Map<String, RecordRef> model = new HashMap<>();
 
         String requestUsername = SecurityUtils.getCurrentUserLoginFromRequestContext();
-        model.put("user", RecordRef.valueOf("alfresco/people@${" + requestUsername + "}"));
+        model.put("user", RecordRef.valueOf("alfresco/people@" + requestUsername));
 
         Map<RecordRef, List<Boolean>> evalResultByRecord = evaluatorsService.evaluate(recordRefs, evaluators, model);
         Map<RecordRef, List<ActionModule>> actionsByRecord = new HashMap<>();
