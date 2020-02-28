@@ -1,10 +1,8 @@
 package ru.citeck.ecos.uiserv.records.evaluator;
 
 import lombok.Data;
-import org.apache.commons.lang.ObjectUtils;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluator;
-import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 
 import java.util.Collections;
 import java.util.Map;

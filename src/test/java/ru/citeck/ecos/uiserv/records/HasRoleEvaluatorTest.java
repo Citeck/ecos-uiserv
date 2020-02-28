@@ -66,7 +66,7 @@ public class HasRoleEvaluatorTest extends LocalRecordsDAO implements LocalRecord
 
     @Override
     public List<Object> getLocalRecordsMeta(List<RecordRef> list, MetaField metaField) {
-       return Collections.singletonList(new TestMixin());
+        return Collections.singletonList(new TestMixin());
     }
 
     @Data
