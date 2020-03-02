@@ -1,7 +1,8 @@
 package ru.citeck.ecos.uiserv.records;
 
+import junit.framework.TestCase;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,14 +16,15 @@ import ru.citeck.ecos.records2.objdata.ObjectData;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
 import ru.citeck.ecos.records2.utils.json.JsonUtils;
-import ru.citeck.ecos.uiserv.records.evaluator.HasRoleEvaluator;
+import ru.citeck.ecos.uiserv.records.evaluator.UserInRoleEvaluator;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-public class HasRoleEvaluatorTest extends LocalRecordsDAO implements LocalRecordsMetaDAO<Object> {
+public class UserInRoleEvaluatorTest extends LocalRecordsDAO implements LocalRecordsMetaDAO<Object> {
 
-    private static final String ID = "hasRoleEvaluatorTest";
+    private static final String ID = "userInRoleEvaluatorTest";
+    private static final String TEST_USERNAME = "$CURRENT";
+    private static final String TEST_WRONG_USERNAME = "WRONG_USER";
 
     private RecordEvaluatorService evaluatorsService;
 
@@ -36,7 +38,7 @@ public class HasRoleEvaluatorTest extends LocalRecordsDAO implements LocalRecord
         recordsService.register(this);
 
         evaluatorsService = factory.getRecordEvaluatorService();
-        evaluatorsService.register(new HasRoleEvaluator());
+        evaluatorsService.register(new UserInRoleEvaluator());
     }
 
     @Test
@@ -48,20 +50,45 @@ public class HasRoleEvaluatorTest extends LocalRecordsDAO implements LocalRecord
         model.put("user", userRef);
 
         RecordEvaluatorDto evaluatorDto = new RecordEvaluatorDto();
-        evaluatorDto.setType("has-role");
+        evaluatorDto.setType("user-in-role");
 
-        //need this for compare with some role value
-        HasRoleEvaluator.Config config = new HasRoleEvaluator.Config();
-        config.setRole("ROLE_STR");
+        UserInRoleEvaluator.Config config = new UserInRoleEvaluator.Config();
         evaluatorDto.setConfig(JsonUtils.convert(config, ObjectData.class));
 
         RecordRef recordRef = RecordRef.create(ID, "record");
+
+        TestCaseRole.currentUsername = TEST_USERNAME;
 
         //  act
         boolean result = evaluatorsService.evaluate(recordRef, evaluatorDto, model);
 
         //  assert
         Assert.assertTrue(result);
+    }
+
+    @Test
+    public void evaluateWithWrongUser() {
+
+        //  arrange
+        Map<String, Object> model = new HashMap<>();
+        RecordRef userRef = RecordRef.create(ID, "user");
+        model.put("user", userRef);
+
+        RecordEvaluatorDto evaluatorDto = new RecordEvaluatorDto();
+        evaluatorDto.setType("user-in-role");
+
+        UserInRoleEvaluator.Config config = new UserInRoleEvaluator.Config();
+        evaluatorDto.setConfig(JsonUtils.convert(config, ObjectData.class));
+
+        RecordRef recordRef = RecordRef.create(ID, "record");
+
+        TestCaseRole.currentUsername = TEST_WRONG_USERNAME;
+
+        //  act
+        boolean result = evaluatorsService.evaluate(recordRef, evaluatorDto, model);
+
+        //  assert
+        Assert.assertFalse(result);
     }
 
     @Override
@@ -87,12 +114,13 @@ public class HasRoleEvaluatorTest extends LocalRecordsDAO implements LocalRecord
 
     @Data
     public static class TestCaseRole implements MetaValue {
+
+        private static String currentUsername;
+
         @Override
         public boolean has(String name) {
-            //  constant that we find some 'true' value for roles
-            return true;
+            return currentUsername.equals(name);
         }
     }
-
 
 }

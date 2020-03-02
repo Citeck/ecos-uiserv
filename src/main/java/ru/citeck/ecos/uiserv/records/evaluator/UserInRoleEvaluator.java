@@ -8,10 +8,10 @@ import java.util.Collections;
 import java.util.Map;
 
 @Component
-public class HasRoleEvaluator implements RecordEvaluator<Map<String, String>, HasRoleEvaluator.Meta,
-    HasRoleEvaluator.Config> {
+public class UserInRoleEvaluator implements RecordEvaluator<Map<String, String>, UserInRoleEvaluator.Meta,
+    UserInRoleEvaluator.Config> {
 
-    private static final String TYPE = "has-role";
+    private static final String TYPE = "user-in-role";
 
     @Override
     public Map<String, String> getMetaToRequest(Config config) {
