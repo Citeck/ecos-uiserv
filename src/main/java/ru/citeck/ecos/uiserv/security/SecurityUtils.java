@@ -1,18 +1,21 @@
 package ru.citeck.ecos.uiserv.security;
 
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.Optional;
 
 /**
  * Utility class for Spring Security.
  */
+@NoArgsConstructor
 public final class SecurityUtils {
 
-    private SecurityUtils() {
-    }
+    private static final String REQUEST_USERNAME_ATTRIBUTE = "requestUsername";
 
     /**
      * Get the login of the current user.
@@ -31,6 +34,14 @@ public final class SecurityUtils {
                 }
                 return null;
             });
+    }
+
+    public static String getCurrentUserLoginFromRequestContext() {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null) {
+            return (String) requestAttributes.getAttribute(REQUEST_USERNAME_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
+        }
+        return null;
     }
 
     /**
