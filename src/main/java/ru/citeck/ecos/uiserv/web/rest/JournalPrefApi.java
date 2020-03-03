@@ -2,6 +2,8 @@ package ru.citeck.ecos.uiserv.web.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.NonNull;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -88,12 +90,9 @@ public class JournalPrefApi {
     @PostMapping
     public String postJournalPrefs(@RequestParam String journalId,
                                  @RequestParam(required = false) JournalPrefService.TargetType target,
-                                 @ModelAttribute("username") String username,
+                                 @ModelAttribute("username") @NonNull String username,
                                  @RequestBody byte[] bytes) {
-        if (username == null) {
-            throw new IllegalArgumentException("Expecting username");
-        }
-        if (username.equals("")) {
+        if (StringUtils.isBlank(username)) {
             throw new IllegalArgumentException("Username cannot be empty");
         }
         if (username.contains("@")) {

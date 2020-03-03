@@ -14,10 +14,7 @@ import ru.citeck.ecos.uiserv.service.file.FileService;
 import ru.citeck.ecos.uiserv.service.file.FileViewCaching;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,8 +67,9 @@ public class JournalPrefService {
 
 
     public String deployOverride(String prefsId, byte[] bytes, String username, TargetType target, String journalId) {
-        final File prefs = fileService.deployFileOverride(FileType.JOURNALPREFS, prefsId, null, bytes,
-            Collections.singletonMap("lookupKey", composeLookupKey(username, target, journalId)));
+        Map<String, String> meta = new HashMap<>();
+        meta.put("lookupKey", composeLookupKey(username, target, journalId));
+        File prefs = fileService.deployFileOverride(FileType.JOURNALPREFS, prefsId, null, bytes, meta);
         return prefs.getFileId();
     }
 

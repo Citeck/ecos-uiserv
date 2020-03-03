@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.service.file;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.uiserv.domain.File;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Component
+@Slf4j
 public class FileStore {
 
     @Autowired
@@ -90,7 +92,12 @@ public class FileStore {
             versionRepository.save(newVersion);
         }
         newVersion.setFile(cfg);
-        return repository.save(cfg);
+        try {
+            return repository.save(cfg);
+        } catch (Exception e) {
+            log.error("Cannot save configuration", e);
+            return null;
+        }
     }
 
     public Optional<FileVersion> getLastFileVersion(FileType fileType, String fileId) {
