@@ -1,0 +1,42 @@
+package ru.citeck.ecos.uiserv.records.evaluator;
+
+import lombok.Data;
+import org.springframework.stereotype.Component;
+import ru.citeck.ecos.records2.evaluator.RecordEvaluator;
+
+import java.util.Collections;
+import java.util.Map;
+
+@Component
+public class UserInRoleEvaluator implements RecordEvaluator<Map<String, String>, UserInRoleEvaluator.Meta,
+    UserInRoleEvaluator.Config> {
+
+    private static final String TYPE = "user-in-role";
+
+    @Override
+    public Map<String, String> getMetaToRequest(Config config) {
+        String role = config.getRole();
+        String metaValue = String.format(".att(n:\"case-roles\"){att(n:\"%s\"){has(n:\"$CURRENT\")}}", role);
+        return Collections.singletonMap("role", metaValue);
+    }
+
+    @Override
+    public boolean evaluate(Meta meta, Config config) {
+        return Boolean.TRUE.equals(meta.role);
+    }
+
+    @Override
+    public String getType() {
+        return TYPE;
+    }
+
+    @Data
+    public static class Meta {
+        private Boolean role;
+    }
+
+    @Data
+    public static class Config {
+        private String role;
+    }
+}
