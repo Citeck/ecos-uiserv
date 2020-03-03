@@ -1,24 +1,25 @@
 package ru.citeck.ecos.uiserv.records;
 
-import junit.framework.TestCase;
 import lombok.Data;
-import lombok.Setter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsServiceFactory;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluatorService;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
-import ru.citeck.ecos.records2.objdata.ObjectData;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
-import ru.citeck.ecos.records2.utils.json.JsonUtils;
 import ru.citeck.ecos.uiserv.records.evaluator.UserInRoleEvaluator;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class UserInRoleEvaluatorTest extends LocalRecordsDAO implements LocalRecordsMetaDAO<Object> {
 
@@ -53,7 +54,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDAO implements LocalRec
         evaluatorDto.setType("user-in-role");
 
         UserInRoleEvaluator.Config config = new UserInRoleEvaluator.Config();
-        evaluatorDto.setConfig(JsonUtils.convert(config, ObjectData.class));
+        evaluatorDto.setConfig(Json.getMapper().convert(config, ObjectData.class));
 
         RecordRef recordRef = RecordRef.create(ID, "record");
 
@@ -78,7 +79,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDAO implements LocalRec
         evaluatorDto.setType("user-in-role");
 
         UserInRoleEvaluator.Config config = new UserInRoleEvaluator.Config();
-        evaluatorDto.setConfig(JsonUtils.convert(config, ObjectData.class));
+        evaluatorDto.setConfig(Json.getMapper().convert(config, ObjectData.class));
 
         RecordRef recordRef = RecordRef.create(ID, "record");
 
