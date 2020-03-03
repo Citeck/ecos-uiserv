@@ -5,7 +5,8 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluator;
 
 @Component
-public class IsLockedEvaluator implements RecordEvaluator<Class<IsLockedEvaluator.Meta>, IsLockedEvaluator.Meta, IsLockedEvaluator.Config> {
+public class IsLockedEvaluator implements RecordEvaluator<Class<IsLockedEvaluator.Meta>, IsLockedEvaluator.Meta,
+    IsLockedEvaluator.Config> {
 
     private static final String TYPE = "is-locked";
 
