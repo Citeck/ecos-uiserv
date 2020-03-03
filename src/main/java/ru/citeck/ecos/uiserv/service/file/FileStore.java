@@ -2,7 +2,6 @@ package ru.citeck.ecos.uiserv.service.file;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.uiserv.domain.File;
@@ -20,7 +19,6 @@ import java.util.Map;
 import java.util.Optional;
 
 @Component
-@Slf4j
 public class FileStore {
 
     @Autowired
@@ -102,7 +100,7 @@ public class FileStore {
 
     public void clearFileCurrentVersionRef(FileType fileType, String fileId) {
         final File cfg = repository.findByTypeAndFileId(fileType, fileId)
-            .orElseThrow(() -> new RuntimeException("File should exist: " +  fileId));
+            .orElseThrow(() -> new RuntimeException("File should exist: " + fileId));
         cfg.setFileVersion(null);
         repository.save(cfg);
     }
