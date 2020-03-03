@@ -92,12 +92,7 @@ public class FileStore {
             versionRepository.save(newVersion);
         }
         newVersion.setFile(cfg);
-        try {
-            return repository.save(cfg);
-        } catch (Exception e) {
-            log.error("Cannot save configuration", e);
-            return null;
-        }
+        return repository.save(cfg);
     }
 
     public Optional<FileVersion> getLastFileVersion(FileType fileType, String fileId) {
