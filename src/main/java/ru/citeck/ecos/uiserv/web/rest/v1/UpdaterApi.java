@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.web.rest.updates;
+package ru.citeck.ecos.uiserv.web.rest.v1;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,8 +13,9 @@ import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.file.FileBundle;
 import ru.citeck.ecos.uiserv.service.file.FileService;
+import ru.citeck.ecos.uiserv.service.journal.JournalPrefService;
 import ru.citeck.ecos.uiserv.service.translation.TranslationService;
-import ru.citeck.ecos.uiserv.web.rest.JournalPrefApi;
+import ru.citeck.ecos.uiserv.web.rest.v1.dto.ModuleToDeploy;
 
 import java.io.IOException;
 
@@ -22,12 +23,13 @@ import java.io.IOException;
 @RequestMapping("/api/updates")
 @Transactional
 @RequiredArgsConstructor
-public class UpdaterController {
+public class UpdaterApi {
+
     private final FileService fileService;
 
     private final TranslationService i18n;
 
-    private final JournalPrefApi journalPrefApi;
+    private final JournalPrefService journalPrefsService;
 
     private final ObjectMapper objectMapper;
 
@@ -56,7 +58,7 @@ public class UpdaterController {
             try {
                 final JournalPrefsUpdate journalPrefsUpdate =
                     objectMapper.readValue(update.data, JournalPrefsUpdate.class);
-                journalPrefApi.deployJournalPrefs(journalPrefsUpdate.getId(),
+                journalPrefsService.deployJournalPrefs(journalPrefsUpdate.getId(),
                     journalPrefsUpdate.getJournalId(), journalPrefsUpdate.getData());
                 return journalPrefsUpdate.getId();
             } catch (IOException e) {

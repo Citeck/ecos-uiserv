@@ -13,6 +13,7 @@ import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.file.FileService;
 import ru.citeck.ecos.uiserv.service.file.FileViewCaching;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -84,6 +85,21 @@ public class JournalPrefService {
             .filter(Optional::isPresent)
             .map(Optional::get)
             .collect(Collectors.toList());
+    }
+
+    public void deployJournalPrefs(String journalViewPrefsId,
+                                   String journalId,
+                                   JsonNode prefs) {
+        final byte[] bytes;
+        try (final ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            objectMapper.writeValue(output, prefs);
+            bytes = output.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        fileService.deployFileOverride(FileType.JOURNALPREFS, journalViewPrefsId, null, bytes,
+            Collections.singletonMap("journalId", journalId));
     }
 
     public enum TargetType {

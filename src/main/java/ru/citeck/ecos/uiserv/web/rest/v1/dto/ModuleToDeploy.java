@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.web.rest.updates;
+package ru.citeck.ecos.uiserv.web.rest.v1.dto;
 
 public class ModuleToDeploy {
     public long version;

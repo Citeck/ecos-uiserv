@@ -2,13 +2,13 @@ package ru.citeck.ecos.uiserv.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -18,6 +18,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "file_version")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Data
 public class FileVersion implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -60,62 +61,11 @@ public class FileVersion implements Serializable {
     @Setter
     private String contentType;
 
-    public byte[] getBytes() {
-        return bytes;
-    }
-
-    public void setBytes(byte[] bytes) {
-        this.bytes = bytes;
-    }
-
-    public Long getOrdinal() {
-        return ordinal;
-    }
-
-    public void setOrdinal(Long ordinal) {
-        this.ordinal = ordinal;
-    }
-
-    public Long getProductVersion() {
-        return productVersion;
-    }
-
-    public void setProductVersion(Long productVersion) {
-        this.productVersion = productVersion;
-    }
-
-    public Boolean getRevert() {
-        return isRevert;
-    }
-
-    public void setRevert(Boolean revert) {
-        isRevert = revert;
-    }
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Translated getTranslated() {
-        return translated;
-    }
 
     public FileVersion translated(Translated translated) {
         this.translated = translated;
         return this;
     }
-
-    public void setTranslated(Translated translated) {
-        this.translated = translated;
-    }
-
-
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
     public boolean equals(Object o) {
@@ -135,13 +85,5 @@ public class FileVersion implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hashCode(getId());
-    }
-
-    @Override
-    public String toString() {
-        return "FileVersion{" +
-            "id=" + getId() +
-            ", contentType=" + getContentType() +
-            "}";
     }
 }

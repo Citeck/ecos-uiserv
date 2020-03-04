@@ -69,7 +69,7 @@ public class FileStore {
         newVersion.setTranslated(crutches.save(new Translated()));
         newVersion.setBytes(bytes);
         newVersion.setProductVersion(productVersion);
-        newVersion.setRevert(isRevert);
+        newVersion.setIsRevert(isRevert);
         newVersion.setOrdinal(ordinal); //also serves as optimistic lock
         newVersion.setContentType(contentType);
         if (isRevert && productVersion == null)
@@ -80,7 +80,9 @@ public class FileStore {
         cfg.setFileId(fileId);
         cfg.setLatestOrdinal(ordinal);
         cfg.setType(fileType);
-        cfg.setFileMeta(meta);
+        if (cfg.getFileMeta() == null) {
+            cfg.setFileMeta(meta);
+        }
         cfg = repository.save(cfg);
 
         if (!skipThisVersion) {
