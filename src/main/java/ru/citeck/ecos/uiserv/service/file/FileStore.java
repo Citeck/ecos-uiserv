@@ -100,7 +100,7 @@ public class FileStore {
 
     public void clearFileCurrentVersionRef(FileType fileType, String fileId) {
         final File cfg = repository.findByTypeAndFileId(fileType, fileId)
-            .orElseThrow(() -> new RuntimeException("File should exist: " +  fileId));
+            .orElseThrow(() -> new RuntimeException("File should exist: " + fileId));
         cfg.setFileVersion(null);
         repository.save(cfg);
     }
