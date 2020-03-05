@@ -1,28 +1,52 @@
 package ru.citeck.ecos.uiserv.records.evaluator;
 
 import lombok.Data;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluator;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Component
-public class UserInRoleEvaluator implements RecordEvaluator<Map<String, String>, UserInRoleEvaluator.Meta,
+public class UserInRoleEvaluator implements RecordEvaluator<Map<String, String>, Map<String, Boolean>,
     UserInRoleEvaluator.Config> {
 
     private static final String TYPE = "user-in-role";
 
     @Override
     public Map<String, String> getMetaToRequest(Config config) {
+
+        Map<String,String> resultMap;
+
+        if (CollectionUtils.isNotEmpty(config.getAnyRole())) {
+            resultMap = new HashMap<>();
+            for (String role : config.getAnyRole()) {
+                String metaValue = String.format(".att(n:\"case-roles\"){att(n:\"%s\"){has(n:\"$CURRENT\")}}", role);
+                resultMap.put(role, metaValue);
+            }
+            return resultMap;
+        }
+
+        if (config.getRole() == null) {
+            return Collections.emptyMap();
+        }
+
         String role = config.getRole();
         String metaValue = String.format(".att(n:\"case-roles\"){att(n:\"%s\"){has(n:\"$CURRENT\")}}", role);
-        return Collections.singletonMap("role", metaValue);
+        return Collections.singletonMap(role, metaValue);
     }
 
     @Override
-    public boolean evaluate(Meta meta, Config config) {
-        return Boolean.TRUE.equals(meta.role);
+    public boolean evaluate(Map<String, Boolean> meta, Config config) {
+        for (Map.Entry<String,Boolean> entry : meta.entrySet()) {
+            if (Boolean.TRUE.equals(entry.getValue())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -31,12 +55,8 @@ public class UserInRoleEvaluator implements RecordEvaluator<Map<String, String>,
     }
 
     @Data
-    public static class Meta {
-        private Boolean role;
-    }
-
-    @Data
     public static class Config {
         private String role;
+        private Set<String> anyRole;
     }
 }
