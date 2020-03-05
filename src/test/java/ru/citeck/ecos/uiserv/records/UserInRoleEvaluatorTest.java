@@ -176,7 +176,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDAO implements LocalRec
 
     @Data
     public static class TestMixin implements MetaValue {
-        
+
         @Override
         public Object getAttribute(String name, MetaField field) {
             return new TestCaseRoles();

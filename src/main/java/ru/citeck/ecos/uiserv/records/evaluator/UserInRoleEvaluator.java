@@ -19,7 +19,7 @@ public class UserInRoleEvaluator implements RecordEvaluator<Map<String, String>,
     @Override
     public Map<String, String> getMetaToRequest(Config config) {
 
-        Map<String,String> resultMap;
+        Map<String, String> resultMap;
 
         if (CollectionUtils.isNotEmpty(config.getAnyRole())) {
             resultMap = new HashMap<>();
@@ -41,7 +41,7 @@ public class UserInRoleEvaluator implements RecordEvaluator<Map<String, String>,
 
     @Override
     public boolean evaluate(Map<String, Boolean> meta, Config config) {
-        for (Map.Entry<String,Boolean> entry : meta.entrySet()) {
+        for (Map.Entry<String, Boolean> entry : meta.entrySet()) {
             if (Boolean.TRUE.equals(entry.getValue())) {
                 return true;
             }
