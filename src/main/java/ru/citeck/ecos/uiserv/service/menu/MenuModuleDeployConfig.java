@@ -13,8 +13,8 @@ import ru.citeck.ecos.apps.utils.io.mem.EappMemDir;
 import ru.citeck.ecos.apps.utils.io.mem.EappMemFile;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.file.FileService;
-import ru.citeck.ecos.uiserv.web.rest.updates.ModuleToDeploy;
-import ru.citeck.ecos.uiserv.web.rest.updates.UpdaterController;
+import ru.citeck.ecos.uiserv.web.rest.v1.dto.ModuleToDeploy;
+import ru.citeck.ecos.uiserv.web.rest.v1.UpdaterApi;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,13 +27,13 @@ public class MenuModuleDeployConfig {
     private EappMemFile menuXmlFile = (EappMemFile) zipToDeploy.createFile("menu.xml", new byte[0]);
 
     private EcosAppsApiFactory apiFactory;
-    private UpdaterController updaterController;
+    private UpdaterApi updaterController;
     private FileService fileService;
 
     private boolean initialized = false;
 
     public MenuModuleDeployConfig(EcosAppsApiFactory apiFactory,
-                                  UpdaterController updaterController,
+                                  UpdaterApi updaterController,
                                   FileService fileService) {
 
         this.fileService = fileService;

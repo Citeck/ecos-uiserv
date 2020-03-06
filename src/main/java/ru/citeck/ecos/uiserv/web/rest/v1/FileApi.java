@@ -1,47 +1,28 @@
-package ru.citeck.ecos.uiserv.web.rest;
+package ru.citeck.ecos.uiserv.web.rest.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.citeck.ecos.uiserv.config.ApplicationProperties;
 import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileType;
-import ru.citeck.ecos.uiserv.service.file.FileService;
 import ru.citeck.ecos.uiserv.service.file.FileBundle;
+import ru.citeck.ecos.uiserv.service.file.FileService;
 import ru.citeck.ecos.uiserv.service.translation.TranslationService;
-import ru.citeck.ecos.uiserv.web.rest.menu.resolvers.MenuItemsResolver;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/store/{fileType}")
-@Transactional
+@RequiredArgsConstructor
 public class FileApi {
-    @Autowired
-    private List<MenuItemsResolver> resolvers;
 
-    @Autowired
-    private ApplicationProperties applicationProperties;
-
-    @Autowired
-    private TranslationService i18n;
-
-    @Autowired
-    private FileService fileService;
+    private final TranslationService i18n;
+    private final FileService fileService;
 
     @GetMapping
     public HttpEntity<byte[]> get(@PathVariable FileType fileType, @RequestParam String fileId) {

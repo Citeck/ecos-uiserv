@@ -110,6 +110,9 @@ public class FileService {
                 true /*isRevert*/);
         }
     }
+    public File deployFileOverride(FileType fileType, String fileId, String contentType, byte[] bytes) {
+        return this.deployFileOverride(fileType, fileId, contentType, bytes, null);
+    }
 
     public File deployFileOverride(FileType fileType, String fileId, String contentType, byte[] bytes,
                                    Map<String, String> metadata) {
@@ -192,7 +195,7 @@ public class FileService {
         if (metaValues.size() == 0) {
             return Collections.emptyList();
         }
-        final List<File> asses = fileRepository.findAll(
+        List<File> asses = fileRepository.findAll(
             (Root<File> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) -> {
                 MapJoin<File, String, String> fileMeta = root.join(File_.fileMeta, JoinType.INNER);
                 return criteriaBuilder.and(
