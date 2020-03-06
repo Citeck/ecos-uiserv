@@ -28,7 +28,7 @@ import java.util.zip.ZipInputStream;
 @Transactional
 @Slf4j
 public class FileService {
-    private static final int MAX_SIZE = 10*1024*1024;
+    private static final int MAX_SIZE = 10 * 1024 * 1024;
 
     private volatile Map<FileType, FileMetadataExtractor> fileMetadataExtractors;
 
@@ -72,6 +72,7 @@ public class FileService {
     private enum KNOWN_LANGUAGE {EN, RU}
 
     private final static Map<FileType, String> extensionMap = new ConcurrentHashMap<>();
+
     static {
         extensionMap.put(FileType.MENU, ".xml");
         extensionMap.put(FileType.JOURNALCFG, ".json");
@@ -86,7 +87,7 @@ public class FileService {
 
     @SuppressWarnings("unchecked")
     private File deployStandardFile(FileType fileType, String fileId, String contentType, byte[] bytes, long productVersion,
-                                                 boolean isRevert) {
+                                    boolean isRevert) {
         final Optional<File> ocfg = fileStore.loadFile(fileType, fileId);
         final long lastOrdinal = ocfg.flatMap(x -> Optional.ofNullable(x.getLatestOrdinal()))
             .orElse(0L);
@@ -94,7 +95,7 @@ public class FileService {
         final boolean activateThisVersion = activeVersion.map(x -> x.getProductVersion() != null)
             .orElse(true);
         return fileStore.saveFile(fileType, fileId, contentType, bytes, Collections.EMPTY_MAP,
-            lastOrdinal+1, productVersion, isRevert, !activateThisVersion);
+            lastOrdinal + 1, productVersion, isRevert, !activateThisVersion);
     }
 
     public void revertFileOverrides(FileType fileType, String fileId) {
@@ -110,6 +111,7 @@ public class FileService {
                 true /*isRevert*/);
         }
     }
+
     public File deployFileOverride(FileType fileType, String fileId, String contentType, byte[] bytes) {
         return this.deployFileOverride(fileType, fileId, contentType, bytes, null);
     }
@@ -125,7 +127,7 @@ public class FileService {
             .orElse(0L);
 
         return fileStore.saveFile(fileType, fileId, contentType, bytes, metadata,
-            lastOrdinal+1, null /*productVersion*/, false/*isRevert*/, false);
+            lastOrdinal + 1, null /*productVersion*/, false/*isRevert*/, false);
     }
 
     public Optional<File> loadFile(FileType fileType, String fileId) {
@@ -195,7 +197,7 @@ public class FileService {
         if (metaValues.size() == 0) {
             return Collections.emptyList();
         }
-        List<File> asses = fileRepository.findAll(
+        final List<File> asses = fileRepository.findAll(
             (Root<File> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) -> {
                 MapJoin<File, String, String> fileMeta = root.join(File_.fileMeta, JoinType.INNER);
                 return criteriaBuilder.and(

@@ -1,8 +1,6 @@
 package ru.citeck.ecos.uiserv.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,54 +79,6 @@ public class FormServiceTest {
     }
 
     @Test
-    public void testMultipleFormsSearch() {
-        EcosFormModel modelA = new EcosFormModel();
-        modelA.setId("TEST_FORM_A");
-        modelA.setDescription("Test form");
-        modelA.setTitle("Test Form");
-        modelA.setDefinition(new JsonNodeFactory(false).textNode("jsonText"));
-        modelA.setFormKey("type_contracts-cat-doctype-contract/contracts-cat-contract-services");
-
-        EcosFormModel modelB = new EcosFormModel();
-        modelB.setId("TEST_FORM_B");
-        modelB.setFormKey("type_contracts-cat-doctype-contract");
-        modelB.setFormMode("X");
-
-        EcosFormModel modelC = new EcosFormModel();
-        modelC.setId("TEST_FORM_C");
-        modelC.setFormKey("alf_contracts:agreement");
-        modelC.setFormMode("Y");
-
-        EcosFormModel modelD = new EcosFormModel();
-        modelD.setId("TEST_FORM_D");
-        modelD.setFormKey("L");
-        modelD.setFormMode("X");
-
-        formService.save(modelA);
-        formService.save(modelB);
-        formService.save(modelC);
-        formService.save(modelD);
-
-        assertThat(
-            formService.getFormsByKeys(Arrays.asList(
-                "type_contracts-cat-doctype-contract/contracts-cat-contract-services",
-                "type_contracts-cat-doctype-contract",
-                "alf_contracts:agreement"
-            )).toString(),
-            is(Arrays.asList(
-                modelA,
-                modelB,
-                modelC
-            ).toString())
-        );
-        assertThat(
-            formService.getFormByKey("type_contracts-cat-doctype-contract/contracts-cat-contract-services"),
-            is(Optional.of(modelA))
-        );
-
-    }
-
-        @Test
     public void testFormModeSearch() {
         EcosFormModel modelA = new EcosFormModel();
         modelA.setId("TEST_FORM_A");
@@ -175,13 +125,13 @@ public class FormServiceTest {
             is(Optional.of(modelC)));
         assertThat(
             formService.getFormByKeyAndMode("K", "Z"),
-            is(Optional.empty()) );
+            is(Optional.empty()));
         assertThat(
             formService.getFormByKeyAndMode("K", null),
-            is(Optional.of(modelA)) );
+            is(Optional.of(modelA)));
         assertThat(
             formService.getFormByKeyAndMode("K", ""),
-            is(Optional.of(modelA)) );
+            is(Optional.of(modelA)));
 
         formService.delete(modelA.getId());
         assertThat(

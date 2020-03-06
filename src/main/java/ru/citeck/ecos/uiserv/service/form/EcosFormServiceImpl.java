@@ -7,11 +7,6 @@ import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.TreeSet;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -171,7 +166,6 @@ public class EcosFormServiceImpl implements EcosFormService {
         providers.add(formProvider);
     }
 
-    //@Autowired
     public void setRecordsService(RecordsService recordsService) {
         this.recordsService = recordsService;
     }
@@ -193,6 +187,8 @@ public class EcosFormServiceImpl implements EcosFormService {
         private final static String ATT_VIEW_FORM_KEY = "_viewFormKey";
 
         @MetaAtt(ATT_VIEW_FORM_KEY)
-        @Getter @Setter private List<String> viewKeys;
+        @Getter
+        @Setter
+        private List<String> viewKeys;
     }
 }
