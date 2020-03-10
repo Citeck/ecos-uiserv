@@ -15,6 +15,7 @@ public class UserInRoleEvaluator implements RecordEvaluator<Map<String, String>,
     UserInRoleEvaluator.Config> {
 
     private static final String TYPE = "user-in-role";
+    private static final String REQUEST_META = ".att(n:\"case-roles\"){att(n:\"%s\"){has(n:\"$CURRENT\")}}";
 
     @Override
     public Map<String, String> getMetaToRequest(Config config) {
@@ -24,7 +25,7 @@ public class UserInRoleEvaluator implements RecordEvaluator<Map<String, String>,
         if (CollectionUtils.isNotEmpty(config.getAnyRole())) {
             resultMap = new HashMap<>();
             for (String role : config.getAnyRole()) {
-                String metaValue = String.format(".att(n:\"case-roles\"){att(n:\"%s\"){has(n:\"$CURRENT\")}}", role);
+                String metaValue = String.format(REQUEST_META, role);
                 resultMap.put(role, metaValue);
             }
             return resultMap;
@@ -35,7 +36,7 @@ public class UserInRoleEvaluator implements RecordEvaluator<Map<String, String>,
         }
 
         String role = config.getRole();
-        String metaValue = String.format(".att(n:\"case-roles\"){att(n:\"%s\"){has(n:\"$CURRENT\")}}", role);
+        String metaValue = String.format(REQUEST_META, role);
         return Collections.singletonMap(role, metaValue);
     }
 
