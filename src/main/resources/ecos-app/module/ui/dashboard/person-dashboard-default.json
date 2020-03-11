@@ -1,0 +1,36 @@
+{
+    "id": "person-dashboard",
+    "typeRef": "model/type$person",
+    "config": {
+        "mobile": [
+            {
+                "tab": {
+                    "label": "Вкладка",
+                    "idLayout": "layout_330b11c3-f296-4949-8a4d-2e0c698e656c"
+                },
+                "columns": [
+                    {
+                        "widgets": []
+                    }
+                ],
+                "id": "layout_330b11c3-f296-4949-8a4d-2e0c698e656c",
+                "type": "mobile"
+            }
+        ],
+        "layouts": [
+            {
+                "tab": {
+                    "label": "Вкладка",
+                    "idLayout": "layout_bb6e6685-f802-4680-8606-007a42a8c1bd"
+                },
+                "columns": [
+                    {
+                        "widgets": []
+                    }
+                ],
+                "id": "layout_bb6e6685-f802-4680-8606-007a42a8c1bd",
+                "type": "1-column"
+            }
+        ]
+    }
+}
