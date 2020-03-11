@@ -1,0 +1,9 @@
+
+modelVersion: "1.0"
+
+controller:
+    type: script
+    config:
+        script: MenuController.groovy
+
+

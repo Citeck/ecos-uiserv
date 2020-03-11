@@ -3,24 +3,16 @@ package ru.citeck.ecos.uiserv.patch;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import ru.citeck.ecos.apps.EappsFactory;
-import ru.citeck.ecos.apps.app.EcosAppImpl;
-import ru.citeck.ecos.apps.app.EcosAppVersion;
-import ru.citeck.ecos.apps.app.module.ModuleRef;
-import ru.citeck.ecos.apps.app.module.type.ui.dashboard.DashboardModule;
 import ru.citeck.ecos.metarepo.EcosMetaRepo;
-import ru.citeck.ecos.uiserv.domain.OldDashboardDto;
 import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
 
 @Slf4j
-@Component
+//@Component
 @DependsOn("liquibase")
 @RequiredArgsConstructor
 public class MigrateDashboardsPatch {
@@ -30,13 +22,12 @@ public class MigrateDashboardsPatch {
 
     private final EcosMetaRepo metaRepo;
     private final DashboardEntityService dashboardEntityService;
-    private final EappsFactory eappsFactory;
 
     @PostConstruct
     @Transactional
     public void execute() {
 
-        PatchStatus currentStatus = metaRepo.get(PATCH_KEY, PatchStatus.class);
+        /*PatchStatus currentStatus = metaRepo.get(PATCH_KEY, PatchStatus.class);
         if (currentStatus != null) {
             return;
         }
@@ -114,7 +105,7 @@ public class MigrateDashboardsPatch {
 
         eappsFactory.getAppsApiFactory().getAppApi().deployApp("mutation", app);
 
-        metaRepo.put(PATCH_KEY, status);
+        metaRepo.put(PATCH_KEY, status);*/
     }
 
     @Data

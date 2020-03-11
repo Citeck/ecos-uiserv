@@ -1,0 +1,8 @@
+
+modelVersion: "1.0"
+
+controller:
+    type: json
+    config:
+        mixin-atts:
+            _formKey: "action_${type}"

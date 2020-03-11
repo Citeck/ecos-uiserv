@@ -2,15 +2,12 @@ package ru.citeck.ecos.uiserv.service.menu;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ClassPathResource;
-import ru.citeck.ecos.apps.EcosAppsApiFactory;
-import ru.citeck.ecos.apps.app.module.type.ui.menu.MenuModule;
-import ru.citeck.ecos.apps.utils.EappZipUtils;
-import ru.citeck.ecos.apps.utils.io.mem.EappMemDir;
-import ru.citeck.ecos.apps.utils.io.mem.EappMemFile;
+import ru.citeck.ecos.apps.module.listener.EcosModuleListener;
+import ru.citeck.ecos.commons.io.file.mem.EcosMemDir;
+import ru.citeck.ecos.commons.utils.ZipUtils;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.file.FileService;
 import ru.citeck.ecos.uiserv.web.rest.v1.dto.ModuleToDeploy;
@@ -21,23 +18,17 @@ import java.io.InputStream;
 
 @Slf4j
 @Configuration
-public class MenuModuleDeployConfig {
+public class MenuModuleDeployConfig implements EcosModuleListener<MenuModule> {
 
-    private EappMemDir zipToDeploy = new EappMemDir("menu.zip");
-    private EappMemFile menuXmlFile = (EappMemFile) zipToDeploy.createFile("menu.xml", new byte[0]);
+    private EcosMemDir zipToDeploy = new EcosMemDir();
 
-    private EcosAppsApiFactory apiFactory;
     private UpdaterApi updaterController;
     private FileService fileService;
 
-    private boolean initialized = false;
-
-    public MenuModuleDeployConfig(EcosAppsApiFactory apiFactory,
-                                  UpdaterApi updaterController,
-                                  FileService fileService) {
+    public MenuModuleDeployConfig(UpdaterApi updaterController,
+                                 FileService fileService) {
 
         this.fileService = fileService;
-        this.apiFactory = apiFactory;
         this.updaterController = updaterController;
 
         //Temp solution. Will be changed
@@ -55,25 +46,14 @@ public class MenuModuleDeployConfig {
         }
     }
 
-    @EventListener
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-
-        if (initialized) {
-            return;
-        }
-        apiFactory.getModuleApi().onModulePublished(MenuModule.class, this::deployMenu);
-        apiFactory.getModuleApi().onModuleDeleted(MenuModule.class, this::deleteMenu);
-        initialized = true;
-    }
-
-    public void deleteMenu(String menuId) {
-
+    @Override
+    public void onModuleDeleted(@NotNull String menuId) {
         log.info("Menu delete msg: " + menuId);
-
         fileService.deployFileOverride(FileType.MENU, menuId, null, null, null);
     }
 
-    public void deployMenu(MenuModule menuModule) {
+    @Override
+    public void onModulePublished(MenuModule menuModule) {
 
         log.info("Menu module received: " + menuModule.getId());
 
@@ -83,8 +63,17 @@ public class MenuModuleDeployConfig {
         moduleToDeploy.version = 1;
         moduleToDeploy.type = "MENU";
 
-        menuXmlFile.write(menuModule.getXmlData());
-        moduleToDeploy.data = EappZipUtils.writeZipAsBytes(zipToDeploy);
+        EcosMemDir deployDir = new EcosMemDir();
+        deployDir.copyFilesFrom(zipToDeploy);
+        deployDir.createFile("menu.xml", menuModule.getXmlData());
+
+        moduleToDeploy.data = ZipUtils.writeZipAsBytes(deployDir);
         updaterController.deploy(moduleToDeploy);
+    }
+
+    @NotNull
+    @Override
+    public String getModuleType() {
+        return "ui/menu";
     }
 }
