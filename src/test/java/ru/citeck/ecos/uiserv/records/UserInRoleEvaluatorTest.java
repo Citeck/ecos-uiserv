@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.records;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,10 +17,7 @@ import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
 import ru.citeck.ecos.uiserv.records.evaluator.UserInRoleEvaluator;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class UserInRoleEvaluatorTest extends LocalRecordsDAO implements LocalRecordsMetaDAO<Object> {
 
@@ -43,7 +41,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDAO implements LocalRec
     }
 
     @Test
-    public void evaluate() {
+    public void evaluateWithSingleRole() {
 
         //  arrange
         Map<String, Object> model = new HashMap<>();
@@ -54,6 +52,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDAO implements LocalRec
         evaluatorDto.setType("user-in-role");
 
         UserInRoleEvaluator.Config config = new UserInRoleEvaluator.Config();
+        config.setRole("Admin");
         evaluatorDto.setConfig(Json.getMapper().convert(config, ObjectData.class));
 
         RecordRef recordRef = RecordRef.create(ID, "record");
@@ -65,6 +64,84 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDAO implements LocalRec
 
         //  assert
         Assert.assertTrue(result);
+    }
+
+    @Test
+    public void evaluateWithMultipleRoles() {
+
+        //  arrange
+        Map<String, Object> model = new HashMap<>();
+        RecordRef userRef = RecordRef.create(ID, "user");
+        model.put("user", userRef);
+
+        RecordEvaluatorDto evaluatorDto = new RecordEvaluatorDto();
+        evaluatorDto.setType("user-in-role");
+
+        UserInRoleEvaluator.Config config = new UserInRoleEvaluator.Config();
+        config.setAnyRole(new HashSet<>(Arrays.asList("Admin", "Initiator")));
+        evaluatorDto.setConfig(Json.getMapper().convert(config, ObjectData.class));
+
+        RecordRef recordRef = RecordRef.create(ID, "record");
+
+        TestCaseRole.currentUsername = TEST_USERNAME;
+
+        //  act
+        boolean result = evaluatorsService.evaluate(recordRef, evaluatorDto, model);
+
+        //  assert
+        Assert.assertTrue(result);
+    }
+
+    @Test
+    public void evaluateWithMultipleRolesWithWrongUserInRoles() {
+
+        //  arrange
+        Map<String, Object> model = new HashMap<>();
+        RecordRef userRef = RecordRef.create(ID, "user");
+        model.put("user", userRef);
+
+        RecordEvaluatorDto evaluatorDto = new RecordEvaluatorDto();
+        evaluatorDto.setType("user-in-role");
+
+        UserInRoleEvaluator.Config config = new UserInRoleEvaluator.Config();
+        config.setAnyRole(new HashSet<>(Arrays.asList("Admin", "Initiator")));
+        evaluatorDto.setConfig(Json.getMapper().convert(config, ObjectData.class));
+
+        RecordRef recordRef = RecordRef.create(ID, "record");
+
+        TestCaseRole.currentUsername = TEST_WRONG_USERNAME;
+
+        //  act
+        boolean result = evaluatorsService.evaluate(recordRef, evaluatorDto, model);
+
+        //  assert
+        Assert.assertFalse(result);
+    }
+
+    @Test
+    public void evaluateWithMultipleRolesWithUserNotFoundInRoles() {
+
+        //  arrange
+        Map<String, Object> model = new HashMap<>();
+        RecordRef userRef = RecordRef.create(ID, "user");
+        model.put("user", userRef);
+
+        RecordEvaluatorDto evaluatorDto = new RecordEvaluatorDto();
+        evaluatorDto.setType("user-in-role");
+
+        UserInRoleEvaluator.Config config = new UserInRoleEvaluator.Config();
+        config.setAnyRole(new HashSet<>(Arrays.asList("Initiator", "Expert")));
+        evaluatorDto.setConfig(Json.getMapper().convert(config, ObjectData.class));
+
+        RecordRef recordRef = RecordRef.create(ID, "record");
+
+        TestCaseRole.currentUsername = TEST_USERNAME;
+
+        //  act
+        boolean result = evaluatorsService.evaluate(recordRef, evaluatorDto, model);
+
+        //  assert
+        Assert.assertFalse(result);
     }
 
     @Test
@@ -99,6 +176,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDAO implements LocalRec
 
     @Data
     public static class TestMixin implements MetaValue {
+
         @Override
         public Object getAttribute(String name, MetaField field) {
             return new TestCaseRoles();
@@ -107,20 +185,23 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDAO implements LocalRec
 
     @Data
     public static class TestCaseRoles implements MetaValue {
+
         @Override
         public Object getAttribute(String name, MetaField field) {
-            return new TestCaseRole();
+            return new TestCaseRole(name);
         }
     }
 
     @Data
+    @AllArgsConstructor
     public static class TestCaseRole implements MetaValue {
 
         private static String currentUsername;
+        private String roleName;
 
         @Override
         public boolean has(String name) {
-            return currentUsername.equals(name);
+            return roleName.equals("Admin") && currentUsername.equals(name);
         }
     }
 
