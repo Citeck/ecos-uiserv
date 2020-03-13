@@ -4,8 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.apps.module.ModuleRef;
+import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
@@ -22,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -32,11 +36,36 @@ public class ActionService {
     private final RecordEvaluatorService evaluatorsService;
     private final ActionRepository actionRepository;
 
+    private Consumer<ActionModule> changeListener;
+
     private ObjectMapper objectMapper = new ObjectMapper();
+
+    public ActionModule getAction(String id) {
+        return entityToDto(actionRepository.findByExtId(id));
+    }
+
+    public int getCount() {
+        return (int) actionRepository.count();
+    }
+
+    public List<ActionModule> getActions(int max, int skip) {
+
+        PageRequest page = PageRequest.of(skip / max, max, Sort.by(Sort.Direction.DESC, "id"));
+
+        return actionRepository.findAll(page)
+            .stream()
+            .map(this::entityToDto)
+            .collect(Collectors.toList());
+    }
 
     public void updateAction(ActionModule action) {
         ActionEntity actionEntity = dtoToEntity(action);
-        actionRepository.save(actionEntity);
+        actionEntity = actionRepository.save(actionEntity);
+        changeListener.accept(entityToDto(actionEntity));
+    }
+
+    public void onActionChanged(Consumer<ActionModule> listener) {
+        changeListener = listener;
     }
 
     public void deleteAction(String id) {
@@ -116,7 +145,7 @@ public class ActionService {
         ActionModule action = new ActionModule();
         action.setId(actionEntity.getExtId());
         action.setIcon(actionEntity.getIcon());
-        action.setName(actionEntity.getName());
+        action.setName(Json.getMapper().read(actionEntity.getName(), MLText.class));
         action.setKey(actionEntity.getKey());
         action.setType(actionEntity.getType());
 
@@ -153,7 +182,7 @@ public class ActionService {
 
         actionEntity.setIcon(action.getIcon());
         actionEntity.setKey(action.getKey());
-        actionEntity.setName(action.getName());
+        actionEntity.setName(Json.getMapper().toString(action.getName()));
         actionEntity.setType(action.getType());
 
         if (action.getConfig() != null) {

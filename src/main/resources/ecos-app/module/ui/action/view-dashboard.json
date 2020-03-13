@@ -1,6 +1,9 @@
 {
     "id": "view-dashboard",
     "key": "crud.view.dashboard",
-    "name": "Просмотреть",
+    "name": {
+        "ru": "Просмотреть",
+        "en": "View"
+    },
     "type": "view"
 }

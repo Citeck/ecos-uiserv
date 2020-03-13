@@ -1,7 +1,10 @@
 {
     "id": "delete",
     "key": "crud.delete",
-    "name": "Удалить",
+    "name": {
+        "ru": "Удалить",
+        "en": "Delete"
+    },
     "type": "delete",
     "evaluator": {
         "type": "has-permission",

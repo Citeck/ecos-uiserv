@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.repository;
 
+import org.springframework.data.domain.PageRequest;
 import ru.citeck.ecos.uiserv.domain.File;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
@@ -16,5 +17,9 @@ public interface FileRepository extends JpaRepository<File, Long>, JpaSpecificat
 
     Optional<File> findByTypeAndFileId(FileType fileType, String fileId);
 
-    List<File> findByType(FileType fileType);
+    @Query("SELECT file FROM File file WHERE file.type=?1")
+    List<File> findByType(FileType fileType, PageRequest page);
+
+    @Query("SELECT COUNT(file) FROM File file WHERE file.type=?1")
+    int getCountByType(FileType fileType);
 }

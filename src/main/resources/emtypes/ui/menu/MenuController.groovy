@@ -8,11 +8,8 @@ import org.slf4j.LoggerFactory
 import org.w3c.dom.Document
 import org.xml.sax.SAXException
 import ru.citeck.ecos.apps.module.controller.ModuleController
-import ru.citeck.ecos.apps.module.controller.ModuleMeta
-import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.io.file.EcosFile
 import ru.citeck.ecos.commons.utils.FileUtils
-import ru.citeck.ecos.records2.graphql.meta.value.EmptyValue
 
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
@@ -66,31 +63,6 @@ return new ModuleController<Module, Unit>() {
         root.createFile(name, (Function1<OutputStream, Unit>) {
             OutputStream out -> out.write(module.getXmlData())
         })
-    }
-
-    @Override
-    Map<String, Object> getMetaValueMixinAttributes(Module module, Unit config) {
-        return Collections.emptyMap()
-    }
-
-    @Override
-    Object getAsMetaValue(Module module, Unit config) {
-        return EmptyValue
-    }
-
-    @Override
-    Module mutate(Module module, @NotNull ObjectData data, Unit config) {
-        return module
-    }
-
-    @Override
-    Module merge(Module oldModule, Module newModule, Unit config) {
-        return newModule
-    }
-
-    @Override
-    ModuleMeta getModuleMeta(Module module, Unit config) {
-        return new ModuleMeta(module.id, module.id, [])
     }
 
     static class Module {

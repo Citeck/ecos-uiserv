@@ -4,9 +4,13 @@ import ru.citeck.ecos.records2.RecordRef;
 
 import java.util.List;
 import java.util.Optional;
-
+import java.util.function.Consumer;
 
 public interface EcosFormService {
+
+    int getCount();
+
+    List<EcosFormModel> getAllForms(int max, int skip);
 
     Optional<EcosFormModel> getFormByKey(String formKey);
 
@@ -29,4 +33,6 @@ public interface EcosFormService {
     void register(FormProvider formProvider);
 
     void delete(String id);
+
+    void addChangeListener(Consumer<EcosFormModel> listener);
 }

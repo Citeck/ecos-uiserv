@@ -1,10 +1,10 @@
 package ru.citeck.ecos.uiserv.service.dashdoard;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
@@ -14,6 +14,7 @@ import ru.citeck.ecos.uiserv.domain.DashboardEntity;
 import ru.citeck.ecos.uiserv.repository.DashboardRepository;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,11 +24,17 @@ public class DashboardService {
     private final DashboardRepository repo;
     private final RecordsService recordsService;
 
+    private Consumer<DashboardDto> changeListener;
+
     public List<DashboardDto> getAllDashboards() {
         return repo.findAll()
             .stream()
             .map(this::mapToDto)
             .collect(Collectors.toList());
+    }
+
+    public void addChangeListener(Consumer<DashboardDto> changeListener) {
+        this.changeListener = changeListener;
     }
 
     public Optional<DashboardDto> getDashboardById(String id) {
@@ -45,7 +52,9 @@ public class DashboardService {
     public DashboardDto saveDashboard(DashboardDto dashboard) {
 
         DashboardEntity entity = mapToEntity(dashboard);
-        return mapToDto(repo.save(entity));
+        DashboardDto result = mapToDto(repo.save(entity));
+        changeListener.accept(result);
+        return result;
     }
 
     public void removeDashboard(String id) {
@@ -64,13 +73,17 @@ public class DashboardService {
 
         if (dashboards.isEmpty() && expandType) {
 
-            DataValue parents = recordsService.getAttribute(type, "parents[]?id");
-            for (DataValue parent : parents) {
-                if (parent.isTextual()) {
-                    dashboards = findDashboardsByType(parent.asText(), authorities, includeForAll);
-                    if (!dashboards.isEmpty()) {
-                        break;
-                    }
+            ExpandedTypeMeta typeMeta = recordsService.getMeta(type, ExpandedTypeMeta.class);
+            if (typeMeta == null) {
+                return Optional.empty();
+            }
+            for (ParentMeta parent : typeMeta.getParents()) {
+                if (!Objects.equals(parent.inhDashboardType, typeMeta.inhDashboardType)) {
+                    return Optional.empty();
+                }
+                dashboards = findDashboardsByType(parent.id, authorities, includeForAll);
+                if (!dashboards.isEmpty()) {
+                    break;
                 }
             }
         }
@@ -113,26 +126,38 @@ public class DashboardService {
 
     private DashboardEntity mapToEntity(DashboardDto dto) {
 
-        DashboardEntity entity = repo.findByExtId(dto.getId())
-            .orElseGet(DashboardEntity::new);
-
-        if (entity.getId() != null &&
-            (!Objects.equals(entity.getAuthority(), dto.getAuthority())
-                || !Objects.equals(entity.getTypeRef(), String.valueOf(dto.getTypeRef())))) {
-
-            throw new RuntimeException("Dashboard collision. Entity: " + entity.getId()
-                + " " + entity.getAuthority()  + " "+ entity.getTypeRef() + " "
-                + " dto: " + dto.getAuthority() + " " + dto.getTypeRef());
+        Optional<DashboardEntity> optEntity;
+        String authority = StringUtils.isBlank(dto.getAuthority()) ? null : dto.getAuthority();
+        if (authority == null) {
+            optEntity = repo.findByTypeRefForAll(dto.getTypeRef().toString());
+        } else {
+            optEntity = repo.findByAuthorityAndTypeRef(authority, dto.getTypeRef().toString());
         }
+
+        DashboardEntity entity = optEntity.orElseGet(() -> {
+            DashboardEntity newDashboard = new DashboardEntity();
+            newDashboard.setExtId(StringUtils.isBlank(dto.getId()) ? UUID.randomUUID().toString() : dto.getId());
+            newDashboard.setAuthority(authority);
+            newDashboard.setTypeRef(dto.getTypeRef().toString());
+            return newDashboard;
+        });
 
         if (dto.getConfig() != null && dto.getConfig().size() > 0) {
             entity.setConfig(Json.getMapper().toBytes(dto.getConfig()));
         }
 
-        entity.setExtId(dto.getId());
-        entity.setAuthority(dto.getAuthority());
-        entity.setTypeRef(dto.getTypeRef().toString());
-
         return entity;
+    }
+
+    @Data
+    private static class ExpandedTypeMeta {
+        private List<ParentMeta> parents;
+        private String inhDashboardType;
+    }
+
+    @Data
+    public static class ParentMeta {
+        private String id;
+        private String inhDashboardType;
     }
 }

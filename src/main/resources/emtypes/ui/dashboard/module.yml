@@ -1,11 +1,9 @@
 
 modelVersion: "1.0"
 
+source-id: ""
+
 controller:
     type: json
-    config:
-        merge-policy: FILL_EMPTY_OBJ_FROM_OLD
-        meta:
-            key: '${typeRef}|${authority}'
 
 

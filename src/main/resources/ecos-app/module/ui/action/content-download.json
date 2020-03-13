@@ -1,5 +1,9 @@
 {
     "id": "content-download",
+    "name": {
+        "en": "Download",
+        "ru": "Скачать"
+    },
     "key": "content.download",
     "type": "download",
     "evaluator": {

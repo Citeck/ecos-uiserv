@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.uiserv.domain.File;
@@ -188,7 +190,18 @@ public class FileService {
     }
 
     public List<File> findByType(FileType type) {
-        return fileRepository.findByType(type);
+        return findByType(type, 10000, 0);
+    }
+
+    public List<File> findByType(FileType type, int max, int skip) {
+        return fileRepository.findByType(type, PageRequest.of(
+            skip / max, max,
+            Sort.by(Sort.Direction.DESC, "id"))
+        );
+    }
+
+    public int getCount(FileType type) {
+        return fileRepository.getCountByType(type);
     }
 
     //If at some moment we'll really need to find by multiple keys, we'll probably better off by

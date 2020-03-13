@@ -8,6 +8,7 @@ import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class EcosFormServiceImpl implements EcosFormService {
@@ -17,6 +18,25 @@ public class EcosFormServiceImpl implements EcosFormService {
     private Set<FormProvider> providers = new TreeSet<>(Comparator.comparing(FormProvider::getOrder));
     private MutableFormProvider newFormsStore;
     private RecordsService recordsService;
+
+    private Consumer<EcosFormModel> listener;
+
+    @Override
+    public void addChangeListener(Consumer<EcosFormModel> listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public int getCount() {
+        return providers.stream().mapToInt(FormProvider::getCount).sum();
+    }
+
+    @Override
+    public List<EcosFormModel> getAllForms(int max, int skip) {
+        return providers.stream()
+            .flatMap(p -> p.getAllForms(max, skip).stream())
+            .collect(Collectors.toList());
+    }
 
     @Override
     public EcosFormModel getDefault() {
@@ -123,9 +143,14 @@ public class EcosFormServiceImpl implements EcosFormService {
             for (FormProvider provider : providers) {
 
                 EcosFormModel form = provider.getFormById(model.getId());
+
                 if (form != null) {
+
                     if (provider instanceof MutableFormProvider) {
+
                         ((MutableFormProvider) provider).save(model);
+                        listener.accept(model);
+
                         return model.getId();
                     }
                 }
@@ -139,6 +164,8 @@ public class EcosFormServiceImpl implements EcosFormService {
         }
 
         newFormsStore.create(model);
+        listener.accept(model);
+
         return model.getId();
     }
 
