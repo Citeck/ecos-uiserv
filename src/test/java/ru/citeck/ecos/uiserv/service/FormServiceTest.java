@@ -54,7 +54,7 @@ public class FormServiceTest {
         modelA.setId("TEST_FORM_A");
         modelA.setDescription("Test form");
         modelA.setTitle("Test Form");
-        modelA.setDefinition(new JsonNodeFactory(false).textNode("jsonText"));
+        modelA.setDefinition(new JsonNodeFactory(false).objectNode());
         modelA.setFormKey("A");
 
         formService.save(modelA);
@@ -84,7 +84,7 @@ public class FormServiceTest {
         modelA.setId("TEST_FORM_A");
         modelA.setDescription("Test form");
         modelA.setTitle("Test Form");
-        modelA.setDefinition(new JsonNodeFactory(false).textNode("jsonText"));
+        modelA.setDefinition(new JsonNodeFactory(false).objectNode());
         modelA.setFormKey("K");
 
         EcosFormModel modelB = new EcosFormModel(modelA);
