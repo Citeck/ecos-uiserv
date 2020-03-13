@@ -22,5 +22,7 @@ public interface DashboardRepository extends JpaRepository<DashboardEntity, Long
         "WHERE dashboard.typeRef = ?1 AND dashboard.authority IS NULL")
     Optional<DashboardEntity> findByTypeRefForAll(String typeRef);
 
+    Optional<DashboardEntity> findByAuthorityAndTypeRef(String authority, String typeRef);
+
     Optional<DashboardEntity> findByExtId(String extId);
 }

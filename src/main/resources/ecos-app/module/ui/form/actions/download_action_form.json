@@ -65,7 +65,7 @@
                                             "maxWords": "",
                                             "pattern": ""
                                         },
-                                        "key": "module_id",
+                                        "key": "moduleId",
                                         "properties": {},
                                         "conditional": {
                                             "show": "",

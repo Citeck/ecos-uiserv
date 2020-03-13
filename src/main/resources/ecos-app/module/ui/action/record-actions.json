@@ -1,6 +1,9 @@
 {
     "id": "record-actions",
     "key": "record.actions",
-    "name": "Серверные Действия",
+    "name": {
+        "ru": "Серверные Действия",
+        "en": "Server Actions"
+    },
     "type": "record-actions"
 }

@@ -3,21 +3,33 @@ package ru.citeck.ecos.uiserv.service.action;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import ecos.com.fasterxml.jackson210.annotation.JsonIgnore;
+import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
+import ecos.com.fasterxml.jackson210.annotation.JsonValue;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.citeck.ecos.apps.app.module.ModuleRef;
-import ru.citeck.ecos.apps.app.module.type.ui.action.ActionModule;
+import ru.citeck.ecos.apps.module.ModuleRef;
+import ru.citeck.ecos.commons.data.MLText;
+import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.records2.QueryContext;
+import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
+import ru.citeck.ecos.records2.graphql.meta.annotation.DisplayName;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
+import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
+import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.request.result.RecordsResult;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
+import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDAO;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDAO;
 import ru.citeck.ecos.commons.utils.StringUtils;
 
@@ -30,7 +42,9 @@ import java.util.stream.Collectors;
  */
 @Component
 public class ActionRecords extends LocalRecordsDAO
-                           implements LocalRecordsQueryWithMetaDAO<ActionRecords.RecordActions> {
+                           implements LocalRecordsQueryWithMetaDAO<Object>,
+                                      LocalRecordsMetaDAO<ActionRecords.ActionRecord>,
+                                      MutableRecordsLocalDAO<ActionRecords.ActionRecord> {
 
     private static final String RECORD_ACTIONS_TYPE = "record-actions";
 
@@ -47,9 +61,70 @@ public class ActionRecords extends LocalRecordsDAO
     }
 
     @Override
-    public RecordsQueryResult<RecordActions> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
+    public RecordsDelResult delete(RecordsDeletion deletion) {
+        RecordsDelResult result = new RecordsDelResult();
+        for (RecordRef record : deletion.getRecords()) {
+            actionService.deleteAction(record.getId());
+            result.addRecord(new RecordMeta(record));
+        }
+        return result;
+    }
 
-        ActionsQuery query = recordsQuery.getQuery(ActionsQuery.class);
+    @Override
+    public List<ActionRecord> getValuesToMutate(List<RecordRef> records) {
+        return getLocalRecordsMeta(records, null);
+    }
+
+    @Override
+    public RecordsMutResult save(List<ActionRecord> values) {
+        RecordsMutResult result = new RecordsMutResult();
+        values.forEach(value -> {
+            actionService.updateAction(value);
+            result.addRecord(new RecordMeta(RecordRef.valueOf(value.getId())));
+        });
+        return result;
+    }
+
+    @Override
+    public List<ActionRecord> getLocalRecordsMeta(List<RecordRef> records, MetaField metaField) {
+        return records.stream()
+            .map(r -> {
+                if (r.getId().isEmpty()) {
+                    return new ActionRecord();
+                }
+                return actionService.getAction(r.getId());
+            })
+            .map(ActionRecord::new)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public RecordsQueryResult<Object> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
+
+        ActionsQuery parsedQuery = null;
+        if (StringUtils.isBlank(recordsQuery.getLanguage())) {
+            parsedQuery = recordsQuery.getQuery(ActionsQuery.class);
+        }
+
+        if (parsedQuery == null) {
+
+            RecordsQueryResult<Object> result = new RecordsQueryResult<>();
+
+            int max = recordsQuery.getMaxItems();
+            int skip = recordsQuery.getSkipCount();
+
+            List<Object> actions = actionService.getActions(max, skip)
+                .stream()
+                .map(ActionRecord::new)
+                .collect(Collectors.toList());
+
+            result.setRecords(actions);
+            result.setTotalCount(actionService.getCount());
+
+            return result;
+        }
+
+        ActionsQuery query = parsedQuery;
 
         List<RecordInfo> recordsInfo = query.getRecords()
             .stream()
@@ -86,8 +161,8 @@ public class ActionRecords extends LocalRecordsDAO
             resultList.add(recordActions);
         }
 
-        RecordsQueryResult<RecordActions> queryResult = new RecordsQueryResult<>();
-        queryResult.setRecords(resultList);
+        RecordsQueryResult<Object> queryResult = new RecordsQueryResult<>();
+        resultList.forEach(queryResult::addRecord);
 
         return queryResult;
     }
@@ -294,6 +369,50 @@ public class ActionRecords extends LocalRecordsDAO
             } else {
                 recordRef = originalRecordRef.addAppName("alfresco");
             }
+        }
+    }
+
+    public static class ActionRecord extends ActionModule {
+
+        public ActionRecord(ActionModule model) {
+            super(model);
+        }
+
+        public ActionRecord() {
+        }
+
+        public String getModuleId() {
+            return getId();
+        }
+
+        public void setModuleId(String value) {
+            setId(value);
+        }
+
+        @DisplayName
+        public String getDisplayName() {
+            MLText mlName = getName();
+            String name = mlName != null ? mlName.getClosestValue(QueryContext.getCurrent().getLocale()) : null;
+            return StringUtils.defaultString(name, "Action");
+        }
+
+        public String get_formKey() {
+            return "action_" + getType();
+        }
+
+        @JsonProperty("_content")
+        public void setContent(List<ObjectData> content) {
+
+            String base64Content = content.get(0).get("url", "");
+            base64Content = base64Content.replaceAll("^data:application/json;base64,", "");
+            ObjectData data = Json.getMapper().read(Base64.getDecoder().decode(base64Content), ObjectData.class);
+
+            Json.getMapper().applyData(this, data);
+        }
+
+        @JsonValue
+        public ActionModule toJson() {
+            return new ActionModule(this);
         }
     }
 }
