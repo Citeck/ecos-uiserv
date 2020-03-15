@@ -1,6 +1,6 @@
 {
     "id": "user-dashboard",
-    "typeRef": "model/type$user-dashboard",
+    "typeRef": "emodel/type@user-dashboard",
     "config": {
         "mobile": [
             {

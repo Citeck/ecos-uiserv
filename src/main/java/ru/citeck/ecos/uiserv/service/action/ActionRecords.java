@@ -3,13 +3,11 @@ package ru.citeck.ecos.uiserv.service.action;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import ecos.com.fasterxml.jackson210.annotation.JsonIgnore;
 import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
 import ecos.com.fasterxml.jackson210.annotation.JsonValue;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.citeck.ecos.apps.module.ModuleRef;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.QueryContext;
@@ -184,11 +182,11 @@ public class ActionRecords extends LocalRecordsDAO
 
     private void expandActionIds(List<RecordInfo> recordsInfo) {
 
-        Map<Set<ModuleRef>, List<RecordInfo>> recordsByActionsList = new HashMap<>();
+        Map<Set<RecordRef>, List<RecordInfo>> recordsByActionsList = new HashMap<>();
 
         recordsInfo.forEach(info -> {
             if (info.getActionIds() != null && !info.getActionIds().isEmpty()) {
-                Set<ModuleRef> key = new HashSet<>(info.getActionIds());
+                Set<RecordRef> key = new HashSet<>(info.getActionIds());
                 recordsByActionsList.computeIfAbsent(key, ids -> new ArrayList<>()).add(info);
             }
         });
@@ -202,11 +200,19 @@ public class ActionRecords extends LocalRecordsDAO
             Map<RecordRef, List<ActionModule>> actionsRes = actionService.getActions(refs, new ArrayList<>(actions));
 
             records.forEach(info -> {
+
                 List<ActionModule> recordActions = new ArrayList<>(actionsRes.get(info.getRecordRef()));
+
                 recordActions.sort((a0, a1) -> {
-                    List<ModuleRef> recordActionIds = info.getActionIds();
-                    int idx0 = recordActionIds.indexOf(ModuleRef.create("ui/action", a0.getId()));
-                    int idx1 = recordActionIds.indexOf(ModuleRef.create("ui/action", a1.getId()));
+
+                    List<RecordRef> recordActionIds = info.getActionIds();
+
+                    RecordRef rec0 = RecordRef.create("uiserv", "action", a0.getId());
+                    RecordRef rec1 = RecordRef.create("uiserv", "action", a1.getId());
+
+                    int idx0 = recordActionIds.indexOf(rec0);
+                    int idx1 = recordActionIds.indexOf(rec1);
+
                     return Integer.compare(idx0, idx1);
                 });
                 info.setResultActions(recordActions);
@@ -317,13 +323,13 @@ public class ActionRecords extends LocalRecordsDAO
     @Data
     public static class ActionsRefMeta {
         @MetaAtt("_actions[]?str")
-        private List<ModuleRef> actions;
+        private List<RecordRef> actions;
     }
 
     @Data
     public static class ActionsQuery {
         private List<JsonNode> records;
-        private List<ModuleRef> actions;
+        private List<RecordRef> actions;
     }
 
     @Data
@@ -341,12 +347,12 @@ public class ActionRecords extends LocalRecordsDAO
         private final RecordRef recordRef;
         private final RecordRef originalRecordRef;
 
-        private RecordRef type;
+        private RecordRef type = RecordRef.EMPTY;
 
         private List<ActionModule> recordActions = Collections.emptyList();
         private List<ActionModule> resultActions = Collections.emptyList();
 
-        private List<ModuleRef> actionIds;
+        private List<RecordRef> actionIds;
 
         public RecordInfo(JsonNode record) {
 
@@ -356,9 +362,9 @@ public class ActionRecords extends LocalRecordsDAO
                 originalRecordRef = RecordRef.valueOf(record.get("record").asText());
                 if (record.has("actions")) {
                     actionIds = new ArrayList<>();
-                    record.get("actions").forEach(action -> {
-                        actionIds.add(ModuleRef.valueOf(action.asText()));
-                    });
+                    record.get("actions").forEach(action ->
+                        actionIds.add(RecordRef.valueOf(action.asText()))
+                    );
                 }
             } else {
                 throw new IllegalArgumentException("Incorrect record info: " + record);

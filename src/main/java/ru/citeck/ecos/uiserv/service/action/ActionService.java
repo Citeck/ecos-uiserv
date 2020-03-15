@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.citeck.ecos.apps.module.ModuleRef;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
@@ -75,11 +74,11 @@ public class ActionService {
         }
     }
 
-    private List<ActionModule> getActionModules(List<ModuleRef> actionRefs) {
+    private List<ActionModule> getActionModules(List<RecordRef> actionRefs) {
 
         List<ActionModule> result = new ArrayList<>();
 
-        for (ModuleRef ref : actionRefs) {
+        for (RecordRef ref : actionRefs) {
             ActionEntity entity = actionRepository.findByExtId(ref.getId());
             if (entity == null) {
                 log.error("Action doesn't exists: " + ref);
@@ -91,7 +90,7 @@ public class ActionService {
         return result;
     }
 
-    public Map<RecordRef, List<ActionModule>> getActions(List<RecordRef> recordRefs, List<ModuleRef> actions) {
+    public Map<RecordRef, List<ActionModule>> getActions(List<RecordRef> recordRefs, List<RecordRef> actions) {
 
         List<ActionModule> actionsModules = getActionModules(actions);
 

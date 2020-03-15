@@ -1,6 +1,6 @@
 {
     "id": "person-dashboard",
-    "typeRef": "model/type$person",
+    "typeRef": "emodel/type@person",
     "config": {
         "mobile": [
             {

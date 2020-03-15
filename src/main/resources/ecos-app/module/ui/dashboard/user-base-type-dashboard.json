@@ -1,6 +1,6 @@
 {
     "id": "user-base-type-dashboard",
-    "typeRef": "model/type$user-base",
+    "typeRef": "emodel/type@user-base",
     "config": {
         "mobile": [
             {

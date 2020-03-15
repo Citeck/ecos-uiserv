@@ -7,11 +7,10 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.records2.QueryContext;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.annotation.DisplayName;
@@ -39,8 +38,7 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
 
     private static final Set<RecordRef> SYSTEM_FORMS = new HashSet<>(Arrays.asList(DEFAULT_FORM_ID, ECOS_FORM_ID));
 
-    private final EcosFormService eformFormService; //рекордам нужен сервис, сервис создается конфигом и потому для его создания нужен конфиг, а конфигу нужны рекорды
-    private final MessageSource messageSource;
+    private final EcosFormService eformFormService;
 
     {
         setId(ID);
@@ -62,11 +60,7 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
     }
 
     private EcosFormModelDownstream toDownstream(EcosFormModel model) {
-        final String displayName = model.getTitle() != null ? model.getTitle() :
-            messageSource.getMessage("ecosForms_model.type.ecosForms_form.title", null,
-                LocaleContextHolder.getLocale());
-
-        return new EcosFormModelDownstream(model, displayName);
+        return new EcosFormModelDownstream(model);
     }
 
     @Override
@@ -175,8 +169,7 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
             }
         }
 
-        form
-            .map(this::toDownstream)
+        form.map(this::toDownstream)
             .map(Collections::singletonList)
             .ifPresent(list -> {
                 result.setRecords(list);
@@ -196,11 +189,9 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
 
     public static class EcosFormModelDownstream extends EcosFormModel {
 
-        private String displayName;
 
-        public EcosFormModelDownstream(EcosFormModel model, String displayName) {
+        public EcosFormModelDownstream(EcosFormModel model) {
             super(model);
-            this.displayName = displayName;
         }
 
         public String getModuleId() {
@@ -213,7 +204,7 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
 
         @DisplayName
         public String getDisplayName() {
-            return displayName;
+            return getTitle().getClosestValue(QueryContext.getCurrent().getLocale());
         }
 
         @JsonIgnore

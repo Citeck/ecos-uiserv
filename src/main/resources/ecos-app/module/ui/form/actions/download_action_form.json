@@ -2,7 +2,6 @@
     "id": "download_action_form",
     "title": "Download Action Form",
     "formKey": "action_download",
-    "formMode": null,
     "description": "",
     "customModule": null,
     "i18n": null,
