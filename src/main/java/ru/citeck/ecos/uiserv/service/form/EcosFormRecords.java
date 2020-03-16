@@ -102,7 +102,7 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
                 .map(x -> eformFormService.getFormById(x)
                     .orElseThrow(() -> new IllegalArgumentException("Form with id " + id + " not found!")))
                 .orElseGet(() -> {
-                    final EcosFormModel form = new EcosFormModel();
+                    final EcosFormModel form = new EcosFormModelDownstream(new EcosFormModel());
                     form.setId("");
                     return form;
                 }))
