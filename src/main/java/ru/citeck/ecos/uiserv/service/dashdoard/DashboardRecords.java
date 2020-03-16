@@ -167,6 +167,7 @@ public class DashboardRecords extends LocalRecordsDAO
         }
 
         @JsonValue
+        @com.fasterxml.jackson.annotation.JsonValue
         public DashboardDto toJson() {
             return new DashboardDto(this);
         }

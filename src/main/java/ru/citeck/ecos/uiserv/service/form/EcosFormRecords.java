@@ -227,6 +227,7 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
         }
 
         @JsonValue
+        @com.fasterxml.jackson.annotation.JsonValue
         public EcosFormModel toJson() {
             return new EcosFormModel(this);
         }

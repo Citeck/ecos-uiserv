@@ -417,6 +417,7 @@ public class ActionRecords extends LocalRecordsDAO
         }
 
         @JsonValue
+        @com.fasterxml.jackson.annotation.JsonValue
         public ActionModule toJson() {
             return new ActionModule(this);
         }
