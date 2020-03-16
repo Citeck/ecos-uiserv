@@ -204,7 +204,11 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
 
         @DisplayName
         public String getDisplayName() {
-            return getTitle().getClosestValue(QueryContext.getCurrent().getLocale());
+            String name =  getTitle().getClosestValue(QueryContext.getCurrent().getLocale());
+            if (StringUtils.isBlank(name)) {
+                name = "Form";
+            }
+            return name;
         }
 
         @JsonIgnore
