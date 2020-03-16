@@ -9,13 +9,13 @@ import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
 @Data
 public class ActionModule {
 
-    private String id = "";
-    private MLText name = new MLText();
-    private String key = "";
-    private String icon = "";
-    private RecordRef typeRef = RecordRef.EMPTY;
+    private String id;
+    private MLText name;
+    private String key;
+    private String icon;
+    private RecordRef typeRef;
 
-    private String type = "";
+    private String type;
     private ObjectData config = new ObjectData();
 
     private RecordEvaluatorDto evaluator;
@@ -34,7 +34,7 @@ public class ActionModule {
         this.evaluator = other.evaluator;
         this.typeRef = other.typeRef;
 
-        this.config = other.config.deepCopy();
-        this.attributes = other.attributes.deepCopy();
+        this.config = ObjectData.deepCopy(other.config);
+        this.attributes = ObjectData.deepCopy(other.attributes);
     }
 }

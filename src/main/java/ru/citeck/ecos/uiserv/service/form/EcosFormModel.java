@@ -8,12 +8,13 @@ import ru.citeck.ecos.records2.RecordRef;
 @Data
 public class EcosFormModel {
 
-    private String id = "";
-    private String formKey = "";
-    private MLText title = new MLText();
-    private MLText description = new MLText();
-    private String customModule = "";
-    private RecordRef typeRef = RecordRef.EMPTY;
+    private String id;
+    private String formKey;
+    private MLText title;
+    private MLText description;
+    private String customModule;
+    private RecordRef typeRef;
+    private String formMode;
 
     private ObjectData i18n = new ObjectData();
     private ObjectData definition = new ObjectData();
@@ -32,9 +33,9 @@ public class EcosFormModel {
         this.description = model.getDescription();
         this.customModule = model.getCustomModule();
 
-        this.i18n = model.getI18n().deepCopy();
-        this.definition = model.getDefinition().deepCopy();
-        this.attributes = model.getAttributes().deepCopy();
+        this.i18n = ObjectData.deepCopy(model.getI18n());
+        this.definition = ObjectData.deepCopy(model.getDefinition());
+        this.attributes = ObjectData.deepCopy(model.getAttributes());
     }
 }
 

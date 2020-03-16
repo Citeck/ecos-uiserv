@@ -6,6 +6,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import ru.citeck.ecos.commons.data.MLText;
+import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.service.form.EcosFormModel;
 import ru.citeck.ecos.uiserv.service.form.EcosFormService;
@@ -32,8 +34,8 @@ public class FormServiceTest {
 
         EcosFormModel model = new EcosFormModel();
         model.setId(id);
-        model.setTitle("test");
-        model.setDefinition(JsonNodeFactory.instance.objectNode());
+        model.setTitle(new MLText("test"));
+        model.setDefinition(new ObjectData());
 
         formService.save(model);
 
@@ -52,9 +54,9 @@ public class FormServiceTest {
     public void testMetaOverwrite() {
         EcosFormModel modelA = new EcosFormModel();
         modelA.setId("TEST_FORM_A");
-        modelA.setDescription("Test form");
-        modelA.setTitle("Test Form");
-        modelA.setDefinition(new JsonNodeFactory(false).objectNode());
+        modelA.setDescription(new MLText("Test form"));
+        modelA.setTitle(new MLText("Test Form"));
+        modelA.setDefinition(new ObjectData());
         modelA.setFormKey("A");
 
         formService.save(modelA);
@@ -82,9 +84,9 @@ public class FormServiceTest {
     public void testFormModeSearch() {
         EcosFormModel modelA = new EcosFormModel();
         modelA.setId("TEST_FORM_A");
-        modelA.setDescription("Test form");
-        modelA.setTitle("Test Form");
-        modelA.setDefinition(new JsonNodeFactory(false).objectNode());
+        modelA.setDescription(new MLText("Test form"));
+        modelA.setTitle(new MLText("Test Form"));
+        modelA.setDefinition(new ObjectData());
         modelA.setFormKey("K");
 
         EcosFormModel modelB = new EcosFormModel(modelA);

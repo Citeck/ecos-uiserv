@@ -8,7 +8,7 @@ import ru.citeck.ecos.commons.data.ObjectData;
 public class DashboardDto {
 
     private String id;
-    private RecordRef typeRef = RecordRef.EMPTY;
+    private RecordRef typeRef;
     private String authority;
     private float priority;
 
@@ -25,7 +25,7 @@ public class DashboardDto {
         this.authority = other.authority;
         this.priority = other.priority;
 
-        this.config = other.config.deepCopy();
-        this.attributes = other.attributes.deepCopy();
+        this.config = ObjectData.deepCopy(other.config);
+        this.attributes = ObjectData.deepCopy(other.attributes);
     }
 }
