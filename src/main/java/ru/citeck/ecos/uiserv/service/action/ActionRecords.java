@@ -317,7 +317,17 @@ public class ActionRecords extends LocalRecordsDAO
     @Data
     public static class ActionsDtoMeta {
         @MetaAtt("_actions[]")
-        private List<ActionModule> actions;
+        private List<RecordActionDto> actions;
+    }
+
+    @Data
+    public static class RecordActionDto {
+        private String id;
+        private String name;
+        private String key;
+        private String icon;
+        private String type;
+        private ObjectData config = new ObjectData();
     }
 
     @Data
@@ -375,6 +385,41 @@ public class ActionRecords extends LocalRecordsDAO
             } else {
                 recordRef = originalRecordRef.addAppName("alfresco");
             }
+        }
+
+        private void setRecordActions(List<RecordActionDto> actions) {
+
+            if (actions != null && actions.size() > 0) {
+
+                recordActions = actions.stream().map(a -> {
+                    ActionModule module = new ActionModule();
+                    module.setId(a.id);
+                    module.setName(createMLText(a.name));
+                    module.setKey(a.key);
+                    module.setIcon(a.icon);
+                    module.setType(a.type);
+                    module.setConfig(a.config);
+                    return module;
+                }).collect(Collectors.toList());
+
+            } else {
+
+                recordActions = Collections.emptyList();
+            }
+        }
+
+        private MLText createMLText(String text) {
+            if (text == null) {
+                text = "null";
+            }
+            MLText ml = new MLText();
+            QueryContext currentCtx = QueryContext.getCurrent();
+            if (currentCtx != null) {
+                ml.set(currentCtx.getLocale(), text);
+            } else {
+                ml.set(text);
+            }
+            return ml;
         }
     }
 
