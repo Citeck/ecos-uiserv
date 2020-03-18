@@ -1,13 +1,16 @@
 package ru.citeck.ecos.uiserv.service.form;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import ecos.com.fasterxml.jackson210.annotation.JsonIgnore;
+import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
+import ecos.com.fasterxml.jackson210.annotation.JsonValue;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.records2.QueryContext;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.annotation.DisplayName;
@@ -16,6 +19,7 @@ import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
 import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
+import ru.citeck.ecos.records2.request.query.page.SkipPage;
 import ru.citeck.ecos.records2.source.dao.local.CrudRecordsDAO;
 
 import java.util.*;
@@ -34,8 +38,7 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
 
     private static final Set<RecordRef> SYSTEM_FORMS = new HashSet<>(Arrays.asList(DEFAULT_FORM_ID, ECOS_FORM_ID));
 
-    private final EcosFormService eformFormService; //рекордам нужен сервис, сервис создается конфигом и потому для его создания нужен конфиг, а конфигу нужны рекорды
-    private final MessageSource messageSource;
+    private final EcosFormService eformFormService;
 
     {
         setId(ID);
@@ -57,11 +60,7 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
     }
 
     private EcosFormModelDownstream toDownstream(EcosFormModel model) {
-        final String displayName = model.getTitle() != null ? model.getTitle() :
-            messageSource.getMessage("ecosForms_model.type.ecosForms_form.title", null,
-                LocaleContextHolder.getLocale());
-
-        return new EcosFormModelDownstream(model, displayName);
+        return new EcosFormModelDownstream(model);
     }
 
     @Override
@@ -103,7 +102,7 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
                 .map(x -> eformFormService.getFormById(x)
                     .orElseThrow(() -> new IllegalArgumentException("Form with id " + id + " not found!")))
                 .orElseGet(() -> {
-                    final EcosFormModel form = new EcosFormModel();
+                    final EcosFormModel form = new EcosFormModelDownstream(new EcosFormModel());
                     form.setId("");
                     return form;
                 }))
@@ -114,14 +113,34 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
     @Override
     public RecordsQueryResult<EcosFormModelDownstream> getMetaValues(RecordsQuery recordsQuery) {
 
-        String lang = recordsQuery.getLanguage();
         RecordsQueryResult<EcosFormModelDownstream> result = new RecordsQueryResult<>();
 
-        if (lang != null && !lang.isEmpty()) {
-            throw new IllegalArgumentException("This records source does not support specifying search language");
+        Query query = null;
+        if (StringUtils.isBlank(recordsQuery.getLanguage())) {
+            query = recordsQuery.getQuery(Query.class);
         }
 
-        Query query = recordsQuery.getQuery(Query.class);
+        if (query == null) {
+
+            int max = 10;
+            int skipCount = 0;
+
+            SkipPage page = recordsQuery.getSkipPage();
+            if (page != null) {
+                max = page.getMaxItems();
+                skipCount = page.getSkipCount();
+            }
+
+            List<EcosFormModelDownstream> forms = eformFormService.getAllForms(max, skipCount)
+                .stream()
+                .map(this::toDownstream)
+                .collect(Collectors.toList());
+
+            result.setRecords(forms);
+            result.setTotalCount(eformFormService.getCount());
+            return result;
+        }
+
         Optional<EcosFormModel> form = Optional.empty();
 
         if (CollectionUtils.isNotEmpty(query.formKeys)) {
@@ -150,8 +169,7 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
             }
         }
 
-        form
-            .map(this::toDownstream)
+        form.map(this::toDownstream)
             .map(Collections::singletonList)
             .ifPresent(list -> {
                 result.setRecords(list);
@@ -171,17 +189,47 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
 
     public static class EcosFormModelDownstream extends EcosFormModel {
 
-        private String displayName;
 
-        @DisplayName
-        @JsonIgnore
-        public String getDisplayName() {
-            return displayName;
+        public EcosFormModelDownstream(EcosFormModel model) {
+            super(model);
         }
 
-        public EcosFormModelDownstream(EcosFormModel model, String displayName) {
-            super(model);
-            this.displayName = displayName;
+        public String getModuleId() {
+            return getId();
+        }
+
+        public void setModuleId(String value) {
+            setId(value);
+        }
+
+        @DisplayName
+        public String getDisplayName() {
+            String name =  getTitle().getClosestValue(QueryContext.getCurrent().getLocale());
+            if (StringUtils.isBlank(name)) {
+                name = "Form";
+            }
+            return name;
+        }
+
+        @JsonIgnore
+        public String get_formKey() {
+            return "module_form";
+        }
+
+        @JsonProperty("_content")
+        public void setContent(List<ObjectData> content) {
+
+            String base64Content = content.get(0).get("url", "");
+            base64Content = base64Content.replaceAll("^data:application/json;base64,", "");
+            ObjectData data = Json.getMapper().read(Base64.getDecoder().decode(base64Content), ObjectData.class);
+
+            Json.getMapper().applyData(this, data);
+        }
+
+        @JsonValue
+        @com.fasterxml.jackson.annotation.JsonValue
+        public EcosFormModel toJson() {
+            return new EcosFormModel(this);
         }
     }
 }

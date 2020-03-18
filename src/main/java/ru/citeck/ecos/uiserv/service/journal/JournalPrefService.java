@@ -13,11 +13,9 @@ import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.file.FileService;
 import ru.citeck.ecos.uiserv.service.file.FileViewCaching;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,8 +68,9 @@ public class JournalPrefService {
 
 
     public String deployOverride(String prefsId, byte[] bytes, String username, TargetType target, String journalId) {
-        final File prefs = fileService.deployFileOverride(FileType.JOURNALPREFS, prefsId, null, bytes,
-            Collections.singletonMap("lookupKey", composeLookupKey(username, target, journalId)));
+        Map<String, String> meta = new HashMap<>();
+        meta.put("lookupKey", composeLookupKey(username, target, journalId));
+        File prefs = fileService.deployFileOverride(FileType.JOURNALPREFS, prefsId, null, bytes, meta);
         return prefs.getFileId();
     }
 
@@ -86,6 +85,21 @@ public class JournalPrefService {
             .filter(Optional::isPresent)
             .map(Optional::get)
             .collect(Collectors.toList());
+    }
+
+    public void deployJournalPrefs(String journalViewPrefsId,
+                                   String journalId,
+                                   JsonNode prefs) {
+        final byte[] bytes;
+        try (final ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            objectMapper.writeValue(output, prefs);
+            bytes = output.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        fileService.deployFileOverride(FileType.JOURNALPREFS, journalViewPrefsId, null, bytes,
+            Collections.singletonMap("journalId", journalId));
     }
 
     public enum TargetType {

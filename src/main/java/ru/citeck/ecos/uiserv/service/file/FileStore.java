@@ -69,7 +69,7 @@ public class FileStore {
         newVersion.setTranslated(crutches.save(new Translated()));
         newVersion.setBytes(bytes);
         newVersion.setProductVersion(productVersion);
-        newVersion.setRevert(isRevert);
+        newVersion.setIsRevert(isRevert);
         newVersion.setOrdinal(ordinal); //also serves as optimistic lock
         newVersion.setContentType(contentType);
         if (isRevert && productVersion == null)
@@ -80,7 +80,9 @@ public class FileStore {
         cfg.setFileId(fileId);
         cfg.setLatestOrdinal(ordinal);
         cfg.setType(fileType);
-        cfg.setFileMeta(meta);
+        if (cfg.getFileMeta() == null) {
+            cfg.setFileMeta(meta);
+        }
         cfg = repository.save(cfg);
 
         if (!skipThisVersion) {
@@ -100,7 +102,7 @@ public class FileStore {
 
     public void clearFileCurrentVersionRef(FileType fileType, String fileId) {
         final File cfg = repository.findByTypeAndFileId(fileType, fileId)
-            .orElseThrow(() -> new RuntimeException("File should exist: " +  fileId));
+            .orElseThrow(() -> new RuntimeException("File should exist: " + fileId));
         cfg.setFileVersion(null);
         repository.save(cfg);
     }

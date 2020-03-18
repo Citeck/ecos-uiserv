@@ -17,7 +17,7 @@
                 "type": "textfield",
                 "allowMultipleMasks": false,
                 "input": true,
-                "key": "module_id",
+                "key": "moduleId",
                 "validate": {
                     "customMessage": "",
                     "json": "",

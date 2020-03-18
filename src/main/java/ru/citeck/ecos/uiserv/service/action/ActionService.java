@@ -4,21 +4,27 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.citeck.ecos.apps.app.module.ModuleRef;
-import ru.citeck.ecos.apps.app.module.type.ui.action.ActionModule;
+import ru.citeck.ecos.commons.data.MLText;
+import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluatorService;
 import ru.citeck.ecos.records2.evaluator.evaluators.AlwaysFalseEvaluator;
 import ru.citeck.ecos.records2.evaluator.evaluators.AlwaysTrueEvaluator;
-import ru.citeck.ecos.records2.objdata.ObjectData;
-import ru.citeck.ecos.records2.utils.json.JsonUtils;
+import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.uiserv.domain.ActionEntity;
 import ru.citeck.ecos.uiserv.domain.EvaluatorEntity;
 import ru.citeck.ecos.uiserv.repository.ActionRepository;
+import ru.citeck.ecos.uiserv.security.SecurityUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,11 +35,36 @@ public class ActionService {
     private final RecordEvaluatorService evaluatorsService;
     private final ActionRepository actionRepository;
 
+    private Consumer<ActionModule> changeListener;
+
     private ObjectMapper objectMapper = new ObjectMapper();
+
+    public ActionModule getAction(String id) {
+        return entityToDto(actionRepository.findByExtId(id));
+    }
+
+    public int getCount() {
+        return (int) actionRepository.count();
+    }
+
+    public List<ActionModule> getActions(int max, int skip) {
+
+        PageRequest page = PageRequest.of(skip / max, max, Sort.by(Sort.Direction.DESC, "id"));
+
+        return actionRepository.findAll(page)
+            .stream()
+            .map(this::entityToDto)
+            .collect(Collectors.toList());
+    }
 
     public void updateAction(ActionModule action) {
         ActionEntity actionEntity = dtoToEntity(action);
-        actionRepository.save(actionEntity);
+        actionEntity = actionRepository.save(actionEntity);
+        changeListener.accept(entityToDto(actionEntity));
+    }
+
+    public void onActionChanged(Consumer<ActionModule> listener) {
+        changeListener = listener;
     }
 
     public void deleteAction(String id) {
@@ -43,11 +74,11 @@ public class ActionService {
         }
     }
 
-    private List<ActionModule> getActionModules(List<ModuleRef> actionRefs) {
+    private List<ActionModule> getActionModules(List<RecordRef> actionRefs) {
 
         List<ActionModule> result = new ArrayList<>();
 
-        for (ModuleRef ref : actionRefs) {
+        for (RecordRef ref : actionRefs) {
             ActionEntity entity = actionRepository.findByExtId(ref.getId());
             if (entity == null) {
                 log.error("Action doesn't exists: " + ref);
@@ -59,7 +90,7 @@ public class ActionService {
         return result;
     }
 
-    public Map<RecordRef, List<ActionModule>> getActions(List<RecordRef> recordRefs, List<ModuleRef> actions) {
+    public Map<RecordRef, List<ActionModule>> getActions(List<RecordRef> recordRefs, List<RecordRef> actions) {
 
         List<ActionModule> actionsModules = getActionModules(actions);
 
@@ -77,13 +108,18 @@ public class ActionService {
                 }
                 if (recordEvaluatorDto.getType() == null) {
                     log.error("Evaluator type is null: '" + recordEvaluatorDto + "'. " +
-                              "Replace it with Always False Evaluator. Action: " + a);
+                        "Replace it with Always False Evaluator. Action: " + a);
                     recordEvaluatorDto.setType(AlwaysFalseEvaluator.TYPE);
                 }
                 return recordEvaluatorDto;
             }).collect(Collectors.toList());
 
-        Map<RecordRef, List<Boolean>> evalResultByRecord = evaluatorsService.evaluate(recordRefs, evaluators);
+        Map<String, RecordRef> model = new HashMap<>();
+
+        String requestUsername = SecurityUtils.getCurrentUserLoginFromRequestContext();
+        model.put("user", RecordRef.valueOf("alfresco/people@" + requestUsername));
+
+        Map<RecordRef, List<Boolean>> evalResultByRecord = evaluatorsService.evaluate(recordRefs, evaluators, model);
         Map<RecordRef, List<ActionModule>> actionsByRecord = new HashMap<>();
 
         for (RecordRef recordRef : recordRefs) {
@@ -108,13 +144,13 @@ public class ActionService {
         ActionModule action = new ActionModule();
         action.setId(actionEntity.getExtId());
         action.setIcon(actionEntity.getIcon());
-        action.setName(actionEntity.getName());
+        action.setName(Json.getMapper().read(actionEntity.getName(), MLText.class));
         action.setKey(actionEntity.getKey());
         action.setType(actionEntity.getType());
 
         String configJson = actionEntity.getConfigJson();
         if (configJson != null) {
-            action.setConfig(JsonUtils.convert(configJson, ObjectData.class));
+            action.setConfig(Json.getMapper().convert(configJson, ObjectData.class));
         }
 
         EvaluatorEntity evaluator = actionEntity.getEvaluator();
@@ -126,7 +162,7 @@ public class ActionService {
 
             configJson = evaluator.getConfigJson();
             if (configJson != null) {
-                evaluatorDto.setConfig(JsonUtils.convert(configJson, ObjectData.class));
+                evaluatorDto.setConfig(Json.getMapper().convert(configJson, ObjectData.class));
             }
 
             action.setEvaluator(evaluatorDto);
@@ -145,7 +181,7 @@ public class ActionService {
 
         actionEntity.setIcon(action.getIcon());
         actionEntity.setKey(action.getKey());
-        actionEntity.setName(action.getName());
+        actionEntity.setName(Json.getMapper().toString(action.getName()));
         actionEntity.setType(action.getType());
 
         if (action.getConfig() != null) {

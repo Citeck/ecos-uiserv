@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.web.rest;
+package ru.citeck.ecos.uiserv.web.rest.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.CacheControl;

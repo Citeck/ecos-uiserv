@@ -1,7 +1,10 @@
 {
     "id": "edit",
     "key": "crud.edit",
-    "name": "Редактировать Свойства",
+    "name": {
+        "ru": "Редактировать Свойства",
+        "en": "Edit Properties"
+    },
     "type": "edit",
     "evaluator": {
         "type": "has-permission",

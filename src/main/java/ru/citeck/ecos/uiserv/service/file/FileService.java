@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.uiserv.domain.File;
@@ -28,7 +30,7 @@ import java.util.zip.ZipInputStream;
 @Transactional
 @Slf4j
 public class FileService {
-    private static final int MAX_SIZE = 10*1024*1024;
+    private static final int MAX_SIZE = 10 * 1024 * 1024;
 
     private volatile Map<FileType, FileMetadataExtractor> fileMetadataExtractors;
 
@@ -72,6 +74,7 @@ public class FileService {
     private enum KNOWN_LANGUAGE {EN, RU}
 
     private final static Map<FileType, String> extensionMap = new ConcurrentHashMap<>();
+
     static {
         extensionMap.put(FileType.MENU, ".xml");
         extensionMap.put(FileType.JOURNALCFG, ".json");
@@ -86,7 +89,7 @@ public class FileService {
 
     @SuppressWarnings("unchecked")
     private File deployStandardFile(FileType fileType, String fileId, String contentType, byte[] bytes, long productVersion,
-                                                 boolean isRevert) {
+                                    boolean isRevert) {
         final Optional<File> ocfg = fileStore.loadFile(fileType, fileId);
         final long lastOrdinal = ocfg.flatMap(x -> Optional.ofNullable(x.getLatestOrdinal()))
             .orElse(0L);
@@ -94,7 +97,7 @@ public class FileService {
         final boolean activateThisVersion = activeVersion.map(x -> x.getProductVersion() != null)
             .orElse(true);
         return fileStore.saveFile(fileType, fileId, contentType, bytes, Collections.EMPTY_MAP,
-            lastOrdinal+1, productVersion, isRevert, !activateThisVersion);
+            lastOrdinal + 1, productVersion, isRevert, !activateThisVersion);
     }
 
     public void revertFileOverrides(FileType fileType, String fileId) {
@@ -111,6 +114,10 @@ public class FileService {
         }
     }
 
+    public File deployFileOverride(FileType fileType, String fileId, String contentType, byte[] bytes) {
+        return this.deployFileOverride(fileType, fileId, contentType, bytes, null);
+    }
+
     public File deployFileOverride(FileType fileType, String fileId, String contentType, byte[] bytes,
                                    Map<String, String> metadata) {
         //if we make use of JPA's optimistic locking, maybe with our field file.ordinal,
@@ -122,7 +129,7 @@ public class FileService {
             .orElse(0L);
 
         return fileStore.saveFile(fileType, fileId, contentType, bytes, metadata,
-            lastOrdinal+1, null /*productVersion*/, false/*isRevert*/, false);
+            lastOrdinal + 1, null /*productVersion*/, false/*isRevert*/, false);
     }
 
     public Optional<File> loadFile(FileType fileType, String fileId) {
@@ -183,7 +190,18 @@ public class FileService {
     }
 
     public List<File> findByType(FileType type) {
-        return fileRepository.findByType(type);
+        return findByType(type, 10000, 0);
+    }
+
+    public List<File> findByType(FileType type, int max, int skip) {
+        return fileRepository.findByType(type, PageRequest.of(
+            skip / max, max,
+            Sort.by(Sort.Direction.DESC, "id"))
+        );
+    }
+
+    public int getCount(FileType type) {
+        return fileRepository.getCountByType(type);
     }
 
     //If at some moment we'll really need to find by multiple keys, we'll probably better off by

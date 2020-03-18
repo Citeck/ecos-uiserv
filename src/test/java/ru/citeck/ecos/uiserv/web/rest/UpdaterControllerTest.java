@@ -13,8 +13,8 @@ import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.repository.FileVersionRepository;
 import ru.citeck.ecos.uiserv.service.journal.JournalConfigService;
 import ru.citeck.ecos.uiserv.service.menu.MenuService;
-import ru.citeck.ecos.uiserv.web.rest.updates.ModuleToDeploy;
-import ru.citeck.ecos.uiserv.web.rest.updates.UpdaterController;
+import ru.citeck.ecos.uiserv.web.rest.v1.dto.ModuleToDeploy;
+import ru.citeck.ecos.uiserv.web.rest.v1.UpdaterApi;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,7 +25,7 @@ import java.util.Optional;
 @SpringBootTest(classes = Application.class)
 public class UpdaterControllerTest {
     @Autowired
-    private UpdaterController updaterController;
+    private UpdaterApi updaterController;
 
     @Autowired
     private MenuService menuService;

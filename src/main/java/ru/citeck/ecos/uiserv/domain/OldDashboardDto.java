@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.domain;
 
 import lombok.Data;
-import ru.citeck.ecos.records2.objdata.ObjectData;
+import ru.citeck.ecos.commons.data.ObjectData;
 
 /**
  * @author Roman Makarskiy

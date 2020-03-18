@@ -1,0 +1,7 @@
+
+modelVersion: "1.0"
+
+source-id: "action"
+
+controller:
+    type: json

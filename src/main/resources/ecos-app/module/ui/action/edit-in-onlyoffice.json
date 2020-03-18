@@ -1,7 +1,10 @@
 {
     "id": "edit-in-onlyoffice",
     "key": "edit.onlyoffice",
-    "name": "Редактировать Документ",
+    "name": {
+        "ru": "Редактировать Документ",
+        "en": "Edit Document"
+    },
     "type": "open-url",
     "config": {
         "url": "/share/page/onlyoffice-edit?nodeRef=${recordRef}&new="
