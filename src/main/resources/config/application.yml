@@ -216,3 +216,6 @@ spring.rabbitmq:
     host: rabbitmq
     username: admin
     password: admin
+
+# Лимит хранимых конфигураций, созданных пользователем. При превышении удаляется самая старая конфигурация
+max-user-configurations-persisted: 1000

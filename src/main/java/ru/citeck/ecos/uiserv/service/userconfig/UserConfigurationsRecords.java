@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.service.journal.link;
+package ru.citeck.ecos.uiserv.service.userconfig;
 
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordMeta;

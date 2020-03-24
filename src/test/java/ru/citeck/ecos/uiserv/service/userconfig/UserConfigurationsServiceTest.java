@@ -1,10 +1,11 @@
-package ru.citeck.ecos.uiserv.service.journal.link;
+package ru.citeck.ecos.uiserv.service.userconfig;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.citeck.ecos.commons.data.DataValue;
@@ -22,6 +23,8 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class UserConfigurationsServiceTest {
+    @Value("${max-user-configurations-persisted}")
+    private Integer limit;
 
     @Autowired
     private UserConfigurationsRepository userConfigurationsRepository;
@@ -92,7 +95,7 @@ public class UserConfigurationsServiceTest {
         UserConfigurationDto savedLatestDto = userConfigurationsService.save(latestDto);
         String latestDtoExternalId = savedLatestDto.getId();
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < limit; i++) {
             UserConfigurationDto configuration = new UserConfigurationDto();
             configuration.setCreationTime(Instant.now());
             configuration.setUserName(name);
@@ -101,7 +104,7 @@ public class UserConfigurationsServiceTest {
             userConfigurationsService.save(configuration);
         }
 
-        assertEquals(1000, userConfigurationsRepository.countByUserName(name));
+        assertEquals((int) limit, userConfigurationsRepository.countByUserName(name));
         assertNull(userConfigurationsRepository.findByExternalId(latestDtoExternalId));
     }
 

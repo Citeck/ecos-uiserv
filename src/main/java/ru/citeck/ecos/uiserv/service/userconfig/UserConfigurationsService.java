@@ -1,6 +1,7 @@
-package ru.citeck.ecos.uiserv.service.journal.link;
+package ru.citeck.ecos.uiserv.service.userconfig;
 
 import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.commons.data.DataValue;
@@ -13,7 +14,8 @@ import java.util.UUID;
 @Service
 @Transactional
 public class UserConfigurationsService {
-    private static final int LIMIT = 1000;
+    @Value("${max-user-configurations-persisted}")
+    private Integer limit;
 
     private UserConfigurationsRepository userConfigurationsRepository;
 
@@ -30,7 +32,7 @@ public class UserConfigurationsService {
     }
 
     private void removeLatestIfExceedsLimit(String userName) {
-        int exceededCount = userConfigurationsRepository.countByUserName(userName) - LIMIT;
+        int exceededCount = userConfigurationsRepository.countByUserName(userName) - limit;
 
         for (int i = 0; i < exceededCount; i++) {
             removeLatest(userName);
