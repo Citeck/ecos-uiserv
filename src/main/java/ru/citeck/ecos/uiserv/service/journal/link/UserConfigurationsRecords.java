@@ -10,7 +10,7 @@ import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
 import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
-import ru.citeck.ecos.uiserv.domain.JournalFilter;
+import ru.citeck.ecos.uiserv.domain.UserConfigurationDto;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,54 +18,49 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-public class JournalFiltersRecords extends LocalRecordsDAO
-    implements MutableRecordsLocalDAO<JournalFilter>, LocalRecordsMetaDAO<JournalFilter> {
+public class UserConfigurationsRecords extends LocalRecordsDAO
+    implements MutableRecordsLocalDAO<UserConfigurationDto>, LocalRecordsMetaDAO<UserConfigurationDto> {
 
     public static final String ID = "user-conf";
 
-    private final JournalFiltersService journalFiltersService;
+    private final UserConfigurationsService userConfigurationsService;
 
-    public JournalFiltersRecords(JournalFiltersService journalFiltersService) {
+    public UserConfigurationsRecords(UserConfigurationsService userConfigurationsService) {
         setId(ID);
-        this.journalFiltersService = journalFiltersService;
+        this.userConfigurationsService = userConfigurationsService;
     }
 
     @Override
-    public RecordsMutResult save(List<JournalFilter> values) {
+    public RecordsMutResult save(List<UserConfigurationDto> values) {
         RecordsMutResult result = new RecordsMutResult();
-        for (JournalFilter value : values) {
-            JournalFilter saved = journalFiltersService.save(value);
-            result.addRecord(new RecordMeta(saved.getExternalId()));
+        for (UserConfigurationDto value : values) {
+            UserConfigurationDto saved = userConfigurationsService.save(value);
+            result.addRecord(new RecordMeta(saved.getId()));
         }
         return result;
     }
 
     @Override
     public RecordsDelResult delete(RecordsDeletion deletion) {
-        RecordsDelResult result = new RecordsDelResult();
-        for (RecordRef record : deletion.getRecords()) {
-            journalFiltersService.deleteByExternalId(record.getId());
-            result.addRecord(new RecordMeta(record));
-        }
-        return result;
+        throw new UnsupportedOperationException("Delete operation for user configurations not supported");
     }
 
     @Override
-    public List<JournalFilter> getValuesToMutate(List<RecordRef> records) {
+    public List<UserConfigurationDto> getValuesToMutate(List<RecordRef> records) {
         return getRecordsFromRecordRefs(records);
     }
 
     @Override
-    public List<JournalFilter> getLocalRecordsMeta(List<RecordRef> records, MetaField metaField) {
+    public List<UserConfigurationDto> getLocalRecordsMeta(List<RecordRef> records, MetaField metaField) {
         return getRecordsFromRecordRefs(records);
     }
 
-    private List<JournalFilter> getRecordsFromRecordRefs(Collection<RecordRef> records) {
+    private List<UserConfigurationDto> getRecordsFromRecordRefs(Collection<RecordRef> records) {
         return records.stream()
             .map(RecordRef::getId)
             .map(extId ->
-                Optional.ofNullable(journalFiltersService.findByExternalId(extId))
-                    .orElseGet(JournalFilter::new)
+                Optional.ofNullable(userConfigurationsService.findByExternalId(extId))
+                    .orElseGet(UserConfigurationDto::new)
             ).collect(Collectors.toList());
     }
 }

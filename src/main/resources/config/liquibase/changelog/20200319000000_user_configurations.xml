@@ -5,7 +5,7 @@
 
     <changeSet author="citeck" id="20200220000000">
 
-        <createTable tableName="journal_filter">
+        <createTable tableName="user_configuration">
 
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
@@ -24,7 +24,7 @@
             </column>
 
         </createTable>
-        <createIndex tableName="journal_filter" indexName="idx_journal_filter_user_name">
+        <createIndex tableName="user_configuration" indexName="idx_user_configuration_user_name">
             <column name="user_name"/>
         </createIndex>
 

@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.domain;
 
 import lombok.Data;
+import org.hibernate.annotations.Immutable;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -8,8 +9,9 @@ import java.time.Instant;
 
 @Data
 @Entity
-@Table(name = "journal_filter")
-public class JournalFilter implements Serializable {
+@Immutable
+@Table(name = "user_configuration")
+public class UserConfigurationEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
     @SequenceGenerator(name = "sequenceGenerator")
