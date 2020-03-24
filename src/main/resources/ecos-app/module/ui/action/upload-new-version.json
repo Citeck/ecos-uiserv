@@ -1,0 +1,29 @@
+{
+    "id": "upload-new-version",
+    "key": "upload.new.version",
+    "name": {
+        "ru": "Загрузить новую версию",
+        "en": "Upload New Version"
+    },
+    "type": "upload-new-version",
+    "evaluator": {
+        "type": "group",
+        "config": {
+            "joinBy": "AND",
+            "evaluators": [
+                {
+                    "type": "has-permission",
+                    "config": {
+                        "permission": "Write"
+                    }
+                },
+                {
+                    "type": "has-attribute",
+                    "config": {
+                        "attribute": "_content"
+                    }
+                }
+            ]
+        }
+    }
+}
