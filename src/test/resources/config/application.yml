@@ -95,5 +95,5 @@ jhipster:
             enabled: true
             report-frequency: 60 # in seconds
 
-# Лимит хранимых конфигураций, созданных пользователем. При превышении удаляется самая старая конфигурация
+# Persisted user configurations limit. If exceeded, the latest configuration is deleted
 max-user-configurations-persisted: 10

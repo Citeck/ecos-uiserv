@@ -217,5 +217,5 @@ spring.rabbitmq:
     username: admin
     password: admin
 
-# Лимит хранимых конфигураций, созданных пользователем. При превышении удаляется самая старая конфигурация
+# Persisted user configurations limit. If exceeded, the latest configuration is deleted
 max-user-configurations-persisted: 1000
