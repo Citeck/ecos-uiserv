@@ -114,15 +114,29 @@ public class EcosFormServiceImpl implements EcosFormService {
     @Override
     public List<EcosFormModel> getAllFormsForType(RecordRef typeRef) {
 
-        List<EcosFormEntity> forms = new ArrayList<>(formsRepository.findAllByTypeRef(typeRef.toString()));
+        List<EcosFormEntity> forms = new ArrayList<>();
+        Set<String> formIds = new HashSet<>();
+
+        Consumer<EcosFormEntity> addIfNotAdded = form -> {
+            if (formIds.add(form.getExtId())) {
+                forms.add(form);
+            }
+        };
 
         try {
-            Parents parents = recordsService.getMeta(typeRef, Parents.class);
+            ParentsAndFormByType parents = recordsService.getMeta(typeRef, ParentsAndFormByType.class);
+            if (!RecordRef.isEmpty(parents.form)) {
+                formsRepository.findByExtId(parents.form.getId()).ifPresent(addIfNotAdded);
+            }
+
+            formsRepository.findAllByTypeRef(typeRef.toString()).forEach(addIfNotAdded);
+
             if (parents.parents != null) {
                 List<String> typesStr = parents.parents.stream().map(Object::toString).collect(Collectors.toList());
-                forms.addAll(formsRepository.findAllByTypeRefIn(typesStr));
+                formsRepository.findAllByTypeRefIn(typesStr).forEach(addIfNotAdded);
             }
         } catch (Exception e) {
+            formsRepository.findAllByTypeRef(typeRef.toString()).forEach(addIfNotAdded);
             log.error("Parents forms can't be received", e);
         }
 
@@ -178,8 +192,9 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Data
-    public static class Parents {
+    public static class ParentsAndFormByType {
         private List<RecordRef> parents;
+        private RecordRef form;
     }
 
     public static class FormKeys {
