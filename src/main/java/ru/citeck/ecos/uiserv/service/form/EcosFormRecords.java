@@ -31,7 +31,7 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
 
     public static final String ID = "eform";
 
-    private static final String ECOS_FORM_KEY = "ECOS_FORM";
+    private static final String FORMS_FOR_TYPE_LANG = "forms-for-type";
 
     private static final RecordRef DEFAULT_FORM_ID = RecordRef.create(ID, "DEFAULT");
     private static final RecordRef ECOS_FORM_ID = RecordRef.create(ID, "ECOS_FORM");
@@ -117,7 +117,22 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
 
         Query query = null;
         if (StringUtils.isBlank(recordsQuery.getLanguage())) {
+
             query = recordsQuery.getQuery(Query.class);
+
+        } else if (recordsQuery.getLanguage().equals(FORMS_FOR_TYPE_LANG)) {
+
+            FormsForTypeQuery formsForTypeQuery = recordsQuery.getQuery(FormsForTypeQuery.class);
+            if (RecordRef.isEmpty(formsForTypeQuery.typeRef)) {
+                return result;
+
+            }
+
+            result.addRecords(eformFormService.getAllFormsForType(formsForTypeQuery.getTypeRef()).stream()
+                .map(this::toDownstream)
+                .collect(Collectors.toList())
+            );
+            return result;
         }
 
         if (query == null) {
@@ -158,15 +173,6 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
                 .filter(StringUtils::isNotBlank)
                 .collect(Collectors.toList()));
 
-        } else if (query.record != null) {
-
-            if (ID.equals(query.record.getSourceId())) {
-
-                form = eformFormService.getFormByKey(ECOS_FORM_KEY);
-
-            } else {
-                form = eformFormService.getFormByRecord(query.record, query.isViewMode);
-            }
         }
 
         form.map(this::toDownstream)
@@ -185,6 +191,11 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
         private List<String> formKeys;
         private RecordRef record;
         private Boolean isViewMode;
+    }
+
+    @Data
+    public static class FormsForTypeQuery {
+        private RecordRef typeRef;
     }
 
     public static class EcosFormModelDownstream extends EcosFormModel {
