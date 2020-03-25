@@ -58,7 +58,7 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     @Override
     public Optional<EcosFormModel> getFormByKey(String formKey) {
-        return formsRepository.findByFormKey(formKey).map(this::mapToDto);
+        return formsRepository.findFirstByFormKey(formKey).map(this::mapToDto);
     }
 
     @Override

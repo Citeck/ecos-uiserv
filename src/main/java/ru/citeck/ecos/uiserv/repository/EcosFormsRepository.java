@@ -17,5 +17,5 @@ public interface EcosFormsRepository extends JpaRepository<EcosFormEntity, Long>
 
     Optional<EcosFormEntity> findByExtId(String extId);
 
-    Optional<EcosFormEntity> findByFormKey(String formKey);
+    Optional<EcosFormEntity> findFirstByFormKey(String formKey);
 }

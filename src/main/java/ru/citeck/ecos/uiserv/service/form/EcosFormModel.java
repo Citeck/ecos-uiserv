@@ -13,7 +13,7 @@ public class EcosFormModel {
     private MLText title;
     private MLText description;
     private String customModule;
-    private RecordRef typeRef;
+    private RecordRef typeRef = RecordRef.EMPTY;
     private String width;
 
     private ObjectData i18n = new ObjectData();
