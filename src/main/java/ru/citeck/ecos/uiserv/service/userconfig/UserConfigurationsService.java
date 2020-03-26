@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.commons.data.DataValue;
+import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.uiserv.domain.UserConfigurationDto;
 import ru.citeck.ecos.uiserv.domain.UserConfigurationEntity;
@@ -66,7 +67,7 @@ public class UserConfigurationsService {
         dto.setId(entity.getExternalId());
         dto.setUserName(entity.getUserName());
         dto.setCreationTime(entity.getCreationTime());
-        dto.setData(new DataValue(entity.getData()));
+        dto.setData(new ObjectData(entity.getData()));
 
         return dto;
     }

@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
-import ru.citeck.ecos.commons.data.DataValue;
+import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.UserConfigurationDto;
 import ru.citeck.ecos.uiserv.domain.UserConfigurationEntity;
@@ -55,7 +55,7 @@ public class UserConfigurationsServiceTest {
         String data = "{}";
 
         UserConfigurationDto configuration = new UserConfigurationDto();
-        configuration.setData(new DataValue(data));
+        configuration.setData(new ObjectData(data));
 
         userConfigurationsService.save(configuration);
 
@@ -74,7 +74,7 @@ public class UserConfigurationsServiceTest {
         String data = "{\"data\":\"data\"}";
 
         UserConfigurationDto configuration = new UserConfigurationDto();
-        configuration.setData(new DataValue(data));
+        configuration.setData(new ObjectData(data));
 
         UserConfigurationDto saved = userConfigurationsService.save(configuration);
 
@@ -97,7 +97,7 @@ public class UserConfigurationsServiceTest {
     @Test
     public void save_usernameFromContextSet() {
         UserConfigurationDto configuration = new UserConfigurationDto();
-        configuration.setData(new DataValue("data"));
+        configuration.setData(new ObjectData("{}"));
 
         UserConfigurationDto saved = userConfigurationsService.save(configuration);
 
@@ -106,7 +106,7 @@ public class UserConfigurationsServiceTest {
 
     public void save_creationTimeSet() {
         UserConfigurationDto configuration = new UserConfigurationDto();
-        configuration.setData(new DataValue("data"));
+        configuration.setData(new ObjectData("data"));
 
         UserConfigurationDto saved = userConfigurationsService.save(configuration);
 
@@ -122,7 +122,7 @@ public class UserConfigurationsServiceTest {
         UserConfigurationDto latestDto = new UserConfigurationDto();
         latestDto.setCreationTime(creationTime);
         latestDto.setUserName(name);
-        latestDto.setData(new DataValue(data));
+        latestDto.setData(new ObjectData(data));
 
         UserConfigurationDto savedLatestDto = userConfigurationsService.save(latestDto);
         String latestDtoExternalId = savedLatestDto.getId();
@@ -131,7 +131,7 @@ public class UserConfigurationsServiceTest {
             UserConfigurationDto configuration = new UserConfigurationDto();
             configuration.setCreationTime(Instant.now());
             configuration.setUserName(name);
-            configuration.setData(new DataValue(data));
+            configuration.setData(new ObjectData(data));
 
             userConfigurationsService.save(configuration);
         }
@@ -149,7 +149,7 @@ public class UserConfigurationsServiceTest {
         UserConfigurationDto configuration = new UserConfigurationDto();
         configuration.setCreationTime(creationTime);
         configuration.setUserName(name);
-        configuration.setData(new DataValue(data));
+        configuration.setData(new ObjectData(data));
         String persistentExternalId = userConfigurationsService.save(configuration).getId();
 
         UserConfigurationDto found = userConfigurationsService.findByExternalId(persistentExternalId);
