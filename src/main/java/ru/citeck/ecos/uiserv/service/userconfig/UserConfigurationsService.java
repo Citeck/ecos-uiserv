@@ -8,7 +8,9 @@ import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.uiserv.domain.UserConfigurationDto;
 import ru.citeck.ecos.uiserv.domain.UserConfigurationEntity;
 import ru.citeck.ecos.uiserv.repository.UserConfigurationsRepository;
+import ru.citeck.ecos.uiserv.security.SecurityUtils;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Service
@@ -24,6 +26,10 @@ public class UserConfigurationsService {
     }
 
     public UserConfigurationDto save(UserConfigurationDto userConfigurationDto) {
+        if (userConfigurationDto == null || userConfigurationDto.getData() == null) {
+            throw new IllegalArgumentException("User configuration and data cannot be null");
+        }
+
         UserConfigurationEntity entity = userConfigurationsRepository.save(mapToEntity(userConfigurationDto));
 
         removeLatestIfExceedsLimit(userConfigurationDto.getUserName());
@@ -68,8 +74,8 @@ public class UserConfigurationsService {
         UserConfigurationEntity entity = new UserConfigurationEntity();
 
         entity.setExternalId(UUID.randomUUID().toString());
-        entity.setUserName(dto.getUserName());
-        entity.setCreationTime(dto.getCreationTime());
+        entity.setUserName(SecurityUtils.getCurrentUserLoginFromRequestContext());
+        entity.setCreationTime(Instant.now());
         entity.setData(dto.getData().asText());
 
         return entity;

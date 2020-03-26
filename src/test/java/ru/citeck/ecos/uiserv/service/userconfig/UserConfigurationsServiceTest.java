@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.UserConfigurationDto;
@@ -23,6 +25,9 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class UserConfigurationsServiceTest {
+    private static final String REQUEST_USERNAME_ATTRIBUTE = "requestUsername";
+    private static final String USER_NAME = "username";
+
     @Value("${max-user-configurations-persisted}")
     private Integer limit;
 
@@ -33,19 +38,23 @@ public class UserConfigurationsServiceTest {
     private UserConfigurationsService userConfigurationsService;
 
     @Before
-    public void cleanRepository() {
+    public void prepare() {
         userConfigurationsRepository.deleteAll();
+        setUserInContext();
+    }
+
+    private void setUserInContext() {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null) {
+            requestAttributes.setAttribute(REQUEST_USERNAME_ATTRIBUTE, USER_NAME, RequestAttributes.SCOPE_REQUEST);
+        }
     }
 
     @Test
     public void save_persistenceTest() {
-        Instant creationTime = Instant.now();
         String data = "{}";
-        String name = "username";
 
         UserConfigurationDto configuration = new UserConfigurationDto();
-        configuration.setCreationTime(creationTime);
-        configuration.setUserName(name);
         configuration.setData(new DataValue(data));
 
         userConfigurationsService.save(configuration);
@@ -57,28 +66,51 @@ public class UserConfigurationsServiceTest {
         UserConfigurationEntity dto = dtos.get(0);
         assertNotNull(dto.getId());
         assertTrue(StringUtils.isNotBlank(dto.getExternalId()));
-        assertEquals(creationTime, dto.getCreationTime());
-        assertEquals(name, dto.getUserName());
         assertEquals(data, dto.getData());
     }
 
     @Test
     public void save_returningProperDto() {
-        Instant creationTime = Instant.now();
         String data = "{\"data\":\"data\"}";
-        String name = "username";
 
         UserConfigurationDto configuration = new UserConfigurationDto();
-        configuration.setCreationTime(creationTime);
-        configuration.setUserName(name);
         configuration.setData(new DataValue(data));
 
         UserConfigurationDto saved = userConfigurationsService.save(configuration);
 
         assertTrue(StringUtils.isNotBlank(saved.getId()));
-        assertEquals(creationTime, saved.getCreationTime());
-        assertEquals(name, saved.getUserName());
         assertEquals(configuration.getData(), saved.getData());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void save_nullEntity() {
+        userConfigurationsService.save(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void save_entityWithNullData() {
+        UserConfigurationDto configuration = new UserConfigurationDto();
+
+        userConfigurationsService.save(configuration);
+    }
+
+    @Test
+    public void save_usernameFromContextSet() {
+        UserConfigurationDto configuration = new UserConfigurationDto();
+        configuration.setData(new DataValue("data"));
+
+        UserConfigurationDto saved = userConfigurationsService.save(configuration);
+
+        assertEquals(USER_NAME, saved.getUserName());
+    }
+
+    public void save_creationTimeSet() {
+        UserConfigurationDto configuration = new UserConfigurationDto();
+        configuration.setData(new DataValue("data"));
+
+        UserConfigurationDto saved = userConfigurationsService.save(configuration);
+
+        assertNotNull(saved.getCreationTime());
     }
 
     @Test
