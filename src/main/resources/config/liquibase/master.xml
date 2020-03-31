@@ -28,5 +28,7 @@
     <include file="changelog/20200120000000_update_action_columns.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20200218000000_dashboards_table.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20200220000000_ecos_meta_table.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20200319000000_user_configurations.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20200324000000_ecos_forms_table.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

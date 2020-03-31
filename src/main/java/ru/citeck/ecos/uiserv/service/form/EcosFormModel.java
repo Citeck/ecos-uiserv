@@ -13,8 +13,8 @@ public class EcosFormModel {
     private MLText title;
     private MLText description;
     private String customModule;
-    private RecordRef typeRef;
-    private String formMode;
+    private RecordRef typeRef = RecordRef.EMPTY;
+    private String width;
 
     private ObjectData i18n = new ObjectData();
     private ObjectData definition = new ObjectData();
@@ -27,6 +27,7 @@ public class EcosFormModel {
     public EcosFormModel(EcosFormModel model) {
 
         this.id = model.getId();
+        this.width = model.getWidth();
         this.title = model.getTitle();
         this.formKey = model.getFormKey();
         this.typeRef = model.getTypeRef();

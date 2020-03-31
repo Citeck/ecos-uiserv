@@ -16,21 +16,15 @@ public interface EcosFormService {
 
     Optional<EcosFormModel> getFormByKey(List<String> formKeys);
 
-    Optional<EcosFormModel> getFormByKeyAndMode(String formKey, String formMode);
-
     List<EcosFormModel> getFormsByKeys(List<String> formKeys);
 
-    Optional<EcosFormModel> getFormByRecord(RecordRef record, Boolean isViewMode);
-
     Optional<EcosFormModel> getFormById(String id);
+
+    List<EcosFormModel> getAllFormsForType(RecordRef typeRef);
 
     String save(EcosFormModel model);
 
     EcosFormModel getDefault();
-
-    boolean hasForm(RecordRef record, Boolean isViewMode);
-
-    void register(FormProvider formProvider);
 
     void delete(String id);
 

@@ -1,25 +1,40 @@
 package ru.citeck.ecos.uiserv.service.form;
 
+import lombok.Data;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import ru.citeck.ecos.commons.data.MLText;
+import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
+import ru.citeck.ecos.uiserv.domain.EcosFormEntity;
+import ru.citeck.ecos.uiserv.repository.EcosFormsRepository;
 
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+@Slf4j
+@Service
+@RequiredArgsConstructor
 public class EcosFormServiceImpl implements EcosFormService {
 
     private static final String DEFAULT_KEY = "DEFAULT";
 
-    private Set<FormProvider> providers = new TreeSet<>(Comparator.comparing(FormProvider::getOrder));
-    private MutableFormProvider newFormsStore;
-    private RecordsService recordsService;
-
     private Consumer<EcosFormModel> listener;
+
+    private final EcosFormsRepository formsRepository;
+    private final RecordsService recordsService;
+
 
     @Override
     public void addChangeListener(Consumer<EcosFormModel> listener) {
@@ -28,13 +43,16 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     @Override
     public int getCount() {
-        return providers.stream().mapToInt(FormProvider::getCount).sum();
+        return (int) formsRepository.count();
     }
 
     @Override
     public List<EcosFormModel> getAllForms(int max, int skip) {
-        return providers.stream()
-            .flatMap(p -> p.getAllForms(max, skip).stream())
+
+        PageRequest page = PageRequest.of(skip / max, max, Sort.by(Sort.Direction.DESC, "id"));
+
+        return formsRepository.findAll(page).stream()
+            .map(this::mapToDto)
             .collect(Collectors.toList());
     }
 
@@ -45,21 +63,12 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     @Override
     public Optional<EcosFormModel> getFormByKey(String formKey) {
-
-        EcosFormModel form = null;
-
-        for (FormProvider provider : providers) {
-            form = provider.getFormByKey(formKey);
-            if (form != null) {
-                break;
-            }
-        }
-
-        return Optional.ofNullable(form);
+        return formsRepository.findFirstByFormKey(formKey).map(this::mapToDto);
     }
 
     @Override
     public Optional<EcosFormModel> getFormByKey(List<String> formKeys) {
+
         if (CollectionUtils.isEmpty(formKeys)) {
             return Optional.empty();
         }
@@ -72,21 +81,8 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
-    public Optional<EcosFormModel> getFormByKeyAndMode(String formKey, String formMode) {
-        EcosFormModel form = null;
-
-        for (FormProvider provider : providers) {
-            form = provider.getFormByKeyAndMode(formKey, formMode);
-            if (form != null) {
-                break;
-            }
-        }
-
-        return Optional.ofNullable(form);
-    }
-
-    @Override
     public List<EcosFormModel> getFormsByKeys(List<String> formKeys) {
+
         if (CollectionUtils.isEmpty(formKeys)) {
             return new ArrayList<>();
         }
@@ -100,105 +96,110 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
-    public Optional<EcosFormModel> getFormByRecord(RecordRef record, Boolean isViewMode) {
-
-        if (isViewMode == null) {
-            isViewMode = false;
-        }
-
-        if (isViewMode) {
-
-            ViewFormKeys keys = recordsService.getMeta(record, ViewFormKeys.class);
-            Optional<EcosFormModel> form = getFormByKey(keys.getViewKeys());
-            if (!form.isPresent()) {
-                form = getFormByKey(keys.getKeys());
-            }
-            return form;
-
-        } else {
-
-            FormKeys keys = recordsService.getMeta(record, FormKeys.class);
-            return getFormByKey(keys.getKeys());
-        }
-    }
-
-    @Override
     public Optional<EcosFormModel> getFormById(String id) {
-
-        for (FormProvider provider : providers) {
-
-            EcosFormModel form = provider.getFormById(id);
-            if (form != null) {
-                return Optional.of(form);
-            }
-        }
-        return Optional.empty();
+        return formsRepository.findByExtId(id).map(this::mapToDto);
     }
 
     @Override
     public String save(EcosFormModel model) {
 
-        if (model.getId() != null) {
+        EcosFormEntity entity = formsRepository.save(mapToEntity(model));
+        EcosFormModel result = mapToDto(entity);
 
-            for (FormProvider provider : providers) {
+        listener.accept(result);
 
-                EcosFormModel form = provider.getFormById(model.getId());
-
-                if (form != null) {
-
-                    if (provider instanceof MutableFormProvider) {
-
-                        ((MutableFormProvider) provider).save(model);
-                        listener.accept(model);
-
-                        return model.getId();
-                    }
-                }
-            }
-        } else {
-            if (model.getDefinition() == null) {
-                model.setDefinition(getDefault().getDefinition().deepCopy());
-            }
-
-            model.setId(UUID.randomUUID().toString());
-        }
-
-        newFormsStore.create(model);
-        listener.accept(model);
-
-        return model.getId();
+        return result.getId();
     }
 
     @Override
     public void delete(String id) {
-        for (FormProvider provider : providers) {
+        formsRepository.findByExtId(id).ifPresent(formsRepository::delete);
+    }
 
-            EcosFormModel form = provider.getFormById(id);
-            if (form != null) {
-                if (provider instanceof MutableFormProvider) {
-                    ((MutableFormProvider) provider).delete(id);
-                    break;
-                }
+    @Override
+    public List<EcosFormModel> getAllFormsForType(RecordRef typeRef) {
+
+        List<EcosFormEntity> forms = new ArrayList<>();
+        Set<String> formIds = new HashSet<>();
+
+        Consumer<EcosFormEntity> addIfNotAdded = form -> {
+            if (formIds.add(form.getExtId())) {
+                forms.add(form);
+            }
+        };
+
+        try {
+            ParentsAndFormByType parents = recordsService.getMeta(typeRef, ParentsAndFormByType.class);
+            if (!RecordRef.isEmpty(parents.form)) {
+                formsRepository.findByExtId(parents.form.getId()).ifPresent(addIfNotAdded);
+            }
+
+            formsRepository.findAllByTypeRef(typeRef.toString()).forEach(addIfNotAdded);
+
+            if (parents.parents != null) {
+                List<String> typesStr = parents.parents.stream().map(Object::toString).collect(Collectors.toList());
+                formsRepository.findAllByTypeRefIn(typesStr).forEach(addIfNotAdded);
+            }
+        } catch (Exception e) {
+            formsRepository.findAllByTypeRef(typeRef.toString()).forEach(addIfNotAdded);
+            log.error("Parents forms can't be received", e);
+        }
+
+        return forms.stream().map(this::mapToDto).collect(Collectors.toList());
+    }
+
+    private EcosFormModel mapToDto(EcosFormEntity entity) {
+
+        EcosFormModel model = new EcosFormModel();
+
+        model.setId(entity.getExtId());
+        model.setTitle(Json.getMapper().read(entity.getTitle(), MLText.class));
+        model.setDescription(Json.getMapper().read(entity.getDescription(), MLText.class));
+
+        model.setWidth(entity.getWidth());
+        model.setFormKey(entity.getFormKey());
+        model.setTypeRef(RecordRef.valueOf(entity.getTypeRef()));
+        model.setCustomModule(entity.getCustomModule());
+
+        model.setI18n(Json.getMapper().read(entity.getI18n(), ObjectData.class));
+        model.setAttributes(Json.getMapper().read(entity.getAttributes(), ObjectData.class));
+        model.setDefinition(Json.getMapper().read(entity.getDefinition(), ObjectData.class));
+
+        return model;
+    }
+
+    private EcosFormEntity mapToEntity(EcosFormModel model) {
+
+        EcosFormEntity entity = null;
+        if (!StringUtils.isBlank(model.getId())) {
+            entity = formsRepository.findByExtId(model.getId()).orElse(null);
+        }
+        if (entity == null) {
+            entity = new EcosFormEntity();
+            if (StringUtils.isBlank(model.getId())) {
+                entity.setExtId(UUID.randomUUID().toString());
+            } else {
+                entity.setExtId(model.getId());
             }
         }
+
+        entity.setTitle(Json.getMapper().toString(model.getTitle()));
+        entity.setWidth(model.getWidth());
+        entity.setDescription(Json.getMapper().toString(model.getDescription()));
+        entity.setFormKey(model.getFormKey());
+        entity.setTypeRef(RecordRef.toString(model.getTypeRef()));
+        entity.setCustomModule(model.getCustomModule());
+        entity.setI18n(Json.getMapper().toString(model.getI18n()));
+        entity.setDefinition(Json.getMapper().toString(model.getDefinition()));
+        entity.setAttributes(Json.getMapper().toString(model.getAttributes()));
+
+        return entity;
     }
 
-    @Override
-    public boolean hasForm(RecordRef record, Boolean isViewMode) {
-        return getFormByRecord(record, isViewMode).isPresent();
-    }
-
-    @Override
-    public void register(FormProvider formProvider) {
-        providers.add(formProvider);
-    }
-
-    public void setRecordsService(RecordsService recordsService) {
-        this.recordsService = recordsService;
-    }
-
-    public void setNewFormsStore(MutableFormProvider newFormsStore) {
-        this.newFormsStore = newFormsStore;
+    @Data
+    public static class ParentsAndFormByType {
+        private List<RecordRef> parents;
+        private RecordRef form;
     }
 
     public static class FormKeys {
