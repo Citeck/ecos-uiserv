@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.security;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.uiserv.config.Constants;
 
 import java.util.Optional;
 
@@ -15,6 +16,7 @@ public class SpringSecurityAuditorAware implements AuditorAware<String> {
     @NotNull
     @Override
     public Optional<String> getCurrentAuditor() {
-        return Optional.ofNullable(SecurityUtils.getCurrentUserLoginFromRequestContext());
+        return Optional.of(Optional.ofNullable(SecurityUtils.getCurrentUserLoginFromRequestContext())
+            .orElse(Constants.ANONYMOUS_USER));
     }
 }
