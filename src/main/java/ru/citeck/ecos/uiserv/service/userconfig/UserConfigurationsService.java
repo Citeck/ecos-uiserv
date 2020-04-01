@@ -5,10 +5,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.commons.data.DataValue;
+import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.uiserv.domain.UserConfigurationDto;
 import ru.citeck.ecos.uiserv.domain.UserConfigurationEntity;
 import ru.citeck.ecos.uiserv.repository.UserConfigurationsRepository;
+import ru.citeck.ecos.uiserv.security.SecurityUtils;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Service
@@ -24,6 +28,10 @@ public class UserConfigurationsService {
     }
 
     public UserConfigurationDto save(UserConfigurationDto userConfigurationDto) {
+        if (userConfigurationDto == null || userConfigurationDto.getData() == null) {
+            throw new IllegalArgumentException("User configuration and data cannot be null");
+        }
+
         UserConfigurationEntity entity = userConfigurationsRepository.save(mapToEntity(userConfigurationDto));
 
         removeLatestIfExceedsLimit(userConfigurationDto.getUserName());
@@ -59,7 +67,7 @@ public class UserConfigurationsService {
         dto.setId(entity.getExternalId());
         dto.setUserName(entity.getUserName());
         dto.setCreationTime(entity.getCreationTime());
-        dto.setData(new DataValue(entity.getData()));
+        dto.setData(new ObjectData(entity.getData()));
 
         return dto;
     }
@@ -68,9 +76,9 @@ public class UserConfigurationsService {
         UserConfigurationEntity entity = new UserConfigurationEntity();
 
         entity.setExternalId(UUID.randomUUID().toString());
-        entity.setUserName(dto.getUserName());
-        entity.setCreationTime(dto.getCreationTime());
-        entity.setData(dto.getData().asText());
+        entity.setUserName(SecurityUtils.getCurrentUserLoginFromRequestContext());
+        entity.setCreationTime(Instant.now());
+        entity.setData(Json.getMapper().toString(dto.getData()));
 
         return entity;
     }
