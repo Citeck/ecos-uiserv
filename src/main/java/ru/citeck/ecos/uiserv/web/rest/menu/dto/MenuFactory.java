@@ -26,7 +26,7 @@ public class MenuFactory {
                        List<MenuItemsResolver> resolvers) {
         this.authorities = userAuthorities;
         this.i18n = i18n;
-        this.resolvers = resolvers.stream().collect(Collectors.toMap(r -> r.getId(), r -> r));
+        this.resolvers = resolvers.stream().collect(Collectors.toMap(MenuItemsResolver::getId, Function.identity()));
     }
 
     public Menu getResolvedMenu(MenuConfig menuConfigContentData) {
@@ -98,7 +98,7 @@ public class MenuFactory {
 
         return evaluator.getParam().stream()
             .filter(p -> p.getName().equals("groupName"))
-            .map(p -> p.getValue())
+            .map(Parameter::getValue)
             .findAny()
             .map(authorities::contains).orElse(false);
     }

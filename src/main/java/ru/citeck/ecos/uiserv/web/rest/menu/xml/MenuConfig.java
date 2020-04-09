@@ -1,11 +1,7 @@
-
 package ru.citeck.ecos.uiserv.web.rest.menu.xml;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
+import java.io.Serializable;
 
 
 /**
@@ -27,8 +23,6 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- *
- *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
@@ -38,7 +32,7 @@ import javax.xml.bind.annotation.XmlType;
     "items"
 })
 @XmlRootElement(name = "menu-config", namespace = "http://www.citeck.ru/menu/config/1.0")
-public class MenuConfig {
+public class MenuConfig implements Serializable  {
 
     @XmlElement(namespace = "http://www.citeck.ru/menu/config/1.0", required = true)
     protected String id;
@@ -52,10 +46,8 @@ public class MenuConfig {
     /**
      * Gets the value of the id property.
      *
-     * @return
-     *     possible object is
-     *     {@link String }
-     *
+     * @return possible object is
+     * {@link String }
      */
     public String getId() {
         return id;
@@ -64,10 +56,8 @@ public class MenuConfig {
     /**
      * Sets the value of the id property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setId(String value) {
         this.id = value;
@@ -76,10 +66,8 @@ public class MenuConfig {
     /**
      * Gets the value of the type property.
      *
-     * @return
-     *     possible object is
-     *     {@link String }
-     *
+     * @return possible object is
+     * {@link String }
      */
     public String getType() {
         return type;
@@ -88,10 +76,8 @@ public class MenuConfig {
     /**
      * Sets the value of the type property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setType(String value) {
         this.type = value;
@@ -100,10 +86,8 @@ public class MenuConfig {
     /**
      * Gets the value of the authorities property.
      *
-     * @return
-     *     possible object is
-     *     {@link String }
-     *
+     * @return possible object is
+     * {@link String }
      */
     public String getAuthorities() {
         return authorities;
@@ -112,10 +96,8 @@ public class MenuConfig {
     /**
      * Sets the value of the authorities property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setAuthorities(String value) {
         this.authorities = value;
@@ -124,10 +106,8 @@ public class MenuConfig {
     /**
      * Gets the value of the items property.
      *
-     * @return
-     *     possible object is
-     *     {@link Items }
-     *
+     * @return possible object is
+     * {@link Items }
      */
     public Items getItems() {
         return items;
@@ -136,10 +116,8 @@ public class MenuConfig {
     /**
      * Sets the value of the items property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link Items }
-     *
+     * @param value allowed object is
+     *              {@link Items }
      */
     public void setItems(Items value) {
         this.items = value;

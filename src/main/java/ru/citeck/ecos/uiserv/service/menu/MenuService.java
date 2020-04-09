@@ -19,8 +19,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
+/**
+ * @deprecated for removal
+ * use {@link MenuConfigurationService}
+ */
 @Service
 @Transactional
+@Deprecated
 public class MenuService {
     private final JAXBContext jaxbContext;
     private final FileViewCaching<MenuView> caching;
@@ -68,7 +73,7 @@ public class MenuService {
                 marshaller.marshal(xml, output);
                 return output.toByteArray();
             }
-        } catch (JAXBException |IOException e) {
+        } catch (JAXBException | IOException e) {
             throw new RuntimeException(e);
         }
     }

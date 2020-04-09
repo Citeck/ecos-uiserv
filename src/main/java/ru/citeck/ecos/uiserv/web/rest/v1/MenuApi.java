@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.web.rest.v1;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.compress.utils.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.citeck.ecos.uiserv.config.ApplicationProperties;
+import ru.citeck.ecos.uiserv.domain.MenuConfigurationDto;
 import ru.citeck.ecos.uiserv.service.AuthoritiesSupport;
-import ru.citeck.ecos.uiserv.service.menu.MenuService;
+import ru.citeck.ecos.uiserv.service.menu.MenuConfigurationService;
 import ru.citeck.ecos.uiserv.service.translation.TranslationService;
 import ru.citeck.ecos.uiserv.web.rest.menu.dto.Menu;
 import ru.citeck.ecos.uiserv.web.rest.menu.dto.MenuFactory;
@@ -26,36 +27,20 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/usermenu")
 @Transactional
+@RequiredArgsConstructor
 public class MenuApi {
-    @Autowired
-    private List<MenuItemsResolver> resolvers;
+    private static final String DEFAULT_AUTHORITY = "default";
 
-    @Autowired
-    private ApplicationProperties applicationProperties;
-
-    @Autowired
-    private TranslationService i18n;
-
-    @Autowired
-    private MenuService menuService;
-
-    @Autowired
-    private AuthoritiesSupport authoritiesSupport;
-
+    private final List<MenuItemsResolver> resolvers;
+    private final ApplicationProperties applicationProperties;
+    private final TranslationService i18n;
+    private final MenuConfigurationService menuService;
+    private final AuthoritiesSupport authoritiesSupport;
     @Value("${application.menu.useFileSystemResources:}")
     private String fsResourcesRoot;
 
@@ -79,28 +64,17 @@ public class MenuApi {
             .body(menu);
     }
 
-    private Menu loadMenuFromStore(MenuService.MenuView menuView, Set<String> allUserAuthorities,
-                                   Locale locale) {
-        return new MenuFactory(allUserAuthorities,
-            messageKey -> i18n
-                .getTranslations(menuView.translatedEntityId, locale)
-                .flatMap(bundle -> {
-                    try {
-                        return Optional.of(bundle.getString(messageKey));
-                    } catch (MissingResourceException e) {
-                        return Optional.empty();
-                    }
-                })
-                .orElse(messageKey),
-            resolvers)
-            .getResolvedMenu(menuView.xml);
-    }
-
-    private Optional<MenuService.MenuView> getMenu(String authority) {
+    private Optional<MenuConfigurationDto> getMenu(String authority) {
         return menuService.getMenu(authority + "-menu");
     }
 
-    private static final String DEFAULT_AUTHORITY = "default";
+    private Menu loadMenuFromStore(MenuConfigurationDto menuConfigDto, Set<String> allUserAuthorities,
+                                   Locale locale) {
+        return new MenuFactory(allUserAuthorities,
+            messageKey -> Optional.ofNullable(menuConfigDto.getLocalizedString(messageKey, locale)).orElse(messageKey),
+            resolvers)
+            .getResolvedMenu(menuConfigDto.getConfig());
+    }
 
     private List<String> getOrderedAuthorities(Set<String> userAuthorities, String userName) {
         Set<String> allUserAuthorities = new HashSet<>(userAuthorities);
