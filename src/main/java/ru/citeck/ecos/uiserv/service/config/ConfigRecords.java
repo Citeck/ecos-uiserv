@@ -8,8 +8,8 @@ import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.uiserv.config.UiServProperties;
-import ru.citeck.ecos.uiserv.domain.ConfigDto;
-import ru.citeck.ecos.uiserv.domain.EntityDto;
+import ru.citeck.ecos.uiserv.dto.config.ConfigDto;
+import ru.citeck.ecos.uiserv.dto.EntityDto;
 import ru.citeck.ecos.uiserv.service.entity.AbstractEntityRecords;
 
 import java.util.ArrayList;

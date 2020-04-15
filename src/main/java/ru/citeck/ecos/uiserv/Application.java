@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv;
 
+import org.springframework.beans.factory.annotation.Value;
 import ru.citeck.ecos.uiserv.config.ApplicationProperties;
 import ru.citeck.ecos.uiserv.config.DefaultProfileUtil;
 
