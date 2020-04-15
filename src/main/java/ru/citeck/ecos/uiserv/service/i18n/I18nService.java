@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.service.i18n;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -88,9 +89,10 @@ public class I18nService {
         Map<String, String> messages = messagesByLocale.get(localeKey);
         if (messages != null) {
             localizedString = messages.get(key);
-            if (StringUtils.isBlank(localizedString)) {
-                localizedString = defaultMessages.get(key);
-            }
+        }
+
+        if (MapUtils.isNotEmpty(defaultMessages) && StringUtils.isBlank(localizedString)) {
+            localizedString = defaultMessages.get(key);
         }
 
         return StringUtils.isNotBlank(localizedString) ? localizedString : key;
@@ -162,6 +164,9 @@ public class I18nService {
         return dto;
     }
 
-    public static class StrList extends ArrayList<String> {}
-    public static class StrToStrListMap extends HashMap<String, List<String>> {}
+    public static class StrList extends ArrayList<String> {
+    }
+
+    public static class StrToStrListMap extends HashMap<String, List<String>> {
+    }
 }
