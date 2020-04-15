@@ -1,0 +1,152 @@
+{
+    "id": "menu-messages",
+    "locales": ["en", "ru"],
+    "order": 0,
+    "messages": {
+        "menu.header.tasks": [
+            "Tasks",
+            "Задачи"
+        ],
+        "menu.header.sites": [
+            "Sites",
+            "Разделы"
+        ],
+        "menu.header.orgstructure": [
+            "Organizational structure",
+            "Оргструктура"
+        ],
+        "menu.header.processes": [
+            "Processes",
+            "Процессы"
+        ],
+        "menu.header.references": [
+            "References",
+            "Справочники"
+        ],
+        "menu.header.my": [
+            "My...",
+            "Мои..."
+        ],
+        "menu.header.admin-tools": [
+            "Admin tools...",
+            "Инструменты администратора..."
+        ],
+        "menu.item.documentlibrary": [
+            "Document Library",
+            "Каталог"
+        ],
+        "menu.item.calendar": [
+            "Calendar",
+            "Календарь"
+        ],
+        "menu.item.find-sites": [
+            "Find site",
+            "Поиск сайтов"
+        ],
+        "menu.item.create-site": [
+            "Create site",
+            "Создать сайт"
+        ],
+        "menu.item.my-workflows": [
+            "Workflows I've started",
+            "Запущенные мной процессы"
+        ],
+        "menu.item.completed-workflows": [
+            "Completed business processes",
+            "Завершенные бизнес-процессы"
+        ],
+        "menu.item.my-content": [
+            "My Content",
+            "Мои материалы"
+        ],
+        "menu.item.my-sites": [
+            "My Sites",
+            "Мои сайты"
+        ],
+        "menu.item.my-files": [
+            "My Files",
+            "Мои файлы"
+        ],
+        "menu.item.data-lists": [
+            "Data lists",
+            "Справочники"
+        ],
+        "menu.item.common-data-lists": [
+            "Common",
+            "Общие"
+        ],
+        "menu.item.finance-data-lists": [
+            "Finance data lists",
+            "Финансовые справочники"
+        ],
+        "menu.item.repository": [
+            "Repository",
+            "Репозиторий"
+        ],
+        "menu.item.application": [
+            "Application",
+            "Приложение"
+        ],
+        "menu.item.bpmn-modeler": [
+            "BPMN modeler",
+            "Редактор бизнес-процессов"
+        ],
+        "menu.item.groups": [
+            "Groups",
+            "Группы"
+        ],
+        "menu.item.users": [
+            "Users",
+            "Пользователи"
+        ],
+        "menu.item.types": [
+            "Types",
+            "Типы и виды"
+        ],
+        "menu.item.system-journals": [
+            "System journals",
+            "Системные журналы"
+        ],
+        "menu.item.journal-setup": [
+            "Journal Setup",
+            "Настройка журналов"
+        ],
+        "menu.item.templates": [
+            "Templates",
+            "Шаблоны"
+        ],
+        "menu.item.more": [
+            "More...",
+            "Еще..."
+        ],
+        "menu.item.dev-tools": [
+            "Tools",
+            "Инструменты"
+        ],
+        "menu.item.active-tasks": [
+            "Active tasks",
+            "Текущие задачи"
+        ],
+        "menu.item.income-package-tasks": [
+            "Income package tasks",
+            "Задачи разбора входящих"
+        ],
+       
+        "menuconfig_menuconfig.type.menuconfig_menuConfig.title": [
+            "Menu configurations model",
+            "Модель конфигурации меню"
+        ],
+        "menuconfig_menuconfig.property.menuconfig_id.title": [
+            "Id",
+            "Id"
+        ],
+        "menuconfig_menuconfig.property.menuconfig_type.title": [
+            "Type",
+            "Type"
+        ],
+        "menuconfig_menuconfig.property.menuconfig_authorities.title": [
+            "Authorities",
+            "Authorities"
+        ]
+    }
+}

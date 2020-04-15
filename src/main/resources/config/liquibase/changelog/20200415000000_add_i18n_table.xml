@@ -1,0 +1,28 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="citeck" id="20200415000000">
+
+        <createTable tableName="internationalization">
+
+            <column name="id" type="BIGINT" autoIncrement="${autoIncrement}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ext_id" type="VARCHAR" />
+            <column name="tenant" type="VARCHAR" />
+            <column name="locales" type="VARCHAR" />
+            <column name="messages" type="VARCHAR" />
+            <column name="module_order" type="REAL" />
+
+            <column name="created_date" type="TIMESTAMP" />
+            <column name="created_by" type="VARCHAR(50)" />
+            <column name="last_modified_date" type="TIMESTAMP" />
+            <column name="last_modified_by" type="VARCHAR(50)" />
+
+        </createTable>
+
+    </changeSet>
+
+</databaseChangeLog>
