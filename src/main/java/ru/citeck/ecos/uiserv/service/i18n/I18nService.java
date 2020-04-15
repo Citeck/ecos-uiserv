@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.service.i18n;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -77,17 +78,22 @@ public class I18nService {
         return result;
     }
 
-    public String getMessage(String key) {
+    public String getMessage(@NonNull String key) {
 
         ensureInitialized();
         String localeKey = LocaleContextHolder.getLocale().getLanguage();
 
-        String result = messagesByLocale.get(localeKey).get(key);
-        if (StringUtils.isBlank(result)) {
-            result = defaultMessages.get(key);
+        String localizedString = null;
+
+        Map<String, String> messages = messagesByLocale.get(localeKey);
+        if (messages != null) {
+            localizedString = messages.get(key);
+            if (StringUtils.isBlank(localizedString)) {
+                localizedString = defaultMessages.get(key);
+            }
         }
 
-        return StringUtils.isNotBlank(result) ? result : key;
+        return StringUtils.isNotBlank(localizedString) ? localizedString : key;
     }
 
     private synchronized void ensureInitialized() {
