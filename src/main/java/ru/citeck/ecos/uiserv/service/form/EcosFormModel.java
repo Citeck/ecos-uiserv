@@ -1,11 +1,13 @@
 package ru.citeck.ecos.uiserv.service.form;
 
 import lombok.Data;
+import lombok.ToString;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.RecordRef;
 
 @Data
+@ToString(exclude = { "definition", "i18n" })
 public class EcosFormModel {
 
     private String id;

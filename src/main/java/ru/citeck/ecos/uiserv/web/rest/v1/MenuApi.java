@@ -1,7 +1,6 @@
 package ru.citeck.ecos.uiserv.web.rest.v1;
 
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.compress.utils.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -13,10 +12,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.citeck.ecos.uiserv.config.ApplicationProperties;
-import ru.citeck.ecos.uiserv.domain.MenuConfigurationDto;
 import ru.citeck.ecos.uiserv.service.AuthoritiesSupport;
-import ru.citeck.ecos.uiserv.service.menu.MenuConfigurationService;
-import ru.citeck.ecos.uiserv.service.translation.TranslationService;
+import ru.citeck.ecos.uiserv.service.i18n.I18nService;
+import ru.citeck.ecos.uiserv.service.menu.MenuService;
 import ru.citeck.ecos.uiserv.web.rest.menu.dto.Menu;
 import ru.citeck.ecos.uiserv.web.rest.menu.dto.MenuFactory;
 import ru.citeck.ecos.uiserv.web.rest.menu.resolvers.MenuItemsResolver;
@@ -27,20 +25,34 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/usermenu")
 @Transactional
-@RequiredArgsConstructor
 public class MenuApi {
-    private static final String DEFAULT_AUTHORITY = "default";
+    @Autowired
+    private List<MenuItemsResolver> resolvers;
 
-    private final List<MenuItemsResolver> resolvers;
-    private final ApplicationProperties applicationProperties;
-    private final TranslationService i18n;
-    private final MenuConfigurationService menuService;
-    private final AuthoritiesSupport authoritiesSupport;
+    @Autowired
+    private ApplicationProperties applicationProperties;
+
+    @Autowired
+    private MenuService menuService;
+
+    @Autowired
+    private AuthoritiesSupport authoritiesSupport;
+
+    @Autowired
+    private I18nService i18nService;
+
     @Value("${application.menu.useFileSystemResources:}")
     private String fsResourcesRoot;
 
@@ -64,17 +76,19 @@ public class MenuApi {
             .body(menu);
     }
 
-    private Optional<MenuConfigurationDto> getMenu(String authority) {
+    private Menu loadMenuFromStore(MenuService.MenuView menuView, Set<String> allUserAuthorities,
+                                   Locale locale) {
+        return new MenuFactory(allUserAuthorities,
+            key -> i18nService.getMessage(key),
+            resolvers)
+            .getResolvedMenu(menuView.xml);
+    }
+
+    private Optional<MenuService.MenuView> getMenu(String authority) {
         return menuService.getMenu(authority + "-menu");
     }
 
-    private Menu loadMenuFromStore(MenuConfigurationDto menuConfigDto, Set<String> allUserAuthorities,
-                                   Locale locale) {
-        return new MenuFactory(allUserAuthorities,
-            messageKey -> Optional.ofNullable(menuConfigDto.getLocalizedString(messageKey, locale)).orElse(messageKey),
-            resolvers)
-            .getResolvedMenu(menuConfigDto.getConfig());
-    }
+    private static final String DEFAULT_AUTHORITY = "default";
 
     private List<String> getOrderedAuthorities(Set<String> userAuthorities, String userName) {
         Set<String> allUserAuthorities = new HashSet<>(userAuthorities);
@@ -104,18 +118,8 @@ public class MenuApi {
             throw new RuntimeException(e);
         }
 
-        final ResourceBundle resourceBundle;
-        final Resource resource = getResource(
-            String.format("/menu/default-menu_%s.properties",
-                locale.toLanguageTag().split("-", 2)[0]));
-        try (InputStream input = resource.getInputStream()) {
-            resourceBundle = i18n.toBundle(IOUtils.toByteArray(input));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         return new MenuFactory(allUserAuthorities,
-            resourceBundle::getString,
+            key -> i18nService.getMessage(key),
             resolvers).getResolvedMenu(menuConfig);
     }
 
