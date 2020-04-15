@@ -15,10 +15,10 @@ import ru.citeck.ecos.uiserv.config.ApplicationProperties;
 import ru.citeck.ecos.uiserv.service.AuthoritiesSupport;
 import ru.citeck.ecos.uiserv.service.i18n.I18nService;
 import ru.citeck.ecos.uiserv.service.menu.MenuService;
-import ru.citeck.ecos.uiserv.web.rest.menu.dto.Menu;
-import ru.citeck.ecos.uiserv.web.rest.menu.dto.MenuFactory;
-import ru.citeck.ecos.uiserv.web.rest.menu.resolvers.MenuItemsResolver;
-import ru.citeck.ecos.uiserv.web.rest.menu.xml.MenuConfig;
+import ru.citeck.ecos.uiserv.service.menu.resolving.ResolvedMenuDto;
+import ru.citeck.ecos.uiserv.service.menu.resolving.MenuFactory;
+import ru.citeck.ecos.uiserv.service.menu.resolving.resolvers.MenuItemsResolver;
+import ru.citeck.ecos.uiserv.service.menu.format.xml.xml.MenuConfig;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -57,12 +57,12 @@ public class MenuApi {
     private String fsResourcesRoot;
 
     @GetMapping
-    public ResponseEntity<Menu> getUserMenu(@ModelAttribute("username") String username, Locale locale) {
+    public ResponseEntity<ResolvedMenuDto> getUserMenu(@ModelAttribute("username") String username, Locale locale) {
         if (username == null)
             throw new IllegalArgumentException("Expecting username");
         final Set<String> allUserAuthorities = new HashSet<>(authoritiesSupport.queryUserAuthorities(username));
 
-        final Menu menu = getOrderedAuthorities(allUserAuthorities, username)
+        final ResolvedMenuDto menu = getOrderedAuthorities(allUserAuthorities, username)
             .stream()
             .map(this::getMenu)
             .filter(Optional::isPresent)
@@ -76,15 +76,15 @@ public class MenuApi {
             .body(menu);
     }
 
-    private Menu loadMenuFromStore(MenuService.MenuView menuView, Set<String> allUserAuthorities,
-                                   Locale locale) {
+    private ResolvedMenuDto loadMenuFromStore(MenuView menuView, Set<String> allUserAuthorities,
+                                              Locale locale) {
         return new MenuFactory(allUserAuthorities,
             key -> i18nService.getMessage(key),
             resolvers)
             .getResolvedMenu(menuView.xml);
     }
 
-    private Optional<MenuService.MenuView> getMenu(String authority) {
+    private Optional<MenuView> getMenu(String authority) {
         return menuService.getMenu(authority + "-menu");
     }
 
@@ -104,7 +104,7 @@ public class MenuApi {
         return orderedAuthorities;
     }
 
-    private Menu loadMenuFromClassPath(Set<String> allUserAuthorities, Locale locale) {
+    private ResolvedMenuDto loadMenuFromClassPath(Set<String> allUserAuthorities, Locale locale) {
         final MenuConfig menuConfig;
 
         final Resource menuConfigResource = getResource("/menu/default-menu.xml");
@@ -126,5 +126,19 @@ public class MenuApi {
     private Resource getResource(String relativePath) {
         return fsResourcesRoot.equals("") ? new ClassPathResource(relativePath) :
             new FileSystemResource(fsResourcesRoot + relativePath);
+    }
+
+    public static class MenuView {
+
+        public final Long translatedEntityId;
+        public final MenuConfig xml;
+        public final Long productVersion;
+
+        public MenuView(Long translatedEntityId, MenuConfig xml,
+                        Long productVersion) {
+            this.translatedEntityId = translatedEntityId;
+            this.xml = xml;
+            this.productVersion = productVersion;
+        }
     }
 }

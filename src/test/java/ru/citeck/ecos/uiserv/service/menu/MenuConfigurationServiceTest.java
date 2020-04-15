@@ -7,9 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.MenuConfigurationDto;
-import ru.citeck.ecos.uiserv.domain.MenuConfigurationEntity;
-import ru.citeck.ecos.uiserv.repository.MenuConfigurationRepository;
+import ru.citeck.ecos.uiserv.domain.MenuEntity;
+import ru.citeck.ecos.uiserv.repository.MenuRepository;
+import ru.citeck.ecos.uiserv.service.menu.dto.MenuDto;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -22,13 +22,13 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = Application.class)
 public class MenuConfigurationServiceTest {
     @MockBean
-    private MenuConfigurationRepository menuConfigurationRepository;
+    private MenuRepository menuConfigurationRepository;
 
-    private MenuConfigurationService menuConfigurationService;
+    private MenuService menuConfigurationService;
 
     @Before
     public void setup() {
-        this.menuConfigurationService = new MenuConfigurationService(menuConfigurationRepository);
+        this.menuConfigurationService = new MenuService(menuConfigurationRepository);
     }
 
     @Test
@@ -274,7 +274,7 @@ public class MenuConfigurationServiceTest {
         Integer modelVersion = 1;
         String localization = "{\"en\":{\"text\":\"text\"},\"ru\":{\"text\":\"текст\"}}";
 
-        MenuConfigurationEntity entity = new MenuConfigurationEntity();
+        MenuEntity entity = new MenuEntity();
         entity.setId(1L);
         entity.setExtId(menuId);
         entity.setType(type);
@@ -284,10 +284,10 @@ public class MenuConfigurationServiceTest {
         entity.setLocalization(localization);
         when(menuConfigurationRepository.findByExtId(menuId)).thenReturn(Optional.of(entity));
 
-        Optional<MenuConfigurationDto> gotOpt = menuConfigurationService.getMenu(menuId);
+        Optional<MenuDto> gotOpt = menuConfigurationService.getMenu(menuId);
         assertTrue(gotOpt.isPresent());
 
-        MenuConfigurationDto got = gotOpt.get();
+        MenuDto got = gotOpt.get();
         assertEquals(menuId, got.getId());
         assertEquals(type, got.getType());
         assertEquals(authorities, got.getAuthorities());

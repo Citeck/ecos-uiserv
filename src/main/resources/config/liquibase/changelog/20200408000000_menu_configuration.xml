@@ -3,31 +3,33 @@
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-    <changeSet author="nikolay.gerasimenko" id="20200220000000">
+    <changeSet author="nikolay.gerasimenko" id="20200408000000">
 
-        <createTable tableName="menu_configuration">
+        <createTable tableName="ecos_menu">
 
-            <column name="id" type="bigint" autoIncrement="${autoIncrement}">
+            <column name="id" type="BIGINT" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="ext_id" type="varchar">
-                <constraints nullable="false" unique="true"/>
-            </column>
-            <column name="type" type="varchar">
+            <column name="tenant" type="VARCHAR">
                 <constraints nullable="false"/>
             </column>
-            <column name="authorities" type="varchar">
+            <column name="ext_id" type="VARCHAR">
                 <constraints nullable="false"/>
             </column>
-            <column name="config" type="varchar">
+            <column name="authorities" type="VARCHAR">
                 <constraints nullable="false"/>
             </column>
-            <column name="model_version" type="integer">
+            <column name="priority" type="REAL">
                 <constraints nullable="false"/>
             </column>
-            <column name="localization" type="varchar">
+            <column name="items" type="VARCHAR">
                 <constraints nullable="false"/>
             </column>
+
+            <column name="created_date" type="TIMESTAMP" />
+            <column name="created_by" type="VARCHAR(50)" />
+            <column name="last_modified_date" type="TIMESTAMP" />
+            <column name="last_modified_by" type="VARCHAR(50)" />
 
         </createTable>
 
