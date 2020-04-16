@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.uiserv.dto.config.UserConfigurationDto;
+import ru.citeck.ecos.uiserv.service.userconfig.dto.UserConfigurationDto;
 import ru.citeck.ecos.uiserv.domain.UserConfigurationEntity;
 import ru.citeck.ecos.uiserv.repository.UserConfigurationsRepository;
 import ru.citeck.ecos.uiserv.security.SecurityUtils;

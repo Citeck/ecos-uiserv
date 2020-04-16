@@ -10,7 +10,7 @@ import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.CrudRecordsDAO;
-import ru.citeck.ecos.uiserv.dto.EntityDto;
+import ru.citeck.ecos.uiserv.service.EntityDto;
 import ru.citeck.ecos.uiserv.service.RecordNotFoundException;
 
 import java.util.*;

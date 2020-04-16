@@ -1,4 +1,5 @@
-package ru.citeck.ecos.uiserv.dto;
+package ru.citeck.ecos.uiserv.service;
+
 
 public interface EntityDto {
 

@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.service.mapper;
+package ru.citeck.ecos.uiserv.journal.mapper;
 
 import ecos.com.fasterxml.jackson210.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -11,13 +11,12 @@ import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.uiserv.domain.journal.JournalColumnEntity;
-import ru.citeck.ecos.uiserv.domain.journal.JournalEntity;
-import ru.citeck.ecos.uiserv.dto.journal.JournalColumnDto;
-import ru.citeck.ecos.uiserv.dto.journal.JournalDto;
+import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
+import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -25,12 +24,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JournalMapper {
 
-    private final static String APP_NAME = "uiserv";
-    private final static String ACTION_SOURCE_ID = "action";
-
     private final ModelMapper modelMapper;
-    private final ObjectMapper objectMapper;
-    private final JournalColumnMapper columnMapper;
 
     public JournalDto entityToDto(JournalEntity entity) {
 
@@ -45,17 +39,12 @@ public class JournalMapper {
         }
 
         if (entity.getPredicate() != null) {
-            try {
-                dto.setPredicate(objectMapper.readTree(entity.getPredicate()));
-            } catch (IOException e) {
-                log.error("Cannot parse predicate to JsonNode for journal with EXT_ID: " + entity.getExtId(), e);
-            }
+            ObjectData objectData = Json.getMapper().read(entity.getPredicate(), ObjectData.class);
+            dto.setPredicate(objectData);
         }
 
-        if (CollectionUtils.isNotEmpty(entity.getActions())) {
-            Set<RecordRef> actionsRefs = entity.getActions().stream()
-                .map(a -> RecordRef.create(APP_NAME, ACTION_SOURCE_ID, a.getExtId()))
-                .collect(Collectors.toSet());
+        if (StringUtils.isNotEmpty(entity.getActions())) {
+            List<RecordRef> actionsRefs = Json.getMapper().read(entity.getActions(), RecordRefsList.class);
             dto.setActions(actionsRefs);
         }
 
@@ -64,12 +53,8 @@ public class JournalMapper {
             dto.setAttributes(attributes);
         }
 
-        Set<JournalColumnEntity> columnEntities = entity.getColumns();
-        if (CollectionUtils.isNotEmpty(columnEntities)) {
-            Set<JournalColumnDto> columnDtos = columnEntities.stream()
-                .map(columnMapper::entityToDto)
-                .collect(Collectors.toSet());
-            dto.setColumns(columnDtos);
+        if (entity.getMetaRecord() != null) {
+            dto.setMetaRecord(RecordRef.valueOf(entity.getMetaRecord()));
         }
 
         return dto;
@@ -78,4 +63,6 @@ public class JournalMapper {
     public JournalEntity dtoToEntity(JournalDto dto) {
         return modelMapper.map(dto, JournalEntity.class);
     }
+
+    public static class RecordRefsList extends ArrayList<RecordRef> {}
 }

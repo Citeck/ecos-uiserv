@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.dto.config;
+package ru.citeck.ecos.uiserv.service.userconfig.dto;
 
 import lombok.Data;
 import ru.citeck.ecos.commons.data.ObjectData;

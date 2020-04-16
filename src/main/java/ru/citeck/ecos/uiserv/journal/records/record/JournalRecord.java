@@ -1,7 +1,5 @@
-package ru.citeck.ecos.uiserv.web.records.record;
+package ru.citeck.ecos.uiserv.journal.records.record;
 
-import ecos.com.fasterxml.jackson210.core.JsonProcessingException;
-import ecos.com.fasterxml.jackson210.databind.JsonNode;
 import ecos.com.fasterxml.jackson210.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,8 +11,7 @@ import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
 import ru.citeck.ecos.uiserv.config.ApplicationConfig;
-import ru.citeck.ecos.uiserv.dto.journal.JournalColumnDto;
-import ru.citeck.ecos.uiserv.dto.journal.JournalDto;
+import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -35,17 +32,17 @@ public class JournalRecord implements MetaValue {
 
     private MLText name;
 
-    private String metaRecord;
+    private RecordRef metaRecord;
 
     private RecordRef typeRef;
 
-    private JsonNode predicate;
+    private ObjectData predicate;
 
     private Set<String> actions = new HashSet<>();
 
     private boolean editable;
 
-    private Set<JournalColumnDto> columns = new HashSet<>();
+    private String columns;
 
     private ObjectData attributes;
 
@@ -98,12 +95,7 @@ public class JournalRecord implements MetaValue {
             case "editable":
                 return editable;
             case "columns":
-                try {
-                    return objectMapper.writeValueAsString(columns);
-                } catch (JsonProcessingException e) {
-                    log.error("Cannot serialize journal columns", e);
-                    return null;
-                }
+                return columns;
             case "attributes":
                 return attributes;
         }

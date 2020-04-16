@@ -1,6 +1,5 @@
 package ru.citeck.ecos.uiserv.web;
 
-import ecos.com.fasterxml.jackson210.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,26 +13,23 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.ActionEntity;
-import ru.citeck.ecos.uiserv.domain.journal.JournalColumnEntity;
-import ru.citeck.ecos.uiserv.domain.journal.JournalConfigEntity;
-import ru.citeck.ecos.uiserv.domain.journal.JournalEntity;
-import ru.citeck.ecos.uiserv.dto.journal.JournalColumnDto;
+import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
+import ru.citeck.ecos.uiserv.journal.mapper.JournalMapper;
 import ru.citeck.ecos.uiserv.repository.ActionRepository;
 import ru.citeck.ecos.uiserv.repository.JournalRepository;
-import ru.citeck.ecos.uiserv.service.action.ActionRecords;
-import ru.citeck.ecos.uiserv.service.mapper.JournalColumnMapper;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isIn;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -55,12 +51,6 @@ public class JournalRecordsDAOTest {
 
     @Autowired
     private ActionRepository actionRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private JournalColumnMapper columnMapper;
 
     @BeforeEach
     void setUp() {
@@ -193,59 +183,56 @@ public class JournalRecordsDAOTest {
     @Test
     void queryJournalMeta() throws Exception {
 
-        ActionEntity action = new ActionEntity();
-        action.setName("actionA");
-        action.setExtId("actionId");
-
-        actionRepository.save(action);
-
-        JournalConfigEntity formatter = new JournalConfigEntity();
-        formatter.setType("formatterType");
-        formatter.setConfig("{\"f\":\"Fval\"}");
-
-        JournalConfigEntity options = new JournalConfigEntity();
-        options.setType("optionsType");
-        options.setConfig("{\"o\":\"Oval\"}");
-
-        JournalConfigEntity filter = new JournalConfigEntity();
-        options.setType("filterType");
-        options.setConfig("{\"fil\":\"FilVal\"}");
-
-        JournalColumnEntity jcole = new JournalColumnEntity();
-        jcole.setName("columnA");
-        jcole.setFormatter(formatter);
-        jcole.setOptions(options);
-        jcole.setFilter(filter);
-        jcole.setAttribute("testAttr");
-        jcole.setAttributes("{\"a\":\"value\"}");
-        jcole.setEditable(true);
-        jcole.setEditorRef("users@admin");
-        jcole.setGroupable(true);
-        jcole.setSearchable(true);
-        jcole.setShow(true);
-        jcole.setSortable(true);
-        jcole.setType("testType");
-        jcole.setVisible(true);
-
         JournalEntity journalEntity = new JournalEntity();
         journalEntity.setExtId("myTestJournal");
         journalEntity.setName("{\"en\":\"test\"}");
         journalEntity.setTypeRef(TypesDao.testTypeRef.toString());
         journalEntity.setEditable(false);
-        journalEntity.setMetaRecord("MetaRecord");
-        journalEntity.setPredicate("{\"t\":\"eq\",\"att\":\"Type\",\"val\":\"smthg\"}".getBytes());
+        journalEntity.setMetaRecord("someAPP/someDAO@MetaRecord");
+        journalEntity.setPredicate("{\"att\":\"Type\",\"val\":\"smthg\",\"t\":\"eq\"}");
         journalEntity.setAttributes("{\"a\":\"value\"}");
-        journalEntity.setColumns(Collections.singleton(jcole));
+
+        journalEntity.setColumns("[\n" +
+            "        {\n" +
+            "            \"attribute\": \"icase:case\",\n" +
+            "            \"editorRef\": \"\",\n" +
+            "            \"type\": \"text\",\n" +
+            "            \"searchable\": true,\n" +
+            "            \"sortable\": true,\n" +
+            "            \"groupable\": false,\n" +
+            "            \"editable\": true,\n" +
+            "            \"name\": {\n" +
+            "                \"ru\": \"21312\",\n" +
+            "                \"en\": \"213123\"\n" +
+            "            },\n" +
+            "            \"formatter\": {\n" +
+            "                \"type\": \"colored\",\n" +
+            "                \"config\": {}\n" +
+            "            },\n" +
+            "            \"show\": true,\n" +
+            "            \"visible\": false,\n" +
+            "            \"options\": {\n" +
+            "                \"type\": \"json\",\n" +
+            "                \"config\": [\n" +
+            "                    { \"value\": \"value\", \"label\": \"label\" }\n" +
+            "                ]\n" +
+            "            },\n" +
+            "            \"attributes\": {},\n" +
+            "            \"filter\": {\n" +
+            "                \"type\": \"journal\",\n" +
+            "                \"config\": {\n" +
+            "                    \"journalId\": \"uiserv/journal@currency\"\n" +
+            "                }\n" +
+            "            }\n" +
+            "        }\n" +
+            "    ]");
+
+
+        journalEntity.setActions("[\"uiserv/action@testAction\",\"uiserv/action@testAction2\"]");
+        List<RecordRef> actions = Json.getMapper().read(journalEntity.getActions(), JournalMapper.RecordRefsList.class);
+        String actionsString = Json.getMapper().toString(actions);
 
         journalRepository.save(journalEntity);
-
-        journalEntity.setActions(Collections.singleton(action));
-        journalRepository.save(journalEntity);
-
-        Set<JournalColumnDto> columnDtos = journalEntity.getColumns().stream()
-            .map(columnMapper::entityToDto)
-            .collect(Collectors.toSet());
-        String columnsStr = objectMapper.writeValueAsString(columnDtos);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/records/query")
             .contentType("application/json")
@@ -259,21 +246,22 @@ public class JournalRecordsDAOTest {
                 "        \"editable\",\n" +
                 "        \"attributes\",\n" +
                 "        \"columns\",\n" +
-                "        \"actions?str\",\n" +
-                "        \"metaRecord\"\n" +
+                "        \"actions[]\",\n" +
+                "        \"metaRecord?str\"\n" +
                 "    ]\n" +
                 "}"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id", is(JOURNAL_DAO_ID + "@" + UISERV_APP_ID + "/" + JOURNAL_DAO_ID + "@" + journalEntity.getExtId())))
+            .andExpect(jsonPath("$.id",
+                is(JOURNAL_DAO_ID + "@" + UISERV_APP_ID + "/" + JOURNAL_DAO_ID + "@" + journalEntity.getExtId())))
             .andExpect(jsonPath("$.attributes.name", is("test")))
             .andExpect(jsonPath("$.attributes.typeRef?id", is(journalEntity.getTypeRef())))
-            .andExpect(jsonPath("$.attributes.predicate", is(objectMapper.readTree(journalEntity.getPredicate()).toString())))
+            .andExpect(jsonPath("$.attributes.predicate", is(journalEntity.getPredicate())))
             .andExpect(jsonPath("$.attributes.editable", is(Boolean.FALSE.toString())))
             .andExpect(jsonPath("$.attributes.attributes", is(journalEntity.getAttributes())))
-            .andExpect(jsonPath("$.attributes.columns", is(columnsStr)))
-            .andExpect(jsonPath("$.attributes.actions?str",
-                is(RecordRef.create(UISERV_APP_ID, ActionRecords.ID, action.getExtId()).toString())))
-            .andExpect(jsonPath("$.attributes.metaRecord", is(journalEntity.getMetaRecord())));
+            .andExpect(jsonPath("$.attributes.columns", is(journalEntity.getColumns())))
+            .andExpect(jsonPath("$['attributes']['actions[]'][0]", is(actions.get(0).toString())))
+            .andExpect(jsonPath("$['attributes']['actions[]'][1]", is(actions.get(1).toString())))
+            .andExpect(jsonPath("$.attributes.metaRecord?str", is(journalEntity.getMetaRecord())));
     }
 
     @Component

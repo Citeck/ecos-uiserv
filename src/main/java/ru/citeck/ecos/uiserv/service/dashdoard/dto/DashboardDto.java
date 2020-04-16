@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.dto.dashboard;
+package ru.citeck.ecos.uiserv.service.dashdoard.dto;
 
 import lombok.Data;
 import lombok.ToString;

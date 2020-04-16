@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.service.journal.impl;
+package ru.citeck.ecos.uiserv.journal.service.impl;
 
 import lombok.*;
 import org.apache.commons.collections.CollectionUtils;
@@ -12,14 +12,12 @@ import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
-import ru.citeck.ecos.uiserv.domain.ActionEntity;
-import ru.citeck.ecos.uiserv.domain.journal.JournalEntity;
-import ru.citeck.ecos.uiserv.dto.journal.JournalDto;
+import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
+import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.repository.JournalRepository;
-import ru.citeck.ecos.uiserv.service.action.ActionModule;
 import ru.citeck.ecos.uiserv.service.exception.ResourceNotFoundException;
-import ru.citeck.ecos.uiserv.service.journal.JournalService;
-import ru.citeck.ecos.uiserv.service.mapper.JournalMapper;
+import ru.citeck.ecos.uiserv.journal.service.JournalService;
+import ru.citeck.ecos.uiserv.journal.mapper.JournalMapper;
 
 import javax.annotation.Nullable;
 import java.util.List;

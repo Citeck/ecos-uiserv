@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.apps.module.handler.EcosModuleHandler;
 import ru.citeck.ecos.apps.module.handler.ModuleMeta;
 import ru.citeck.ecos.apps.module.handler.ModuleWithMeta;
-import ru.citeck.ecos.uiserv.dto.dashboard.DashboardDto;
+import ru.citeck.ecos.uiserv.service.dashdoard.dto.DashboardDto;
 
 import java.util.Collections;
 import java.util.Optional;

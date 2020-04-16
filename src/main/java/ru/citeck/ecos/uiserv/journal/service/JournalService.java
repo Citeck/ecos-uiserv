@@ -1,14 +1,10 @@
-package ru.citeck.ecos.uiserv.service.journal;
+package ru.citeck.ecos.uiserv.journal.service;
 
 import org.jetbrains.annotations.Nullable;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
-import ru.citeck.ecos.uiserv.dto.journal.JournalDto;
-import ru.citeck.ecos.uiserv.service.action.ActionModule;
-import ru.citeck.ecos.uiserv.web.records.record.JournalRecord;
+import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Set;
 import java.util.function.Consumer;
 

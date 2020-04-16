@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.service.journal;
+package ru.citeck.ecos.uiserv.journal.eapps;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -7,9 +7,8 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.apps.module.handler.EcosModuleHandler;
 import ru.citeck.ecos.apps.module.handler.ModuleMeta;
 import ru.citeck.ecos.apps.module.handler.ModuleWithMeta;
-import ru.citeck.ecos.uiserv.dto.journal.JournalDto;
-import ru.citeck.ecos.uiserv.service.action.ActionModule;
-import ru.citeck.ecos.uiserv.service.action.ActionService;
+import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
+import ru.citeck.ecos.uiserv.journal.service.JournalService;
 
 import java.util.Collections;
 import java.util.function.Consumer;

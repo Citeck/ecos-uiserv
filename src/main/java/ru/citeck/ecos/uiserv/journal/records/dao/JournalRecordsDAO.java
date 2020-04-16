@@ -1,23 +1,20 @@
-package ru.citeck.ecos.uiserv.web.records.dao;
+package ru.citeck.ecos.uiserv.journal.records.dao;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
-import ru.citeck.ecos.records2.predicate.Elements;
 import ru.citeck.ecos.records2.predicate.PredicateService;
-import ru.citeck.ecos.records2.predicate.RecordElement;
-import ru.citeck.ecos.records2.predicate.RecordElements;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDAO;
-import ru.citeck.ecos.uiserv.dto.journal.JournalDto;
-import ru.citeck.ecos.uiserv.service.journal.JournalService;
-import ru.citeck.ecos.uiserv.web.records.record.JournalRecord;
+import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
+import ru.citeck.ecos.uiserv.journal.service.JournalService;
+import ru.citeck.ecos.uiserv.journal.records.record.JournalRecord;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,11 +32,9 @@ public class JournalRecordsDAO extends LocalRecordsDAO
     public RecordsQueryResult<JournalRecord> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
         RecordsQueryResult<JournalRecord> result = new RecordsQueryResult<>();
 
-        Map<String, String> query = (Map<String, String>)recordsQuery.getQuery();
-        if (query != null && query.containsKey("typeRef")) {
-
-            RecordRef typeRef = RecordRef.valueOf(query.get("typeRef"));
-            JournalDto dto = journalService.searchJournalByTypeRef(typeRef);
+        JournalQueryByTypeRef queryByTypeRef = recordsQuery.getQuery(JournalQueryByTypeRef.class);
+        if (queryByTypeRef != null && queryByTypeRef.getTypeRef() != null) {
+            JournalDto dto = journalService.searchJournalByTypeRef(queryByTypeRef.getTypeRef());
             if (dto != null) {
                 JournalRecord journalRecord = new JournalRecord(dto);
                 result.addRecord(journalRecord);
@@ -90,5 +85,10 @@ public class JournalRecordsDAO extends LocalRecordsDAO
     @Override
     public String getId() {
         return "journal";
+    }
+
+    @Data
+    public static class JournalQueryByTypeRef {
+        private RecordRef typeRef;
     }
 }

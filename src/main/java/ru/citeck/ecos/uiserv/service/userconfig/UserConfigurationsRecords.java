@@ -10,7 +10,7 @@ import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
 import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
-import ru.citeck.ecos.uiserv.dto.config.UserConfigurationDto;
+import ru.citeck.ecos.uiserv.service.userconfig.dto.UserConfigurationDto;
 
 import java.util.Collection;
 import java.util.List;

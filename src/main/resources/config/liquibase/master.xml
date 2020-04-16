@@ -31,6 +31,6 @@
     <include file="changelog/20200319000000_user_configurations.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20200324000000_ecos_forms_table.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20200415000000_add_i18n_table.xml" relativeToChangelogFile="true"/>
-    <include file="changelog/20200413000000_create_journal_journalcolumn_journalconfig_table.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20200413000000_create_journal_table.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

@@ -1,13 +1,10 @@
 package ru.citeck.ecos.uiserv.repository;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
-import ru.citeck.ecos.uiserv.domain.journal.JournalEntity;
+import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
