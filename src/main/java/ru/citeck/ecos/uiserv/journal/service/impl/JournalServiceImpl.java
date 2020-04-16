@@ -14,7 +14,7 @@ import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
-import ru.citeck.ecos.uiserv.repository.JournalRepository;
+import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
 import ru.citeck.ecos.uiserv.service.exception.ResourceNotFoundException;
 import ru.citeck.ecos.uiserv.journal.service.JournalService;
 import ru.citeck.ecos.uiserv.journal.mapper.JournalMapper;

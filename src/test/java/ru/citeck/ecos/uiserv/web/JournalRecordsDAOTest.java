@@ -23,7 +23,7 @@ import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
 import ru.citeck.ecos.uiserv.journal.mapper.JournalMapper;
 import ru.citeck.ecos.uiserv.repository.ActionRepository;
-import ru.citeck.ecos.uiserv.repository.JournalRepository;
+import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.repository;
+package ru.citeck.ecos.uiserv.journal.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
