@@ -193,6 +193,9 @@ uiserv:
             value: true
         language-switcher-enabled:
             value: true
+        custom-create-buttons:
+            value: '[]'
+
     ecos-records:
         apps:
             alfresco:
