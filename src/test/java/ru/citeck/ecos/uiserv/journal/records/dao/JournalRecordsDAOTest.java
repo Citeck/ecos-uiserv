@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.web;
+package ru.citeck.ecos.uiserv.journal.records.dao;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -84,7 +84,8 @@ public class JournalRecordsDAOTest {
                 "               }" +
                 "     }"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.records[0]", is("uiserv/journal@uiserv/journal@" + journalEntity.getExtId())));
+            .andExpect(jsonPath("$.records[0]",
+                is(UISERV_APP_ID + "/" + JOURNAL_DAO_ID + "@" + journalEntity.getExtId())));
     }
 
     @Test
@@ -119,7 +120,7 @@ public class JournalRecordsDAOTest {
                 "               }" +
                 "     }"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.records[0]", is("uiserv/journal@uiserv/journal@" + journalEntity.getExtId())));
+            .andExpect(jsonPath("$.records[0]", is("uiserv/journal@" + journalEntity.getExtId())));
     }
 
     @Test
@@ -159,7 +160,7 @@ public class JournalRecordsDAOTest {
                 "               }" +
                 "     }"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.records[0]", is("uiserv/journal@uiserv/journal@" + otherJournalEntity.getExtId())));
+            .andExpect(jsonPath("$.records[0]", is("uiserv/journal@" + otherJournalEntity.getExtId())));
     }
 
     @Test
@@ -252,7 +253,7 @@ public class JournalRecordsDAOTest {
                 "}"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id",
-                is(JOURNAL_DAO_ID + "@" + UISERV_APP_ID + "/" + JOURNAL_DAO_ID + "@" + journalEntity.getExtId())))
+                is(JOURNAL_DAO_ID + "@" + journalEntity.getExtId())))
             .andExpect(jsonPath("$.attributes.name", is("test")))
             .andExpect(jsonPath("$.attributes.typeRef?id", is(journalEntity.getTypeRef())))
             .andExpect(jsonPath("$.attributes.predicate", is(journalEntity.getPredicate())))

@@ -1,6 +1,5 @@
 package ru.citeck.ecos.uiserv.journal.records.record;
 
-import ecos.com.fasterxml.jackson210.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +9,6 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
-import ru.citeck.ecos.uiserv.config.ApplicationConfig;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 
 import java.util.HashSet;
@@ -23,10 +21,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Slf4j
 public class JournalRecord implements MetaValue {
-
-    public final static String JOURNAL_DAO_RECORD_PREFIX = "journal@";
-    public final static String FULL_RECORD_PREFIX = ApplicationConfig.APP_NAME + "/" + JOURNAL_DAO_RECORD_PREFIX;
-    private final static ObjectMapper objectMapper = new ObjectMapper();
 
     private String id;
 
@@ -65,7 +59,7 @@ public class JournalRecord implements MetaValue {
 
     @Override
     public String getId() {
-        return FULL_RECORD_PREFIX + id;
+        return id;
     }
 
     @Override
