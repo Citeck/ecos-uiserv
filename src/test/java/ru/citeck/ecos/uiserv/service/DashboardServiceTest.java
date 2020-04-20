@@ -11,7 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.OldDashboardDto;
+import ru.citeck.ecos.uiserv.service.dashdoard.dto.OldDashboardDto;
 import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;
 
 import java.io.IOException;

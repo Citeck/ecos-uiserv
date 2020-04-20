@@ -9,7 +9,7 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.uiserv.domain.DashboardDto;
+import ru.citeck.ecos.uiserv.service.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.DashboardEntity;
 import ru.citeck.ecos.uiserv.repository.DashboardRepository;
 

@@ -10,16 +10,20 @@
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
 
+uiserv:
+    ecos-records:
+        force-local-mode: true
+
 eureka:
     client:
         enabled: false
     instance:
-        appname: myApp
-        instanceId: myApp:${spring.application.instance-id:${random.value}}
+        appname: uiserv
+        instanceId: uiserv:${spring.application.instance-id:${random.value}}
 
 spring:
     application:
-        name: myApp
+        name: uiserv
     cache:
         type: simple
     datasource:

@@ -1,8 +1,9 @@
-package ru.citeck.ecos.uiserv.domain;
+package ru.citeck.ecos.uiserv.service.config.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import lombok.Data;
+import ru.citeck.ecos.uiserv.service.EntityDto;
 
 /**
  * @author Roman Makarskiy

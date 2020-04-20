@@ -20,7 +20,7 @@ import ru.citeck.ecos.records2.request.rest.RestHandler;
 import ru.citeck.ecos.records2.spring.web.rest.RecordsRestApi;
 import ru.citeck.ecos.records2.spring.config.RecordsServiceFactoryConfiguration;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.DashboardDto;
+import ru.citeck.ecos.uiserv.service.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.service.dashdoard.DashboardService;
 import ru.citeck.ecos.uiserv.web.rest.TestEntityRecordUtil;
 import ru.citeck.ecos.uiserv.web.rest.TestUtil;
