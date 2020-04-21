@@ -8,6 +8,8 @@ import ru.citeck.ecos.records2.RecordsProperties;
 @Configuration
 public class ApplicationConfig {
 
+    public final static String APP_NAME = "uiserv";
+
     @Bean
     @ConfigurationProperties(prefix = "uiserv.ecos-records")
     public RecordsProperties recordsProperties() {

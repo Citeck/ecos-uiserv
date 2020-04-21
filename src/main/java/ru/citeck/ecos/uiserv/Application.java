@@ -1,5 +1,7 @@
 package ru.citeck.ecos.uiserv;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import ru.citeck.ecos.uiserv.config.ApplicationProperties;
 import ru.citeck.ecos.uiserv.config.DefaultProfileUtil;
 
@@ -24,6 +26,7 @@ import java.util.Collection;
 @SpringBootApplication
 @EnableConfigurationProperties({LiquibaseProperties.class, ApplicationProperties.class})
 @EnableDiscoveryClient
+@EnableJpaRepositories("ru.citeck.ecos.uiserv.*.repository")
 public class Application {
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);

@@ -1,7 +1,8 @@
-package ru.citeck.ecos.uiserv.domain;
+package ru.citeck.ecos.uiserv.service.dashdoard.dto;
 
 import lombok.Data;
 import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.uiserv.service.EntityDto;
 
 /**
  * @author Roman Makarskiy

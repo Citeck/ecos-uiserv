@@ -11,7 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.TestConfigData;
-import ru.citeck.ecos.uiserv.domain.ConfigDto;
+import ru.citeck.ecos.uiserv.service.config.dto.ConfigDto;
 import ru.citeck.ecos.uiserv.service.config.ConfigEntityService;
 
 import java.io.IOException;
