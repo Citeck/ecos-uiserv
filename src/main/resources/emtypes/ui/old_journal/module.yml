@@ -1,0 +1,9 @@
+modelVersion: "1.0"
+
+source-id: "old_journal"
+
+controller:
+    type: json
+
+
+
