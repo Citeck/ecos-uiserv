@@ -13,6 +13,9 @@
             <column name="tenant" type="VARCHAR">
                 <constraints nullable="false"/>
             </column>
+            <column name="type" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
             <column name="ext_id" type="VARCHAR">
                 <constraints nullable="false"/>
             </column>

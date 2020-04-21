@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class MenuReaderService {
 
-    private Map<String, MenuReader> readers = new ConcurrentHashMap<>();
+    private final Map<String, MenuReader> readers = new ConcurrentHashMap<>();
 
     public MenuDto readMenu(byte[] data, String filename) {
         String extension = FilenameUtils.getExtension(filename);

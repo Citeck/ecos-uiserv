@@ -1,14 +1,15 @@
 package ru.citeck.ecos.uiserv.service.menu.resolving;
 
 import org.apache.commons.lang.StringUtils;
+import ru.citeck.ecos.commons.data.DataValue;
+import ru.citeck.ecos.commons.data.MLText;
+import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
+import ru.citeck.ecos.uiserv.service.menu.dto.MenuDto;
+import ru.citeck.ecos.uiserv.service.menu.dto.MenuItemActionDto;
+import ru.citeck.ecos.uiserv.service.menu.dto.MenuItemDto;
+import ru.citeck.ecos.uiserv.service.menu.dto.SubMenuDto;
 import ru.citeck.ecos.uiserv.service.menu.resolving.resolvers.MenuItemsResolver;
-import ru.citeck.ecos.uiserv.service.menu.format.xml.xml.Action;
-import ru.citeck.ecos.uiserv.service.menu.format.xml.xml.Evaluator;
-import ru.citeck.ecos.uiserv.service.menu.format.xml.xml.Item;
-import ru.citeck.ecos.uiserv.service.menu.format.xml.xml.Items;
-import ru.citeck.ecos.uiserv.service.menu.format.xml.xml.ItemsResolver;
-import ru.citeck.ecos.uiserv.service.menu.format.xml.xml.MenuConfig;
-import ru.citeck.ecos.uiserv.service.menu.format.xml.xml.Parameter;
 
 import java.util.*;
 import java.util.function.Function;
@@ -32,35 +33,44 @@ public class MenuFactory {
         this.resolvers = resolvers.stream().collect(Collectors.toMap(MenuItemsResolver::getId, Function.identity()));
     }
 
-    public ResolvedMenuDto getResolvedMenu(MenuConfig menuConfigContentData) {
+    public ResolvedMenuDto getResolvedMenu(MenuDto menuDto) {
         ResolvedMenuDto menu = new ResolvedMenuDto();
-        menu.setId(menuConfigContentData.getId());
-        menu.setType(menuConfigContentData.getType());
 
-        List<ResolvedMenuItemDto> elements = constructItems(menuConfigContentData.getItems(), null);
-        menu.setItems(elements);
+        menu.setId(menuDto.getId());
+        menu.setType(menuDto.getType());
+        menu.setItems(subMenusToItemDtos(menuDto.getSubMenu()));
+
         return menu;
     }
 
-    private List<ResolvedMenuItemDto> constructItems(Items items, ResolvedMenuItemDto context) {
+    private List<ResolvedMenuItemDto> subMenusToItemDtos(Map<String, SubMenuDto> subMenuDtoMap) {
+        SubMenuDto left = subMenuDtoMap.get("left");
+        if (left == null) {
+            return Collections.emptyList();
+        }
+
+        return constructItems(left.getItems(), null);
+    }
+
+    private List<ResolvedMenuItemDto> constructItems(List<MenuItemDto> items, ResolvedMenuItemDto context) {
         if (items == null) {
             return Collections.emptyList();
         }
         List<ResolvedMenuItemDto> result = new ArrayList<>();
-        items.getItemsChildren()
-                .forEach(obj -> {
-                    if (obj instanceof Item && evaluate((Item) obj)) {
-                        ResolvedMenuItemDto newElement = new ResolvedMenuItemDto();
-                        if (context == null) {
-                            Map<String, String> params = new HashMap<>();
-                            params.put("rootElement", "true");
-                            newElement.setParams(params);
-                        }
-                        result.add(updateItem(newElement, (Item) obj));
-                    } else if (obj instanceof ItemsResolver) {
-                        result.addAll(resolve((ItemsResolver) obj, context));
-                    }
-                });
+
+        items.forEach(itemDto -> {
+            if (itemDto.isItem() && evaluate(itemDto)) {
+                ResolvedMenuItemDto newElement = new ResolvedMenuItemDto();
+                if (context == null) {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("rootElement", "true");
+                    newElement.setParams(params);
+                }
+                result.add(updateItem(newElement, itemDto));
+            } else if (itemDto.isResolver()) {
+                result.addAll(resolve(itemDto, context));
+            }
+        });
         return filterElements(result, context);
     }
 
@@ -89,24 +99,25 @@ public class MenuFactory {
     //todo Since we decided to only allow privileges check as opposed to other "evaluators"
     //(some of them can be slow because they ask something of ecos),
     // we'd better change XML schema accordingly, to avoid having ugly code like this:
-    private boolean evaluate(Item item) {
-        Evaluator evaluator = item.getEvaluator();
+    private boolean evaluate(MenuItemDto item) {
+        RecordEvaluatorDto evaluator = item.getEvaluator();
         if (evaluator == null) {
             return true;
         }
 
-        if (!evaluator.getId().equals(userInGroupEvaluatorId))
+        if (!evaluator.getId().equals(userInGroupEvaluatorId)) {
             //todo log WARN or ERROR
             return false;
+        }
 
-        return evaluator.getParam().stream()
-            .filter(p -> p.getName().equals("groupName"))
-            .map(Parameter::getValue)
-            .findAny()
-            .map(authorities::contains).orElse(false);
+        DataValue groupName = evaluator.getConfig().get("groupName");
+        if (groupName.isNull()) {
+            return false;
+        }
+        return authorities.contains(groupName.asText());
     }
 
-    private List<ResolvedMenuItemDto> resolve(ItemsResolver child, ResolvedMenuItemDto context) {
+    private List<ResolvedMenuItemDto> resolve(MenuItemDto child, ResolvedMenuItemDto context) {
         String resolverId = child.getId();
         if (StringUtils.isEmpty(resolverId)) {
             return Collections.emptyList();
@@ -116,16 +127,20 @@ public class MenuFactory {
             return Collections.emptyList();
         }
         Map<String, String> params = new HashMap<>();
-        for (Parameter param : child.getParam()) {
-            params.put(param.getName(), param.getValue());
-        }
+        child.getConfig().forEach((k, v) -> {
+            params.put(k, v.textValue());
+        });
+
+        MenuItemDto childItem = child.getItems() != null && !child.getItems().isEmpty()
+            ? child.getItems().get(0)
+            : null;
 
         return resolver.resolve(params, context, i18n).stream()
-            .map(element -> updateItem(element, child.getItem()))
+            .map(element -> updateItem(element, childItem))
             .collect(Collectors.toList());
     }
 
-    private ResolvedMenuItemDto updateItem(ResolvedMenuItemDto targetElement, Item newData) {
+    private ResolvedMenuItemDto updateItem(ResolvedMenuItemDto targetElement, MenuItemDto newData) {
         if (targetElement == null) {
             return null;
         }
@@ -133,42 +148,44 @@ public class MenuFactory {
             return targetElement;
         }
 
-        String label = getLocalizedMessage(newData.getLabel());
-        String id = newData.getId();
-        String icon = newData.getIcon();
-        List<Parameter> param = newData.getParam();
-
-        Boolean mobileVisible = newData.isMobileVisible();
-
-        Action xmlAction = newData.getAction();
-        if (xmlAction != null) {
+        MenuItemActionDto actionDto = newData.getAction();
+        if (actionDto != null) {
             Map<String, String> params = new HashMap<>();
-            for (Parameter xmlParam : xmlAction.getParam()) {
-                params.put(xmlParam.getName(), xmlParam.getValue());
-            }
-            targetElement.setAction(xmlAction.getType(), params);
+            actionDto.getConfig().forEach((k, v) -> {
+                params.put(k, v.textValue());
+            });
+            targetElement.setAction(actionDto.getType(), params);
         }
 
+        String id = newData.getId();
         if (!StringUtils.isEmpty(id)) {
             targetElement.setId(id);
+        }
+
+        MLText mlLabel = newData.getLabel();
+        String label = null;
+        if (mlLabel != null) {
+            label = getLocalizedMessage(mlLabel.get());
         }
         if (!StringUtils.isEmpty(label)) {
             targetElement.setLabel(label);
         }
+
+        String icon = newData.getIcon();
         if (!StringUtils.isEmpty(icon)) {
             targetElement.setIcon(icon);
         }
-        if (mobileVisible != null) {
-            targetElement.setMobileVisible(mobileVisible);
-        }
 
-        if (param != null) {
+        targetElement.setMobileVisible(newData.isMobileVisible());
+
+        ObjectData config = newData.getConfig();
+        if (config != null) {
             Map<String, String> params = targetElement.getParams();
             if (params == null) {
                 params = new HashMap<>();
             }
             Map<String, String> newParams = new HashMap<>();
-            param.forEach(parameter -> newParams.put(parameter.getName(), parameter.getValue()));
+            config.forEach((k, v) -> newParams.put(k, v.textValue()));
             params.putAll(newParams);
             targetElement.setParams(params);
         }

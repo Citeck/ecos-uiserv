@@ -9,6 +9,8 @@ import java.util.List;
 
 @Data
 public class MenuItemDto {
+    public static final String TYPE_ITEM = "item";
+    public static final String TYPE_RESOLVER = "resolver";
 
     private String id;
 
@@ -24,4 +26,12 @@ public class MenuItemDto {
     private RecordEvaluatorDto evaluator;
 
     private List<MenuItemDto> items;
+
+    public boolean isItem() {
+        return TYPE_ITEM.equals(this.type);
+    }
+
+    public boolean isResolver() {
+        return TYPE_RESOLVER.equals(this.type);
+    }
 }

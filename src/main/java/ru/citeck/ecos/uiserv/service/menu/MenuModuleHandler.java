@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import ru.citeck.ecos.apps.module.handler.EcosModuleHandler;
 import ru.citeck.ecos.apps.module.handler.ModuleMeta;
 import ru.citeck.ecos.apps.module.handler.ModuleWithMeta;
-import ru.citeck.ecos.uiserv.service.menu.format.MenuReaderService;
 
 import java.util.function.Consumer;
 
@@ -16,12 +15,11 @@ import java.util.function.Consumer;
 @Configuration
 @RequiredArgsConstructor
 public class MenuModuleHandler implements EcosModuleHandler<MenuDeployModule> {
-
-    private final MenuReaderService readerService;
+    private final MenuService menuService;
 
     @Override
     public void deployModule(@NotNull MenuDeployModule menuModule) {
-
+        menuService.upload(menuModule);
     }
 
     @NotNull

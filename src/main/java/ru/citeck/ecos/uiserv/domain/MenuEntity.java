@@ -38,11 +38,11 @@ public class MenuEntity extends AbstractAuditingEntity {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        MenuEntity menuConfig = (MenuEntity) o;
-        if (menuConfig.getId() == null || getId() == null) {
+        MenuEntity menuEntity = (MenuEntity) o;
+        if (menuEntity.getId() == null || getId() == null) {
             return false;
         }
-        return Objects.equals(getId(), menuConfig.getId());
+        return Objects.equals(getId(), menuEntity.getId());
     }
 
     @Override
