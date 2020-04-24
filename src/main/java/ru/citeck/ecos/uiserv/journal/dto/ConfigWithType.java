@@ -6,11 +6,9 @@ import lombok.NoArgsConstructor;
 import ru.citeck.ecos.commons.data.ObjectData;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class JournalConfigDto {
-
+@AllArgsConstructor
+public class ConfigWithType {
     private String type;
-
     private ObjectData config;
 }
