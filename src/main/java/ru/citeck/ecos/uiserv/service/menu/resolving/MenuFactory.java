@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.service.menu.resolving;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.context.i18n.LocaleContextHolder;
 import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
@@ -165,7 +166,8 @@ public class MenuFactory {
         MLText mlLabel = newData.getLabel();
         String label = null;
         if (mlLabel != null) {
-            label = getLocalizedMessage(mlLabel.get());
+            Locale locale = LocaleContextHolder.getLocale();
+            label = getLocalizedMessage(mlLabel.getClosestValue(locale));
         }
         if (!StringUtils.isEmpty(label)) {
             targetElement.setLabel(label);
