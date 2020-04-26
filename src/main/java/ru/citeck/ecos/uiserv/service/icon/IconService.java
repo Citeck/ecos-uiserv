@@ -11,6 +11,7 @@ import ru.citeck.ecos.uiserv.service.icon.dto.IconType;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -19,7 +20,34 @@ import java.util.stream.Collectors;
 public class IconService {
     private final IconRepository iconRepository;
 
+    public List<IconDto> findAll() {
+        return iconRepository.findAll().stream()
+            .map(this::mapToDto)
+            .collect(Collectors.toList());
+    }
+
+    public Optional<IconDto> findById(String id) {
+        if (StringUtils.isBlank(id)) {
+            return Optional.empty();
+        }
+
+        return iconRepository.findByExtId(id)
+            .map(this::mapToDto);
+    }
+
+    public void deleteById(String id) {
+        if (StringUtils.isBlank(id)) {
+            throw new IllegalArgumentException("Id parameter is mandatory for icon deletion");
+        }
+
+        iconRepository.deleteByExtId(id);
+    }
+
     public IconDto save(IconDto iconDto) {
+        if (StringUtils.isBlank(iconDto.getId())) {
+            throw new IllegalArgumentException("Id parameter is mandatory for saving icon");
+        }
+
         IconEntity saved = iconRepository.save(mapToEntity(iconDto));
 
         return mapToDto(saved);

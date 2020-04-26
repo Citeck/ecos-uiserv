@@ -179,4 +179,58 @@ public class IconServiceTest {
 
         assertTrue(saved.getModified().isAfter(modified));
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void save_dtoWithNullId_throwsException() {
+        IconDto dto = new IconDto();
+        iconService.save(dto);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void save_dtoWithBlankId_throwsException() {
+        IconDto dto = new IconDto();
+        dto.setId("");
+        iconService.save(dto);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void delete_dtoWithNullId_throwsException() {
+        IconDto dto = new IconDto();
+        dto.setId("");
+        iconService.save(dto);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void delete_dtoWithBlankId_throwsException() {
+        IconDto dto = new IconDto();
+        iconService.save(dto);
+    }
+
+    @Test
+    public void findAllByType_findsProperly() {
+        IconDto dto1 = new IconDto();
+        dto1.setId("id1");
+        dto1.setType(IconType.FA);
+        dto1.setData("data1");
+
+        IconDto dto2 = new IconDto();
+        dto2.setId("id2");
+        dto2.setType(IconType.FA);
+        dto2.setData("data2");
+
+        IconDto dto3 = new IconDto();
+        dto3.setId("id3");
+        dto3.setType(IconType.IMG);
+        byte[] data = RandomUtils.nextBytes(20);
+        String dataString = Base64.getEncoder().encodeToString(data);
+        dto3.setData(dataString);
+
+        iconService.save(dto1);
+        iconService.save(dto2);
+        iconService.save(dto3);
+
+        List<IconDto> found = iconService.findAllByType(IconType.FA);
+
+        assertEquals(2, found.size());
+    }
 }

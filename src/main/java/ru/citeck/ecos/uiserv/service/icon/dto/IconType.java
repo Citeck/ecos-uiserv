@@ -1,7 +1,6 @@
 package ru.citeck.ecos.uiserv.service.icon.dto;
 
-
-import com.fasterxml.jackson.annotation.JsonValue;
+import ecos.com.fasterxml.jackson210.annotation.JsonValue;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -14,7 +13,7 @@ public enum IconType {
 
     public static IconType byTypeString(String typeString) {
         for (IconType type : TYPES) {
-            if (type.typeString.equals(typeString)) {
+            if (type.typeString.equalsIgnoreCase(typeString)) {
                 return type;
             }
         }
