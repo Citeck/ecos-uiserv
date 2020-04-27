@@ -38,20 +38,30 @@
             },
             {
                 "tab": {
-                    "label": "Действия",
-                    "idLayout": "layout_c5b3186f-5a78-4d92-a730-1c8086562141"
+                    "label": "Задачи",
+                    "idLayout": "layout_3cf89517-1d08-4530-be06-bd31bf862c71"
                 },
                 "type": "mobile",
                 "columns": [
                     {
                         "widgets": [
                             {
-                                "name": "record-actions",
-                                "label": "dashboard-settings.widget.actions",
-                                "dndId": "13059de7-854e-474f-9bca-6fe313000714",
-                                "id": "2fd922fe-f0de-421d-a40b-b7761d563fb7",
+                                "name": "tasks",
+                                "label": "dashboard-settings.widget.tasks",
+                                "dndId": "ebcd2f91-f774-4e10-b164-e37f9020abfe",
+                                "id": "0c813a7e-4ccc-440f-b288-1272fd6cb73d",
                                 "props": {
-                                    "id": "2fd922fe-f0de-421d-a40b-b7761d563fb7",
+                                    "id": "0c813a7e-4ccc-440f-b288-1272fd6cb73d",
+                                    "config": {}
+                                }
+                            },
+                            {
+                                "name": "current-tasks",
+                                "label": "dashboard-settings.widget.current-tasks",
+                                "dndId": "d192dea4-68e8-4dbe-83c8-ee374d1e6fde",
+                                "id": "58ad77ee-00b9-45b1-96ff-d604a26a588b",
+                                "props": {
+                                    "id": "58ad77ee-00b9-45b1-96ff-d604a26a588b",
                                     "config": {}
                                 }
                             }
@@ -86,6 +96,29 @@
             },
             {
                 "tab": {
+                    "label": "Действия",
+                    "idLayout": "layout_c5b3186f-5a78-4d92-a730-1c8086562141"
+                },
+                "type": "mobile",
+                "columns": [
+                    {
+                        "widgets": [
+                            {
+                                "name": "record-actions",
+                                "label": "dashboard-settings.widget.actions",
+                                "dndId": "13059de7-854e-474f-9bca-6fe313000714",
+                                "id": "2fd922fe-f0de-421d-a40b-b7761d563fb7",
+                                "props": {
+                                    "id": "2fd922fe-f0de-421d-a40b-b7761d563fb7",
+                                    "config": {}
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": {
                     "label": "Документы",
                     "idLayout": "layout_69e552d9-1323-42b4-b8ac-af176a6084fc"
                 },
@@ -102,24 +135,27 @@
                                     "id": "ae30d4c7-1bd6-4ae5-b193-78ac5b9761f5",
                                     "config": {}
                                 }
-                            },
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": {
+                    "label": "Связи документа",
+                    "idLayout": "layout_07d39068-7d9b-4d4e-822a-c2db4913cb6d"
+                },
+                "type": "mobile",
+                "columns": [
+                    {
+                        "widgets": [
                             {
                                 "name": "doc-associations",
                                 "label": "dashboard-settings.widget.doc-associations",
-                                "dndId": "ae4e41c4-76ff-4e1d-bb4c-005d2b58405f",
-                                "id": "627634e6-aaea-41ec-8844-4d68d979746e",
+                                "dndId": "e176af3f-e6a4-4ea3-b66c-2a73a0ca9ad4",
+                                "id": "35970600-1790-41e6-81db-7f428ef42d90",
                                 "props": {
-                                    "id": "627634e6-aaea-41ec-8844-4d68d979746e",
-                                    "config": {}
-                                }
-                            },
-                            {
-                                "name": "barcode",
-                                "label": "dashboard-settings.widget.barcode",
-                                "dndId": "b17e249d-a287-475c-b45e-6fb7c57d2916",
-                                "id": "2537fe2f-7f51-4dad-aba7-1a0771ae3b1d",
-                                "props": {
-                                    "id": "2537fe2f-7f51-4dad-aba7-1a0771ae3b1d",
+                                    "id": "35970600-1790-41e6-81db-7f428ef42d90",
                                     "config": {}
                                 }
                             }
@@ -152,39 +188,6 @@
             },
             {
                 "tab": {
-                    "label": "Задачи",
-                    "idLayout": "layout_3cf89517-1d08-4530-be06-bd31bf862c71"
-                },
-                "type": "mobile",
-                "columns": [
-                    {
-                        "widgets": [
-                            {
-                                "name": "tasks",
-                                "label": "dashboard-settings.widget.tasks",
-                                "dndId": "ebcd2f91-f774-4e10-b164-e37f9020abfe",
-                                "id": "0c813a7e-4ccc-440f-b288-1272fd6cb73d",
-                                "props": {
-                                    "id": "0c813a7e-4ccc-440f-b288-1272fd6cb73d",
-                                    "config": {}
-                                }
-                            },
-                            {
-                                "name": "current-tasks",
-                                "label": "dashboard-settings.widget.current-tasks",
-                                "dndId": "d192dea4-68e8-4dbe-83c8-ee374d1e6fde",
-                                "id": "58ad77ee-00b9-45b1-96ff-d604a26a588b",
-                                "props": {
-                                    "id": "58ad77ee-00b9-45b1-96ff-d604a26a588b",
-                                    "config": {}
-                                }
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "tab": {
                     "label": "Журнал версий",
                     "idLayout": "layout_8b060391-384f-4040-a16b-18ed74a8959f"
                 },
@@ -201,14 +204,27 @@
                                     "id": "a11ba347-98dc-467f-95a8-e6ff79009479",
                                     "config": {}
                                 }
-                            },
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": {
+                    "label": "История событий",
+                    "idLayout": "layout_0ae86778-b9a2-4f1b-8bb8-43891c1539cd"
+                },
+                "type": "mobile",
+                "columns": [
+                    {
+                        "widgets": [
                             {
                                 "name": "events-history",
                                 "label": "dashboard-settings.widget.events-history",
-                                "dndId": "25b0dc48-36b3-468b-9fea-afb52d46f196",
-                                "id": "f6ef4a1d-14c5-41ac-bee2-895088f27d66",
+                                "dndId": "ae360bbf-6283-425d-a285-ff410e777364",
+                                "id": "4dc3ad5e-184a-49f0-8f00-d3e5299ecf56",
                                 "props": {
-                                    "id": "f6ef4a1d-14c5-41ac-bee2-895088f27d66",
+                                    "id": "4dc3ad5e-184a-49f0-8f00-d3e5299ecf56",
                                     "config": {}
                                 }
                             }
