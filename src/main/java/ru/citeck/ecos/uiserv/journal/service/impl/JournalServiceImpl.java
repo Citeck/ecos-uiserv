@@ -17,13 +17,11 @@ import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
-import ru.citeck.ecos.uiserv.service.exception.ResourceNotFoundException;
 import ru.citeck.ecos.uiserv.journal.service.JournalService;
 import ru.citeck.ecos.uiserv.journal.mapper.JournalMapper;
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
-import javax.persistence.EntityNotFoundException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -128,7 +126,7 @@ public class JournalServiceImpl implements JournalService {
     private void updateJournalLists(JournalDto journal) {
 
         ObjectData attributes = journal.getAttributes();
-        String listId = attributes.get("listId").asText();
+        String listId = attributes != null ? attributes.get("listId").asText() : "";
 
         if (StringUtils.isNotBlank(listId)) {
 

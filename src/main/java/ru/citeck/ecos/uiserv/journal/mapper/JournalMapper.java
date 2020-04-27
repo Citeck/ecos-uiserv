@@ -14,6 +14,7 @@ import ru.citeck.ecos.uiserv.journal.dto.JournalSortBy;
 import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 @Component
 @RequiredArgsConstructor
@@ -27,7 +28,9 @@ public class JournalMapper {
         JournalDto dto = new JournalDto();
         dto.setId(entity.getExtId());
         dto.setEditable(entity.getEditable());
-        dto.setColumns(Json.getMapper().read(entity.getColumns(), ColumnsList.class));
+
+        ColumnsList columns = Json.getMapper().read(entity.getColumns(), ColumnsList.class);
+        dto.setColumns(columns != null ? columns : Collections.emptyList());
         dto.setLabel(Json.getMapper().read(entity.getLabel(), MLText.class));
         dto.setTypeRef(RecordRef.valueOf(entity.getTypeRef()));
         dto.setPredicate(Json.getMapper().read(entity.getPredicate(), ObjectData.class));
