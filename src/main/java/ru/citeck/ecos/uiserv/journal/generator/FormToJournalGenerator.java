@@ -28,14 +28,6 @@ public class FormToJournalGenerator {
     private static final String JOURNAL_PREFIX = "JOURNAL_";
     private static final String JOURNAL_TEXT = "journal";
 
-    //todo: just for testing
-    @PostConstruct
-    public void init() throws IOException {
-        File file = ResourceUtils.getFile("classpath:ecos-app/module/ui/form/ecos-form.json");
-        String content = new String(Files.readAllBytes(file.toPath()));
-        this.read(content);
-    }
-
     public JournalDto read(String content) {
         JsonNode node = Json.getMapper().read(content);
         if (node == null) {
