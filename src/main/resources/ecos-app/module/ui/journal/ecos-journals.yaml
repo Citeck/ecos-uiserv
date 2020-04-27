@@ -7,7 +7,7 @@ label: Journals journal
 
 attributes:
   actionFormatter: '' #include include/legacy-actions.js
-  listId: global-main
+  listId: global-system
 
 actions:
   - uiserv/action@ecos-module-download
@@ -16,7 +16,8 @@ actions:
 
 columns:
   - name: moduleId
+    label: { ru: "Идентификатор", en: "Id" }
   - name: typeRef
+    label: { ru: "Тип ECOS", en: "ECOS Type" }
   - name: label
-  - name: metaRecord
-  - name: editable
+    label: { ru: "Название", en: "Name" }

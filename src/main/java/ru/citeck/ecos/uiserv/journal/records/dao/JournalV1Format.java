@@ -51,6 +51,8 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
 
                 if (column.getLabel() != null) {
                     respColumn.setText(column.getLabel().getClosestValue(LocaleContextHolder.getLocale()));
+                } else {
+                    respColumn.setText(column.getName());
                 }
                 respColumn.setAttribute(column.getName());
                 respColumn.setDefault(!Boolean.FALSE.equals(column.getVisible()));
