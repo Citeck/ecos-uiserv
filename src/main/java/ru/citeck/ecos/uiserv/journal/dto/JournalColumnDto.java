@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.journal.dto;
 
+import ecos.com.fasterxml.jackson210.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.RecordRef;
 
 @Data
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @AllArgsConstructor
 @NoArgsConstructor
 public class JournalColumnDto {
@@ -65,34 +67,34 @@ public class JournalColumnDto {
     /**
      * Is filtering allowed for this column?
      */
-    private boolean searchable;
+    private Boolean searchable;
 
     /**
      * Is sorting allowed for this column?
      */
-    private boolean sortable;
+    private Boolean sortable;
 
     /**
      * Can data be grouped by this column?
      */
-    private boolean groupable;
+    private Boolean groupable;
 
     /**
      * Is column editable?
      */
-    private boolean editable;
+    private Boolean editable;
 
     /**
      * Is column visible or not.
      * This parameter can be changed by user in UI
      */
-    private boolean visible;
+    private Boolean visible;
 
     /**
      * Hidden column won't be displayed in UI.
      * This parameter required when some extra data is required to load.
      */
-    private boolean hidden;
+    private Boolean hidden;
 
     /**
      * Custom attributes for temporal or very specific

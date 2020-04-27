@@ -65,7 +65,7 @@ public class JournalRecordsDAOTest {
 
         JournalEntity journalEntity = new JournalEntity();
         journalEntity.setExtId("myTestJournal");
-        journalEntity.setName("{\"en\":\"test\"}");
+        journalEntity.setLabel("{\"en\":\"test\"}");
         journalEntity.setTypeRef(TypesDao.testTypeRef.toString());
 
         journalRepository.save(journalEntity);
@@ -95,7 +95,7 @@ public class JournalRecordsDAOTest {
 
         JournalEntity journalEntity = new JournalEntity();
         journalEntity.setExtId("myTestJournal");
-        journalEntity.setName("{\"en\":\"test\"}");
+        journalEntity.setLabel("{\"en\":\"test\"}");
         journalEntity.setTypeRef(TypesDao.testTypeRef.toString());
 
         journalRepository.save(journalEntity);
@@ -130,11 +130,11 @@ public class JournalRecordsDAOTest {
 
         JournalEntity journalEntity = new JournalEntity();
         journalEntity.setExtId("myTestJournal");
-        journalEntity.setName("{\"en\":\"test\"}");
+        journalEntity.setLabel("{\"en\":\"test\"}");
 
         JournalEntity otherJournalEntity = new JournalEntity();
         otherJournalEntity.setExtId("otherTestJournal");
-        otherJournalEntity.setName("{\"en\":\"test\"}");
+        otherJournalEntity.setLabel("{\"en\":\"test\"}");
         otherJournalEntity.setTypeRef(TypesDao.baseTypeRef.toString());
 
         journalRepository.save(journalEntity);
@@ -186,7 +186,7 @@ public class JournalRecordsDAOTest {
 
         JournalEntity journalEntity = new JournalEntity();
         journalEntity.setExtId("myTestJournal");
-        journalEntity.setName("{\"en\":\"test\"}");
+        journalEntity.setLabel("{\"en\":\"test\"}");
         journalEntity.setTypeRef(TypesDao.testTypeRef.toString());
         journalEntity.setEditable(false);
         journalEntity.setMetaRecord("someAPP/someDAO@MetaRecord");
