@@ -5,7 +5,6 @@ import kotlin.jvm.functions.Function1
 import org.jetbrains.annotations.NotNull
 import ru.citeck.ecos.apps.module.controller.ModuleController
 import ru.citeck.ecos.commons.io.file.EcosFile
-import ru.citeck.ecos.commons.utils.FileUtils
 
 import java.util.function.Function
 import java.util.stream.Collectors
@@ -39,10 +38,7 @@ return new ModuleController<Module, Unit>() {
 
     @Override
     void write(@NotNull EcosFile root, Module module, Unit config) {
-
-        String name = FileUtils.getValidName(module.filename)
-
-        root.createFile(name, (Function1<OutputStream, Unit>) {
+        root.createFile(module.filename, (Function1<OutputStream, Unit>) {
             OutputStream out -> out.write(module.data)
         })
     }
