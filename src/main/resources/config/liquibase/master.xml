@@ -33,5 +33,6 @@
     <include file="changelog/20200415000000_add_i18n_table.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20200413000000_create_journal_table.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20200422000000_icon.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20200427000000_update_journal_table.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
