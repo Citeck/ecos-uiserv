@@ -23,7 +23,7 @@ import java.util.List;
 
 @Component
 @Slf4j
-public class FormToJournalGenerator {
+public class JournalGenerator {
 
     private static final String JOURNAL_PREFIX = "JOURNAL_";
     private static final String JOURNAL_TEXT = "journal";
