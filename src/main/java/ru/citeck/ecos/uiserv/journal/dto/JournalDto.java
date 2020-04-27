@@ -40,13 +40,13 @@ public class JournalDto {
      * @see ru.citeck.ecos.records2.graphql.meta.value.MetaEdge
      */
     @JsonProperty("meta-record")
-    private RecordRef metaRecord;
+    private RecordRef metaRecord = RecordRef.EMPTY;
 
     /**
      * ECOS type.
      */
     @JsonProperty("type-ref")
-    private RecordRef typeRef;
+    private RecordRef typeRef = RecordRef.EMPTY;
 
     /**
      * Predicate for base entities filtering in a table.

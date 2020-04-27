@@ -22,14 +22,13 @@ import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
 import ru.citeck.ecos.uiserv.journal.mapper.JournalMapper;
-import ru.citeck.ecos.uiserv.repository.ActionRepository;
 import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
+import ru.citeck.ecos.uiserv.repository.ActionRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isIn;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
