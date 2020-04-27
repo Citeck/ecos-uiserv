@@ -25,7 +25,7 @@ public class OldJournalModuleHandler implements EcosModuleHandler<OldJournalModu
     @Override
     public void deployModule(@NotNull OldJournalModule module) {
         JournalDto dto = oldJournalMapper.moduleToDto(module);
-        journalService.save(dto);
+        journalService.update(dto);
     }
 
     @NotNull

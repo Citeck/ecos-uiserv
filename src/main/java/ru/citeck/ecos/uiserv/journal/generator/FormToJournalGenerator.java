@@ -9,8 +9,10 @@ import org.springframework.util.ResourceUtils;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.uiserv.journal.dto.ColumnEditorDto;
 import ru.citeck.ecos.uiserv.journal.dto.JournalColumnDto;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
+import ru.citeck.ecos.uiserv.journal.dto.JournalOptionsDto;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -56,7 +58,7 @@ public class FormToJournalGenerator {
 
         JsonNode titleNode = node.path("title");
         if (!titleNode.isMissingNode() && !titleNode.isNull()) {
-            journalDto.setName(new MLText(titleNode.asText() + " " + JOURNAL_TEXT));
+            journalDto.setLabel(new MLText(titleNode.asText() + " " + JOURNAL_TEXT));
         }
 
         ArrayNode components = node
@@ -109,19 +111,56 @@ public class FormToJournalGenerator {
             columnDto.setLabel(new MLText(labelNode.asText()));
         }
 
-        JsonNode protectedNode = componentNode.path("protected");
+        JsonNode keyNode = componentNode.path("key");
+        if (!keyNode.isMissingNode() && !keyNode.isNull()) {
+            columnDto.setName(keyNode.asText());
+        }
+
+        JsonNode attributeNode = componentNode.path("properties").path("attribute");
+        if (!attributeNode.isMissingNode() && !attributeNode.isNull()) {
+            columnDto.setAttribute(attributeNode.asText());
+        }
+
+        JsonNode protectedNode = componentNode.path("disabled");
         if (!protectedNode.isMissingNode() && !protectedNode.isNull()) {
             columnDto.setEditable(!protectedNode.asBoolean());
         }
 
         JsonNode hiddenNode = componentNode.path("hidden");
         if (!hiddenNode.isMissingNode() && !hiddenNode.isNull()) {
-            columnDto.setVisible(hiddenNode.asBoolean());
+            columnDto.setVisible(!hiddenNode.asBoolean());
         }
 
         JsonNode attributesNode = componentNode.path("attributes");
         if (!attributesNode.isMissingNode() && !attributesNode.isNull()) {
             columnDto.setAttributes(new ObjectData(attributesNode));
+        }
+
+        JsonNode dataSrcNode = componentNode.path("dataSrc");
+        if (!dataSrcNode.isMissingNode() && !dataSrcNode.isNull()) {
+
+            JournalOptionsDto optionsDto = new JournalOptionsDto();
+            optionsDto.setType(dataSrcNode.asText());
+
+            JsonNode dataNode = componentNode.path("data");
+            if (!dataNode.isMissingNode() && !dataNode.isNull()) {
+                optionsDto.setConfig(new ObjectData(dataNode));
+            }
+
+            columnDto.setOptions(optionsDto);
+        }
+
+        JsonNode typeNode = componentNode.path("type");
+        if (!typeNode.isMissingNode() && !typeNode.isNull()) {
+
+            ColumnEditorDto editorDto = new ColumnEditorDto();
+            editorDto.setType(typeNode.asText());
+
+            ObjectData componentData = new ObjectData(componentNode);
+            componentData.remove("type");
+            editorDto.setConfig(componentData);
+
+            columnDto.setEditor(editorDto);
         }
 
         return columnDto;

@@ -24,7 +24,7 @@ public class OldJournalMapper {
 
         String name = module.getName();
         if (StringUtils.isNotEmpty(name)) {
-            dto.setName(new MLText(name));
+            dto.setLabel(new MLText(name));
         }
 
         String columnsJSON = module.getColumnsJSONStr();
