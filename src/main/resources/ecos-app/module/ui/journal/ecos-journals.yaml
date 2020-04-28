@@ -3,7 +3,7 @@ id: ecos-journals
 
 source-id: uiserv/journal
 
-label: Journals journal
+label: Journals
 
 attributes:
   actionFormatter: '' #include include/legacy-actions.js
@@ -17,6 +17,8 @@ actions:
 columns:
   - name: moduleId
     label: { ru: "Идентификатор", en: "Id" }
+  - name: sourceId
+    label: { ru: "Источник данных", en: "Data source" }
   - name: typeRef
     label: { ru: "Тип ECOS", en: "ECOS Type" }
   - name: label

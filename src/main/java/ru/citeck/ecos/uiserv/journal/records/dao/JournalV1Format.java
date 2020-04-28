@@ -1,12 +1,10 @@
 package ru.citeck.ecos.uiserv.journal.records.dao;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.uiserv.journal.dto.ColumnEditorDto;
-import ru.citeck.ecos.uiserv.journal.dto.ColumnFormatterDto;
+import ru.citeck.ecos.uiserv.journal.dto.ColumnController;
 import ru.citeck.ecos.uiserv.journal.dto.JournalColumnDto;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.journal.dto.legacy1.Column;
@@ -65,20 +63,12 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
                 respColumn.setType(column.getType());
                 respColumn.setVisible(!Boolean.TRUE.equals(column.getHidden()));
 
-                ColumnFormatterDto formatter = column.getFormatter();
-                if (formatter != null) {
+                ColumnController controller = column.getController();
+                if (controller != null) {
                     Formatter respFormatter = new Formatter();
-                    respFormatter.setName(formatter.getType());
-                    respFormatter.setParams(formatter.getConfig());
+                    respFormatter.setName(controller.getType());
+                    respFormatter.setParams(controller.getConfig());
                     respColumn.setFormatter(respFormatter);
-                }
-
-                ColumnEditorDto editor = column.getEditor();
-                if (editor != null && editor.getConfig() != null) {
-                    String journalId = editor.getConfig().get("journalId").asText();
-                    if (StringUtils.isNotBlank(journalId)) {
-                        respColumn.setEditorKey(journalId);
-                    }
                 }
 
                 columns.add(respColumn);

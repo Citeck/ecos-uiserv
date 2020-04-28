@@ -4,6 +4,7 @@ import ecos.com.fasterxml.jackson210.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.RecordRef;
@@ -20,6 +21,7 @@ public class JournalColumnDto {
      *
      * Mandatory
      */
+    @NotNull
     private String name;
 
     /**
@@ -38,25 +40,15 @@ public class JournalColumnDto {
     private String attribute;
 
     /**
-     * Configuration for inline or group attribute editor.
+     * Configuration for controller.
+     * Controller should define formatter, editor and filter rules.
      */
-    private ColumnEditorDto editor;
+    private ColumnController controller;
 
     /**
-     * Configuration for filter.
+     * Can this attribute be changed by group action?
      */
-    private ColumnFilterDto filter;
-
-    /**
-     * Configuration for formatter.
-     * Required to change default display logic in table.
-     */
-    private ColumnFormatterDto formatter;
-
-    /**
-     * Attribute options. Can be used in filter and editor.
-     */
-    private JournalOptionsDto options;
+    private Boolean batchEdit;
 
     /**
      * Data type.
