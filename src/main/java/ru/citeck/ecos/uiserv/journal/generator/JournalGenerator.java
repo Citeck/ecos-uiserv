@@ -28,7 +28,7 @@ public class JournalGenerator {
     private static final String JOURNAL_PREFIX = "JOURNAL_";
     private static final String JOURNAL_TEXT = "journal";
 
-    public JournalDto read(String content) {
+    public JournalDto readForm(String content) {
         JsonNode node = Json.getMapper().read(content);
         if (node == null) {
             throw new RuntimeException("Cannot get Journal from form. Cannot read JSON: " + content);

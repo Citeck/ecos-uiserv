@@ -1,0 +1,45 @@
+{
+    "id": "ECOS_FORM",
+    "title": "Form ui",
+    "description": "Form to edit other forms",
+    "formKey": "module_form",
+    "formMode": null,
+    "customModule": "js/citeck/modules/eform/ecos-form-custom",
+    "width": null,
+    "i18n": {},
+    "definition": {
+        "display": "form",
+        "components": [
+            {
+                "label": "Width",
+                "dataSrc": "values",
+                "data": {
+                    "values": [
+                        {
+                            "label": "Default",
+                            "value": "default"
+                        },
+                        {
+                            "label": "Large",
+                            "value": "lg"
+                        },
+                        {
+                            "label": "Extra Large",
+                            "value": "extra-lg"
+                        }
+                    ],
+                    "json": "",
+                    "url": "",
+                    "resource": "",
+                    "custom": ""
+                },
+                "key": "width",
+                "attributes": {},
+                "type": "ecosSelect",
+                "input": true,
+                "hidden": false,
+                "disabled": false
+            }
+        ]
+    }
+}
