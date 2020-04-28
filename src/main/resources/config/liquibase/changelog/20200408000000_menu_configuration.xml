@@ -19,9 +19,6 @@
             <column name="ext_id" type="VARCHAR">
                 <constraints nullable="false"/>
             </column>
-            <column name="authorities" type="VARCHAR">
-                <constraints nullable="false"/>
-            </column>
             <column name="priority" type="REAL">
                 <constraints nullable="false"/>
             </column>
@@ -29,13 +26,27 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="created_date" type="TIMESTAMP" />
-            <column name="created_by" type="VARCHAR(50)" />
-            <column name="last_modified_date" type="TIMESTAMP" />
-            <column name="last_modified_by" type="VARCHAR(50)" />
+            <column name="created_date" type="TIMESTAMP"/>
+            <column name="created_by" type="VARCHAR(50)"/>
+            <column name="last_modified_date" type="TIMESTAMP"/>
+            <column name="last_modified_by" type="VARCHAR(50)"/>
 
         </createTable>
 
+        <createTable tableName="ecos_menu_authority">
+            <column name="menu_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authority" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="menu_id"
+                                 baseTableName="ecos_menu_authority"
+                                 constraintName="fk_menu_id_menu"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ecos_menu"/>
     </changeSet>
 
 </databaseChangeLog>

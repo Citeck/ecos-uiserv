@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -24,7 +25,11 @@ public class MenuEntity extends AbstractAuditingEntity {
     @NotNull
     private String type;
     @NotNull
-    private String authorities;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @MapKeyColumn(name = "menu_id")
+    @Column(name = "authority")
+    @CollectionTable(name = "ecos_menu_authority", joinColumns = @JoinColumn(name = "menu_id"))
+    private List<String> authorities;
     @NotNull
     private float priority;
     @NotNull

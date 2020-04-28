@@ -17,6 +17,8 @@ import ru.citeck.ecos.uiserv.service.menu.resolving.ResolvedMenuDto;
 import ru.citeck.ecos.uiserv.service.menu.resolving.resolvers.MenuItemsResolver;
 
 import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -25,7 +27,7 @@ public class MenuService {
     private static final String DEFAULT_AUTHORITY = "default";
     private static final String DEFAULT_MENU_ID = "default-menu";
 
-    private final MenuRepository repository;
+    private final MenuRepository menuRepository;
     private final MenuReaderService readerService;
     private final I18nService i18nService;
     private final AuthoritiesSupport authoritiesSupport;
@@ -35,16 +37,16 @@ public class MenuService {
     public MenuDto upload(MenuDeployModule module) {
         MenuDto menuDto = readerService.readMenu(module.getData(), module.getFilename());
         MenuEntity entity = mapToEntity(menuDto);
-        return mapToDto(repository.save(entity));
+        return mapToDto(menuRepository.save(entity));
     }
 
     public Optional<MenuDto> getMenu(String menuId) {
-        return repository.findByExtId(menuId).map(this::mapToDto);
+        return menuRepository.findByExtId(menuId).map(this::mapToDto);
     }
 
     private MenuEntity mapToEntity(MenuDto menuDto) {
 
-        MenuEntity entity = repository.findByExtId(menuDto.getId()).orElse(null);
+        MenuEntity entity = menuRepository.findByExtId(menuDto.getId()).orElse(null);
         if (entity == null) {
             entity = new MenuEntity();
             entity.setExtId(menuDto.getId());
@@ -52,7 +54,7 @@ public class MenuService {
 
         entity.setTenant("");
         entity.setType(menuDto.getType());
-        entity.setAuthorities(Json.getMapper().toString(menuDto.getAuthorities()));
+        entity.setAuthorities(new ArrayList<>(menuDto.getAuthorities()));
         entity.setPriority(menuDto.getPriority());
         entity.setItems(Json.getMapper().toString(menuDto.getSubMenu()));
 
@@ -69,7 +71,7 @@ public class MenuService {
 
         dto.setId(entity.getExtId());
         dto.setType(entity.getType());
-        dto.setAuthorities(Json.getMapper().read(entity.getAuthorities(), StrList.class));
+        dto.setAuthorities(new ArrayList<>(entity.getAuthorities()));
         dto.setSubMenu(Json.getMapper().read(entity.getItems(), SubMenus.class));
         dto.setPriority(entity.getPriority());
 
@@ -77,48 +79,67 @@ public class MenuService {
     }
 
     public ResolvedMenuDto getMenuForUser(String username) {
-        final Set<String> allUserAuthorities = new HashSet<>(authoritiesSupport.queryUserAuthorities(username));
+        final Set<String> userAuthorities = new HashSet<>(authoritiesSupport.queryUserAuthorities(username));
 
-        return getOrderedAuthorities(allUserAuthorities, username)
-            .stream()
-            .map(this::getMenu)
+        MenuDto foundDto = Stream.<Supplier<Optional<MenuDto>>>of(
+            () -> findMenuByUsername(username),
+            () -> findByAuthorities(userAuthorities),
+            this::findByDefaultAuthority
+        ).map(Supplier::get)
             .filter(Optional::isPresent)
+            .map(Optional::get)
             .findFirst()
-            .orElse(this.getMenu(DEFAULT_AUTHORITY))
-            .map(menuDto -> loadMenuFromStore(menuDto, allUserAuthorities))
-            .orElseGet(() -> this.loadDefaultMenu(allUserAuthorities));
+            .orElseGet(this::findDefaultMenu);
+
+        return resolveMenu(foundDto, userAuthorities);
     }
 
-    private List<String> getOrderedAuthorities(Set<String> userAuthorities, String userName) {
+    private Optional<MenuDto> findMenuByUsername(String username) {
+        return getMenu(username);
+    }
+
+    private Optional<MenuDto> findByAuthorities(Set<String> userAuthorities) {
+        List<String> orderedAuthorities = getOrderedAuthorities(userAuthorities);
+
+        return findFirstByAuthorities(orderedAuthorities);
+    }
+
+    private Optional<MenuDto> findByDefaultAuthority() {
+        return findFirstByAuthorities(Collections.singletonList(DEFAULT_AUTHORITY));
+    }
+
+    private Optional<MenuDto> findFirstByAuthorities(List<String> authorities) {
+        return authorities.stream()
+            .map(menuRepository::findAllByAuthoritiesContains)
+            .flatMap(List::stream)
+            .filter(entity -> !DEFAULT_MENU_ID.equals(entity.getExtId()))
+            .map(this::mapToDto)
+            .findFirst();
+    }
+
+    private List<String> getOrderedAuthorities(Set<String> userAuthorities) {
         Set<String> allUserAuthorities = new HashSet<>(userAuthorities);
-        String defaultOrderParam = applicationProperties.getMenuConfigAuthorityOrder();
-        List<String> defaultOrder = new ArrayList<>(Arrays.asList(defaultOrderParam.split(",")));
+        List<String> defaultOrder = new ArrayList<>(applicationProperties.getMenuConfigAuthorityOrder());
         defaultOrder.retainAll(allUserAuthorities);
         allUserAuthorities.removeAll(defaultOrder);
-        allUserAuthorities.remove(userName);
 
         List<String> orderedAuthorities = new LinkedList<>();
-        orderedAuthorities.add(userName);
         orderedAuthorities.addAll(defaultOrder);
         orderedAuthorities.addAll(allUserAuthorities);
         return orderedAuthorities;
     }
 
-    private ResolvedMenuDto loadDefaultMenu(Set<String> authorities) {
-        return this.getMenu(DEFAULT_MENU_ID)
-            .map(menuDto -> loadMenuFromStore(menuDto, authorities))
+    private MenuDto findDefaultMenu() {
+        return getMenu(DEFAULT_MENU_ID)
             .orElseThrow(() -> new RuntimeException("Cannot load default menu"));
     }
 
-    private ResolvedMenuDto loadMenuFromStore(MenuDto menuDto, Set<String> allUserAuthorities) {
+    private ResolvedMenuDto resolveMenu(MenuDto menuDto, Set<String> allUserAuthorities) {
         return new MenuFactory(
             allUserAuthorities,
             i18nService::getMessage,
             resolvers
         ).getResolvedMenu(menuDto);
-    }
-
-    public static class StrList extends ArrayList<String> {
     }
 
     public static class SubMenus extends HashMap<String, SubMenuDto> {
