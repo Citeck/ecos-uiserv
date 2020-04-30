@@ -2,6 +2,8 @@ package ru.citeck.ecos.uiserv.journal.generator;
 
 import ecos.com.fasterxml.jackson210.databind.JsonNode;
 import ecos.com.fasterxml.jackson210.databind.node.ArrayNode;
+import ecos.com.fasterxml.jackson210.databind.node.MissingNode;
+import ecos.com.fasterxml.jackson210.databind.node.NullNode;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -39,13 +41,6 @@ public class JournalGenerator {
         JsonNode idNode = node.path("id");
         if (!idNode.isMissingNode()) {
             journalDto.setId(JOURNAL_PREFIX + idNode.asText());
-        } else {
-            JsonNode formKeyNode = node.path("formKey");
-            if (!formKeyNode.isMissingNode()) {
-                journalDto.setId(JOURNAL_PREFIX + formKeyNode.asText());
-            } else {
-                throw new RuntimeException("Cannot get Journal from form. Cannot create 'id' for journal.");
-            }
         }
 
         JsonNode titleNode = node.path("title");
@@ -74,21 +69,18 @@ public class JournalGenerator {
                 continue;
             }
 
-            if (hasInnerComponents(componentJsonNode)) {
-
-                ArrayNode innerColumnsNodes = componentJsonNode.withArray("columns");
-                for (JsonNode columnNode : innerColumnsNodes) {
-
+            ArrayNode innerComponents = this.getInnerComponents(componentJsonNode);
+            if (!innerComponents.isMissingNode() && !innerComponents.isNull() && innerComponents.size() != 0) {
+                for (JsonNode columnNode : innerComponents) {
                     ArrayNode innerComponentsNodes = columnNode.withArray("components");
                     if (!innerComponentsNodes.isMissingNode() && !innerComponentsNodes.isNull()) {
                         columnsDtos.addAll(this.readColumns(innerComponentsNodes));
                     }
                 }
-                continue;
+            } else {
+                JournalColumnDto columnDto = this.readColumn(componentJsonNode);
+                columnsDtos.add(columnDto);
             }
-
-            JournalColumnDto columnDto = this.readColumn(componentJsonNode);
-            columnsDtos.add(columnDto);
         }
 
         return columnsDtos;
@@ -164,8 +156,13 @@ public class JournalGenerator {
      * @param componentNode
      * @return boolean value of checking result
      */
-    private boolean hasInnerComponents(JsonNode componentNode) {
-        return componentNode.get("columns") != null;
+    private ArrayNode getInnerComponents(JsonNode componentNode) {
+        if (componentNode.path("type").asText().equals("columns")) {
+            return componentNode.withArray("columns");
+        } else {
+            return componentNode.has("components") ?
+                componentNode.withArray("components") : new ArrayNode(null);
+        }
     }
 
     /**
