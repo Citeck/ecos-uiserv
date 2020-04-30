@@ -28,7 +28,6 @@ import java.util.List;
 public class JournalGenerator {
 
     private static final String JOURNAL_PREFIX = "JOURNAL_";
-    private static final String JOURNAL_TEXT = "journal";
 
     public JournalDto readForm(String content) {
         JsonNode node = Json.getMapper().read(content);
@@ -45,7 +44,7 @@ public class JournalGenerator {
 
         JsonNode titleNode = node.path("title");
         if (!titleNode.isMissingNode() && !titleNode.isNull()) {
-            journalDto.setLabel(new MLText(titleNode.asText() + " " + JOURNAL_TEXT));
+            journalDto.setLabel(new MLText(titleNode.asText()));
         }
 
         ArrayNode components = node

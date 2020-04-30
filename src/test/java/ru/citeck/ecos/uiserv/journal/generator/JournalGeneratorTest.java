@@ -23,7 +23,7 @@ import java.util.List;
 public class JournalGeneratorTest {
 
     private static final String TEST_FORM_PATH = "src/test/resources/form/ecos-form.json";
-    
+
     private JournalGenerator journalGenerator;
 
     @BeforeEach
@@ -38,7 +38,7 @@ public class JournalGeneratorTest {
 
         JournalDto journalDto = new JournalDto();
         journalDto.setId("JOURNAL_ECOS_FORM");
-        journalDto.setLabel(new MLText("Form ui journal"));
+        journalDto.setLabel(new MLText("Form ui"));
 
         JournalColumnDto widthColumn = new JournalColumnDto();
         widthColumn.setName("width");
