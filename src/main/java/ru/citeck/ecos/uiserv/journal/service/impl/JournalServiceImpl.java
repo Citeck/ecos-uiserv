@@ -49,6 +49,12 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
+    public JournalDto getJournalById(String id) {
+        Optional<JournalEntity> entity = journalRepository.findByExtId(id);
+        return entity.map(journalMapper::entityToDto).orElse(null);
+    }
+
+    @Override
     public Set<JournalDto> getAll(int max, int skipCount, Predicate predicate) {
 
         PageRequest page = PageRequest.of(
@@ -227,6 +233,11 @@ public class JournalServiceImpl implements JournalService {
             .map(Optional::get)
             .map(journalMapper::entityToDto)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public void delete(String id) {
+        journalRepository.findByExtId(id).ifPresent(journalRepository::delete);
     }
 
     private JournalEntity getByTypeRef(String typeRefStr) {

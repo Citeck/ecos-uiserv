@@ -30,7 +30,6 @@ public class JournalDto {
     /**
      * Records source ID.
      */
-    @JsonProperty("source-id")
     private String sourceId;
 
     /**
@@ -39,13 +38,11 @@ public class JournalDto {
      * @see ru.citeck.ecos.records2.graphql.meta.value.MetaValue#getEdge(String, MetaField)
      * @see ru.citeck.ecos.records2.graphql.meta.value.MetaEdge
      */
-    @JsonProperty("meta-record")
     private RecordRef metaRecord;
 
     /**
      * ECOS type.
      */
-    @JsonProperty("type-ref")
     private RecordRef typeRef;
 
     /**
@@ -58,13 +55,11 @@ public class JournalDto {
     /**
      * Group records by specified attributes.
      */
-    @JsonProperty("group-by")
     private List<String> groupBy;
 
     /**
      * Default sorting.
      */
-    @JsonProperty("sort-by")
     private List<JournalSortBy> sortBy;
 
     /**

@@ -1,0 +1,19 @@
+
+id: form
+
+name:
+  en: Form
+  ru: Форма
+
+system: true
+
+createVariants:
+
+  - id: create-new-form
+    name: { ru: Создать форму, en: Create form }
+    recordRef: uiserv/eform@
+
+  - id: upload-form
+    name: { ru: Загрузить форму, en: Upload form }
+    recordRef: uiserv/eform@
+    formKey: ecos-module-upload

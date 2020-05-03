@@ -1,0 +1,15 @@
+
+id: ui-action
+
+name:
+  en: UI Action
+  ru: UI Действие
+
+system: true
+
+createVariants:
+
+  - id: upload-action
+    name: { ru: Загрузить действие, en: Upload action }
+    recordRef: uiserv/action@
+    formKey: ecos-module-upload

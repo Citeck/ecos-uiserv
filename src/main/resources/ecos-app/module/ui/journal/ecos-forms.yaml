@@ -1,9 +1,9 @@
 
 id: ecos-forms
-
-source-id: uiserv/eform
-
 label: { ru: Формы, en: Forms }
+
+typeRef: emodel/type@form
+sourceId: uiserv/eform
 
 attributes:
   actionFormatter: '' #include include/legacy-actions.js
@@ -17,14 +17,14 @@ actions:
 columns:
 
   - name: moduleId
-    label: { ru: "Идентификатор", en: "Id" }
+    label: { ru: Идентификатор, en: Id }
 
   - name: formKey
-    label: { ru: "Ключ формы", en: "Form key" }
+    label: { ru: Ключ формы, en: Form key }
 
   - name: title
-    label: { ru: "Название", en: "Name" }
+    label: { ru: Название, en: Name }
 
   - name: description
-    label: { ru: "Описание", en: "Description" }
+    label: { ru: Описание, en: Description }
 
