@@ -4,6 +4,7 @@ import ecos.com.fasterxml.jackson210.annotation.JsonIgnore;
 import ecos.com.fasterxml.jackson210.annotation.JsonInclude;
 import lombok.Data;
 
+import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -18,10 +19,17 @@ public class JournalConfig {
 
     public JournalConfig(JournalConfigResp conf, JournalTypeDto type) {
         this.type = type;
-        this.createVariants = conf.getCreateVariants();
-        this.criteria = conf.getCriteria();
-        this.nodeRef = conf.getNodeRef();
-        this.title = conf.getTitle();
+        if (conf != null) {
+            this.createVariants = conf.getCreateVariants();
+            this.criteria = conf.getCriteria();
+            this.nodeRef = conf.getNodeRef();
+            this.title = conf.getTitle();
+        } else {
+            this.createVariants = Collections.emptyList();
+            this.criteria = Collections.emptyList();
+            this.nodeRef = type.getId();
+            this.title = type.getId();
+        }
     }
 
     public JournalConfig() {
