@@ -30,7 +30,7 @@ public interface JournalService {
 
     void onJournalChanged(Consumer<JournalDto> consumer);
 
-    JournalDto update(JournalDto dto);
+    JournalDto save(JournalDto dto);
 
     List<JournalDto> getJournalsByJournalsList(String journalsListId);
 

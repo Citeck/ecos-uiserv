@@ -21,7 +21,7 @@ public class JournalModuleHandler implements EcosModuleHandler<JournalDto> {
 
     @Override
     public void deployModule(@NotNull JournalDto module) {
-        journalService.update(module);
+        journalService.save(module);
     }
 
     @NotNull

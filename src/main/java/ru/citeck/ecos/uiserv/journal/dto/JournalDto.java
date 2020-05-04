@@ -38,12 +38,12 @@ public class JournalDto {
      * @see ru.citeck.ecos.records2.graphql.meta.value.MetaValue#getEdge(String, MetaField)
      * @see ru.citeck.ecos.records2.graphql.meta.value.MetaEdge
      */
-    private RecordRef metaRecord;
+    private RecordRef metaRecord = RecordRef.EMPTY;
 
     /**
      * ECOS type.
      */
-    private RecordRef typeRef;
+    private RecordRef typeRef = RecordRef.EMPTY;
 
     /**
      * Predicate for base entities filtering in a table.

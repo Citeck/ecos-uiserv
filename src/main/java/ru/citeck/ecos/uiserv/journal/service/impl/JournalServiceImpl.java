@@ -116,7 +116,7 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
-    public JournalDto update(JournalDto dto) {
+    public JournalDto save(JournalDto dto) {
 
         JournalEntity journalEntity = journalMapper.dtoToEntity(dto);
         JournalEntity storedJournalEntity = journalRepository.save(journalEntity);
@@ -223,6 +223,12 @@ public class JournalServiceImpl implements JournalService {
         return null;
     }
 
+    private JournalEntity getByTypeRef(String typeRefStr) {
+        Optional<JournalEntity> optionalJournalEntity = journalRepository.findAllByTypeRef(typeRefStr).stream()
+            .findFirst();
+        return optionalJournalEntity.orElse(null);
+    }
+
     @Override
     public List<JournalDto> getJournalsByJournalsList(String journalsListId) {
 
@@ -238,12 +244,6 @@ public class JournalServiceImpl implements JournalService {
     @Override
     public void delete(String id) {
         journalRepository.findByExtId(id).ifPresent(journalRepository::delete);
-    }
-
-    private JournalEntity getByTypeRef(String typeRefStr) {
-        Optional<JournalEntity> optionalJournalEntity = journalRepository.findAllByTypeRef(typeRefStr).stream()
-            .findFirst();
-        return optionalJournalEntity.orElse(null);
     }
 
     private Specification<JournalEntity> toSpec(Predicate predicate) {
