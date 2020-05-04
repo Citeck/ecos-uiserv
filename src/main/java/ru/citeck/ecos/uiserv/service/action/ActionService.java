@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -96,12 +97,10 @@ public class ActionService {
 
         List<RecordEvaluatorDto> evaluators = actionsModules.stream()
             .map(a -> {
-                RecordEvaluatorDto recordEvaluatorDto;
-                if (a.getEvaluator() == null) {
+                RecordEvaluatorDto recordEvaluatorDto = a.getEvaluator();
+                if (recordEvaluatorDto == null) {
                     recordEvaluatorDto = new RecordEvaluatorDto();
                     recordEvaluatorDto.setType(AlwaysTrueEvaluator.TYPE);
-                } else {
-                    recordEvaluatorDto = a.getEvaluator();
                 }
                 if (recordEvaluatorDto.getType() == null) {
                     recordEvaluatorDto.setType(recordEvaluatorDto.getId());
@@ -154,8 +153,11 @@ public class ActionService {
         }
 
         EvaluatorEntity evaluator = actionEntity.getEvaluator();
+        RecordEvaluatorDto evaluatorDto = null;
+
         if (evaluator != null) {
-            RecordEvaluatorDto evaluatorDto = new RecordEvaluatorDto();
+
+            evaluatorDto = new RecordEvaluatorDto();
             evaluatorDto.setId(evaluator.getEvaluatorId());
             evaluatorDto.setType(evaluator.getType());
             evaluatorDto.setInverse(evaluator.isInverse());
@@ -164,8 +166,12 @@ public class ActionService {
             if (configJson != null) {
                 evaluatorDto.setConfig(Json.getMapper().convert(configJson, ObjectData.class));
             }
+        }
 
+        if (isValidEvaluator(evaluatorDto)) {
             action.setEvaluator(evaluatorDto);
+        } else {
+            action.setEvaluator(null);
         }
 
         return action;
@@ -196,7 +202,7 @@ public class ActionService {
         }
 
         RecordEvaluatorDto evaluator = action.getEvaluator();
-        if (evaluator != null) {
+        if (isValidEvaluator(evaluator)) {
 
             EvaluatorEntity evaluatorEntity = actionEntity.getEvaluator();
             if (evaluatorEntity == null) {
@@ -218,8 +224,16 @@ public class ActionService {
             evaluatorEntity.setInverse(evaluator.isInverse());
 
             actionEntity.setEvaluator(evaluatorEntity);
+
+        } else {
+
+            actionEntity.setEvaluator(null);
         }
 
         return actionEntity;
+    }
+
+    private boolean isValidEvaluator(RecordEvaluatorDto ev) {
+        return ev != null && (StringUtils.isNotBlank(ev.getId()) || StringUtils.isNotBlank(ev.getType()));
     }
 }

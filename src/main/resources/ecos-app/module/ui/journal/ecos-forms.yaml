@@ -1,9 +1,9 @@
 
-id: ecos-journals
-label: { ru: Журналы, en: Journals }
+id: ecos-forms
+label: { ru: Формы, en: Forms }
 
-typeRef: emodel/type@journal
-sourceId: uiserv/journal
+typeRef: emodel/type@form
+sourceId: uiserv/eform
 
 attributes:
   actionFormatter: '' #include include/legacy-actions.js
@@ -19,11 +19,12 @@ columns:
   - name: moduleId
     label: { ru: Идентификатор, en: Id }
 
-  - name: sourceId
-    label: { ru: Источник данных, en: Data source }
+  - name: formKey
+    label: { ru: Ключ формы, en: Form key }
 
-  - name: typeRef
-    label: { ru: Тип ECOS, en: ECOS Type }
-
-  - name: label
+  - name: title
     label: { ru: Название, en: Name }
+
+  - name: description
+    label: { ru: Описание, en: Description }
+

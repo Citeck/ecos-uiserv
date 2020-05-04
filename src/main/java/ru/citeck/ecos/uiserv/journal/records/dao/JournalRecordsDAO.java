@@ -8,14 +8,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.annotation.DisplayName;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
+import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
+import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
+import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDAO;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
@@ -28,7 +33,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class JournalRecordsDAO extends LocalRecordsDAO
     implements LocalRecordsQueryWithMetaDAO<JournalDto>,
-               LocalRecordsMetaDAO<JournalDto> {
+               LocalRecordsMetaDAO<JournalDto>,
+               MutableRecordsLocalDAO<JournalRecordsDAO.JournalRecord> {
 
     public static final String LANG_QUERY_BY_LIST_ID = "list-id";
 
@@ -99,6 +105,50 @@ public class JournalRecordsDAO extends LocalRecordsDAO
             }).collect(Collectors.toList());
     }
 
+    @Override
+    public RecordsDelResult delete(RecordsDeletion deletion) {
+
+        List<RecordMeta> resultRecords = new ArrayList<>();
+
+        deletion.getRecords()
+            .forEach(r -> {
+                journalService.delete(r.getId());
+                resultRecords.add(new RecordMeta(r));
+            });
+
+        RecordsDelResult result = new RecordsDelResult();
+        result.setRecords(resultRecords);
+        return result;
+    }
+
+    @Override
+    public List<JournalRecord> getValuesToMutate(List<RecordRef> records) {
+
+        return records.stream()
+            .map(RecordRef::getId)
+            .map(id -> {
+                JournalDto dto = journalService.getJournalById(id);
+                if (dto == null) {
+                    dto = new JournalDto();
+                    dto.setId(id);
+                }
+                return new JournalRecord(dto);
+            })
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public RecordsMutResult save(List<JournalRecord> values) {
+
+        RecordsMutResult result = new RecordsMutResult();
+
+        for (final JournalRecord model : values) {
+            result.addRecord(new RecordMeta(journalService.update(model).getId()));
+        }
+
+        return result;
+    }
+
     @Data
     public static class QueryWithTypeRef {
         private String typeRef;
@@ -120,9 +170,6 @@ public class JournalRecordsDAO extends LocalRecordsDAO
     }
 
     public static class JournalRecord extends JournalDto {
-
-        JournalRecord() {
-        }
 
         JournalRecord(JournalDto dto) {
             super(dto);

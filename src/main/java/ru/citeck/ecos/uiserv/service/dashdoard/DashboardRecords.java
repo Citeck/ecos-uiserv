@@ -54,7 +54,7 @@ public class DashboardRecords extends LocalRecordsDAO
     public RecordsQueryResult<DashboardRecord> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
 
         Query query = recordsQuery.getQuery(Query.class);
-        if (query == null) {
+        if (query == null || "criteria".equals(recordsQuery.getLanguage())) {
             RecordsQueryResult<DashboardRecord> result = new RecordsQueryResult<>();
             result.setRecords(dashboardService.getAllDashboards()
                 .stream()

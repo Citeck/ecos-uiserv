@@ -11,6 +11,8 @@ import java.util.function.Consumer;
 
 public interface JournalService {
 
+    JournalDto getJournalById(String id);
+
     Set<JournalDto> getAll(int max, int skipCount, Predicate predicate);
 
     JournalDto getById(String id);
@@ -31,4 +33,6 @@ public interface JournalService {
     JournalDto save(JournalDto dto);
 
     List<JournalDto> getJournalsByJournalsList(String journalsListId);
+
+    void delete(String id);
 }

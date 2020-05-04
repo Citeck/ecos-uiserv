@@ -49,6 +49,12 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
+    public JournalDto getJournalById(String id) {
+        Optional<JournalEntity> entity = journalRepository.findByExtId(id);
+        return entity.map(journalMapper::entityToDto).orElse(null);
+    }
+
+    @Override
     public Set<JournalDto> getAll(int max, int skipCount, Predicate predicate) {
 
         PageRequest page = PageRequest.of(
@@ -123,7 +129,7 @@ public class JournalServiceImpl implements JournalService {
         return journalDto;
     }
 
-    private void updateJournalLists(JournalDto journal) {
+    private synchronized void updateJournalLists(JournalDto journal) {
 
         ObjectData attributes = journal.getAttributes();
         String listId = attributes != null ? attributes.get("listId").asText() : "";
@@ -159,7 +165,7 @@ public class JournalServiceImpl implements JournalService {
                     Collections.newSetFromMap(new ConcurrentHashMap<>())
                 ).remove(journal.getId());
 
-                listByJournalId.remove(listIdBefore);
+                listByJournalId.remove(journal.getId());
             }
         }
     }
@@ -233,6 +239,11 @@ public class JournalServiceImpl implements JournalService {
             .map(Optional::get)
             .map(journalMapper::entityToDto)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public void delete(String id) {
+        journalRepository.findByExtId(id).ifPresent(journalRepository::delete);
     }
 
     private Specification<JournalEntity> toSpec(Predicate predicate) {

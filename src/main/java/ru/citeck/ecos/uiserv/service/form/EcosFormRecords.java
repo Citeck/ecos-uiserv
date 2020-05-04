@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.QueryContext;
@@ -215,7 +216,7 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
 
         @DisplayName
         public String getDisplayName() {
-            String name =  getTitle().getClosestValue(QueryContext.getCurrent().getLocale());
+            String name = MLText.getClosestValue(getTitle(), QueryContext.getCurrent().getLocale());
             if (StringUtils.isBlank(name)) {
                 name = "Form";
             }

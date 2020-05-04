@@ -1,0 +1,19 @@
+
+id: ui-action/record-actions
+
+parent: emodel/type@ui-action
+
+name:
+  en: Server actions
+  ru: Серверные действия
+
+system: true
+
+createVariants:
+
+  - id: create-new-action-record-actions
+    name: { ru: Создать "Серверные действия", en: Create "Server actions" }
+    recordRef: uiserv/action@
+    formKey: action_record_actions
+    attributes:
+      type: record-actions
