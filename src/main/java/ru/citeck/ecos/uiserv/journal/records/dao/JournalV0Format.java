@@ -1,8 +1,6 @@
 package ru.citeck.ecos.uiserv.journal.records.dao;
 
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.DataValue;
@@ -10,8 +8,6 @@ import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.uiserv.journal.dto.JournalColumnDto;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.journal.dto.legacy0.Attribute;
@@ -32,8 +28,6 @@ public class JournalV0Format implements JournalModelFormat<JournalConfig> {
 
     @Override
     public JournalConfig convert(JournalDto dto) {
-
-        StrStrMap emptyStrStrMap = new StrStrMap();
 
         Locale currentLocale = LocaleContextHolder.getLocale();
 
