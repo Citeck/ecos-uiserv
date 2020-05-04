@@ -16,4 +16,4 @@ createVariants:
     recordRef: uiserv/action@
     formKey: action_record_actions
     attributes:
-      type: record_actions
+      type: record-actions
