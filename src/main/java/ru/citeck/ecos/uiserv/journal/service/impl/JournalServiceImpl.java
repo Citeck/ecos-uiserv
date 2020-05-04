@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.journal.service.impl;
 
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.DependsOn;
@@ -14,6 +15,8 @@ import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records2.request.query.RecordsQuery;
+import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
@@ -27,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @DependsOn("liquibase")
 @RequiredArgsConstructor
@@ -232,13 +236,38 @@ public class JournalServiceImpl implements JournalService {
     @Override
     public List<JournalDto> getJournalsByJournalsList(String journalsListId) {
 
-        return journalsByListId.getOrDefault(journalsListId, Collections.emptySet())
+        if (StringUtils.isBlank(journalsListId)) {
+            return Collections.emptyList();
+        }
+
+        List<JournalDto> journals = journalsByListId.getOrDefault(journalsListId, Collections.emptySet())
             .stream()
             .map(journalRepository::findByExtId)
             .filter(Optional::isPresent)
             .map(Optional::get)
             .map(journalMapper::entityToDto)
             .collect(Collectors.toList());
+
+        List<RecordRef> types = getTypesByJournalListId(journalsListId);
+        //types.
+
+        return journals;
+    }
+
+    private List<RecordRef> getTypesByJournalListId(String journalListId) {
+
+        RecordsQuery query = new RecordsQuery();
+        query.setLanguage("journal-list");
+        query.setSourceId("emodel/type");
+        query.setQuery(new ObjectData("{\"listId\":\"" + journalListId + "\"}"));
+
+        try {
+            RecordsQueryResult<RecordRef> result = recordsService.queryRecords(query);
+            return result.getRecords();
+        } catch (Exception e) {
+            log.error("Types can't be received from emodel. List id: '" + journalListId + "'", e);
+            return Collections.emptyList();
+        }
     }
 
     @Override
@@ -278,7 +307,7 @@ public class JournalServiceImpl implements JournalService {
         @MetaAtt("journal?str")
         private RecordRef journalRef;
 
-        @MetaAtt("parents?str")
+        @MetaAtt("parents[]?id")
         private List<RecordRef> parentsRefs;
     }
 }
