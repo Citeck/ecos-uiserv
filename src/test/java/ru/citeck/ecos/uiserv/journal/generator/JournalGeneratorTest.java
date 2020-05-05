@@ -7,10 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.uiserv.journal.dto.ColumnEditorDto;
 import ru.citeck.ecos.uiserv.journal.dto.JournalColumnDto;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
-import ru.citeck.ecos.uiserv.journal.dto.JournalOptionsDto;
+import ru.citeck.ecos.uiserv.journal.service.type.JournalByFormGenerator;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,11 +23,11 @@ public class JournalGeneratorTest {
 
     private static final String TEST_FORM_PATH = "src/test/resources/form/ecos-form.json";
 
-    private JournalGenerator journalGenerator;
+    private JournalByFormGenerator journalGenerator;
 
     @BeforeEach
     void setUp() {
-        journalGenerator = new JournalGenerator();
+        journalGenerator = new JournalByFormGenerator();
     }
 
     @Test
@@ -47,7 +46,7 @@ public class JournalGeneratorTest {
         widthColumn.setVisible(true);
         widthColumn.setAttributes(new ObjectData("{}"));
 
-        ColumnEditorDto widthEditor = new ColumnEditorDto();
+        /*ColumnEditorDto widthEditor = new ColumnEditorDto();
         widthEditor.setType("ecosSelect");
         widthEditor.setConfig(new ObjectData(
             "   {" +
@@ -116,11 +115,11 @@ public class JournalGeneratorTest {
 
         //  act
 
-        JournalDto resultDto = journalGenerator.readForm(formContent);
+        JournalDto resultDto = journalGenerator.getJournalImpl(formContent);
 
         //  assert
 
-        Assert.assertEquals(journalDto, resultDto);
+        Assert.assertEquals(journalDto, resultDto);*/
     }
 
     private String readFormFileContent() throws IOException {

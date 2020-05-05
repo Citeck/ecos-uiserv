@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.journal.dto.legacy0;
 import ecos.com.fasterxml.jackson210.annotation.JsonIgnore;
 import ecos.com.fasterxml.jackson210.annotation.JsonInclude;
 import lombok.Data;
+import ru.citeck.ecos.commons.data.ObjectData;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,6 +17,7 @@ public class JournalConfig {
     private List<Criteria> criteria;
     private String nodeRef;
     private String title;
+    private ObjectData predicate;
 
     public JournalConfig(JournalConfigResp conf, JournalTypeDto type) {
         this.type = type;

@@ -36,9 +36,13 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
         JournalConfigResp resp = new JournalConfigResp();
         resp.setId(dto.getId());
         resp.setParams(Json.getMapper().convert(dto.getAttributes(), StrStrMap.class));
+        if (resp.getParams() == null) {
+            resp.setParams(new HashMap<>());
+        }
         resp.setSourceId(dto.getSourceId());
 
         JournalMeta meta = new JournalMeta();
+        meta.setNodeRef(dto.getId());
         meta.setActions(dto.getActions());
         meta.setGroupBy(Json.getMapper().convert(dto.getGroupBy(), JsonNode.class));
         if (dto.getMetaRecord() != null) {
@@ -70,6 +74,9 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
 
                 respColumn.setGroupable(Boolean.TRUE.equals(column.getGroupable()));
                 respColumn.setParams(Json.getMapper().convert(column.getAttributes(), StrStrMap.class));
+                if (respColumn.getParams() == null) {
+                    respColumn.setParams(new HashMap<>());
+                }
                 respColumn.setSchema(column.getAttribute());
                 respColumn.setSearchable(Boolean.TRUE.equals(column.getSearchable()));
                 respColumn.setSortable(Boolean.TRUE.equals(column.getSortable()));

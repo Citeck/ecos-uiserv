@@ -66,6 +66,7 @@ public class JournalV0Format implements JournalModelFormat<JournalConfig> {
         config.setType(journalType);
         config.setNodeRef(dto.getId());
         config.setCriteria(Collections.emptyList());
+        config.setPredicate(dto.getPredicate() != null ? new ObjectData(dto.getPredicate()) : null);
         config.setTitle(MLText.getClosestValue(dto.getLabel(), currentLocale));
         config.setCreateVariants(getCreateVariants(dto.getTypeRef()));
 

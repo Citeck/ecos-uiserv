@@ -20,6 +20,7 @@ import ru.citeck.ecos.uiserv.domain.EcosFormEntity;
 import ru.citeck.ecos.uiserv.repository.EcosFormsRepository;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -30,15 +31,14 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     private static final String DEFAULT_KEY = "DEFAULT";
 
-    private Consumer<EcosFormModel> listener;
+    private List<Consumer<EcosFormModel>> listeners = new CopyOnWriteArrayList<>();
 
     private final EcosFormsRepository formsRepository;
     private final RecordsService recordsService;
 
-
     @Override
     public void addChangeListener(Consumer<EcosFormModel> listener) {
-        this.listener = listener;
+        listeners.add(listener);
     }
 
     @Override
@@ -97,6 +97,9 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     @Override
     public Optional<EcosFormModel> getFormById(String id) {
+        if (StringUtils.isBlank(id)) {
+            return Optional.empty();
+        }
         return formsRepository.findByExtId(id).map(this::mapToDto);
     }
 
@@ -106,7 +109,7 @@ public class EcosFormServiceImpl implements EcosFormService {
         EcosFormEntity entity = formsRepository.save(mapToEntity(model));
         EcosFormModel result = mapToDto(entity);
 
-        listener.accept(result);
+        listeners.forEach(it -> it.accept(result));
 
         return result.getId();
     }

@@ -1,7 +1,5 @@
 package ru.citeck.ecos.uiserv.journal.service;
 
-import org.jetbrains.annotations.Nullable;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 
@@ -20,9 +18,6 @@ public interface JournalService {
     Set<JournalDto> getAll(int maxItems, int skipCount);
 
     Set<JournalDto> getAll(Set<String> extIds);
-
-    @Nullable
-    JournalDto searchJournalByTypeRef(RecordRef typeRef);
 
     long getCount();
 

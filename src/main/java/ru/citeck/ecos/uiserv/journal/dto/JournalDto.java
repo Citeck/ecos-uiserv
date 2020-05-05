@@ -1,7 +1,6 @@
 package ru.citeck.ecos.uiserv.journal.dto;
 
 import ecos.com.fasterxml.jackson210.annotation.JsonInclude;
-import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import ru.citeck.ecos.commons.data.MLText;
@@ -91,18 +90,21 @@ public class JournalDto {
     }
 
     public JournalDto(JournalDto other) {
-        this.id = other.id;
-        this.label = Json.getMapper().copy(other.label);
-        this.sourceId = other.sourceId;
-        this.metaRecord = other.metaRecord;
-        this.typeRef = other.typeRef;
-        this.predicate = Json.getMapper().copy(other.predicate);
-        this.groupBy = Json.getMapper().copy(other.groupBy);
-        this.sortBy = other.sortBy;
-        this.actions = Json.getMapper().copy(other.actions);
-        this.editable = other.editable;
-        List<JournalColumnDto> columns = Json.getMapper().copy(other.columns);
-        this.columns = columns != null ? columns : new ArrayList<>();
-        this.attributes = Json.getMapper().copy(other.attributes);
+        JournalDto copy = Json.getMapper().copy(other);
+        if (copy == null) {
+            return;
+        }
+        this.id = copy.id;
+        this.label = copy.label;
+        this.sourceId = copy.sourceId;
+        this.metaRecord = copy.metaRecord;
+        this.typeRef = copy.typeRef;
+        this.predicate = copy.predicate;
+        this.groupBy = copy.groupBy;
+        this.sortBy = copy.sortBy;
+        this.actions = copy.actions;
+        this.editable = copy.editable;
+        this.columns = copy.columns;
+        this.attributes = copy.attributes;
     }
 }

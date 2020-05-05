@@ -25,6 +25,7 @@ import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDAO;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.journal.service.JournalService;
+import ru.citeck.ecos.uiserv.journal.service.type.TypeJournalService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,6 +40,7 @@ public class JournalRecordsDAO extends LocalRecordsDAO
     public static final String LANG_QUERY_BY_LIST_ID = "list-id";
 
     private final JournalService journalService;
+    private final TypeJournalService typeJournalService;
 
     @Override
     public RecordsQueryResult<JournalDto> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
@@ -48,7 +50,7 @@ public class JournalRecordsDAO extends LocalRecordsDAO
         if (LANG_QUERY_BY_LIST_ID.equals(recordsQuery.getLanguage())) {
 
             QueryByListId queryByListId = recordsQuery.getQuery(QueryByListId.class);
-            List<JournalDto> journals = journalService.getJournalsByJournalsList(queryByListId.listId);
+            List<JournalDto> journals = typeJournalService.getJournalsByListId(queryByListId.listId);
 
             journals.forEach(j -> result.addRecord(new JournalRecord(j)));
 
@@ -57,10 +59,9 @@ public class JournalRecordsDAO extends LocalRecordsDAO
 
         JournalQueryByTypeRef queryByTypeRef = recordsQuery.getQuery(JournalQueryByTypeRef.class);
         if (queryByTypeRef != null && queryByTypeRef.getTypeRef() != null) {
-            JournalDto dto = journalService.searchJournalByTypeRef(queryByTypeRef.getTypeRef());
-            if (dto != null) {
-                result.addRecord(new JournalRecord(dto));
-            }
+            typeJournalService.getJournalForType(queryByTypeRef.getTypeRef()).ifPresent(dto ->
+                result.addRecord(new JournalRecord(dto))
+            );
             return result;
         }
 
@@ -96,7 +97,17 @@ public class JournalRecordsDAO extends LocalRecordsDAO
                 if (RecordRef.isEmpty(ref)) {
                     dto = new JournalDto();
                 } else {
-                    dto = journalService.getById(ref.getId());
+                    String id = ref.getId();
+                    if (id.startsWith(TypeJournalService.JOURNAL_ID_PREFIX)) {
+                        RecordRef typeRef = RecordRef.create(
+                            "emodel",
+                            "type",
+                            id.substring(TypeJournalService.JOURNAL_ID_PREFIX.length())
+                        );
+                        dto = typeJournalService.getJournalForType(typeRef).orElse(null);
+                    } else {
+                        dto = journalService.getById(ref.getId());
+                    }
                     if (dto == null) {
                         dto = new JournalDto();
                     }
@@ -143,7 +154,7 @@ public class JournalRecordsDAO extends LocalRecordsDAO
         RecordsMutResult result = new RecordsMutResult();
 
         for (final JournalRecord model : values) {
-            result.addRecord(new RecordMeta(journalService.update(model).getId()));
+            result.addRecord(new RecordMeta(journalService.save(model).getId()));
         }
 
         return result;

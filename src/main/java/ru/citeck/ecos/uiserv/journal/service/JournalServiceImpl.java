@@ -1,8 +1,7 @@
-package ru.citeck.ecos.uiserv.journal.service.impl;
+package ru.citeck.ecos.uiserv.journal.service;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.PageRequest;
@@ -10,20 +9,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
-import ru.citeck.ecos.records2.request.query.RecordsQuery;
-import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
-import ru.citeck.ecos.uiserv.journal.service.JournalService;
 import ru.citeck.ecos.uiserv.journal.mapper.JournalMapper;
 
-import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -174,65 +167,6 @@ public class JournalServiceImpl implements JournalService {
         }
     }
 
-    /**
-     * Search journal by 2 ways:
-     * 1. in type hierarchy
-     * 2. searching journal with same typeRef
-     *
-     * @param typeRef - input value of typeRef
-     * @return journalDto - result of search
-     */
-    @Override
-    @Nullable
-    public JournalDto searchJournalByTypeRef(@NonNull RecordRef typeRef) {
-
-        TypeJournalMeta typeJournalResult = recordsService.getMeta(typeRef, TypeJournalMeta.class);
-
-        List<RecordRef> parentsTypeRefs = typeJournalResult.getParentsRefs();
-        RecordRef journalRef = typeJournalResult.getJournalRef();
-
-        JournalEntity journalWithSameTypeRef = getByTypeRef(typeRef.toString());
-
-        if (journalRef == null && CollectionUtils.isNotEmpty(parentsTypeRefs)) {
-
-            //  search by types hierarchy iteration
-            for (RecordRef parentTypeRef : parentsTypeRefs) {
-
-                TypeJournalMeta parentTypeJournalResult = recordsService.getMeta(parentTypeRef, TypeJournalMeta.class);
-                journalRef = parentTypeJournalResult.getJournalRef();
-
-                if (journalRef == null && journalWithSameTypeRef == null) {
-                    // for case, when we search JournalEntity with same TypeRef
-                    journalWithSameTypeRef = getByTypeRef(parentTypeRef.toString());
-                }
-
-                if (journalRef != null) {
-                    break;
-                }
-            }
-        }
-
-        if (journalRef == null && journalWithSameTypeRef != null) {
-            //  JournalEntity with same TypeRef
-            return journalMapper.entityToDto(journalWithSameTypeRef);
-        }
-
-        if (journalRef != null) {
-            JournalEntity journalEntity = journalRepository.findByExtId(journalRef.getId()).orElse(null);
-            if (journalEntity != null) {
-                return journalMapper.entityToDto(journalEntity);
-            }
-        }
-
-        return null;
-    }
-
-    private JournalEntity getByTypeRef(String typeRefStr) {
-        Optional<JournalEntity> optionalJournalEntity = journalRepository.findAllByTypeRef(typeRefStr).stream()
-            .findFirst();
-        return optionalJournalEntity.orElse(null);
-    }
-
     @Override
     public List<JournalDto> getJournalsByJournalsList(String journalsListId) {
 
@@ -240,34 +174,13 @@ public class JournalServiceImpl implements JournalService {
             return Collections.emptyList();
         }
 
-        List<JournalDto> journals = journalsByListId.getOrDefault(journalsListId, Collections.emptySet())
+        return journalsByListId.getOrDefault(journalsListId, Collections.emptySet())
             .stream()
             .map(journalRepository::findByExtId)
             .filter(Optional::isPresent)
             .map(Optional::get)
             .map(journalMapper::entityToDto)
             .collect(Collectors.toList());
-
-        List<RecordRef> types = getTypesByJournalListId(journalsListId);
-        //types.
-
-        return journals;
-    }
-
-    private List<RecordRef> getTypesByJournalListId(String journalListId) {
-
-        RecordsQuery query = new RecordsQuery();
-        query.setLanguage("journal-list");
-        query.setSourceId("emodel/type");
-        query.setQuery(new ObjectData("{\"listId\":\"" + journalListId + "\"}"));
-
-        try {
-            RecordsQueryResult<RecordRef> result = recordsService.queryRecords(query);
-            return result.getRecords();
-        } catch (Exception e) {
-            log.error("Types can't be received from emodel. List id: '" + journalListId + "'", e);
-            return Collections.emptyList();
-        }
     }
 
     @Override
@@ -297,17 +210,5 @@ public class JournalServiceImpl implements JournalService {
     public static class PredicateDto {
         private String name;
         private String moduleId;
-    }
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class TypeJournalMeta {
-
-        @MetaAtt("journal?str")
-        private RecordRef journalRef;
-
-        @MetaAtt("parents[]?id")
-        private List<RecordRef> parentsRefs;
     }
 }
