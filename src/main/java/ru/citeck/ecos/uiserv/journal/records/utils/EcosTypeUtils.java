@@ -1,5 +1,8 @@
 package ru.citeck.ecos.uiserv.journal.records.utils;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -7,8 +10,11 @@ import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 
+import javax.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -16,25 +22,45 @@ public class EcosTypeUtils {
 
     private final RecordsService recordsService;
 
+    private LoadingCache<RecordRef, Optional<TypeMeta>> typesMetaCache;
+
+    @PostConstruct
+    public void init() {
+        typesMetaCache = CacheBuilder.newBuilder()
+            .maximumSize(100)
+            .expireAfterWrite(10, TimeUnit.SECONDS)
+            .build(CacheLoader.from(this::getTypeMetaImpl));
+    }
+
+    public List<RecordRef> getActions(RecordRef typeRef) {
+        return getTypeMeta(typeRef)
+            .map(TypeMeta::getActions)
+            .orElse(Collections.emptyList());
+    }
+
     public List<CreateVariantDto> getCreateVariants(RecordRef typeRef) {
+        return getTypeMeta(typeRef)
+            .map(TypeMeta::getCreateVariants)
+            .orElse(Collections.emptyList());
+    }
 
+    private Optional<TypeMeta> getTypeMeta(RecordRef typeRef) {
         if (RecordRef.isEmpty(typeRef)) {
-            return Collections.emptyList();
+            return Optional.empty();
         }
+        return typesMetaCache.getUnchecked(typeRef);
+    }
 
-        TypeCreateVariants meta = recordsService.getMeta(typeRef, TypeCreateVariants.class);
-
-        if (meta == null) {
-            return Collections.emptyList();
-        }
-
-        return meta.createVariants;
+    private Optional<TypeMeta> getTypeMetaImpl(RecordRef typeRef) {
+        return Optional.ofNullable(recordsService.getMeta(typeRef, TypeMeta.class));
     }
 
     @Data
-    public static class TypeCreateVariants {
+    public static class TypeMeta {
         @MetaAtt("inhCreateVariants[]?json")
         private List<CreateVariantDto> createVariants;
+        @MetaAtt("_actions[]?id")
+        private List<RecordRef> actions;
     }
 }
 

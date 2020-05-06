@@ -65,7 +65,7 @@ public class JournalDto {
      * Actions for every entity in a table.
      * Can be filtered for specific entities by evaluator.
      */
-    private List<RecordRef> actions = new ArrayList<>();
+    private List<RecordRef> actions;
 
     /**
      * Can attributes of entities in a table be edited or not.

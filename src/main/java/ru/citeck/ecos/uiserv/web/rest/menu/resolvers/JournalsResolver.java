@@ -5,11 +5,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.context.i18n.LocaleContextHolder;
+import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.records2.request.query.QueryConsistency;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
+import ru.citeck.ecos.uiserv.journal.service.type.TypeJournalService;
 import ru.citeck.ecos.uiserv.web.rest.menu.dto.Element;
 
 import java.util.Arrays;
@@ -31,6 +34,7 @@ public class JournalsResolver {
 
     private final RecordsService recordsService;
     private final JournalListIdExtractor journalListIdExtractor;
+    private final TypeJournalService typeJournalService;
 
     public interface JournalListIdExtractor {
         IDs extract(Map<String, String> params, Element context);
@@ -117,8 +121,21 @@ public class JournalsResolver {
         query.setConsistency(QueryConsistency.TRANSACTIONAL);
 
         RecordsQueryResult<JournalListAtts> result = recordsService.queryRecords(query, JournalListAtts.class);
-        return result.getRecords().stream().flatMap(journalListAtts -> journalListAtts.getJournals().stream())
+        List<JournalAtts> journals = result.getRecords()
+            .stream()
+            .flatMap(journalListAtts -> journalListAtts.getJournals().stream())
             .collect(Collectors.toList());
+
+        typeJournalService.getJournalsByListId(journalList).forEach(journal -> {
+            JournalAtts atts = new JournalAtts();
+            atts.setId(journal.getId());
+            atts.setJournalType(journal.getId());
+            atts.setName(MLText.getClosestValue(journal.getLabel(), LocaleContextHolder.getLocale()));
+            atts.setTitle(atts.getName());
+            journals.add(atts);
+        });
+
+        return journals;
     }
 
     protected Element constructItem(JournalAtts journalInfo, Map<String, String> params, Element context,

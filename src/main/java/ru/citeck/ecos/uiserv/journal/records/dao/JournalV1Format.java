@@ -43,7 +43,11 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
 
         JournalMeta meta = new JournalMeta();
         meta.setNodeRef(dto.getId());
-        meta.setActions(dto.getActions());
+        if (dto.getActions() != null) {
+            meta.setActions(dto.getActions());
+        } else {
+            meta.setActions(typeUtils.getActions(dto.getTypeRef()));
+        }
         meta.setGroupBy(Json.getMapper().convert(dto.getGroupBy(), JsonNode.class));
         if (dto.getMetaRecord() != null) {
             meta.setMetaRecord(dto.getMetaRecord().toString());
