@@ -3,7 +3,6 @@ package ru.citeck.ecos.uiserv.journal.service;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 
-import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -26,8 +25,6 @@ public interface JournalService {
     void onJournalChanged(Consumer<JournalDto> consumer);
 
     JournalDto save(JournalDto dto);
-
-    List<JournalDto> getJournalsByJournalsList(String journalsListId);
 
     void delete(String id);
 }

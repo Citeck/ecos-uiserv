@@ -54,8 +54,29 @@ public class JournalByFormGenerator {
         column.setEditable(!component.get("disabled").asBoolean());
         column.setAttributes(new ObjectData(component.get("attributes")));
 
+        String compType = component.get("type").asText();
+
+        switch (compType) {
+            case "ecosSelect":
+            case "select":
+                column.setType("options");
+                break;
+            case "selectJournal":
+                column.setType("assoc");
+                break;
+            case "selectOrgstruct":
+                column.setType("authority");
+                break;
+            case "textfield":
+            case "textarea":
+                column.setType("text");
+            default:
+                column.setType(compType);
+                break;
+        }
+
         ColumnController controller = new ColumnController();
-        controller.setType(component.get("type").asText());
+        controller.setType(compType);
         controller.setConfig(new ObjectData(component));
         controller.getConfig().remove("type");
 

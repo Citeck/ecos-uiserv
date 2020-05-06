@@ -8,7 +8,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
@@ -17,9 +16,7 @@ import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
 import ru.citeck.ecos.uiserv.journal.mapper.JournalMapper;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -34,16 +31,6 @@ public class JournalServiceImpl implements JournalService {
     private final RecordsService recordsService;
 
     private Consumer<JournalDto> changeListener;
-
-    private final Map<String, Set<String>> journalsByListId = new ConcurrentHashMap<>();
-    private final Map<String, String> listByJournalId = new ConcurrentHashMap<>();
-
-    @PostConstruct
-    public void init() {
-        journalRepository.findAll().forEach(journal ->
-            updateJournalLists(journalMapper.entityToDto(journal))
-        );
-    }
 
     @Override
     public JournalDto getJournalById(String id) {
@@ -120,67 +107,8 @@ public class JournalServiceImpl implements JournalService {
 
         JournalDto journalDto = journalMapper.entityToDto(storedJournalEntity);
 
-        updateJournalLists(journalDto);
-
         changeListener.accept(journalDto);
         return journalDto;
-    }
-
-    private synchronized void updateJournalLists(JournalDto journal) {
-
-        ObjectData attributes = journal.getAttributes();
-        String listId = attributes != null ? attributes.get("listId").asText() : "";
-
-        if (StringUtils.isNotBlank(listId)) {
-
-            Set<String> listJournals = journalsByListId.computeIfAbsent(listId, id ->
-                Collections.newSetFromMap(new ConcurrentHashMap<>())
-            );
-
-            String listIdBefore = listByJournalId.get(journal.getId());
-            if (StringUtils.isNotBlank(listIdBefore)) {
-                if (!listIdBefore.equals(listId)) {
-                    Set<String> listBefore = journalsByListId.computeIfAbsent(listIdBefore, id ->
-                        Collections.newSetFromMap(new ConcurrentHashMap<>())
-                    );
-                    listBefore.remove(journal.getId());
-                    listJournals.add(journal.getId());
-                }
-            } else {
-                listJournals.add(journal.getId());
-            }
-
-            listByJournalId.put(journal.getId(), listId);
-
-        } else {
-
-            String listIdBefore = listByJournalId.get(journal.getId());
-
-            if (StringUtils.isNotBlank(listIdBefore)) {
-
-                journalsByListId.computeIfAbsent(listIdBefore, id ->
-                    Collections.newSetFromMap(new ConcurrentHashMap<>())
-                ).remove(journal.getId());
-
-                listByJournalId.remove(journal.getId());
-            }
-        }
-    }
-
-    @Override
-    public List<JournalDto> getJournalsByJournalsList(String journalsListId) {
-
-        if (StringUtils.isBlank(journalsListId)) {
-            return Collections.emptyList();
-        }
-
-        return journalsByListId.getOrDefault(journalsListId, Collections.emptySet())
-            .stream()
-            .map(journalRepository::findByExtId)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(journalMapper::entityToDto)
-            .collect(Collectors.toList());
     }
 
     @Override

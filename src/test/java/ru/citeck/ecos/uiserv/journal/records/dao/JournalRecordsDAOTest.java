@@ -32,7 +32,6 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -55,71 +54,6 @@ public class JournalRecordsDAOTest {
     void setUp() {
         journalRepository.deleteAll();
         actionRepository.deleteAll();
-    }
-
-    @Test
-    void queryJournalByTypeRef_WithDirectReceiving() throws Exception {
-
-        //  arrange
-
-        JournalEntity journalEntity = new JournalEntity();
-        journalEntity.setExtId("myTestJournal");
-        journalEntity.setLabel("{\"en\":\"test\"}");
-        journalEntity.setTypeRef(TypesDao.testTypeRef.toString());
-
-        journalRepository.save(journalEntity);
-
-        //  act and assert
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/records/query")
-            .contentType("application/json")
-            .header("Content-type", "application/json")
-            .content("{\n" +
-                "    \"query\": {\n" +
-                "        \"sourceId\": \"journal\",\n" +
-                "        \"query\": {\n" +
-                "            \"typeRef\": \"" + TypesDao.testTypeRef.toString() + "\"\n" +
-                "                   }" +
-                "               }" +
-                "     }"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.records[0]",
-                is(UISERV_APP_ID + "/" + JOURNAL_DAO_ID + "@" + journalEntity.getExtId())));
-    }
-
-    @Test
-    void queryJournalByTypeRef_WithParentsIteration() throws Exception {
-
-        //  arrange
-
-        JournalEntity journalEntity = new JournalEntity();
-        journalEntity.setExtId("myTestJournal");
-        journalEntity.setLabel("{\"en\":\"test\"}");
-        journalEntity.setTypeRef(TypesDao.testTypeRef.toString());
-
-        journalRepository.save(journalEntity);
-
-        TypesDao.testTypeRecord.setJournal(null);
-        TypesDao.baseTypeRecord.setJournal(TypesDao.journalRef);
-
-        TypesDao.records.put(TypesDao.testTypeRef.getId(), TypesDao.testTypeRecord);
-        TypesDao.records.put(TypesDao.baseTypeRecord.getId(), TypesDao.baseTypeRecord);
-
-        //  act and assert
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/records/query")
-            .contentType("application/json")
-            .header("Content-type", "application/json")
-            .content("{\n" +
-                "    \"query\": {\n" +
-                "        \"sourceId\": \"journal\",\n" +
-                "        \"query\": {\n" +
-                "            \"typeRef\": \"" + TypesDao.testTypeRef.toString() + "\"\n" +
-                "                   }" +
-                "               }" +
-                "     }"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.records[0]", is("uiserv/journal@" + journalEntity.getExtId())));
     }
 
     //@Test

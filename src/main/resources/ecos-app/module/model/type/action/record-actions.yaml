@@ -9,11 +9,11 @@ name:
 
 system: true
 
-createVariants:
+#createVariants:
 
-  - id: create-new-action-record-actions
-    name: { ru: Создать "Серверные действия", en: Create "Server actions" }
-    recordRef: uiserv/action@
-    formKey: action_record_actions
-    attributes:
-      type: record-actions
+#  - id: create-new-action-record-actions
+#    name: { ru: Создать "Серверные действия", en: Create "Server actions" }
+#    recordRef: uiserv/action@
+#    formRef: action_record_actions
+#    attributes:
+#      type: record-actions

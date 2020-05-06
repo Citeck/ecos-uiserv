@@ -8,3 +8,6 @@ name:
 system: true
 
 dashboardType: user-dashboard
+
+attributes:
+  journalsListId: global-system

@@ -7,7 +7,6 @@ sourceId: uiserv/journal
 
 attributes:
   actionFormatter: '' #include include/legacy-actions.js
-  listId: global-system
 
 actions:
   - uiserv/action@ecos-module-download

@@ -9,7 +9,6 @@ import ru.citeck.ecos.records2.RecordRef;
 public class CreateVariantDto {
     private String id;
     private MLText name;
-    private String formKey;
     private RecordRef formRef;
     private RecordRef recordRef;
     private ObjectData attributes = new ObjectData();

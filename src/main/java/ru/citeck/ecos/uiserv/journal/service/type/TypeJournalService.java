@@ -65,11 +65,7 @@ public class TypeJournalService {
     public List<JournalDto> getJournalsByListId(String journalListId) {
 
         Set<String> journalsId = new HashSet<>();
-
-        List<JournalDto> result = new ArrayList<>(journalService.getJournalsByJournalsList(journalListId));
-        result.stream()
-            .map(JournalDto::getId)
-            .forEach(journalsId::add);
+        List<JournalDto> result = new ArrayList<>();
 
         getJournalsFromTypesByListId(journalListId)
             .stream()
@@ -116,7 +112,12 @@ public class TypeJournalService {
             return Optional.empty();
         }
 
-        Optional<JournalDto> journal = getJournal(typeRef, typeMeta.getJournal(), typeMeta.getForm());
+        Optional<JournalDto> journal = getJournal(
+            typeRef,
+            typeMeta.getSourceId(),
+            typeMeta.getJournal(),
+            typeMeta.getForm()
+        );
         if (!journal.isPresent()) {
             journal = getJournalForTypeImpl(typeMeta.parentsRefs, 0);
         }
@@ -141,14 +142,22 @@ public class TypeJournalService {
             return Optional.empty();
         }
 
-        Optional<JournalDto> journal = getJournal(typeRef, meta.getJournal(), meta.getForm());
+        Optional<JournalDto> journal = getJournal(
+            typeRef,
+            meta.getSourceId(),
+            meta.getJournal(),
+            meta.getForm()
+        );
         if (!journal.isPresent()) {
             journal = getJournalForTypeImpl(types, idx + 1);
         }
         return journal;
     }
 
-    private Optional<JournalDto> getJournal(RecordRef typeRef, RecordRef journalRef, RecordRef formRef) {
+    private Optional<JournalDto> getJournal(RecordRef typeRef,
+                                            String sourceId,
+                                            RecordRef journalRef,
+                                            RecordRef formRef) {
 
         if (RecordRef.isNotEmpty(journalRef)) {
             JournalDto journal = journalService.getJournalById(journalRef.getId());
@@ -160,6 +169,8 @@ public class TypeJournalService {
             return journalByFormIdCache.getUnchecked(formRef.getId())
                 .map(dto -> {
                     JournalDto result = new JournalDto(dto);
+                    result.setTypeRef(typeRef);
+                    result.setSourceId(sourceId);
                     result.setPredicate(new ObjectData(Predicates.eq("_etype", typeRef.toString())));
                     result.setId(JOURNAL_ID_PREFIX + typeRef.getId());
                     return result;
@@ -187,6 +198,7 @@ public class TypeJournalService {
     @Data
     public static class TypeMetaWithParents {
 
+        private String sourceId;
         private RecordRef journal;
         private RecordRef form;
 
@@ -197,6 +209,7 @@ public class TypeJournalService {
     @Data
     public static class TypeMeta {
 
+        private String sourceId;
         private RecordRef journal;
         private RecordRef form;
     }

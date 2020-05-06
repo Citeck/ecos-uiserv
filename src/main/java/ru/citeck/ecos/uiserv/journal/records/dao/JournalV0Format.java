@@ -94,12 +94,11 @@ public class JournalV0Format implements JournalModelFormat<JournalConfig> {
             if (cv.getRecordRef().getSourceId().equals("dict")) {
                 variant.setType(cv.getRecordRef().getId());
             }
-            variant.setFormKey(cv.getFormKey());
             variant.setFormId(RecordRef.toString(cv.getFormRef()));
             variant.setRecordRef(RecordRef.toString(cv.getRecordRef()));
             variant.setTitle(MLText.getClosestValue(cv.getName(), locale));
-
             variant.setCanCreate(true);
+            variant.setAttributes(cv.getAttributes());
 
             return variant;
 

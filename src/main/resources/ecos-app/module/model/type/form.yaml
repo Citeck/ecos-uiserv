@@ -7,6 +7,8 @@ name:
 
 system: true
 
+journal: uiserv/journal@ecos-forms
+
 createVariants:
 
   - id: create-new-form
@@ -16,4 +18,7 @@ createVariants:
   - id: upload-form
     name: { ru: Загрузить форму, en: Upload form }
     recordRef: uiserv/eform@
-    formKey: ecos-module-upload
+    formRef: uiserv/eform@ecos-module-upload
+
+attributes:
+  journalsListId: global-system

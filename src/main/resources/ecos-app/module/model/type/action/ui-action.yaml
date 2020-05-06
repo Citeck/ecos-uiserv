@@ -7,9 +7,14 @@ name:
 
 system: true
 
+journal: uiserv/journal@ui-actions
+
 createVariants:
 
   - id: upload-action
     name: { ru: Загрузить действие, en: Upload action }
     recordRef: uiserv/action@
-    formKey: ecos-module-upload
+    formRef: uiserv/eform@ecos-module-upload
+
+attributes:
+  journalsListId: global-system

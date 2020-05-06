@@ -84,11 +84,22 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
                 respColumn.setVisible(!Boolean.TRUE.equals(column.getHidden()));
 
                 ColumnController controller = column.getController();
+
                 if (controller != null) {
+
                     Formatter respFormatter = new Formatter();
                     respFormatter.setName(controller.getType());
                     respFormatter.setParams(controller.getConfig());
                     respColumn.setFormatter(respFormatter);
+
+                    String type = controller.getType();
+
+                    if ("selectJournal".equals(type)) {
+                        String journalId = controller.getConfig().get("journalId").asText();
+                        if (!journalId.isEmpty()) {
+                            respColumn.setEditorKey(journalId);
+                        }
+                    }
                 }
 
                 columns.add(respColumn);
@@ -118,7 +129,6 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
                 resultVariant.setDestination(destination);
             }
             resultVariant.setFormId(RecordRef.toString(variant.getFormRef()));
-            resultVariant.setFormKey(variant.getFormKey());
             resultVariant.setTitle(MLText.getClosestValue(variant.getName(), locale));
 
             resultVariant.setRecordRef(RecordRef.toString(variant.getRecordRef()));
