@@ -1,17 +1,8 @@
 package ru.citeck.ecos.uiserv.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.uiserv.domain.DashboardDto;
-import ru.citeck.ecos.uiserv.service.action.ActionService;
-import ru.citeck.ecos.uiserv.service.dashdoard.DashboardService;
-import ru.citeck.ecos.uiserv.service.form.EcosFormModel;
-import ru.citeck.ecos.uiserv.service.form.EcosFormService;
 
 //@Slf4j
 //@Configuration

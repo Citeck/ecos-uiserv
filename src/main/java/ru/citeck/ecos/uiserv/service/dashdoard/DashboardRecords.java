@@ -24,7 +24,7 @@ import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
 import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDAO;
-import ru.citeck.ecos.uiserv.domain.DashboardDto;
+import ru.citeck.ecos.uiserv.service.dashdoard.dto.DashboardDto;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -54,7 +54,7 @@ public class DashboardRecords extends LocalRecordsDAO
     public RecordsQueryResult<DashboardRecord> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
 
         Query query = recordsQuery.getQuery(Query.class);
-        if (query == null) {
+        if (query == null || "criteria".equals(recordsQuery.getLanguage())) {
             RecordsQueryResult<DashboardRecord> result = new RecordsQueryResult<>();
             result.setRecords(dashboardService.getAllDashboards()
                 .stream()

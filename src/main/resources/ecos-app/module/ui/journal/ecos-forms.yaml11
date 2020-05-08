@@ -1,0 +1,30 @@
+
+id: ecos-forms
+
+source-id: uiserv/eform
+
+label: { ru: Формы, en: Forms }
+
+attributes:
+  actionFormatter: '' #include include/legacy-actions.js
+  listId: global-system
+
+actions:
+  - uiserv/action@ecos-module-download
+  - uiserv/action@delete
+  - uiserv/action@edit
+
+columns:
+
+  - name: moduleId
+    label: { ru: "Идентификатор", en: "Id" }
+
+  - name: formKey
+    label: { ru: "Ключ формы", en: "Form key" }
+
+  - name: title
+    label: { ru: "Название", en: "Name" }
+
+  - name: description
+    label: { ru: "Описание", en: "Description" }
+

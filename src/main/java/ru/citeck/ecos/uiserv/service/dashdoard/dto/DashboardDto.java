@@ -1,10 +1,12 @@
-package ru.citeck.ecos.uiserv.domain;
+package ru.citeck.ecos.uiserv.service.dashdoard.dto;
 
 import lombok.Data;
+import lombok.ToString;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.commons.data.ObjectData;
 
 @Data
+@ToString(exclude = { "config" })
 public class DashboardDto {
 
     private String id;

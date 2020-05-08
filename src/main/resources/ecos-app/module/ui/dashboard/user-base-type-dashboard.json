@@ -5,19 +5,20 @@
         "mobile": [
             {
                 "tab": {
-                    "label": "Вкладка",
+                    "label": "Свойства",
                     "idLayout": "layout_b4b01e70-e01c-457d-abfa-aaaf0a4ca691"
                 },
+                "type": "mobile",
                 "columns": [
                     {
                         "widgets": [
                             {
-                                "dndId": "fe273bb3-fd01-4cce-a672-4a726e48869d",
-                                "name": "tasks",
-                                "label": "dashboard-settings.widget.tasks",
-                                "id": "96a1c8e1-49c7-47b4-b679-0f9ebd001983",
+                                "name": "doc-status",
+                                "label": "dashboard-settings.widget.doc-status",
+                                "dndId": "c8c32b4e-138c-4746-bb9f-96d38008aa20",
+                                "id": "5720648a-db6f-49ff-9917-67fb2eebf18f",
                                 "props": {
-                                    "id": "96a1c8e1-49c7-47b4-b679-0f9ebd001983",
+                                    "id": "5720648a-db6f-49ff-9917-67fb2eebf18f",
                                     "config": {}
                                 }
                             },
@@ -30,14 +31,60 @@
                                     "id": "09623c98-fce2-4c50-9dbf-3f9c6b829092",
                                     "config": {}
                                 }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": {
+                    "label": "Задачи",
+                    "idLayout": "layout_3cf89517-1d08-4530-be06-bd31bf862c71"
+                },
+                "type": "mobile",
+                "columns": [
+                    {
+                        "widgets": [
+                            {
+                                "name": "tasks",
+                                "label": "dashboard-settings.widget.tasks",
+                                "dndId": "ebcd2f91-f774-4e10-b164-e37f9020abfe",
+                                "id": "0c813a7e-4ccc-440f-b288-1272fd6cb73d",
+                                "props": {
+                                    "id": "0c813a7e-4ccc-440f-b288-1272fd6cb73d",
+                                    "config": {}
+                                }
                             },
                             {
-                                "dndId": "f610694c-adfe-40b0-825d-cd97a3de4912",
+                                "name": "current-tasks",
+                                "label": "dashboard-settings.widget.current-tasks",
+                                "dndId": "d192dea4-68e8-4dbe-83c8-ee374d1e6fde",
+                                "id": "58ad77ee-00b9-45b1-96ff-d604a26a588b",
+                                "props": {
+                                    "id": "58ad77ee-00b9-45b1-96ff-d604a26a588b",
+                                    "config": {}
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": {
+                    "label": "Просмотр",
+                    "idLayout": "layout_4e345aef-8b21-47cb-a653-26e3e897bb5c"
+                },
+                "type": "mobile",
+                "columns": [
+                    {
+                        "widgets": [
+                            {
                                 "name": "doc-preview",
                                 "label": "dashboard-settings.widget.preview",
-                                "id": "1e65976f-fec7-44f5-841e-ffe8fc4e6699",
+                                "dndId": "01972af7-7ca8-403c-9bdb-ba327641e48b",
+                                "id": "078b2f66-a426-41f7-bbe9-399819c95418",
                                 "props": {
-                                    "id": "1e65976f-fec7-44f5-841e-ffe8fc4e6699",
+                                    "id": "078b2f66-a426-41f7-bbe9-399819c95418",
                                     "config": {
                                         "link": ""
                                     }
@@ -45,9 +92,145 @@
                             }
                         ]
                     }
-                ],
-                "id": "layout_b4b01e70-e01c-457d-abfa-aaaf0a4ca691",
-                "type": "mobile"
+                ]
+            },
+            {
+                "tab": {
+                    "label": "Действия",
+                    "idLayout": "layout_c5b3186f-5a78-4d92-a730-1c8086562141"
+                },
+                "type": "mobile",
+                "columns": [
+                    {
+                        "widgets": [
+                            {
+                                "name": "record-actions",
+                                "label": "dashboard-settings.widget.actions",
+                                "dndId": "13059de7-854e-474f-9bca-6fe313000714",
+                                "id": "2fd922fe-f0de-421d-a40b-b7761d563fb7",
+                                "props": {
+                                    "id": "2fd922fe-f0de-421d-a40b-b7761d563fb7",
+                                    "config": {}
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": {
+                    "label": "Документы",
+                    "idLayout": "layout_69e552d9-1323-42b4-b8ac-af176a6084fc"
+                },
+                "type": "mobile",
+                "columns": [
+                    {
+                        "widgets": [
+                            {
+                                "name": "documents",
+                                "label": "dashboard-settings.widget.documents",
+                                "dndId": "1f7b39f6-95ea-42ea-ad20-8d7917ea53e8",
+                                "id": "ae30d4c7-1bd6-4ae5-b193-78ac5b9761f5",
+                                "props": {
+                                    "id": "ae30d4c7-1bd6-4ae5-b193-78ac5b9761f5",
+                                    "config": {}
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": {
+                    "label": "Связи документа",
+                    "idLayout": "layout_07d39068-7d9b-4d4e-822a-c2db4913cb6d"
+                },
+                "type": "mobile",
+                "columns": [
+                    {
+                        "widgets": [
+                            {
+                                "name": "doc-associations",
+                                "label": "dashboard-settings.widget.doc-associations",
+                                "dndId": "e176af3f-e6a4-4ea3-b66c-2a73a0ca9ad4",
+                                "id": "35970600-1790-41e6-81db-7f428ef42d90",
+                                "props": {
+                                    "id": "35970600-1790-41e6-81db-7f428ef42d90",
+                                    "config": {}
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": {
+                    "label": "Комментарии",
+                    "idLayout": "layout_b3a3755f-12c4-4b2c-9c87-10821681b76c"
+                },
+                "type": "mobile",
+                "columns": [
+                    {
+                        "widgets": [
+                            {
+                                "name": "comments",
+                                "label": "dashboard-settings.widget.comments",
+                                "dndId": "74d3ff1c-a21a-414a-8b3b-0998521a2002",
+                                "id": "6d4b6c6f-0e1c-488d-9acd-54bd90325712",
+                                "props": {
+                                    "id": "6d4b6c6f-0e1c-488d-9acd-54bd90325712",
+                                    "config": {}
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": {
+                    "label": "Журнал версий",
+                    "idLayout": "layout_8b060391-384f-4040-a16b-18ed74a8959f"
+                },
+                "type": "mobile",
+                "columns": [
+                    {
+                        "widgets": [
+                            {
+                                "name": "versions-journal",
+                                "label": "dashboard-settings.widget.versions-journal",
+                                "dndId": "3718b6ea-4046-42ca-a7b0-c83e34899430",
+                                "id": "a11ba347-98dc-467f-95a8-e6ff79009479",
+                                "props": {
+                                    "id": "a11ba347-98dc-467f-95a8-e6ff79009479",
+                                    "config": {}
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": {
+                    "label": "История событий",
+                    "idLayout": "layout_0ae86778-b9a2-4f1b-8bb8-43891c1539cd"
+                },
+                "type": "mobile",
+                "columns": [
+                    {
+                        "widgets": [
+                            {
+                                "name": "events-history",
+                                "label": "dashboard-settings.widget.events-history",
+                                "dndId": "ae360bbf-6283-425d-a285-ff410e777364",
+                                "id": "4dc3ad5e-184a-49f0-8f00-d3e5299ecf56",
+                                "props": {
+                                    "id": "4dc3ad5e-184a-49f0-8f00-d3e5299ecf56",
+                                    "config": {}
+                                }
+                            }
+                        ]
+                    }
+                ]
             }
         ],
         "layouts": [

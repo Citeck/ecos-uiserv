@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@Deprecated
 public class JournalListService {
     @Autowired
     private FileService fileService;

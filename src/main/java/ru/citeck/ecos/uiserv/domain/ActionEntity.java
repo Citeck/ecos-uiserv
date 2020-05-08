@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.domain;
 
 import lombok.Data;
+import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
 
 import javax.persistence.*;
 import java.util.Objects;
