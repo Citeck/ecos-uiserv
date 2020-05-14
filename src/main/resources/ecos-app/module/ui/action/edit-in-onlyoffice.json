@@ -25,6 +25,11 @@
                             "text/plain",
                             "text/csv"
                         ]
+                    },
+                    {
+                        "t": "eq",
+                        "att": "$alfMeta.attributes.edition",
+                        "val": "enterprise"
                     }
                 ]
             }
