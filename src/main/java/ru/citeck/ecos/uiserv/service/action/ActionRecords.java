@@ -327,7 +327,7 @@ public class ActionRecords extends LocalRecordsDAO
         private String key;
         private String icon;
         private String type;
-        private ObjectData config = new ObjectData();
+        private ObjectData config = ObjectData.create();
     }
 
     @Data

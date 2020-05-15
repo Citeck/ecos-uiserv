@@ -66,7 +66,7 @@ public class UserConfigurationsService {
         dto.setId(entity.getExternalId());
         dto.setUserName(entity.getUserName());
         dto.setCreationTime(entity.getCreationTime());
-        dto.setData(new ObjectData(entity.getData()));
+        dto.setData(ObjectData.create(entity.getData()));
 
         return dto;
     }

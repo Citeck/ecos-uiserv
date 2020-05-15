@@ -33,7 +33,7 @@ public class FormServiceTest {
         EcosFormModel model = new EcosFormModel();
         model.setId(id);
         model.setTitle(new MLText("test"));
-        model.setDefinition(new ObjectData());
+        model.setDefinition(ObjectData.create());
 
         formService.save(model);
 
@@ -54,7 +54,7 @@ public class FormServiceTest {
         modelA.setId("TEST_FORM_A");
         modelA.setDescription(new MLText("Test form"));
         modelA.setTitle(new MLText("Test Form"));
-        modelA.setDefinition(new ObjectData());
+        modelA.setDefinition(ObjectData.create());
         modelA.setFormKey("A");
 
         formService.save(modelA);
@@ -80,7 +80,7 @@ public class FormServiceTest {
         modelA.setId("TEST_FORM_A");
         modelA.setDescription(new MLText("Test form"));
         modelA.setTitle(new MLText("Test Form"));
-        modelA.setDefinition(new ObjectData());
+        modelA.setDefinition(ObjectData.create());
         modelA.setFormKey("K");
 
         EcosFormModel modelB = new EcosFormModel(modelA);

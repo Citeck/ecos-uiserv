@@ -44,11 +44,11 @@ public class JournalGeneratorTest {
         widthColumn.setLabel(new MLText("Width"));
         widthColumn.setEditable(true);
         widthColumn.setVisible(true);
-        widthColumn.setAttributes(new ObjectData("{}"));
+        widthColumn.setAttributes(ObjectData.create("{}"));
 
         /*ColumnEditorDto widthEditor = new ColumnEditorDto();
         widthEditor.setType("ecosSelect");
-        widthEditor.setConfig(new ObjectData(
+        widthEditor.setConfig(ObjectData.create(
             "   {" +
                 "                \"label\": \"Width\",\n" +
                 "                \"dataSrc\": \"values\",\n" +
@@ -83,7 +83,7 @@ public class JournalGeneratorTest {
 
         JournalOptionsDto widthOptions = new JournalOptionsDto();
         widthOptions.setType("values");
-        widthOptions.setConfig(new ObjectData(
+        widthOptions.setConfig(ObjectData.create(
             "{\n" +
                 "                    \"values\": [\n" +
                 "                        {\n" +

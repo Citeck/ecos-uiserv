@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.journal.dto;
 import ecos.com.fasterxml.jackson210.annotation.JsonInclude;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
+import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
@@ -104,8 +105,7 @@ public class JournalDto {
         this.sortBy = mapper.copy(other.sortBy);
         this.actions = mapper.copy(other.actions);
         this.editable = other.editable;
-        List<JournalColumnDto> columns = mapper.copy(other.columns);
-        this.columns = columns != null ? columns : new ArrayList<>();
+        this.columns = DataValue.create(other.columns).asList(JournalColumnDto.class);
         this.attributes = mapper.copy(other.attributes);
     }
 }

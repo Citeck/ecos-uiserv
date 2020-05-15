@@ -34,9 +34,9 @@ public class JournalV0Format implements JournalModelFormat<JournalConfig> {
         JournalTypeDto journalType = new JournalTypeDto();
         journalType.setId(dto.getId());
         journalType.setDatasource(dto.getSourceId());
-        journalType.setGroupActions(new DataValue(Json.getMapper().newArrayNode()));
+        journalType.setGroupActions(DataValue.create(Json.getMapper().newArrayNode()));
 
-        ObjectData settings = new ObjectData(dto.getAttributes());
+        ObjectData settings = ObjectData.create(dto.getAttributes());
         settings.set("__uiserv__", true);
         journalType.setSettings(Json.getMapper().convert(settings, StrStrMap.class));
 
@@ -44,16 +44,16 @@ public class JournalV0Format implements JournalModelFormat<JournalConfig> {
         for (JournalColumnDto column : dto.getColumns()) {
 
             Attribute att = new Attribute();
-            att.setBatchEdit(new DataValue(Json.getMapper().newArrayNode()));
+            att.setBatchEdit(DataValue.create(Json.getMapper().newArrayNode()));
             att.setName(column.getName());
-            att.setCriterionInvariants(new DataValue(Json.getMapper().newArrayNode()));
+            att.setCriterionInvariants(DataValue.create(Json.getMapper().newArrayNode()));
             att.setGroupable(column.getGroupable() != null ? column.getGroupable() : true);
             att.setIsDefault(column.getVisible() != null ? column.getVisible() : true);
             att.setSearchable(column.getSearchable() != null ? column.getSearchable() : true);
             att.setSortable(column.getSortable() != null ? column.getSortable() : true);
             att.setVisible(column.getHidden() == null || !column.getHidden());
 
-            ObjectData attSettings = new ObjectData(column.getAttributes());
+            ObjectData attSettings = ObjectData.create(column.getAttributes());
             attSettings.set("customLabel", MLText.getClosestValue(column.getLabel(), currentLocale));
             att.setSettings(Json.getMapper().convert(attSettings, StrStrMap.class));
 
@@ -66,7 +66,7 @@ public class JournalV0Format implements JournalModelFormat<JournalConfig> {
         config.setType(journalType);
         config.setNodeRef(dto.getId());
         config.setCriteria(Collections.emptyList());
-        config.setPredicate(dto.getPredicate() != null ? new ObjectData(dto.getPredicate()) : null);
+        config.setPredicate(dto.getPredicate() != null ? ObjectData.create(dto.getPredicate()) : null);
         config.setTitle(MLText.getClosestValue(dto.getLabel(), currentLocale));
         config.setCreateVariants(getCreateVariants(dto.getTypeRef()));
 
@@ -82,7 +82,7 @@ public class JournalV0Format implements JournalModelFormat<JournalConfig> {
 
             ObjectData attributes = cv.getAttributes();
             if (attributes == null) {
-                attributes = new ObjectData();
+                attributes = ObjectData.create();
             }
 
             CreateVariant variant = new CreateVariant();

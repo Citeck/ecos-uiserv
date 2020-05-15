@@ -80,7 +80,7 @@ public class TypeJournalService {
         RecordsQuery query = new RecordsQuery();
         query.setLanguage("journal-list");
         query.setSourceId("emodel/type");
-        query.setQuery(new ObjectData("{\"listId\":\"" + journalListId + "\"}"));
+        query.setQuery(ObjectData.create("{\"listId\":\"" + journalListId + "\"}"));
 
         try {
             RecordsQueryResult<RecordRef> result = recordsService.queryRecords(query);
@@ -171,7 +171,7 @@ public class TypeJournalService {
                     JournalDto result = new JournalDto(dto);
                     result.setTypeRef(typeRef);
                     result.setSourceId(sourceId);
-                    result.setPredicate(new ObjectData(Predicates.eq("_etype", typeRef.toString())));
+                    result.setPredicate(ObjectData.create(Predicates.eq("_etype", typeRef.toString())));
                     result.setId(JOURNAL_ID_PREFIX + typeRef.getId());
                     return result;
                 });

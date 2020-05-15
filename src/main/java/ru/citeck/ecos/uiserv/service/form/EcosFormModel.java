@@ -18,10 +18,10 @@ public class EcosFormModel {
     private RecordRef typeRef = RecordRef.EMPTY;
     private String width;
 
-    private ObjectData i18n = new ObjectData();
-    private ObjectData definition = new ObjectData();
+    private ObjectData i18n = ObjectData.create();
+    private ObjectData definition = ObjectData.create();
 
-    private ObjectData attributes = new ObjectData();
+    private ObjectData attributes = ObjectData.create();
 
     public EcosFormModel() {
     }

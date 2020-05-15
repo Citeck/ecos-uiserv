@@ -11,5 +11,5 @@ public class CreateVariantDto {
     private MLText name;
     private RecordRef formRef;
     private RecordRef recordRef;
-    private ObjectData attributes = new ObjectData();
+    private ObjectData attributes = ObjectData.create();
 }

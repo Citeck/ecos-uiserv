@@ -14,8 +14,8 @@ public class DashboardDto {
     private String authority;
     private float priority;
 
-    private ObjectData config = new ObjectData();
-    private ObjectData attributes = new ObjectData();
+    private ObjectData config = ObjectData.create();
+    private ObjectData attributes = ObjectData.create();
 
     public DashboardDto() {
     }

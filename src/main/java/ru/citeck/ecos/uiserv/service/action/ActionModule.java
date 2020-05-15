@@ -16,10 +16,10 @@ public class ActionModule {
     private RecordRef typeRef;
 
     private String type;
-    private ObjectData config = new ObjectData();
+    private ObjectData config = ObjectData.create();
 
     private RecordEvaluatorDto evaluator;
-    private ObjectData attributes = new ObjectData();
+    private ObjectData attributes = ObjectData.create();
 
     public ActionModule() {
     }

@@ -52,7 +52,7 @@ public class JournalByFormGenerator {
         column.setName(component.get("key").asText());
         column.setAttribute(getAttributeOrNull(component));
         column.setEditable(!component.get("disabled").asBoolean());
-        column.setAttributes(new ObjectData(component.get("attributes")));
+        column.setAttributes(ObjectData.create(component.get("attributes")));
 
         String compType = component.get("type").asText();
 
@@ -77,7 +77,7 @@ public class JournalByFormGenerator {
 
         ColumnController controller = new ColumnController();
         controller.setType(compType);
-        controller.setConfig(new ObjectData(component));
+        controller.setConfig(ObjectData.create(component));
         controller.getConfig().remove("type");
 
         column.setController(controller);
