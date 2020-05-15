@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.commons.json.JsonMapper;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 
@@ -90,21 +91,21 @@ public class JournalDto {
     }
 
     public JournalDto(JournalDto other) {
-        JournalDto copy = Json.getMapper().copy(other);
-        if (copy == null) {
-            return;
-        }
-        this.id = copy.id;
-        this.label = copy.label;
-        this.sourceId = copy.sourceId;
-        this.metaRecord = copy.metaRecord;
-        this.typeRef = copy.typeRef;
-        this.predicate = copy.predicate;
-        this.groupBy = copy.groupBy;
-        this.sortBy = copy.sortBy;
-        this.actions = copy.actions;
-        this.editable = copy.editable;
-        this.columns = copy.columns;
-        this.attributes = copy.attributes;
+
+        JsonMapper mapper = Json.getMapper();
+
+        this.id = other.id;
+        this.label = mapper.copy(other.label);
+        this.sourceId = other.sourceId;
+        this.metaRecord = other.metaRecord;
+        this.typeRef = other.typeRef;
+        this.predicate = mapper.copy(other.predicate);
+        this.groupBy = mapper.copy(other.groupBy);
+        this.sortBy = mapper.copy(other.sortBy);
+        this.actions = mapper.copy(other.actions);
+        this.editable = other.editable;
+        List<JournalColumnDto> columns = mapper.copy(other.columns);
+        this.columns = columns != null ? columns : new ArrayList<>();
+        this.attributes = mapper.copy(other.attributes);
     }
 }
