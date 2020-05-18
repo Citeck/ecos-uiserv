@@ -18,4 +18,6 @@ public interface MenuRepository extends JpaRepository<MenuEntity, Long> {
         "WHERE authority = ?1 " +
         "ORDER BY menu.priority DESC")
     List<MenuEntity> findAllByAuthoritiesContains(String authority);
+
+    void deleteByExtId(String extId);
 }

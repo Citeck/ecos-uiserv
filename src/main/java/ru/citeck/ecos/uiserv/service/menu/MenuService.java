@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.service.menu;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.commons.json.Json;
@@ -41,6 +42,10 @@ public class MenuService {
     }
 
     public Optional<MenuDto> getMenu(String menuId) {
+        if (StringUtils.isBlank(menuId)) {
+            return Optional.empty();
+        }
+
         return menuRepository.findByExtId(menuId).map(this::mapToDto);
     }
 
@@ -140,6 +145,26 @@ public class MenuService {
             i18nService::getMessage,
             resolvers
         ).getResolvedMenu(menuDto);
+    }
+
+    public MenuDto save(MenuDto dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("Dto cannot be null");
+        }
+
+        if (StringUtils.isBlank(dto.getId())) {
+            throw new IllegalArgumentException("Id param in menu dto is mandatory");
+        }
+
+        return mapToDto(menuRepository.save(mapToEntity(dto)));
+    }
+
+    public void deleteByExtId(String menuId) {
+        if (StringUtils.isBlank(menuId)) {
+            return;
+        }
+
+        menuRepository.deleteByExtId(menuId);
     }
 
     public static class SubMenus extends HashMap<String, SubMenuDto> {
