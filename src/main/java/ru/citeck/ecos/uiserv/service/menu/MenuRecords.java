@@ -42,11 +42,10 @@ public class MenuRecords extends LocalRecordsDAO
                 throw new IllegalArgumentException("Parameter 'id' is mandatory for menu record");
             }
 
-        });
-        for (MenuDto value : values) {
-            MenuDto saved = menuService.save(value);
+            MenuDto saved = menuService.save(dto);
             result.addRecord(new RecordMeta(saved.getId()));
-        }
+        });
+
         return result;
     }
 
