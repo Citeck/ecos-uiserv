@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.uiserv.journal.service.type.TypeJournalService;
-import ru.citeck.ecos.uiserv.web.rest.menu.dto.Element;
 import ru.citeck.ecos.uiserv.service.menu.resolving.ResolvedMenuItemDto;
 
 import java.util.List;

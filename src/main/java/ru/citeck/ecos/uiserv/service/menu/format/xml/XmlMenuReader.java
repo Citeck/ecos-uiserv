@@ -163,7 +163,7 @@ public class XmlMenuReader implements MenuReader {
         Map<String, String> parametersMap = parameters
             .stream()
             .collect(Collectors.toMap(Parameter::getName, Parameter::getValue));
-        return new ObjectData(parametersMap);
+        return ObjectData.create(parametersMap);
     }
 
     private MenuConfig unmarshal(byte[] xml) {

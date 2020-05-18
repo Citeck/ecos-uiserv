@@ -13,7 +13,6 @@ import ru.citeck.ecos.records2.request.query.QueryConsistency;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.uiserv.journal.service.type.TypeJournalService;
-import ru.citeck.ecos.uiserv.web.rest.menu.dto.Element;
 import ru.citeck.ecos.uiserv.service.menu.resolving.ResolvedMenuItemDto;
 
 import java.util.Arrays;
