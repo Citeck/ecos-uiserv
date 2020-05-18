@@ -11,7 +11,7 @@ import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.domain.FileVersion;
 import ru.citeck.ecos.uiserv.repository.FileRepository;
-import ru.citeck.ecos.uiserv.service.translation.TranslationService;
+import ru.citeck.ecos.uiserv.service.i18n.I18nService;
 import ru.citeck.ecos.uiserv.service.file.FileService;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -32,9 +32,6 @@ import java.util.stream.Collectors;
 public class JournalListService {
     @Autowired
     private FileService fileService;
-
-    @Autowired
-    private TranslationService translationService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -65,7 +62,11 @@ public class JournalListService {
         final JournalListDownstream result = new JournalListDownstream();
         result.setId(db.getId());
         if (!onlyId) {
-            result.setTitle(translationService.pickLocalizedString(db.getLocalizedTitle(), locale));
+            if (db.getLocalizedTitle() != null) {
+                result.setTitle(db.getLocalizedTitle().values().stream().findFirst().orElse(db.getId()));
+            } else {
+                result.setTitle(db.getId());
+            }
             result.setJournalIds(db.getJournalIds());
         }
         return result;

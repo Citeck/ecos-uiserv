@@ -1,6 +1,6 @@
 package ru.citeck.ecos.uiserv.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
@@ -9,10 +9,20 @@ import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class AuthoritiesSupport {
 
-    @Autowired
-    private RecordsService recordsService;
+    private final RecordsService recordsService;
+
+    private PersonAtts queryPerson(String username) {
+        return recordsService.getMeta(
+            RecordRef.valueOf("alfresco/people@" + username),
+            PersonAtts.class);
+    }
+
+    public List<String> queryUserAuthorities(String username) {
+        return queryPerson(username).getAuthorities();
+    }
 
     private static class PersonAtts {
         @MetaAtt(".att(n:'authorities'){ atts(n: 'list')}")
@@ -25,15 +35,5 @@ public class AuthoritiesSupport {
         public void setAuthorities(List<String> authorities) {
             this.authorities = authorities;
         }
-    }
-
-    private PersonAtts queryPerson(String username) {
-        return recordsService.getMeta(
-            RecordRef.valueOf("alfresco/people@" + username),
-            PersonAtts.class);
-    }
-
-    public List<String> queryUserAuthorities(String username) {
-        return queryPerson(username).getAuthorities();
     }
 }

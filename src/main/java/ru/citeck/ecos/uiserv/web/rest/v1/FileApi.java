@@ -10,18 +10,17 @@ import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.file.FileBundle;
 import ru.citeck.ecos.uiserv.service.file.FileService;
-import ru.citeck.ecos.uiserv.service.translation.TranslationService;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
+@Deprecated
 @RestController
 @RequestMapping("/api/store/{fileType}")
 @RequiredArgsConstructor
 public class FileApi {
 
-    private final TranslationService i18n;
     private final FileService fileService;
 
     @GetMapping
@@ -49,7 +48,6 @@ public class FileApi {
             return;
         }
     }
-
 
     @PostMapping("/{fileId}/deploy")
     public void deploy(@PathVariable FileType fileType, @PathVariable String fileId,
@@ -80,8 +78,8 @@ public class FileApi {
 
         // Should be always present, unless we are deploying "removal" of the menu;
         // in that special case we should not load translations.
-        translations.forEach((tag, trBytes) ->
-            i18n.saveTranslations(deployed.getFileVersion().getTranslated().getId(), tag, trBytes));
+       /* translations.forEach((tag, trBytes) ->
+            i18n.saveTranslations(deployed.getFileVersion().getTranslated().getId(), tag, trBytes));*/
     }
 
     @PostMapping("/{fileId}/revert")
@@ -133,11 +131,6 @@ public class FileApi {
         //final String fileId = fileService.getFileMetadataExtractor(fileType).getFileId(bytes);
 
         final File deployed = fileService.deployFileOverride(fileType, fileId, contentType, bytes, null);
-
-        // Should be always present, unless we are deploying "removal" of the menu;
-        // in that special case we should not load translations.
-        translations.forEach((tag, trBytes) ->
-            i18n.saveTranslations(deployed.getFileVersion().getTranslated().getId(), tag, trBytes));
     }
 
 }

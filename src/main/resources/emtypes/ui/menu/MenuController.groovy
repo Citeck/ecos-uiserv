@@ -23,7 +23,7 @@ return new ModuleController<Module, Unit>() {
     @Override
     List<Module> read(@NotNull EcosFile root, Unit config) {
 
-        return root.findFiles("**.xml")
+        return root.findFiles("**.{json,xml}")
             .stream()
             .map(this.&readModule)
             .collect(Collectors.toList())
@@ -34,10 +34,10 @@ return new ModuleController<Module, Unit>() {
         byte[] data = file.readAsBytes()
 
         try {
-
             Module module = new Module()
             module.setId(getMenuId(data))
-            module.setXmlData(data)
+            module.setFilename(file.getPath().getFileName().toString())
+            module.setData(data)
             return module
 
         } catch (ParserConfigurationException | IOException | SAXException e) {
@@ -61,12 +61,13 @@ return new ModuleController<Module, Unit>() {
         String name = FileUtils.getValidName(module.getId()) + ".xml"
 
         root.createFile(name, (Function1<OutputStream, Unit>) {
-            OutputStream out -> out.write(module.getXmlData())
+            OutputStream out -> out.write(module.getData())
         })
     }
 
     static class Module {
         String id
-        byte[] xmlData
+        String filename
+        byte[] data
     }
 }

@@ -13,6 +13,7 @@ import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.repository.FileVersionRepository;
 import ru.citeck.ecos.uiserv.service.journal.JournalConfigService;
 import ru.citeck.ecos.uiserv.service.menu.MenuService;
+import ru.citeck.ecos.uiserv.service.menu.dto.MenuDto;
 import ru.citeck.ecos.uiserv.web.rest.v1.dto.ModuleToDeploy;
 import ru.citeck.ecos.uiserv.web.rest.v1.UpdaterApi;
 
@@ -57,7 +58,7 @@ public class UpdaterControllerTest {
 
         //need transaction here because of JPA lazyness
         new TransactionTemplate(transactionManager).execute(x -> {
-            final Optional<MenuService.MenuView> check = menuService.getMenu(menuId);
+            final Optional<MenuDto> check = menuService.getMenu(menuId);
             //some tests on "check" and "versionRepository", maybe manual via debugging
             return check;
         });

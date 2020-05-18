@@ -14,7 +14,6 @@ import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.service.file.FileBundle;
 import ru.citeck.ecos.uiserv.service.file.FileService;
 import ru.citeck.ecos.uiserv.service.journal.JournalPrefService;
-import ru.citeck.ecos.uiserv.service.translation.TranslationService;
 import ru.citeck.ecos.uiserv.web.rest.v1.dto.ModuleToDeploy;
 
 import java.io.IOException;
@@ -26,8 +25,6 @@ import java.io.IOException;
 public class UpdaterApi {
 
     private final FileService fileService;
-
-    private final TranslationService i18n;
 
     private final JournalPrefService journalPrefsService;
 
@@ -47,10 +44,6 @@ public class UpdaterApi {
                 .getFileId(bundle.bytes);
             final File deployed = fileService.deployStandardFile(
                 fileType, fileId, update.mimeType, bundle.bytes, update.version);
-            // Should be always present, unless we are deploying "removal" of the menu;
-            // in that special case we should not load translations.
-            bundle.translations.forEach((tag, dictionary) -> i18n.saveTranslations(
-                deployed.getFileVersion().getTranslated().getId(), tag, dictionary));
             return fileId;
         } else {
             //special processing for prefs because we not just deploy a file but
