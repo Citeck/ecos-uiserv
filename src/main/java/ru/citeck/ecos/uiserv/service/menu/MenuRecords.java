@@ -1,26 +1,36 @@
 package ru.citeck.ecos.uiserv.service.menu;
 
+import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
+import ecos.com.fasterxml.jackson210.annotation.JsonValue;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.records2.graphql.meta.annotation.DisplayName;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
 import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
 import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
+import ru.citeck.ecos.records2.request.query.RecordsQuery;
+import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
 import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDAO;
 import ru.citeck.ecos.uiserv.service.menu.dto.MenuDto;
 
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class MenuRecords extends LocalRecordsDAO
-    implements LocalRecordsMetaDAO<MenuDto>,
-    MutableRecordsLocalDAO<MenuDto> {
+    implements LocalRecordsMetaDAO<MenuRecords.MenuRecord>,
+               LocalRecordsQueryWithMetaDAO<MenuRecords.MenuRecord>,
+               MutableRecordsLocalDAO<MenuRecords.MenuRecord> {
 
     private static final String ID = "menu";
     private final MenuService menuService;
@@ -31,12 +41,30 @@ public class MenuRecords extends LocalRecordsDAO
     }
 
     @Override
-    public List<MenuDto> getValuesToMutate(List<RecordRef> records) {
+    public List<MenuRecord> getValuesToMutate(List<RecordRef> records) {
         return getLocalRecordsMeta(records, null);
     }
 
     @Override
-    public RecordsMutResult save(List<MenuDto> values) {
+    public RecordsQueryResult<MenuRecord> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
+
+        if ("criteria".equals(recordsQuery.getLanguage())
+            || "predicate".equals(recordsQuery.getLanguage())) {
+
+            RecordsQueryResult<MenuRecord> result = new RecordsQueryResult<>();
+            result.setRecords(menuService.getAllMenus()
+                .stream()
+                .map(MenuRecord::new)
+                .collect(Collectors.toList()));
+
+            return result;
+        }
+
+        return new RecordsQueryResult<>();
+    }
+
+    @Override
+    public RecordsMutResult save(List<MenuRecord> values) {
 
         RecordsMutResult result = new RecordsMutResult();
         values.forEach(dto -> {
@@ -71,11 +99,51 @@ public class MenuRecords extends LocalRecordsDAO
     }
 
     @Override
-    public List<MenuDto> getLocalRecordsMeta(List<RecordRef> records, MetaField metaField) {
+    public List<MenuRecord> getLocalRecordsMeta(List<RecordRef> records, MetaField metaField) {
         return records.stream()
             .map(RecordRef::getId)
             .map(id -> menuService.getMenu(id)
                 .orElseGet(() -> new MenuDto(id)))
+            .map(MenuRecord::new)
             .collect(Collectors.toList());
+    }
+
+    public static class MenuRecord extends MenuDto {
+
+        public MenuRecord(MenuDto model) {
+            super(model);
+        }
+
+        public MenuRecord() {
+        }
+
+        public String getModuleId() {
+            return getId();
+        }
+
+        public void setModuleId(String value) {
+            setId(value);
+        }
+
+        @DisplayName
+        public String getDisplayName() {
+            return getId();
+        }
+
+        @JsonProperty("_content")
+        public void setContent(List<ObjectData> content) {
+
+            String base64Content = content.get(0).get("url", "");
+            base64Content = base64Content.replaceAll("^data:application/json;base64,", "");
+            ObjectData data = Json.getMapper().read(Base64.getDecoder().decode(base64Content), ObjectData.class);
+
+            Json.getMapper().applyData(this, data);
+        }
+
+        @JsonValue
+        @com.fasterxml.jackson.annotation.JsonValue
+        public MenuDto toJson() {
+            return new MenuDto(this);
+        }
     }
 }

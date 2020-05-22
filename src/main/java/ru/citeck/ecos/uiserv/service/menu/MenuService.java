@@ -19,6 +19,7 @@ import ru.citeck.ecos.uiserv.service.menu.resolving.resolvers.MenuItemsResolver;
 
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -41,11 +42,17 @@ public class MenuService {
         return mapToDto(menuRepository.save(entity));
     }
 
+    public List<MenuDto> getAllMenus() {
+        return menuRepository.findAll()
+            .stream()
+            .map(this::mapToDto)
+            .collect(Collectors.toList());
+    }
+
     public Optional<MenuDto> getMenu(String menuId) {
         if (StringUtils.isBlank(menuId)) {
             return Optional.empty();
         }
-
         return menuRepository.findByExtId(menuId).map(this::mapToDto);
     }
 
