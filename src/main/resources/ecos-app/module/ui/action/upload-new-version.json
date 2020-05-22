@@ -18,9 +18,11 @@
                     }
                 },
                 {
-                    "type": "has-attribute",
+                    "type": "predicate",
                     "config": {
-                        "attribute": "_content"
+                        "t": "eq",
+                        "att": ".att(n:\"dict\"){has(n:\"cm:content\")}",
+                        "val": true
                     }
                 }
             ]
