@@ -20,9 +20,11 @@
                 {
                     "type": "predicate",
                     "config": {
-                        "t": "eq",
-                        "att": ".att(n:\"dict\"){has(n:\"cm:content\")}",
-                        "val": true
+                        "predicate": {
+                            "t": "eq",
+                            "att": ".att(n:\"dict\"){has(n:\"cm:content\")}",
+                            "val": true
+                        }
                     }
                 }
             ]
