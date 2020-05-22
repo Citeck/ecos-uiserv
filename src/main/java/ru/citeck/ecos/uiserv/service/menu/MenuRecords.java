@@ -13,6 +13,7 @@ import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
 import ru.citeck.ecos.uiserv.service.menu.dto.MenuDto;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,11 +37,19 @@ public class MenuRecords extends LocalRecordsDAO
 
     @Override
     public RecordsMutResult save(List<MenuDto> values) {
+
         RecordsMutResult result = new RecordsMutResult();
         values.forEach(dto -> {
             if (StringUtils.isBlank(dto.getId())) {
                 throw new IllegalArgumentException("Parameter 'id' is mandatory for menu record");
             }
+
+            //todo: delete this when editor will be ready
+            if (dto.getId().equals("default-menu")) {
+                throw new IllegalArgumentException("Default menu can't be changed yet. Please, chose other ID");
+            }
+            dto.setAuthorities(Collections.emptyList());
+            //===========================================
 
             MenuDto saved = menuService.save(dto);
             result.addRecord(new RecordMeta(saved.getId()));
