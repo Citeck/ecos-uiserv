@@ -3,7 +3,7 @@ package ru.citeck.ecos.uiserv.service.menu.resolving.resolvers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.uiserv.journal.service.type.TypeJournalService;
+import ru.citeck.ecos.uiserv.journal.service.JournalService;
 import ru.citeck.ecos.uiserv.service.menu.resolving.ResolvedMenuItemDto;
 
 import java.util.List;
@@ -22,8 +22,8 @@ public class SiteJournalsResolver implements MenuItemsResolver {
     private static final String DEFAULT_JOURNAL_LIST_ID = "main";
 
     @Autowired
-    public SiteJournalsResolver(RecordsService recordsService, TypeJournalService typeJournalService) {
-        journalsResolver = new JournalsResolver(recordsService, this::getIdFromParams, typeJournalService);
+    public SiteJournalsResolver(RecordsService recordsService, JournalService journalService) {
+        journalsResolver = new JournalsResolver(recordsService, this::getIdFromParams, journalService);
     }
 
     private JournalsResolver.IDs getIdFromParams(Map<String, String> params, ResolvedMenuItemDto context) {

@@ -15,6 +15,3 @@ createVariants:
     name: { ru: Загрузить действие, en: Upload action }
     recordRef: uiserv/action@
     formRef: uiserv/eform@ecos-module-upload
-
-attributes:
-  journalsListId: global-system

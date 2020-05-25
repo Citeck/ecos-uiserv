@@ -50,8 +50,7 @@ public class JournalRecordsDAO extends LocalRecordsDAO
         if (LANG_QUERY_BY_LIST_ID.equals(recordsQuery.getLanguage())) {
 
             QueryByListId queryByListId = recordsQuery.getQuery(QueryByListId.class);
-            List<JournalDto> journals = typeJournalService.getJournalsByListId(queryByListId.listId);
-
+            List<JournalDto> journals = journalService.getJournalsByJournalList(queryByListId.getListId());
             journals.forEach(j -> result.addRecord(new JournalRecord(j)));
 
             return result;

@@ -19,6 +19,3 @@ createVariants:
     name: { ru: Загрузить дашборд, en: Upload dashboard }
     recordRef: uiserv/dashboard@
     formRef: uiserv/eform@ecos-module-upload
-
-attributes:
-  journalsListId: global-system

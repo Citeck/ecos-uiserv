@@ -8,7 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.citeck.ecos.records2.RecordsService;
+import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
@@ -16,7 +16,9 @@ import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
 import ru.citeck.ecos.uiserv.journal.mapper.JournalMapper;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -28,9 +30,18 @@ public class JournalServiceImpl implements JournalService {
 
     private final JournalRepository journalRepository;
     private final JournalMapper journalMapper;
-    private final RecordsService recordsService;
 
     private Consumer<JournalDto> changeListener;
+
+    private final Map<String, Set<String>> typesByJournalListId = new ConcurrentHashMap<>();
+    private final Map<String, String> journalListByTypeId = new ConcurrentHashMap<>();
+
+    @PostConstruct
+    public void init() {
+        journalRepository.findAll().forEach(journal ->
+            updateJournalLists(journalMapper.entityToDto(journal))
+        );
+    }
 
     @Override
     public JournalDto getJournalById(String id) {
@@ -107,6 +118,8 @@ public class JournalServiceImpl implements JournalService {
 
         JournalDto journalDto = journalMapper.entityToDto(storedJournalEntity);
 
+        updateJournalLists(journalDto);
+
         changeListener.accept(journalDto);
         return journalDto;
     }
@@ -132,6 +145,63 @@ public class JournalServiceImpl implements JournalService {
         }
 
         return spec;
+    }
+
+    @Override
+    public List<JournalDto> getJournalsByJournalList(String journalListId) {
+
+        if (StringUtils.isBlank(journalListId)) {
+            return Collections.emptyList();
+        }
+
+        return typesByJournalListId.getOrDefault(journalListId, Collections.emptySet())
+            .stream()
+            .map(journalRepository::findByExtId)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(journalMapper::entityToDto)
+            .collect(Collectors.toList());
+    }
+
+    private synchronized void updateJournalLists(JournalDto journalDto) {
+
+        ObjectData attributes = journalDto.getAttributes();
+        String listId = attributes != null ? attributes.get("journalsListId").asText() : "";
+
+        if (StringUtils.isNotBlank(listId)) {
+
+            Set<String> listJournals = typesByJournalListId.computeIfAbsent(listId, id ->
+                Collections.newSetFromMap(new ConcurrentHashMap<>())
+            );
+
+            String listIdBefore = journalListByTypeId.get(journalDto.getId());
+            if (StringUtils.isNotBlank(listIdBefore)) {
+                if (!listIdBefore.equals(listId)) {
+                    Set<String> listBefore = typesByJournalListId.computeIfAbsent(listIdBefore, id ->
+                        Collections.newSetFromMap(new ConcurrentHashMap<>())
+                    );
+                    listBefore.remove(journalDto.getId());
+                    listJournals.add(journalDto.getId());
+                }
+            } else {
+                listJournals.add(journalDto.getId());
+            }
+
+            journalListByTypeId.put(journalDto.getId(), listId);
+
+        } else {
+
+            String listIdBefore = journalListByTypeId.get(journalDto.getId());
+
+            if (StringUtils.isNotBlank(listIdBefore)) {
+
+                typesByJournalListId.computeIfAbsent(listIdBefore, id ->
+                    Collections.newSetFromMap(new ConcurrentHashMap<>())
+                ).remove(journalDto.getId());
+
+                journalListByTypeId.remove(journalDto.getId());
+            }
+        }
     }
 
     @Data

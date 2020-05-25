@@ -62,40 +62,6 @@ public class TypeJournalService {
         return journalByTypeCache.getUnchecked(typeRef);
     }
 
-    public List<JournalDto> getJournalsByListId(String journalListId) {
-
-        Set<String> journalsId = new HashSet<>();
-        List<JournalDto> result = new ArrayList<>();
-
-        getJournalsFromTypesByListId(journalListId)
-            .stream()
-            .filter(j -> journalsId.add(j.getId()))
-            .forEach(result::add);
-
-        return result;
-    }
-
-    private List<JournalDto> getJournalsFromTypesByListId(String journalListId) {
-
-        RecordsQuery query = new RecordsQuery();
-        query.setLanguage("journal-list");
-        query.setSourceId("emodel/type");
-        query.setQuery(ObjectData.create("{\"listId\":\"" + journalListId + "\"}"));
-
-        try {
-            RecordsQueryResult<RecordRef> result = recordsService.queryRecords(query);
-            return result.getRecords()
-                .stream()
-                .map(this::getJournalForType)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-        } catch (Exception e) {
-            log.error("Types can't be received from emodel. List id: '" + journalListId + "'", e);
-            return Collections.emptyList();
-        }
-    }
-
     private Optional<JournalDto> getJournalForTypeImpl(RecordRef typeRef) {
 
         if (RecordRef.isEmpty(typeRef)) {

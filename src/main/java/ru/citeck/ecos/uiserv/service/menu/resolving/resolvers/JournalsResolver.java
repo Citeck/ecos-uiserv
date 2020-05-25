@@ -12,7 +12,7 @@ import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.records2.request.query.QueryConsistency;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
-import ru.citeck.ecos.uiserv.journal.service.type.TypeJournalService;
+import ru.citeck.ecos.uiserv.journal.service.JournalService;
 import ru.citeck.ecos.uiserv.service.menu.resolving.ResolvedMenuItemDto;
 
 import java.util.Arrays;
@@ -34,7 +34,7 @@ public class JournalsResolver {
 
     private final RecordsService recordsService;
     private final JournalListIdExtractor journalListIdExtractor;
-    private final TypeJournalService typeJournalService;
+    private final JournalService journalService;
 
     public interface JournalListIdExtractor {
         IDs extract(Map<String, String> params, ResolvedMenuItemDto context);
@@ -45,15 +45,6 @@ public class JournalsResolver {
         return queryJournalsRefs(listId.getId()).stream()
             .map(journalInfo -> constructItem(journalInfo, params, context, listId.getId(), listId.getSimpleId()))
             .collect(Collectors.toList());
-    }
-
-    @Getter
-    @RequiredArgsConstructor
-    public static class IDs {
-        private final String id;
-        //Probably don't need this, but to keep output compatible with what menu is built by monolith ECOS,
-        //original ID has to be written as well
-        private final String simpleId;
     }
 
     /**
@@ -99,16 +90,6 @@ public class JournalsResolver {
         }
     }
 
-    @Getter
-    @Setter
-    protected static class JournalAtts {
-        private String id; //NodeRef
-        private String name;
-        private String title;
-        @MetaAtt("journal:journalType")
-        private String journalType;
-    }
-
     private List<JournalAtts> queryJournalsRefs(String journalList) {
         if (journalList == null || journalList.equals(""))
             return Collections.emptyList();
@@ -126,7 +107,7 @@ public class JournalsResolver {
             .flatMap(journalListAtts -> journalListAtts.getJournals().stream())
             .collect(Collectors.toList());
 
-        typeJournalService.getJournalsByListId(journalList).forEach(journal -> {
+        journalService.getJournalsByJournalList(journalList).forEach(journal -> {
             JournalAtts atts = new JournalAtts();
             atts.setId(journal.getId());
             atts.setJournalType(journal.getId());
@@ -195,5 +176,24 @@ public class JournalsResolver {
         element.setAction(JOURNAL_LINK_KEY, actionParams);
         element.setParams(elementParams);
         return element;
+    }
+
+    @Getter
+    @Setter
+    protected static class JournalAtts {
+        private String id; //NodeRef
+        private String name;
+        private String title;
+        @MetaAtt("journal:journalType")
+        private String journalType;
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class IDs {
+        private final String id;
+        //Probably don't need this, but to keep output compatible with what menu is built by monolith ECOS,
+        //original ID has to be written as well
+        private final String simpleId;
     }
 }
