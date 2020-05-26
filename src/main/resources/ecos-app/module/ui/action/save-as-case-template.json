@@ -6,9 +6,6 @@
         "en": "Save as case template"
     },
     "type": "save-as-case-template",
-    "config": {
-        "download": false
-    },
     "evaluator": {
         "type": "group",
         "config": {
