@@ -14,7 +14,6 @@ import ru.citeck.ecos.records2.QueryContext;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records2.graphql.meta.annotation.DisplayName;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.commons.data.DataValue;
@@ -440,7 +439,7 @@ public class ActionRecords extends LocalRecordsDAO
             setId(value);
         }
 
-        @DisplayName
+        @MetaAtt(".disp")
         public String getDisplayName() {
             MLText mlName = getName();
             String name = mlName != null ? mlName.getClosestValue(QueryContext.getCurrent().getLocale()) : null;

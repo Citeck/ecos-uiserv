@@ -12,7 +12,7 @@ import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records2.graphql.meta.annotation.DisplayName;
+import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
@@ -154,7 +154,7 @@ public class DashboardRecords extends LocalRecordsDAO
         }
 
         @JsonIgnore
-        @DisplayName
+        @MetaAtt(".disp")
         public String getDisplayName() {
             String result = getId();
             return result != null ? result : "Dashboard";
