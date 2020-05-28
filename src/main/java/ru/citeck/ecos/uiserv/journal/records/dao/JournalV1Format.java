@@ -1,9 +1,9 @@
 package ru.citeck.ecos.uiserv.journal.records.dao;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
@@ -48,11 +48,14 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
         } else {
             meta.setActions(typeUtils.getActions(dto.getTypeRef()));
         }
-        meta.setGroupBy(Json.getMapper().convert(dto.getGroupBy(), JsonNode.class));
+        meta.setGroupBy(DataValue.create(dto.getGroupBy()));
         if (dto.getMetaRecord() != null) {
             meta.setMetaRecord(dto.getMetaRecord().toString());
         }
-        meta.setPredicate(Json.getMapper().convert(dto.getPredicate(), JsonNode.class));
+        meta.setPredicate(DataValue.create(dto.getPredicate()));
+        if (meta.getPredicate().isNull()) {
+            meta.setPredicate(DataValue.createObj());
+        }
         if (dto.getLabel() != null) {
             meta.setTitle(dto.getLabel().getClosestValue(LocaleContextHolder.getLocale()));
         }

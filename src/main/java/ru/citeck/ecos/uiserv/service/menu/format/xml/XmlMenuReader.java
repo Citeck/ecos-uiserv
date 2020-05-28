@@ -113,8 +113,6 @@ public class XmlMenuReader implements MenuReader {
         }
         dto.setIcon(item.getIcon());
 
-        Boolean isMobileVisible = item.isMobileVisible();
-        dto.setMobileVisible(isMobileVisible != null ? isMobileVisible : false);
         if (item.getAction() != null) {
             dto.setAction(actionDtoFromAction(item.getAction()));
         }

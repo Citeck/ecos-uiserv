@@ -178,8 +178,6 @@ public class MenuFactory {
             targetElement.setIcon(icon);
         }
 
-        targetElement.setMobileVisible(newData.isMobileVisible());
-
         ObjectData config = newData.getConfig();
         if (config != null) {
             Map<String, String> params = targetElement.getParams();

@@ -17,17 +17,16 @@ public class MenuItemDto {
 
     private String id;
 
-    // "item" or "resolver"
-    private String type;
     private MLText label;
     private String icon;
+    private Boolean hidden;
 
-    private boolean mobileVisible;
-    private MenuItemActionDto action;
-
+    private String type;
     private ObjectData config;
+
     private RecordEvaluatorDto evaluator;
 
+    private MenuItemActionDto action;
     private List<MenuItemDto> items;
 
     @JsonIgnore

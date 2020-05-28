@@ -187,8 +187,10 @@
                 <item id="HEADER_SYSTEM_JOURNALS">
                     <label>menu.item.system-journals</label>
                     <icon>system-journals</icon>
-                    <action type="PAGE_LINK">
-                        <param name="pageId">journals2/list/system</param>
+                    <action type="JOURNAL_LINK">
+                        <param name="listId">system</param>
+                        <param name="journalRef">ecos-forms</param>
+                        <param name="uiType">react</param>
                     </action>
                 </item>
                 <item id="HEADER_META_JOURNALS">
