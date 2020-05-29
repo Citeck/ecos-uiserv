@@ -196,6 +196,11 @@ public class JournalRecordsDAO extends LocalRecordsDAO
             setId(value);
         }
 
+        @MetaAtt(".type")
+        public RecordRef getEcosType() {
+            return RecordRef.valueOf("emodel/type@journal");
+        }
+
         @JsonIgnore
         @MetaAtt(".disp")
         public String getDisplayName() {
