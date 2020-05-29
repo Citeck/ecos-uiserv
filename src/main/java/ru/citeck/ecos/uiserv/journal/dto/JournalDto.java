@@ -10,6 +10,7 @@ import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.json.JsonMapper;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
+import ru.citeck.ecos.uiserv.journal.dto.legacy1.GroupAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +89,12 @@ public class JournalDto {
      */
     private ObjectData attributes;
 
+    /**
+     * This actions in future will be moved to 'actions' field
+     */
+    @Deprecated
+    private List<GroupAction> groupActions;
+
     public JournalDto() {
     }
 
@@ -107,5 +114,6 @@ public class JournalDto {
         this.editable = other.editable;
         this.columns = DataValue.create(other.columns).asList(JournalColumnDto.class);
         this.attributes = mapper.copy(other.attributes);
+        this.groupActions = DataValue.create(other.groupActions).asList(GroupAction.class);
     }
 }

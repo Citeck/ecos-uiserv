@@ -203,8 +203,10 @@
                 <item id="HEADER_TEMPLATES">
                     <label>menu.item.templates</label>
                     <icon>templates</icon>
-                    <action type="PAGE_LINK">
-                        <param name="pageId">journals2/list/templates</param>
+                    <action type="JOURNAL_LINK">
+                        <param name="listId">templates</param>
+                        <param name="journalRef">templates</param>
+                        <param name="uiType">react</param>
                     </action>
                 </item>
                 <item id="HEADER_DEV_TOOLS">

@@ -5,9 +5,12 @@ import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
 import ecos.com.fasterxml.jackson210.annotation.JsonValue;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.records2.QueryContext;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
@@ -196,8 +199,8 @@ public class JournalRecordsDAO extends LocalRecordsDAO
         @JsonIgnore
         @MetaAtt(".disp")
         public String getDisplayName() {
-            String result = getId();
-            return result != null ? result : "Journal";
+            String name = MLText.getClosestValue(getLabel(), QueryContext.getCurrent().getLocale());
+            return StringUtils.isNotBlank(name) ? name : "Journal";
         }
 
         @JsonProperty("_content")

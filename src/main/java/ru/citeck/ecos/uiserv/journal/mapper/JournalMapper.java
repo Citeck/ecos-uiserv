@@ -11,6 +11,7 @@ import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
 import ru.citeck.ecos.uiserv.journal.dto.JournalColumnDto;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.journal.dto.JournalSortBy;
+import ru.citeck.ecos.uiserv.journal.dto.legacy1.GroupAction;
 import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
 
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ public class JournalMapper {
         dto.setSourceId(entity.getSourceId());
         dto.setGroupBy(Json.getMapper().read(entity.getGroupBy(), StrList.class));
         dto.setSortBy(Json.getMapper().read(entity.getSortBy(), SortByList.class));
+        dto.setGroupActions(Json.getMapper().read(entity.getGroupActions(), GroupActionsList.class));
 
         return dto;
     }
@@ -63,6 +65,7 @@ public class JournalMapper {
         entity.setSourceId(dto.getSourceId());
         entity.setGroupBy(Json.getMapper().toString(dto.getGroupBy()));
         entity.setSortBy(Json.getMapper().toString(dto.getSortBy()));
+        entity.setGroupActions(Json.getMapper().toString(dto.getGroupActions()));
 
         return entity;
     }
@@ -71,4 +74,5 @@ public class JournalMapper {
     public static class RecordRefsList extends ArrayList<RecordRef> {}
     public static class StrList extends ArrayList<String> {}
     public static class SortByList extends ArrayList<JournalSortBy> {}
+    public static class GroupActionsList extends ArrayList<GroupAction> {}
 }
