@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.journal.mapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
@@ -14,8 +15,9 @@ import ru.citeck.ecos.uiserv.journal.dto.JournalSortBy;
 import ru.citeck.ecos.uiserv.journal.dto.legacy1.GroupAction;
 import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -43,6 +45,37 @@ public class JournalMapper {
         dto.setSortBy(Json.getMapper().read(entity.getSortBy(), SortByList.class));
         dto.setGroupActions(Json.getMapper().read(entity.getGroupActions(), GroupActionsList.class));
 
+        if (dto.getAttributes() == null) {
+            dto.setAttributes(ObjectData.create());
+        }
+        if (dto.getEditable() == null) {
+            dto.setEditable(true);
+        }
+        if (dto.getPredicate() == null) {
+            dto.setPredicate(ObjectData.create());
+        }
+
+        dto.getColumns().forEach(c -> {
+            if (c.getVisible() == null) {
+                c.setVisible(true);
+            }
+            if (c.getEditable() == null) {
+                c.setEditable(true);
+            }
+            if (c.getGroupable() == null) {
+                c.setGroupable(true);
+            }
+            if (c.getSearchable() == null) {
+                c.setSearchable(true);
+            }
+            if (c.getSortable() == null) {
+                c.setSortable(true);
+            }
+            if (c.getAttributes() == null) {
+                c.setAttributes(ObjectData.create());
+            }
+        });
+
         return dto;
     }
 
@@ -55,7 +88,7 @@ public class JournalMapper {
         }
 
         entity.setEditable(dto.getEditable());
-        entity.setColumns(Json.getMapper().toString(dto.getColumns()));
+        entity.setColumns(Json.getMapper().toString(getNotBlank(dto.getColumns(), JournalColumnDto::getName)));
         entity.setLabel(Json.getMapper().toString(dto.getLabel()));
         entity.setTypeRef(RecordRef.toString(dto.getTypeRef()));
         entity.setPredicate(Json.getMapper().toString(dto.getPredicate()));
@@ -63,11 +96,20 @@ public class JournalMapper {
         entity.setAttributes(Json.getMapper().toString(dto.getAttributes()));
         entity.setMetaRecord(RecordRef.toString(dto.getMetaRecord()));
         entity.setSourceId(dto.getSourceId());
-        entity.setGroupBy(Json.getMapper().toString(dto.getGroupBy()));
-        entity.setSortBy(Json.getMapper().toString(dto.getSortBy()));
+        entity.setGroupBy(Json.getMapper().toString(getNotBlank(dto.getGroupBy(), v -> v)));
         entity.setGroupActions(Json.getMapper().toString(dto.getGroupActions()));
+        entity.setSortBy(Json.getMapper().toString(getNotBlank(dto.getSortBy(), JournalSortBy::getAttribute)));
 
         return entity;
+    }
+
+    private <T> List<T> getNotBlank(List<T> list, Function<T, String> getValueToCheck) {
+        if (list == null) {
+            return list;
+        }
+        return list.stream()
+            .filter(element -> StringUtils.isNotBlank(getValueToCheck.apply(element)))
+            .collect(Collectors.toList());
     }
 
     public static class ColumnsList extends ArrayList<JournalColumnDto> {}
