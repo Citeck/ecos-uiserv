@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.service.form;
 
 import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.records2.predicate.model.Predicate;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +10,8 @@ import java.util.function.Consumer;
 public interface EcosFormService {
 
     int getCount();
+
+    List<EcosFormModel> getAllForms(Predicate predicate, int max, int skip);
 
     List<EcosFormModel> getAllForms(int max, int skip);
 

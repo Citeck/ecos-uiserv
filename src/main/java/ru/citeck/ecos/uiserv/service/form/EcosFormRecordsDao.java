@@ -15,6 +15,9 @@ import ru.citeck.ecos.records2.QueryContext;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
+import ru.citeck.ecos.records2.predicate.PredicateService;
+import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records2.predicate.model.VoidPredicate;
 import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
 import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
 import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
@@ -28,7 +31,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormModelDownstream> {
+public class EcosFormRecordsDao extends CrudRecordsDAO<EcosFormRecordsDao.EcosFormModelDownstream> {
 
     public static final String ID = "eform";
 
@@ -147,7 +150,12 @@ public class EcosFormRecords extends CrudRecordsDAO<EcosFormRecords.EcosFormMode
                 skipCount = page.getSkipCount();
             }
 
-            List<EcosFormModelDownstream> forms = eformFormService.getAllForms(max, skipCount)
+            Predicate predicate = VoidPredicate.INSTANCE;
+            if (PredicateService.LANGUAGE_PREDICATE.equals(recordsQuery.getLanguage())) {
+                predicate = recordsQuery.getQuery(Predicate.class);
+            }
+
+            List<EcosFormModelDownstream> forms = eformFormService.getAllForms(predicate, max, skipCount)
                 .stream()
                 .map(this::toDownstream)
                 .collect(Collectors.toList());

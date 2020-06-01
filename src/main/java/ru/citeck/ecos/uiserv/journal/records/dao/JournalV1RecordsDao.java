@@ -10,23 +10,27 @@ import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
-import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDAO;
+import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.journal.dto.legacy1.JournalConfigResp;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JournalV1RecordsDao  extends LocalRecordsDAO
-    implements LocalRecordsQueryWithMetaDAO<JournalConfigResp>,
-    LocalRecordsMetaDAO<JournalConfigResp> {
+public class JournalV1RecordsDao  extends LocalRecordsDao
+    implements LocalRecordsQueryWithMetaDao<JournalConfigResp>,
+    LocalRecordsMetaDao<JournalConfigResp> {
 
-    private final JournalRecordsDAO journalRecordsDao;
+    private static final String CONFIG_URL = "http://alfresco/share/proxy/alfresco/api/journals/config?journalId=%s";
+
+    private final JournalRecordsDao journalRecordsDao;
     private final JournalV1Format converter;
 
     @Qualifier("recordsRestTemplate")
@@ -51,10 +55,26 @@ public class JournalV1RecordsDao  extends LocalRecordsDAO
 
             if (StringUtils.isBlank(dto.getId())) {
                 try {
-                    result.add(recordsRestTemplate.getForObject(
-                        "http://alfresco/share/proxy/alfresco/api/journals/config?journalId=" + ref.getId(),
+                    JournalConfigResp configResp = recordsRestTemplate.getForObject(
+                        String.format(CONFIG_URL, ref.getId()),
                         JournalConfigResp.class
-                    ));
+                    );
+                    if (configResp == null) {
+                        result.add(converter.convert(dto));
+                        continue;
+                    }
+                    boolean wasResolved = false;
+                    if (!Objects.equals(configResp.getId(), ref.getId())) {
+                        List<RecordRef> newRef = Collections.singletonList(RecordRef.valueOf(configResp.getId()));
+                        List<JournalDto> meta = journalRecordsDao.getLocalRecordsMeta(newRef, metaField);
+                        if (meta.size() == 1 && StringUtils.isNotBlank(meta.get(0).getId())) {
+                            result.add(converter.convert(meta.get(0)));
+                            wasResolved = true;
+                        }
+                    }
+                    if (!wasResolved) {
+                        result.add(configResp);
+                    }
                 } catch (Exception e) {
                     log.error("JournalConfig query failed. JournalId: '" + ref.getId() + "'", e);
                     result.add(converter.convert(dto));

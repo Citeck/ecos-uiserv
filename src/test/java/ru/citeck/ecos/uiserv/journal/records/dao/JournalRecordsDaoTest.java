@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-public class JournalRecordsDAOTest {
+public class JournalRecordsDaoTest {
 
     public static final String JOURNAL_DAO_ID = "journal";
     public static final String UISERV_APP_ID = "uiserv";

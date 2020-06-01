@@ -82,7 +82,7 @@ public class SitesResolver {
     private Collection<SiteInfo> getUserSites() {
         RecordsQuery query = new RecordsQuery();
         query.setSourceId("alfresco/");
-        query.setQuery("TYPE:'st:site'");
+        query.setQuery("TYPE:\"st:site\" AND NOT ASPECT:\"etype:tenantSite\"");
         query.setLanguage("fts-alfresco");
         query.setConsistency(QueryConsistency.TRANSACTIONAL);
 

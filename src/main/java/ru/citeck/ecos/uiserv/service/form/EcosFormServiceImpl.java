@@ -9,6 +9,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
@@ -16,6 +17,8 @@ import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
+import ru.citeck.ecos.records2.predicate.PredicateUtils;
+import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.domain.EcosFormEntity;
 import ru.citeck.ecos.uiserv.repository.EcosFormsRepository;
 
@@ -44,6 +47,30 @@ public class EcosFormServiceImpl implements EcosFormService {
     @Override
     public int getCount() {
         return (int) formsRepository.count();
+    }
+
+    @Override
+    public List<EcosFormModel> getAllForms(Predicate predicate, int max, int skip) {
+
+        FilterPredicate dto = PredicateUtils.convertToDto(predicate, FilterPredicate.class);
+
+        PageRequest page = PageRequest.of(skip / max, max, Sort.by(Sort.Direction.DESC, "id"));
+
+        if (dto != null && StringUtils.isNotBlank(dto.getModuleId())) {
+
+            Specification<EcosFormEntity> idSpec = (root, query, builder) ->
+                builder.like(builder.lower(root.get("extId")), "%" + dto.getModuleId().toLowerCase() + "%");
+
+            return formsRepository.findAll(idSpec, page).stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+
+        } else {
+
+            return formsRepository.findAll(page).stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+        }
     }
 
     @Override
@@ -197,6 +224,11 @@ public class EcosFormServiceImpl implements EcosFormService {
         entity.setAttributes(Json.getMapper().toString(model.getAttributes()));
 
         return entity;
+    }
+
+    @Data
+    public static class FilterPredicate {
+        private String moduleId;
     }
 
     @Data

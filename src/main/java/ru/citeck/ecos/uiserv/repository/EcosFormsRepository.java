@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 import ru.citeck.ecos.uiserv.domain.EcosFormEntity;
 
@@ -9,7 +10,8 @@ import java.util.Optional;
 
 @SuppressWarnings("unused")
 @Repository
-public interface EcosFormsRepository extends JpaRepository<EcosFormEntity, Long> {
+public interface EcosFormsRepository extends JpaRepository<EcosFormEntity, Long>,
+                                             JpaSpecificationExecutor<EcosFormEntity> {
 
     List<EcosFormEntity> findAllByTypeRef(String type);
 

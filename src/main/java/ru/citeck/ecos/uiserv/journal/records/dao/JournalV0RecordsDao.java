@@ -45,7 +45,7 @@ public class JournalV0RecordsDao extends LocalRecordsDAO
     private static final String TYPE_URI = PROXY_URI + "api/journals/types/";
     private static final String NODE_REF_PREFIX = "workspace://";
 
-    private final JournalRecordsDAO journalRecordsDao;
+    private final JournalRecordsDao journalRecordsDao;
     private final JournalV0Format converter;
     private final RecordsService recordsService;
 
