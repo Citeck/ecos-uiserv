@@ -1,7 +1,6 @@
 package ru.citeck.ecos.uiserv.domain;
 
 import lombok.Data;
-import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -30,6 +29,9 @@ public class ActionEntity extends AbstractAuditingEntity {
     @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "evaluator")
     private EvaluatorEntity evaluator;
+
+    private String confirm;
+    private String result;
 
     @Override
     public boolean equals(Object o) {

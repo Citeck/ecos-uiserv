@@ -24,11 +24,11 @@ import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.request.result.RecordsResult;
-import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
-import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDAO;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDAO;
+import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
+import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDao;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.commons.utils.StringUtils;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -38,17 +38,17 @@ import java.util.stream.Collectors;
  * @author Roman Makarskiy
  */
 @Component
-public class ActionRecords extends LocalRecordsDAO
-                           implements LocalRecordsQueryWithMetaDAO<Object>,
-                                      LocalRecordsMetaDAO<ActionRecords.ActionRecord>,
-                                      MutableRecordsLocalDAO<ActionRecords.ActionRecord> {
+public class ActionRecords extends LocalRecordsDao
+                           implements LocalRecordsQueryWithMetaDao<Object>,
+                                      LocalRecordsMetaDao<ActionRecords.ActionRecord>,
+                                      MutableRecordsLocalDao<ActionRecords.ActionRecord> {
 
     private static final String RECORD_ACTIONS_TYPE = "record-actions";
 
     public static final String ID = "action";
 
-    private RecordsService recordsService;
-    private ActionService actionService;
+    private final RecordsService recordsService;
+    private final ActionService actionService;
 
     @Autowired
     public ActionRecords(RecordsService recordsService, ActionService actionService) {

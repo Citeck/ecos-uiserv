@@ -36,5 +36,6 @@
     <include file="changelog/20200422000000_icon.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20200427000000_update_journal_table.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20200529000000_add_group_actions.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20200601000000_add_actions_confirm_and_result.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
