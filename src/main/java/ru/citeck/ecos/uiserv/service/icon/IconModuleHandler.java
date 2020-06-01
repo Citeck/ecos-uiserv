@@ -9,7 +9,6 @@ import ru.citeck.ecos.apps.module.handler.ModuleMeta;
 import ru.citeck.ecos.apps.module.handler.ModuleWithMeta;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.uiserv.service.icon.dto.IconDto;
-import ru.citeck.ecos.uiserv.service.icon.dto.IconType;
 
 import java.util.Base64;
 import java.util.Collections;
@@ -52,7 +51,7 @@ public class IconModuleHandler implements EcosModuleHandler<IconModule> {
 
         String filename = module.getFilename();
         dto.setId(filename);
-        dto.setType(IconType.IMG);
+        dto.setType("img");
         dto.setFormat(getExtension(filename));
         dto.setData(dataString);
 

@@ -9,7 +9,7 @@ import java.time.Instant;
 @ToString(exclude = {"data"})
 public class IconDto {
     private String id;
-    private IconType type;
+    private String type;
     private String format;
     private String data;
     private Instant modified;

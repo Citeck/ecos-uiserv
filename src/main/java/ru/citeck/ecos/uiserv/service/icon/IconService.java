@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.citeck.ecos.uiserv.domain.IconEntity;
 import ru.citeck.ecos.uiserv.repository.IconRepository;
 import ru.citeck.ecos.uiserv.service.icon.dto.IconDto;
-import ru.citeck.ecos.uiserv.service.icon.dto.IconType;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -39,22 +38,19 @@ public class IconService {
         if (StringUtils.isBlank(id)) {
             throw new IllegalArgumentException("Id parameter is mandatory for icon deletion");
         }
-
-        iconRepository.deleteByExtId(id);
+        iconRepository.findByExtId(id).ifPresent(iconRepository::delete);
     }
 
     public IconDto save(IconDto iconDto) {
         if (StringUtils.isBlank(iconDto.getId())) {
-            throw new IllegalArgumentException("Id parameter is mandatory for saving icon");
+            iconDto.setId(UUID.randomUUID().toString());
         }
-
         IconEntity saved = iconRepository.save(mapToEntity(iconDto));
-
         return mapToDto(saved);
     }
 
-    public List<IconDto> findAllByType(IconType type) {
-        return iconRepository.findAllByType(type.getTypeString())
+    public List<IconDto> findAllByType(String type) {
+        return iconRepository.findAllByType(type)
             .stream()
             .map(this::mapToDto)
             .collect(Collectors.toList());
@@ -64,26 +60,20 @@ public class IconService {
         IconDto dto = new IconDto();
 
         dto.setId(entity.getExtId());
+        dto.setType(entity.getType());
+        dto.setFormat(entity.getFormat());
 
-        IconType type = IconType.byTypeString(entity.getType());
-        if (type == null) {
-            throw new IllegalStateException("Unsupported type in repository: " + entity.getType());
-        }
-        dto.setType(type);
-        if (IconType.IMG.equals(type)) {
-            dto.setFormat(entity.getFormat());
-        }
-        dto.setData(bytesToStringByType(entity.getData(), type));
+        dto.setData(bytesToStringByType(entity.getData(), entity.getType()));
         dto.setModified(entity.getLastModifiedDate());
 
         return dto;
     }
 
-    private String bytesToStringByType(byte[] data, IconType type) {
+    private String bytesToStringByType(byte[] data, String type) {
         switch (type) {
-            case FA:
+            case "fa":
                 return new String(data, StandardCharsets.UTF_8);
-            case IMG:
+            case "img":
                 return Base64.getEncoder().encodeToString(data);
             default:
                 throw new IllegalStateException("Unsupported type: " + type);
@@ -104,21 +94,19 @@ public class IconService {
             entity.setExtId(UUID.randomUUID().toString());
         }
 
-        IconType type = dto.getType();
-        entity.setType(type.getTypeString());
-        if (IconType.IMG.equals(type)) {
-            entity.setFormat(dto.getFormat());
-        }
+        String type = dto.getType();
+        entity.setType(type);
+        entity.setFormat(dto.getFormat());
         entity.setData(stringToBytesByType(dto.getData(), type));
 
         return entity;
     }
 
-    private byte[] stringToBytesByType(String data, IconType type) {
+    private byte[] stringToBytesByType(String data, String type) {
         switch (type) {
-            case FA:
+            case "fa":
                 return data.getBytes(StandardCharsets.UTF_8);
-            case IMG:
+            case "img":
                 return Base64.getDecoder().decode(data);
             default:
                 throw new IllegalStateException("Unsupported type: " + type);

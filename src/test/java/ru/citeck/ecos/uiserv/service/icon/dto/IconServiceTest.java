@@ -36,7 +36,7 @@ public class IconServiceTest {
     @Test
     public void save_imgDto_properPersist() {
         String id = "id";
-        IconType type = IconType.IMG;
+        String type = "img";
         String format = "png";
         byte[] data = RandomUtils.nextBytes(20);
         String dataString = Base64.getEncoder().encodeToString(data);
@@ -55,7 +55,7 @@ public class IconServiceTest {
 
         IconEntity saved = entities.get(0);
         assertEquals(id, saved.getExtId());
-        assertEquals(type.getTypeString(), saved.getType());
+        assertEquals(type, saved.getType());
         assertEquals(format, saved.getFormat());
         assertArrayEquals(data, saved.getData());
     }
@@ -63,7 +63,7 @@ public class IconServiceTest {
     @Test
     public void save_imgDto_properReturn() {
         String id = "id";
-        IconType type = IconType.IMG;
+        String type = "img";
         String format = "png";
         byte[] data = RandomUtils.nextBytes(20);
         String dataString = Base64.getEncoder().encodeToString(data);
@@ -87,7 +87,7 @@ public class IconServiceTest {
     @Test
     public void save_faDto_properPersist() {
         String id = "id";
-        IconType type = IconType.FA;
+        String type = "fa";
         String dataString = "data";
         byte[] data = dataString.getBytes(StandardCharsets.UTF_8);
 
@@ -104,7 +104,7 @@ public class IconServiceTest {
 
         IconEntity saved = entities.get(0);
         assertEquals(id, saved.getExtId());
-        assertEquals(type.getTypeString(), saved.getType());
+        assertEquals(type, saved.getType());
         assertNull(saved.getFormat());
         assertArrayEquals(data, saved.getData());
     }
@@ -112,7 +112,7 @@ public class IconServiceTest {
     @Test
     public void save_faDto_properReturn() {
         String id = "id";
-        IconType type = IconType.FA;
+        String type = "fa";
         String dataString = "data";
 
         IconDto dto = new IconDto();
@@ -131,31 +131,13 @@ public class IconServiceTest {
     }
 
     @Test
-    public void save_faDtoWithFormat_formatNotPersisted() {
-        IconDto dto = new IconDto();
-
-        dto.setId("id");
-        dto.setType(IconType.FA);
-        dto.setFormat("shouldNotBePersisted");
-        dto.setData("data");
-
-        iconService.save(dto);
-
-        List<IconEntity> entities = iconRepository.findAll();
-        assertEquals(1, entities.size());
-
-        IconEntity saved = entities.get(0);
-        assertNull(saved.getFormat());
-    }
-
-    @Test
     public void save_faDtoWithModifiedFilled_modifiedPutByRepo() {
         Instant modified = Instant.now().minus(10, ChronoUnit.MINUTES);
 
         IconDto dto = new IconDto();
 
         dto.setId("id");
-        dto.setType(IconType.FA);
+        dto.setType("fa");
         dto.setData("data");
         dto.setModified(modified);
 
@@ -171,7 +153,7 @@ public class IconServiceTest {
         IconDto dto = new IconDto();
 
         dto.setId("id");
-        dto.setType(IconType.IMG);
+        dto.setType("img");
         dto.setData("data");
         dto.setModified(modified);
 
@@ -180,47 +162,21 @@ public class IconServiceTest {
         assertTrue(saved.getModified().isAfter(modified));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void save_dtoWithNullId_throwsException() {
-        IconDto dto = new IconDto();
-        iconService.save(dto);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void save_dtoWithBlankId_throwsException() {
-        IconDto dto = new IconDto();
-        dto.setId("");
-        iconService.save(dto);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void delete_dtoWithNullId_throwsException() {
-        IconDto dto = new IconDto();
-        dto.setId("");
-        iconService.save(dto);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void delete_dtoWithBlankId_throwsException() {
-        IconDto dto = new IconDto();
-        iconService.save(dto);
-    }
-
     @Test
     public void findAllByType_findsProperly() {
         IconDto dto1 = new IconDto();
         dto1.setId("id1");
-        dto1.setType(IconType.FA);
+        dto1.setType("fa");
         dto1.setData("data1");
 
         IconDto dto2 = new IconDto();
         dto2.setId("id2");
-        dto2.setType(IconType.FA);
+        dto2.setType("fa");
         dto2.setData("data2");
 
         IconDto dto3 = new IconDto();
         dto3.setId("id3");
-        dto3.setType(IconType.IMG);
+        dto3.setType("img");
         byte[] data = RandomUtils.nextBytes(20);
         String dataString = Base64.getEncoder().encodeToString(data);
         dto3.setData(dataString);
@@ -229,7 +185,7 @@ public class IconServiceTest {
         iconService.save(dto2);
         iconService.save(dto3);
 
-        List<IconDto> found = iconService.findAllByType(IconType.FA);
+        List<IconDto> found = iconService.findAllByType("fa");
 
         assertEquals(2, found.size());
     }

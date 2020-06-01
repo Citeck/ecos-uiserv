@@ -15,7 +15,6 @@ import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDAO;
 import ru.citeck.ecos.uiserv.service.icon.dto.IconDto;
-import ru.citeck.ecos.uiserv.service.icon.dto.IconType;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,7 +52,7 @@ public class IconRecords extends LocalRecordsDAO
             return result;
         }
 
-        IconType type = typeQuery.getType();
+        String type = typeQuery.getType();
         if (type == null) {
             throw new IllegalArgumentException("Unsupported or empty type in query");
         }
@@ -93,6 +92,6 @@ public class IconRecords extends LocalRecordsDAO
 
     @Data
     private static class TypeQuery {
-        private IconType type;
+        private String type;
     }
 }
