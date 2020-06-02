@@ -1,83 +1,83 @@
 package ru.citeck.ecos.uiserv.service.icon;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.apps.module.controller.type.binary.BinModule;
 import ru.citeck.ecos.apps.module.handler.EcosModuleHandler;
 import ru.citeck.ecos.apps.module.handler.ModuleMeta;
 import ru.citeck.ecos.apps.module.handler.ModuleWithMeta;
+import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.uiserv.service.icon.dto.IconDto;
 
-import java.util.Base64;
 import java.util.Collections;
 import java.util.function.Consumer;
 
 @Component
 @RequiredArgsConstructor
-public class IconModuleHandler implements EcosModuleHandler<IconModule> {
+public class IconModuleHandler implements EcosModuleHandler<BinModule> {
+
     private final IconService iconService;
 
     @Override
-    public void deployModule(@NotNull IconModule iconModule) {
-        iconService.save(iconModuleToDto(iconModule));
+    public void deployModule(@NotNull BinModule iconModule) {
+        iconService.save(convertToDto(iconModule));
     }
 
-    private IconDto iconModuleToDto(IconModule module) {
-        String filename = module.getFilename();
-        String extension = getExtension(filename);
+    private IconDto convertToDto(BinModule module) {
+
+        String extension = FilenameUtils.getExtension(module.getPath());
 
         switch (extension) {
+            case "yml":
+            case "yaml":
             case "json":
-                return dtoFromJson(module);
-            case "png":
-                return dtoFromImg(module);
+                String dataString = new String(module.getData());
+                return Json.getMapper().read(dataString, IconDto.class);
             default:
-                throw new IllegalStateException("Unexpected value: " + extension);
+                IconDto dto = module.getMeta().getAs(IconDto.class);
+                if (dto == null) {
+                    dto = new IconDto();
+                }
+                dto.setData(module.getData());
+                ObjectData config = dto.getConfig();
+                if (config == null) {
+                    dto.setConfig(ObjectData.create());
+                    config = dto.getConfig();
+                }
+                if (config.get("format", "").isEmpty()) {
+                    config.set("format", extension);
+                }
+                if (StringUtils.isBlank(dto.getType())) {
+                    dto.setType("img");
+                }
+                if (StringUtils.isBlank(dto.getId())) {
+                    dto.setId(module.getPath());
+                }
+                return dto;
         }
-    }
-
-    private IconDto dtoFromJson(IconModule module) {
-        String dataString = new String(module.getData());
-        return Json.getMapper().read(dataString, IconDto.class);
-    }
-
-    private IconDto dtoFromImg(IconModule module) {
-        byte[] data = module.getData();
-        String dataString = Base64.getEncoder().encodeToString(data);
-
-        IconDto dto = new IconDto();
-
-        String filename = module.getFilename();
-        dto.setId(filename);
-        dto.setType("img");
-        dto.setFormat(getExtension(filename));
-        dto.setData(dataString);
-
-        return dto;
-    }
-
-    private String getExtension(String filename) {
-        return filename.substring(filename.lastIndexOf(".") + 1);
     }
 
     @NotNull
     @Override
-    public ModuleWithMeta<IconModule> getModuleMeta(@NotNull IconModule iconModule) {
-        return new ModuleWithMeta<>(iconModule, new ModuleMeta(iconModule.getFilename(), Collections.emptyList()));
+    public ModuleWithMeta<BinModule> getModuleMeta(@NotNull BinModule module) {
+        IconDto dto = convertToDto(module);
+        return new ModuleWithMeta<>(module, new ModuleMeta(dto.getId(), Collections.emptyList()));
     }
 
     @Override
-    public void listenChanges(@NotNull Consumer<IconModule> consumer) {
+    public void listenChanges(@NotNull Consumer<BinModule> consumer) {
     }
 
     @Nullable
     @Override
-    public ModuleWithMeta<IconModule> prepareToDeploy(@NotNull IconModule iconModule) {
+    public ModuleWithMeta<BinModule> prepareToDeploy(@NotNull BinModule iconModule) {
         return getModuleMeta(iconModule);
     }
-
 
     @NotNull
     @Override

@@ -1,6 +1,5 @@
 package ru.citeck.ecos.uiserv.domain;
 
-
 import lombok.Data;
 import lombok.ToString;
 
@@ -18,14 +17,19 @@ public class IconEntity extends AbstractAuditingEntity {
     private Long id;
     @Column(name = "ext_id")
     private String extId;
+    private String family;
     private String type;
-    private String format;
+    private String config;
     private byte[] data;
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         IconEntity that = (IconEntity) o;
         return Objects.equals(id, that.id);
     }

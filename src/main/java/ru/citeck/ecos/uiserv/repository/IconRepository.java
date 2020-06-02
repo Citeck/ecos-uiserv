@@ -8,9 +8,9 @@ import java.util.Optional;
 
 public interface IconRepository extends JpaRepository<IconEntity, Long> {
 
-    List<IconEntity> findAllByType(String type);
+    List<IconEntity> findAllByFamilyAndType(String family, String type);
+
+    List<IconEntity> findAllByFamily(String family);
 
     Optional<IconEntity> findByExtId(String extId);
-
-    void deleteByExtId(String extId);
 }

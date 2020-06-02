@@ -37,16 +37,15 @@ public class IconServiceTest {
     public void save_imgDto_properPersist() {
         String id = "id";
         String type = "img";
-        String format = "png";
+        String family = "png";
         byte[] data = RandomUtils.nextBytes(20);
-        String dataString = Base64.getEncoder().encodeToString(data);
 
         IconDto dto = new IconDto();
 
         dto.setId(id);
         dto.setType(type);
-        dto.setFormat(format);
-        dto.setData(dataString);
+        dto.setFamily(family);
+        dto.setData(data);
 
         iconService.save(dto);
 
@@ -56,7 +55,7 @@ public class IconServiceTest {
         IconEntity saved = entities.get(0);
         assertEquals(id, saved.getExtId());
         assertEquals(type, saved.getType());
-        assertEquals(format, saved.getFormat());
+        assertEquals(family, saved.getFamily());
         assertArrayEquals(data, saved.getData());
     }
 
@@ -64,23 +63,22 @@ public class IconServiceTest {
     public void save_imgDto_properReturn() {
         String id = "id";
         String type = "img";
-        String format = "png";
+        String family = "png";
         byte[] data = RandomUtils.nextBytes(20);
-        String dataString = Base64.getEncoder().encodeToString(data);
 
         IconDto dto = new IconDto();
 
         dto.setId(id);
         dto.setType(type);
-        dto.setFormat(format);
-        dto.setData(dataString);
+        dto.setFamily(family);
+        dto.setData(data);
 
         IconDto saved = iconService.save(dto);
         assertNotNull(saved);
         assertEquals(id, saved.getId());
         assertEquals(type, saved.getType());
-        assertEquals(format, saved.getFormat());
-        assertEquals(dataString, saved.getData());
+        assertEquals(family, saved.getFamily());
+        assertEquals(data, saved.getData());
         assertNotNull(saved.getModified());
     }
 
@@ -95,7 +93,7 @@ public class IconServiceTest {
 
         dto.setId(id);
         dto.setType(type);
-        dto.setData(dataString);
+        dto.setData(data);
 
         iconService.save(dto);
 
@@ -105,7 +103,7 @@ public class IconServiceTest {
         IconEntity saved = entities.get(0);
         assertEquals(id, saved.getExtId());
         assertEquals(type, saved.getType());
-        assertNull(saved.getFormat());
+        assertEquals("", saved.getFamily());
         assertArrayEquals(data, saved.getData());
     }
 
@@ -119,14 +117,14 @@ public class IconServiceTest {
 
         dto.setId(id);
         dto.setType(type);
-        dto.setData(dataString);
+        dto.setData(dataString.getBytes());
 
         IconDto saved = iconService.save(dto);
         assertNotNull(saved);
         assertEquals(id, saved.getId());
         assertEquals(type, saved.getType());
-        assertNull(saved.getFormat());
-        assertEquals(dataString, saved.getData());
+        assertEquals("", saved.getFamily());
+        assertArrayEquals(dataString.getBytes(), saved.getData());
         assertNotNull(saved.getModified());
     }
 
@@ -138,7 +136,7 @@ public class IconServiceTest {
 
         dto.setId("id");
         dto.setType("fa");
-        dto.setData("data");
+        dto.setData("data".getBytes());
         dto.setModified(modified);
 
         IconDto saved = iconService.save(dto);
@@ -154,7 +152,7 @@ public class IconServiceTest {
 
         dto.setId("id");
         dto.setType("img");
-        dto.setData("data");
+        dto.setData("data".getBytes());
         dto.setModified(modified);
 
         IconDto saved = iconService.save(dto);
@@ -167,25 +165,25 @@ public class IconServiceTest {
         IconDto dto1 = new IconDto();
         dto1.setId("id1");
         dto1.setType("fa");
-        dto1.setData("data1");
+        dto1.setData("data1".getBytes());
 
         IconDto dto2 = new IconDto();
         dto2.setId("id2");
         dto2.setType("fa");
-        dto2.setData("data2");
+        dto2.setData("data2".getBytes());
 
         IconDto dto3 = new IconDto();
         dto3.setId("id3");
         dto3.setType("img");
         byte[] data = RandomUtils.nextBytes(20);
         String dataString = Base64.getEncoder().encodeToString(data);
-        dto3.setData(dataString);
+        dto3.setData(dataString.getBytes());
 
         iconService.save(dto1);
         iconService.save(dto2);
         iconService.save(dto3);
 
-        List<IconDto> found = iconService.findAllByType("fa");
+        List<IconDto> found = iconService.findAllByFamilyAndType("", "fa");
 
         assertEquals(2, found.size());
     }

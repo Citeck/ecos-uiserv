@@ -4,7 +4,5 @@ modelVersion: "1.0"
 source-id: ""
 
 controller:
-    type: script
-    config:
-        script: IconController.groovy
+    type: bin
 

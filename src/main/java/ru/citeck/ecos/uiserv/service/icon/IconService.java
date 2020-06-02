@@ -3,12 +3,12 @@ package ru.citeck.ecos.uiserv.service.icon;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.uiserv.domain.IconEntity;
 import ru.citeck.ecos.uiserv.repository.IconRepository;
 import ru.citeck.ecos.uiserv.service.icon.dto.IconDto;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,7 +29,6 @@ public class IconService {
         if (StringUtils.isBlank(id)) {
             return Optional.empty();
         }
-
         return iconRepository.findByExtId(id)
             .map(this::mapToDto);
     }
@@ -49,8 +48,15 @@ public class IconService {
         return mapToDto(saved);
     }
 
-    public List<IconDto> findAllByType(String type) {
-        return iconRepository.findAllByType(type)
+    public List<IconDto> findAllByFamilyAndType(String family, String type) {
+        return iconRepository.findAllByFamilyAndType(family, type)
+            .stream()
+            .map(this::mapToDto)
+            .collect(Collectors.toList());
+    }
+
+    public List<IconDto> findAllByFamily(String family) {
+        return iconRepository.findAllByFamily(family)
             .stream()
             .map(this::mapToDto)
             .collect(Collectors.toList());
@@ -61,26 +67,18 @@ public class IconService {
 
         dto.setId(entity.getExtId());
         dto.setType(entity.getType());
-        dto.setFormat(entity.getFormat());
-
-        dto.setData(bytesToStringByType(entity.getData(), entity.getType()));
+        dto.setFamily(entity.getFamily());
+        dto.setConfig(Json.getMapper().read(entity.getConfig(), ObjectData.class));
+        dto.setData(entity.getData());
         dto.setModified(entity.getLastModifiedDate());
 
         return dto;
     }
 
-    private String bytesToStringByType(byte[] data, String type) {
-        switch (type) {
-            case "fa":
-                return new String(data, StandardCharsets.UTF_8);
-            case "img":
-                return Base64.getEncoder().encodeToString(data);
-            default:
-                throw new IllegalStateException("Unsupported type: " + type);
-        }
-    }
-
     private IconEntity mapToEntity(IconDto dto) {
+
+        String family = dto.getFamily() != null ? dto.getFamily() : "";
+
         IconEntity entity;
         String extId = dto.getId();
         if (StringUtils.isNotBlank(extId)) {
@@ -96,20 +94,10 @@ public class IconService {
 
         String type = dto.getType();
         entity.setType(type);
-        entity.setFormat(dto.getFormat());
-        entity.setData(stringToBytesByType(dto.getData(), type));
+        entity.setConfig(Json.getMapper().toString(dto.getConfig()));
+        entity.setFamily(family);
+        entity.setData(dto.getData());
 
         return entity;
-    }
-
-    private byte[] stringToBytesByType(String data, String type) {
-        switch (type) {
-            case "fa":
-                return data.getBytes(StandardCharsets.UTF_8);
-            case "img":
-                return Base64.getDecoder().decode(data);
-            default:
-                throw new IllegalStateException("Unsupported type: " + type);
-        }
     }
 }
