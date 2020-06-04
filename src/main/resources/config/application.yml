@@ -195,6 +195,9 @@ uiserv:
             value: true
         custom-create-buttons:
             value: '[]'
+        restrict-access-to-edit-dashboard:
+            value: false
+
 
     ecos-records:
         apps:
