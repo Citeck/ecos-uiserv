@@ -113,6 +113,12 @@ public class JournalServiceImpl implements JournalService {
     @Override
     public JournalDto save(JournalDto dto) {
 
+        if (dto.getColumns() == null
+            || dto.getColumns().stream().noneMatch(c -> StringUtils.isNotBlank(c.getName()))) {
+
+            throw new IllegalStateException("Columns is a mandatory for journal config");
+        }
+
         JournalEntity journalEntity = journalMapper.dtoToEntity(dto);
         JournalEntity storedJournalEntity = journalRepository.save(journalEntity);
 

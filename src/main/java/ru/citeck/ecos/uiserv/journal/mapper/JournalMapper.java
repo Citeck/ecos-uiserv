@@ -97,7 +97,7 @@ public class JournalMapper {
         entity.setMetaRecord(RecordRef.toString(dto.getMetaRecord()));
         entity.setSourceId(dto.getSourceId());
         entity.setGroupBy(Json.getMapper().toString(getNotBlank(dto.getGroupBy(), v -> v)));
-        entity.setGroupActions(Json.getMapper().toString(dto.getGroupActions()));
+        entity.setGroupActions(Json.getMapper().toString(getNotBlank(dto.getGroupActions(), GroupAction::getId)));
         entity.setSortBy(Json.getMapper().toString(getNotBlank(dto.getSortBy(), JournalSortBy::getAttribute)));
 
         return entity;
