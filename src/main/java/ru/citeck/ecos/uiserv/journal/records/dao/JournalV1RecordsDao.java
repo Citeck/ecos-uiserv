@@ -17,7 +17,9 @@ import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.journal.dto.legacy1.JournalConfigResp;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -25,6 +27,8 @@ import java.util.List;
 public class JournalV1RecordsDao  extends LocalRecordsDAO
     implements LocalRecordsQueryWithMetaDAO<JournalConfigResp>,
     LocalRecordsMetaDAO<JournalConfigResp> {
+
+    private static final String CONFIG_URL = "http://alfresco/share/proxy/alfresco/api/journals/config?journalId=%s";
 
     private final JournalRecordsDAO journalRecordsDao;
     private final JournalV1Format converter;
@@ -51,10 +55,26 @@ public class JournalV1RecordsDao  extends LocalRecordsDAO
 
             if (StringUtils.isBlank(dto.getId())) {
                 try {
-                    result.add(recordsRestTemplate.getForObject(
-                        "http://alfresco/share/proxy/alfresco/api/journals/config?journalId=" + ref.getId(),
+                    JournalConfigResp configResp = recordsRestTemplate.getForObject(
+                        String.format(CONFIG_URL, ref.getId()),
                         JournalConfigResp.class
-                    ));
+                    );
+                    if (configResp == null) {
+                        result.add(converter.convert(dto));
+                        continue;
+                    }
+                    boolean wasResolved = false;
+                    if (!Objects.equals(configResp.getId(), ref.getId())) {
+                        List<RecordRef> newRef = Collections.singletonList(RecordRef.valueOf(configResp.getId()));
+                        List<JournalDto> meta = journalRecordsDao.getLocalRecordsMeta(newRef, metaField);
+                        if (meta.size() == 1 && StringUtils.isNotBlank(meta.get(0).getId())) {
+                            result.add(converter.convert(meta.get(0)));
+                            wasResolved = true;
+                        }
+                    }
+                    if (!wasResolved) {
+                        result.add(configResp);
+                    }
                 } catch (Exception e) {
                     log.error("JournalConfig query failed. JournalId: '" + ref.getId() + "'", e);
                     result.add(converter.convert(dto));

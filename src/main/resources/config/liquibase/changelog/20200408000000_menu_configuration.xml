@@ -1,0 +1,52 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="nikolay.gerasimenko" id="20200408000000">
+
+        <createTable tableName="ecos_menu">
+
+            <column name="id" type="BIGINT" autoIncrement="${autoIncrement}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tenant" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ext_id" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="priority" type="REAL">
+                <constraints nullable="false"/>
+            </column>
+            <column name="items" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_date" type="TIMESTAMP"/>
+            <column name="created_by" type="VARCHAR(50)"/>
+            <column name="last_modified_date" type="TIMESTAMP"/>
+            <column name="last_modified_by" type="VARCHAR(50)"/>
+
+        </createTable>
+
+        <createTable tableName="ecos_menu_authority">
+            <column name="menu_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authority" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="menu_id"
+                                 baseTableName="ecos_menu_authority"
+                                 constraintName="fk_menu_id_menu"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ecos_menu"/>
+    </changeSet>
+
+</databaseChangeLog>

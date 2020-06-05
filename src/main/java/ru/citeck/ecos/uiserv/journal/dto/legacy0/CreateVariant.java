@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.journal.dto.legacy0;
 
 import lombok.Data;
+import ru.citeck.ecos.commons.data.ObjectData;
 
 @Data
 public class CreateVariant {
@@ -14,4 +15,5 @@ public class CreateVariant {
     private String recordRef;
     private String title;
     private String type;
+    private ObjectData attributes;
 }

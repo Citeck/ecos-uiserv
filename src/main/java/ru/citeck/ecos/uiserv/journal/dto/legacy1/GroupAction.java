@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Map;
 
 @Data
-class GroupAction {
+public class GroupAction {
     private String id;
     private String title;
     private Map<String, String> params;

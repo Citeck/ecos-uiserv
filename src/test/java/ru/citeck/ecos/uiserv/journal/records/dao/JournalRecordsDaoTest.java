@@ -13,8 +13,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
@@ -22,23 +24,21 @@ import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
 import ru.citeck.ecos.uiserv.journal.mapper.JournalMapper;
-import ru.citeck.ecos.uiserv.repository.ActionRepository;
 import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
+import ru.citeck.ecos.uiserv.repository.ActionRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isIn;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-public class JournalRecordsDAOTest {
+public class JournalRecordsDaoTest {
 
     public static final String JOURNAL_DAO_ID = "journal";
     public static final String UISERV_APP_ID = "uiserv";
@@ -52,75 +52,13 @@ public class JournalRecordsDAOTest {
     @Autowired
     private ActionRepository actionRepository;
 
+    @Autowired
+    private RecordsService recordsService;
+
     @BeforeEach
     void setUp() {
         journalRepository.deleteAll();
         actionRepository.deleteAll();
-    }
-
-    @Test
-    void queryJournalByTypeRef_WithDirectReceiving() throws Exception {
-
-        //  arrange
-
-        JournalEntity journalEntity = new JournalEntity();
-        journalEntity.setExtId("myTestJournal");
-        journalEntity.setLabel("{\"en\":\"test\"}");
-        journalEntity.setTypeRef(TypesDao.testTypeRef.toString());
-
-        journalRepository.save(journalEntity);
-
-        //  act and assert
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/records/query")
-            .contentType("application/json")
-            .header("Content-type", "application/json")
-            .content("{\n" +
-                "    \"query\": {\n" +
-                "        \"sourceId\": \"journal\",\n" +
-                "        \"query\": {\n" +
-                "            \"typeRef\": \"" + TypesDao.testTypeRef.toString() + "\"\n" +
-                "                   }" +
-                "               }" +
-                "     }"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.records[0]",
-                is(UISERV_APP_ID + "/" + JOURNAL_DAO_ID + "@" + journalEntity.getExtId())));
-    }
-
-    @Test
-    void queryJournalByTypeRef_WithParentsIteration() throws Exception {
-
-        //  arrange
-
-        JournalEntity journalEntity = new JournalEntity();
-        journalEntity.setExtId("myTestJournal");
-        journalEntity.setLabel("{\"en\":\"test\"}");
-        journalEntity.setTypeRef(TypesDao.testTypeRef.toString());
-
-        journalRepository.save(journalEntity);
-
-        TypesDao.testTypeRecord.setJournal(null);
-        TypesDao.baseTypeRecord.setJournal(TypesDao.journalRef);
-
-        TypesDao.records.put(TypesDao.testTypeRef.getId(), TypesDao.testTypeRecord);
-        TypesDao.records.put(TypesDao.baseTypeRecord.getId(), TypesDao.baseTypeRecord);
-
-        //  act and assert
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/records/query")
-            .contentType("application/json")
-            .header("Content-type", "application/json")
-            .content("{\n" +
-                "    \"query\": {\n" +
-                "        \"sourceId\": \"journal\",\n" +
-                "        \"query\": {\n" +
-                "            \"typeRef\": \"" + TypesDao.testTypeRef.toString() + "\"\n" +
-                "                   }" +
-                "               }" +
-                "     }"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.records[0]", is("uiserv/journal@" + journalEntity.getExtId())));
     }
 
     //@Test
@@ -196,6 +134,7 @@ public class JournalRecordsDAOTest {
         journalEntity.setColumns("[\n" +
             "        {\n" +
             "            \"attribute\": \"icase:case\",\n" +
+            "            \"name\": \"columnName\",\n" +
             "            \"type\": \"text\",\n" +
             "            \"searchable\": true,\n" +
             "            \"sortable\": true,\n" +

@@ -1,7 +1,5 @@
 package ru.citeck.ecos.uiserv.journal.service;
 
-import org.jetbrains.annotations.Nullable;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 
@@ -11,6 +9,8 @@ import java.util.function.Consumer;
 
 public interface JournalService {
 
+    JournalDto getJournalById(String id);
+
     Set<JournalDto> getAll(int max, int skipCount, Predicate predicate);
 
     JournalDto getById(String id);
@@ -19,16 +19,15 @@ public interface JournalService {
 
     Set<JournalDto> getAll(Set<String> extIds);
 
-    @Nullable
-    JournalDto searchJournalByTypeRef(RecordRef typeRef);
-
     long getCount();
 
     long getCount(Predicate predicate);
 
     void onJournalChanged(Consumer<JournalDto> consumer);
 
-    JournalDto update(JournalDto dto);
+    JournalDto save(JournalDto dto);
 
-    List<JournalDto> getJournalsByJournalsList(String journalsListId);
+    void delete(String id);
+
+    List<JournalDto> getJournalsByJournalList(String journalListId);
 }

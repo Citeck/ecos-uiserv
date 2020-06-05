@@ -20,4 +20,5 @@ public class Column {
     private boolean isSortable;
     private boolean isVisible;
     private boolean isGroupable;
+    private boolean batchEdit;
 }

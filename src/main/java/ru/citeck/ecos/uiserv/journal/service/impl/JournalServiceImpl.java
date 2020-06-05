@@ -1,7 +1,7 @@
-package ru.citeck.ecos.uiserv.journal.service.impl;
+package ru.citeck.ecos.uiserv.journal.service;
 
 import lombok.*;
-import org.apache.commons.collections.CollectionUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.PageRequest;
@@ -9,24 +9,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
-import ru.citeck.ecos.uiserv.journal.service.JournalService;
 import ru.citeck.ecos.uiserv.journal.mapper.JournalMapper;
 
-import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @DependsOn("liquibase")
 @RequiredArgsConstructor
@@ -34,18 +30,23 @@ public class JournalServiceImpl implements JournalService {
 
     private final JournalRepository journalRepository;
     private final JournalMapper journalMapper;
-    private final RecordsService recordsService;
 
     private Consumer<JournalDto> changeListener;
 
-    private final Map<String, Set<String>> journalsByListId = new ConcurrentHashMap<>();
-    private final Map<String, String> listByJournalId = new ConcurrentHashMap<>();
+    private final Map<String, Set<String>> typesByJournalListId = new ConcurrentHashMap<>();
+    private final Map<String, String> journalListByTypeId = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() {
         journalRepository.findAll().forEach(journal ->
             updateJournalLists(journalMapper.entityToDto(journal))
         );
+    }
+
+    @Override
+    public JournalDto getJournalById(String id) {
+        Optional<JournalEntity> entity = journalRepository.findByExtId(id);
+        return entity.map(journalMapper::entityToDto).orElse(null);
     }
 
     @Override
@@ -110,7 +111,13 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
-    public JournalDto update(JournalDto dto) {
+    public JournalDto save(JournalDto dto) {
+
+        if (dto.getColumns() == null
+            || dto.getColumns().stream().noneMatch(c -> StringUtils.isNotBlank(c.getName()))) {
+
+            throw new IllegalStateException("Columns is a mandatory for journal config");
+        }
 
         JournalEntity journalEntity = journalMapper.dtoToEntity(dto);
         JournalEntity storedJournalEntity = journalRepository.save(journalEntity);
@@ -123,116 +130,9 @@ public class JournalServiceImpl implements JournalService {
         return journalDto;
     }
 
-    private void updateJournalLists(JournalDto journal) {
-
-        ObjectData attributes = journal.getAttributes();
-        String listId = attributes != null ? attributes.get("listId").asText() : "";
-
-        if (StringUtils.isNotBlank(listId)) {
-
-            Set<String> listJournals = journalsByListId.computeIfAbsent(listId, id ->
-                Collections.newSetFromMap(new ConcurrentHashMap<>())
-            );
-
-            String listIdBefore = listByJournalId.get(journal.getId());
-            if (StringUtils.isNotBlank(listIdBefore)) {
-                if (!listIdBefore.equals(listId)) {
-                    Set<String> listBefore = journalsByListId.computeIfAbsent(listIdBefore, id ->
-                        Collections.newSetFromMap(new ConcurrentHashMap<>())
-                    );
-                    listBefore.remove(journal.getId());
-                    listJournals.add(journal.getId());
-                }
-            } else {
-                listJournals.add(journal.getId());
-            }
-
-            listByJournalId.put(journal.getId(), listId);
-
-        } else {
-
-            String listIdBefore = listByJournalId.get(journal.getId());
-
-            if (StringUtils.isNotBlank(listIdBefore)) {
-
-                journalsByListId.computeIfAbsent(listIdBefore, id ->
-                    Collections.newSetFromMap(new ConcurrentHashMap<>())
-                ).remove(journal.getId());
-
-                listByJournalId.remove(listIdBefore);
-            }
-        }
-    }
-
-    /**
-     * Search journal by 2 ways:
-     * 1. in type hierarchy
-     * 2. searching journal with same typeRef
-     *
-     * @param typeRef - input value of typeRef
-     * @return journalDto - result of search
-     */
     @Override
-    @Nullable
-    public JournalDto searchJournalByTypeRef(@NonNull RecordRef typeRef) {
-
-        TypeJournalMeta typeJournalResult = recordsService.getMeta(typeRef, TypeJournalMeta.class);
-
-        List<RecordRef> parentsTypeRefs = typeJournalResult.getParentsRefs();
-        RecordRef journalRef = typeJournalResult.getJournalRef();
-
-        JournalEntity journalWithSameTypeRef = getByTypeRef(typeRef.toString());
-
-        if (journalRef == null && CollectionUtils.isNotEmpty(parentsTypeRefs)) {
-
-            //  search by types hierarchy iteration
-            for (RecordRef parentTypeRef : parentsTypeRefs) {
-
-                TypeJournalMeta parentTypeJournalResult = recordsService.getMeta(parentTypeRef, TypeJournalMeta.class);
-                journalRef = parentTypeJournalResult.getJournalRef();
-
-                if (journalRef == null && journalWithSameTypeRef == null) {
-                    // for case, when we search JournalEntity with same TypeRef
-                    journalWithSameTypeRef = getByTypeRef(parentTypeRef.toString());
-                }
-
-                if (journalRef != null) {
-                    break;
-                }
-            }
-        }
-
-        if (journalRef == null && journalWithSameTypeRef != null) {
-            //  JournalEntity with same TypeRef
-            return journalMapper.entityToDto(journalWithSameTypeRef);
-        }
-
-        if (journalRef != null) {
-            JournalEntity journalEntity = journalRepository.findByExtId(journalRef.getId()).orElse(null);
-            if (journalEntity != null) {
-                return journalMapper.entityToDto(journalEntity);
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    public List<JournalDto> getJournalsByJournalsList(String journalsListId) {
-
-        return journalsByListId.getOrDefault(journalsListId, Collections.emptySet())
-            .stream()
-            .map(journalRepository::findByExtId)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(journalMapper::entityToDto)
-            .collect(Collectors.toList());
-    }
-
-    private JournalEntity getByTypeRef(String typeRefStr) {
-        Optional<JournalEntity> optionalJournalEntity = journalRepository.findAllByTypeRef(typeRefStr).stream()
-            .findFirst();
-        return optionalJournalEntity.orElse(null);
+    public void delete(String id) {
+        journalRepository.findByExtId(id).ifPresent(journalRepository::delete);
     }
 
     private Specification<JournalEntity> toSpec(Predicate predicate) {
@@ -253,21 +153,66 @@ public class JournalServiceImpl implements JournalService {
         return spec;
     }
 
+    @Override
+    public List<JournalDto> getJournalsByJournalList(String journalListId) {
+
+        if (StringUtils.isBlank(journalListId)) {
+            return Collections.emptyList();
+        }
+
+        return typesByJournalListId.getOrDefault(journalListId, Collections.emptySet())
+            .stream()
+            .map(journalRepository::findByExtId)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(journalMapper::entityToDto)
+            .collect(Collectors.toList());
+    }
+
+    private synchronized void updateJournalLists(JournalDto journalDto) {
+
+        ObjectData attributes = journalDto.getAttributes();
+        String listId = attributes != null ? attributes.get("journalsListId").asText() : "";
+
+        if (StringUtils.isNotBlank(listId)) {
+
+            Set<String> listJournals = typesByJournalListId.computeIfAbsent(listId, id ->
+                Collections.newSetFromMap(new ConcurrentHashMap<>())
+            );
+
+            String listIdBefore = journalListByTypeId.get(journalDto.getId());
+            if (StringUtils.isNotBlank(listIdBefore)) {
+                if (!listIdBefore.equals(listId)) {
+                    Set<String> listBefore = typesByJournalListId.computeIfAbsent(listIdBefore, id ->
+                        Collections.newSetFromMap(new ConcurrentHashMap<>())
+                    );
+                    listBefore.remove(journalDto.getId());
+                    listJournals.add(journalDto.getId());
+                }
+            } else {
+                listJournals.add(journalDto.getId());
+            }
+
+            journalListByTypeId.put(journalDto.getId(), listId);
+
+        } else {
+
+            String listIdBefore = journalListByTypeId.get(journalDto.getId());
+
+            if (StringUtils.isNotBlank(listIdBefore)) {
+
+                typesByJournalListId.computeIfAbsent(listIdBefore, id ->
+                    Collections.newSetFromMap(new ConcurrentHashMap<>())
+                ).remove(journalDto.getId());
+
+                journalListByTypeId.remove(journalDto.getId());
+            }
+        }
+    }
+
     @Data
     public static class PredicateDto {
         private String name;
         private String moduleId;
-    }
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class TypeJournalMeta {
-
-        @MetaAtt("journal?str")
-        private RecordRef journalRef;
-
-        @MetaAtt("parents?str")
-        private List<RecordRef> parentsRefs;
     }
 }

@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.journal.dto.legacy1;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
+import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.records2.RecordRef;
 
 import java.util.List;
@@ -11,8 +11,8 @@ public class JournalMeta {
     private String nodeRef;
     private List<Criterion> criteria;
     private String title;
-    private JsonNode predicate;
-    private JsonNode groupBy;
+    private DataValue predicate;
+    private DataValue groupBy;
     private String metaRecord;
     private List<CreateVariant> createVariants;
     private List<RecordRef> actions;

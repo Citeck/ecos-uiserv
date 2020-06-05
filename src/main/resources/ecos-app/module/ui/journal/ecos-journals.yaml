@@ -1,13 +1,13 @@
 
 id: ecos-journals
-
-source-id: uiserv/journal
-
 label: { ru: Журналы, en: Journals }
+
+typeRef: emodel/type@journal
+sourceId: uiserv/journal
 
 attributes:
   actionFormatter: '' #include include/legacy-actions.js
-  listId: global-system
+  journalsListId: global-system
 
 actions:
   - uiserv/action@ecos-module-download
@@ -17,13 +17,13 @@ actions:
 columns:
 
   - name: moduleId
-    label: { ru: "Идентификатор", en: "Id" }
+    label: { ru: Идентификатор, en: Id }
 
   - name: sourceId
-    label: { ru: "Источник данных", en: "Data source" }
+    label: { ru: Источник данных, en: Data source }
 
   - name: typeRef
-    label: { ru: "Тип ECOS", en: "ECOS Type" }
+    label: { ru: Тип ECOS, en: ECOS Type }
 
   - name: label
-    label: { ru: "Название", en: "Name" }
+    label: { ru: Название, en: Name }

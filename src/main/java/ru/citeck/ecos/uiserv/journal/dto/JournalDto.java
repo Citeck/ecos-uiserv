@@ -1,14 +1,15 @@
 package ru.citeck.ecos.uiserv.journal.dto;
 
 import ecos.com.fasterxml.jackson210.annotation.JsonInclude;
-import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.commons.json.JsonMapper;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
+import ru.citeck.ecos.uiserv.journal.dto.legacy1.GroupAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,6 @@ public class JournalDto {
     /**
      * Records source ID.
      */
-    @JsonProperty("source-id")
     private String sourceId;
 
     /**
@@ -39,14 +39,12 @@ public class JournalDto {
      * @see ru.citeck.ecos.records2.graphql.meta.value.MetaValue#getEdge(String, MetaField)
      * @see ru.citeck.ecos.records2.graphql.meta.value.MetaEdge
      */
-    @JsonProperty("meta-record")
-    private RecordRef metaRecord;
+    private RecordRef metaRecord = RecordRef.EMPTY;
 
     /**
      * ECOS type.
      */
-    @JsonProperty("type-ref")
-    private RecordRef typeRef;
+    private RecordRef typeRef = RecordRef.EMPTY;
 
     /**
      * Predicate for base entities filtering in a table.
@@ -58,20 +56,18 @@ public class JournalDto {
     /**
      * Group records by specified attributes.
      */
-    @JsonProperty("group-by")
     private List<String> groupBy;
 
     /**
      * Default sorting.
      */
-    @JsonProperty("sort-by")
     private List<JournalSortBy> sortBy;
 
     /**
      * Actions for every entity in a table.
      * Can be filtered for specific entities by evaluator.
      */
-    private List<RecordRef> actions = new ArrayList<>();
+    private List<RecordRef> actions;
 
     /**
      * Can attributes of entities in a table be edited or not.
@@ -92,22 +88,42 @@ public class JournalDto {
      */
     private ObjectData attributes;
 
+    /**
+     * This actions in future will be moved to 'actions' field
+     */
+    @Deprecated
+    private List<GroupAction> groupActions;
+
     public JournalDto() {
     }
 
     public JournalDto(JournalDto other) {
+
+        JsonMapper mapper = Json.getMapper();
+
         this.id = other.id;
-        this.label = Json.getMapper().copy(other.label);
+        this.label = mapper.copy(other.label);
         this.sourceId = other.sourceId;
         this.metaRecord = other.metaRecord;
         this.typeRef = other.typeRef;
-        this.predicate = Json.getMapper().copy(other.predicate);
-        this.groupBy = Json.getMapper().copy(other.groupBy);
-        this.sortBy = other.sortBy;
-        this.actions = Json.getMapper().copy(other.actions);
+        this.predicate = mapper.copy(other.predicate);
+        this.groupBy = mapper.copy(other.groupBy);
+        this.sortBy = mapper.copy(other.sortBy);
+        this.actions = mapper.copy(other.actions);
         this.editable = other.editable;
-        List<JournalColumnDto> columns = Json.getMapper().copy(other.columns);
-        this.columns = columns != null ? columns : new ArrayList<>();
-        this.attributes = Json.getMapper().copy(other.attributes);
+        this.columns = copy(other.columns);
+        this.attributes = mapper.copy(other.attributes);
+        this.groupActions = copy(other.groupActions);
+    }
+
+    private <T> List<T> copy(List<T> original) {
+        if (original == null) {
+            return null;
+        }
+        List<T> result = new ArrayList<>();
+        for (T element : original) {
+            result.add(Json.getMapper().copy(element));
+        }
+        return result;
     }
 }

@@ -5,21 +5,30 @@ import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
 import ecos.com.fasterxml.jackson210.annotation.JsonValue;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.records2.QueryContext;
+import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.annotation.DisplayName;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
+import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
+import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
+import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDAO;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.journal.service.JournalService;
+import ru.citeck.ecos.uiserv.journal.service.type.TypeJournalService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,12 +36,14 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class JournalRecordsDAO extends LocalRecordsDAO
-    implements LocalRecordsQueryWithMetaDAO<JournalDto>,
-               LocalRecordsMetaDAO<JournalDto> {
+                               implements LocalRecordsQueryWithMetaDAO<JournalDto>,
+                                          LocalRecordsMetaDAO<JournalDto>,
+                                          MutableRecordsLocalDAO<JournalRecordsDAO.JournalRecord> {
 
     public static final String LANG_QUERY_BY_LIST_ID = "list-id";
 
     private final JournalService journalService;
+    private final TypeJournalService typeJournalService;
 
     @Override
     public RecordsQueryResult<JournalDto> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
@@ -42,8 +53,7 @@ public class JournalRecordsDAO extends LocalRecordsDAO
         if (LANG_QUERY_BY_LIST_ID.equals(recordsQuery.getLanguage())) {
 
             QueryByListId queryByListId = recordsQuery.getQuery(QueryByListId.class);
-            List<JournalDto> journals = journalService.getJournalsByJournalsList(queryByListId.listId);
-
+            List<JournalDto> journals = journalService.getJournalsByJournalList(queryByListId.getListId());
             journals.forEach(j -> result.addRecord(new JournalRecord(j)));
 
             return result;
@@ -51,10 +61,9 @@ public class JournalRecordsDAO extends LocalRecordsDAO
 
         JournalQueryByTypeRef queryByTypeRef = recordsQuery.getQuery(JournalQueryByTypeRef.class);
         if (queryByTypeRef != null && queryByTypeRef.getTypeRef() != null) {
-            JournalDto dto = journalService.searchJournalByTypeRef(queryByTypeRef.getTypeRef());
-            if (dto != null) {
-                result.addRecord(new JournalRecord(dto));
-            }
+            typeJournalService.getJournalForType(queryByTypeRef.getTypeRef()).ifPresent(dto ->
+                result.addRecord(new JournalRecord(dto))
+            );
             return result;
         }
 
@@ -90,13 +99,67 @@ public class JournalRecordsDAO extends LocalRecordsDAO
                 if (RecordRef.isEmpty(ref)) {
                     dto = new JournalDto();
                 } else {
-                    dto = journalService.getById(ref.getId());
+                    String id = ref.getId();
+                    if (id.startsWith(TypeJournalService.JOURNAL_ID_PREFIX)) {
+                        RecordRef typeRef = RecordRef.create(
+                            "emodel",
+                            "type",
+                            id.substring(TypeJournalService.JOURNAL_ID_PREFIX.length())
+                        );
+                        dto = typeJournalService.getJournalForType(typeRef).orElse(null);
+                    } else {
+                        dto = journalService.getById(ref.getId());
+                    }
                     if (dto == null) {
                         dto = new JournalDto();
                     }
                 }
                 return new JournalRecord(dto);
             }).collect(Collectors.toList());
+    }
+
+    @Override
+    public RecordsDelResult delete(RecordsDeletion deletion) {
+
+        List<RecordMeta> resultRecords = new ArrayList<>();
+
+        deletion.getRecords()
+            .forEach(r -> {
+                journalService.delete(r.getId());
+                resultRecords.add(new RecordMeta(r));
+            });
+
+        RecordsDelResult result = new RecordsDelResult();
+        result.setRecords(resultRecords);
+        return result;
+    }
+
+    @Override
+    public List<JournalRecord> getValuesToMutate(List<RecordRef> records) {
+
+        return records.stream()
+            .map(RecordRef::getId)
+            .map(id -> {
+                JournalDto dto = journalService.getJournalById(id);
+                if (dto == null) {
+                    dto = new JournalDto();
+                    dto.setId(id);
+                }
+                return new JournalRecord(dto);
+            })
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public RecordsMutResult save(List<JournalRecord> values) {
+
+        RecordsMutResult result = new RecordsMutResult();
+
+        for (final JournalRecord model : values) {
+            result.addRecord(new RecordMeta(journalService.save(model).getId()));
+        }
+
+        return result;
     }
 
     @Data
@@ -121,9 +184,6 @@ public class JournalRecordsDAO extends LocalRecordsDAO
 
     public static class JournalRecord extends JournalDto {
 
-        JournalRecord() {
-        }
-
         JournalRecord(JournalDto dto) {
             super(dto);
         }
@@ -136,11 +196,15 @@ public class JournalRecordsDAO extends LocalRecordsDAO
             setId(value);
         }
 
+        public RecordRef getEcosType() {
+            return RecordRef.valueOf("emodel/type@journal");
+        }
+
         @JsonIgnore
         @DisplayName
         public String getDisplayName() {
-            String result = getId();
-            return result != null ? result : "Journal";
+            String name = MLText.getClosestValue(getLabel(), QueryContext.getCurrent().getLocale());
+            return StringUtils.isNotBlank(name) ? name : "Journal";
         }
 
         @JsonProperty("_content")
