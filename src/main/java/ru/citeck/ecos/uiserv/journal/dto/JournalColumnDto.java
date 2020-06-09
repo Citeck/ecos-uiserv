@@ -21,7 +21,6 @@ public class JournalColumnDto {
      *
      * Mandatory
      */
-    @NotNull
     private String name;
 
     /**
