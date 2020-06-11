@@ -19,6 +19,7 @@
                         "t": "in",
                         "att": "_content.mimetype?str",
                         "val": [
+                            "application/msword",
                             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
@@ -28,8 +29,8 @@
                     },
                     {
                         "t": "eq",
-                        "att": "$alfMeta.attributes.edition",
-                        "val": "enterprise"
+                        "att": ".att(n:\"$alfMeta\"){att(n:\"attributes\"){att(n:\"alfModules\"){has(n:\"onlyoffice-integration-platform-jar\")}}}",
+                        "val": true
                     }
                 ]
             }
