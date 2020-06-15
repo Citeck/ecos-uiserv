@@ -1,31 +1,35 @@
-
 id: search
 
 label: { ru: Поиск, en: Seach }
 
 columns:
 
-  - name: displayName
+  - name: cm:name
     label: { ru: Имя, en: Name }
     attribute: ".disp"
     type: text
 
-  - name: modifier
-    label: { ru: Кем изменен, en: Changed by }
-    attribute: "_modifier"
+  - name: cm:title
+    label: { ru: Заголовок, en: Title }
+    attribute: "cm:title"
     type: text
 
-  - name: modified
+  - name: cm:modifier
+    label: { ru: Кем изменен, en: Changed by }
+    attribute: "cm:modifier"
+    type: text
+
+  - name: cm:modified
     label: { ru: Когда изменен, en: Changed time }
-    attribute: "_modified"
+    attribute: "cm:modified"
     type: datetime
 
-  - name: creator
+  - name: cm:creator
     label: { ru: Создан, en: Changed by }
-    attribute: "_creator"
+    attribute: "cm:creator"
     type: text
 
-  - name: created
+  - name: cm:created
     label: { ru: Дата создания, en: Changed time }
-    attribute: "_created"
+    attribute: "cm:created"
     type: datetime
