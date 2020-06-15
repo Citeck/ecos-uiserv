@@ -25,11 +25,11 @@ columns:
     type: datetime
 
   - name: cm:creator
-    label: { ru: Создан, en: Changed by }
+    label: { ru: Создан, en: Created by }
     attribute: "cm:creator"
     type: text
 
   - name: cm:created
-    label: { ru: Дата создания, en: Changed time }
+    label: { ru: Дата создания, en: Created time }
     attribute: "cm:created"
     type: datetime
