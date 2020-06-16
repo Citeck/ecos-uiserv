@@ -147,8 +147,8 @@ public class ActionService {
         action.setName(Json.getMapper().read(actionEntity.getName(), MLText.class));
         action.setKey(actionEntity.getKey());
         action.setType(actionEntity.getType());
-        action.setConfirm(Json.getMapper().read(actionEntity.getName(), ActionConfirmDto.class));
-        action.setResult(Json.getMapper().read(actionEntity.getName(), ActionResultDto.class));
+        action.setConfirm(Json.getMapper().read(actionEntity.getConfirm(), ActionConfirmDto.class));
+        action.setResult(Json.getMapper().read(actionEntity.getResult(), ActionResultDto.class));
 
         String configJson = actionEntity.getConfigJson();
         if (configJson != null) {
