@@ -2,6 +2,9 @@ id: search
 
 label: { ru: Поиск, en: Seach }
 
+attributes:
+  full-search-predicate: '{ t: contains, att: ALL, val: $INPUT }'
+
 columns:
 
   - name: cm:name
