@@ -7,6 +7,18 @@ attributes:
 
 columns:
 
+  - name: type
+    label: { ru: Тип , en: Type }
+    attribute: "type"
+    type: text
+    visible: false
+
+  - name: etype
+    label: { ru: Тип кейса, en: Case type }
+    attribute: "_type"
+    type: text
+    visible: false
+
   - name: cm:name
     label: { ru: Имя, en: Name }
     attribute: ".disp"
