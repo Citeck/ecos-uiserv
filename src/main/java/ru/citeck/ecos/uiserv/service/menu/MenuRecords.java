@@ -76,7 +76,6 @@ public class MenuRecords extends LocalRecordsDAO
             if (dto.getId().equals("default-menu")) {
                 throw new IllegalArgumentException("Default menu can't be changed yet. Please, chose other ID");
             }
-            dto.setAuthorities(Collections.emptyList());
             //===========================================
 
             MenuDto saved = menuService.save(dto);
