@@ -17,6 +17,7 @@ import ru.citeck.ecos.uiserv.service.menu.resolving.MenuFactory;
 import ru.citeck.ecos.uiserv.service.menu.resolving.ResolvedMenuDto;
 import ru.citeck.ecos.uiserv.service.menu.resolving.resolvers.MenuItemsResolver;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ import java.util.stream.Stream;
 @Transactional
 @RequiredArgsConstructor
 public class MenuService {
+
     private static final String DEFAULT_AUTHORITY = "default";
     private static final String DEFAULT_MENU_ID = "default-menu";
 
@@ -35,6 +37,12 @@ public class MenuService {
     private final AuthoritiesSupport authoritiesSupport;
     private final ApplicationProperties applicationProperties;
     private final List<MenuItemsResolver> resolvers;
+
+    public long getLastModifiedTimeMs() {
+        return menuRepository.getLastModifiedTime()
+            .map(Instant::toEpochMilli)
+            .orElse(0L);
+    }
 
     public MenuDto upload(MenuDeployModule module) {
         MenuDto menuDto = readerService.readMenu(module.getData(), module.getFilename());

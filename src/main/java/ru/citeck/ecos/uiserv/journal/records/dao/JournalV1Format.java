@@ -90,7 +90,6 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
                 respColumn.setSortable(Boolean.TRUE.equals(column.getSortable()));
                 respColumn.setType(column.getType());
                 respColumn.setVisible(!Boolean.TRUE.equals(column.getHidden()));
-                respColumn.setBatchEdit(Boolean.TRUE.equals(column.getBatchEdit()));
 
                 ColumnController controller = column.getController();
 

@@ -4,7 +4,6 @@ import ecos.com.fasterxml.jackson210.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.RecordRef;
@@ -43,11 +42,6 @@ public class JournalColumnDto {
      * Controller should define formatter, editor and filter rules.
      */
     private ColumnController controller;
-
-    /**
-     * Can this attribute be changed by group action?
-     */
-    private Boolean batchEdit;
 
     /**
      * Data type.

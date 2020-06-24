@@ -9,6 +9,8 @@ import java.util.function.Consumer;
 
 public interface JournalService {
 
+    long getLastModifiedTimeMs();
+
     JournalDto getJournalById(String id);
 
     Set<JournalDto> getAll(int max, int skipCount, Predicate predicate);

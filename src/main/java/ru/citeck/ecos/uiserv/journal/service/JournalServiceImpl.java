@@ -17,6 +17,7 @@ import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
 import ru.citeck.ecos.uiserv.journal.mapper.JournalMapper;
 
 import javax.annotation.PostConstruct;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -41,6 +42,12 @@ public class JournalServiceImpl implements JournalService {
         journalRepository.findAll().forEach(journal ->
             updateJournalLists(journalMapper.entityToDto(journal))
         );
+    }
+
+    public long getLastModifiedTimeMs() {
+        return journalRepository.getLastModifiedTime()
+            .map(Instant::toEpochMilli)
+            .orElse(0L);
     }
 
     @Override

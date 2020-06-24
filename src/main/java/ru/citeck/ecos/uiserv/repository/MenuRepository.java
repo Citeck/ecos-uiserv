@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.citeck.ecos.uiserv.domain.MenuEntity;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +21,7 @@ public interface MenuRepository extends JpaRepository<MenuEntity, Long> {
     List<MenuEntity> findAllByAuthoritiesContains(String authority);
 
     void deleteByExtId(String extId);
+
+    @Query("SELECT max(m.lastModifiedDate) FROM MenuEntity m")
+    Optional<Instant> getLastModifiedTime();
 }
