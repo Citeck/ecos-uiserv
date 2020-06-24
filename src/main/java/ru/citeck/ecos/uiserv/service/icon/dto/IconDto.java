@@ -1,6 +1,5 @@
 package ru.citeck.ecos.uiserv.service.icon.dto;
 
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import lombok.Data;
 import lombok.ToString;
 import ru.citeck.ecos.commons.data.ObjectData;
@@ -21,10 +20,18 @@ public class IconDto {
     private Instant modified;
 
     public void setData(String dataStr) {
-        this.data = Base64.decode(dataStr);
+        this.data = dataStr.getBytes();
     }
 
     public void setData(byte[] data) {
         this.data = data;
+    }
+
+    public String getData() {
+        return new String(this.data);
+    }
+
+    public byte[] getByteData() {
+        return this.data;
     }
 }

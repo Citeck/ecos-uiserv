@@ -96,7 +96,7 @@ public class IconService {
         entity.setType(type);
         entity.setConfig(Json.getMapper().toString(dto.getConfig()));
         entity.setFamily(family);
-        entity.setData(dto.getData());
+        entity.setData(dto.getByteData());
 
         return entity;
     }
