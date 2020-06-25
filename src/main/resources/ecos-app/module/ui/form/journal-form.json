@@ -16,8 +16,7 @@
       "Load columns from external source": "Загрузить колонки из внешнего источника",
       "Auto columns URL": "URL для загрузки колонок",
       "Method": "Метод (GET или POST)",
-      "Label En": "Название (en)",
-      "Label Ru": "Название (ru)",
+      "Label": "Наименование",
       "System name": "Системное имя",
       "Column attribute": "Атрибут для загрузки данных (по умолчанию используется системное имя)",
       "Data type": "Тип данных",
@@ -55,8 +54,7 @@
       "Load columns from external source": "Load columns from external source",
       "Auto columns URL": "URL to load columns config ",
       "Method": "Method (GET or POST)",
-      "Label En": "Label (en)",
-      "Label Ru": "Label (ru)",
+      "Label": "Наименование",
       "System name": "System name",
       "Column attribute": "Attribute to load data (system name used by default)",
       "Data type": "Data type",
@@ -208,7 +206,7 @@
                             "mask": false,
                             "inputType": "text",
                             "inputMask": "",
-                            "id": "epg8tpa"
+                            "id": "ejaou6d"
                           },
                           {
                             "label": "Source ID",
@@ -283,7 +281,7 @@
                             "mask": false,
                             "inputType": "text",
                             "inputMask": "",
-                            "id": "eajqykq"
+                            "id": "eko6qlp"
                           },
                           {
                             "label": "Predicate",
@@ -326,6 +324,7 @@
                             },
                             "input": true,
                             "tags": [],
+                            "editor": "ace",
                             "placeholder": "",
                             "prefix": "",
                             "customClass": "",
@@ -364,8 +363,7 @@
                             "inputMask": "",
                             "rows": 3,
                             "wysiwyg": false,
-                            "editor": "ace",
-                            "id": "e8oggy0h"
+                            "id": "etz0t9c"
                           },
                           {
                             "label": "Sort by",
@@ -521,7 +519,7 @@
                             "clearOnRefresh": false,
                             "validateOn": "change",
                             "tree": true,
-                            "id": "eqffh97"
+                            "id": "e45vs8"
                           }
                         ],
                         "xs": 0,
@@ -577,7 +575,7 @@
                           "when": null,
                           "eq": ""
                         },
-                        "id": "e1zsb2i"
+                        "id": "elsog4r"
                       },
                       {
                         "xs": 0,
@@ -596,26 +594,22 @@
                         "components": [
                           {
                             "label": "Journal Label",
-                            "allowMultipleMasks": false,
-                            "showWordCount": false,
-                            "showCharCount": false,
+                            "mask": false,
                             "tableView": true,
                             "alwaysEnabled": false,
-                            "defaultValue": "",
-                            "inputFormat": "plain",
-                            "triggerChangeWhenCalculate": false,
+                            "disableInlineEdit": false,
+                            "defaultValue": {
+                              "ru": "",
+                              "en": ""
+                            },
                             "encrypted": false,
+                            "triggerChangeWhenCalculate": false,
                             "validate": {
                               "customMessage": "",
                               "json": "",
                               "required": false,
                               "custom": "",
-                              "customPrivate": false,
-                              "minLength": "",
-                              "maxLength": "",
-                              "minWords": "",
-                              "maxWords": "",
-                              "pattern": ""
+                              "customPrivate": false
                             },
                             "key": "label",
                             "properties": {},
@@ -628,15 +622,9 @@
                             "customConditional": "",
                             "logic": [],
                             "attributes": {},
-                            "type": "textfield",
+                            "type": "mlText",
                             "input": true,
                             "tags": [],
-                            "widget": {
-                              "type": "",
-                              "format": "yyyy-MM-dd hh:mm a",
-                              "dateFormat": "yyyy-MM-dd hh:mm a",
-                              "saveAs": "text"
-                            },
                             "placeholder": "",
                             "prefix": "",
                             "customClass": "",
@@ -662,13 +650,11 @@
                             "customDefaultValue": "",
                             "calculateValue": "",
                             "allowCalculateOverride": false,
+                            "widget": null,
                             "refreshOn": "",
                             "clearOnRefresh": false,
                             "validateOn": "change",
-                            "mask": false,
-                            "inputType": "text",
-                            "inputMask": "",
-                            "id": "e8v5wm"
+                            "id": "ev1kskc"
                           },
                           {
                             "label": "Meta record",
@@ -743,7 +729,7 @@
                             "mask": false,
                             "inputType": "text",
                             "inputMask": "",
-                            "id": "eg2pi8n"
+                            "id": "e59g6p"
                           },
                           {
                             "label": "Case Type",
@@ -859,7 +845,7 @@
                             "isTableMode": false,
                             "sortAttribute": "sys:node-dbid",
                             "sortAscending": "asc",
-                            "id": "emhn1wk"
+                            "id": "ev8ra0r"
                           },
                           {
                             "label": "Actions",
@@ -947,7 +933,7 @@
                             "isTableMode": false,
                             "sortAttribute": "sys:node-dbid",
                             "sortAscending": "asc",
-                            "id": "etnkh9"
+                            "id": "ev3k3ji"
                           },
                           {
                             "label": "Editable",
@@ -1011,7 +997,7 @@
                             "inputType": "checkbox",
                             "value": "",
                             "name": "",
-                            "id": "eefeffh"
+                            "id": "e6dmwwm"
                           }
                         ],
                         "placeholder": "",
@@ -1054,7 +1040,7 @@
                           "when": null,
                           "eq": ""
                         },
-                        "id": "e5iczgp"
+                        "id": "en31smh"
                       }
                     ],
                     "mask": false,
@@ -1112,7 +1098,7 @@
                     "inlineColumns": false,
                     "autoAdjust": false,
                     "hideOnChildrenHidden": false,
-                    "id": "esg86mb"
+                    "id": "e1lmtk9"
                   },
                   {
                     "label": "Attributes",
@@ -1202,7 +1188,7 @@
                       "mask": false,
                       "inputType": "text",
                       "inputMask": "",
-                      "id": "e19v5i8"
+                      "id": "eg6gjrf"
                     },
                     "tags": [],
                     "placeholder": "",
@@ -1238,7 +1224,7 @@
                     "addAnother": "Add Another",
                     "disableAddingRemovingRows": false,
                     "keyBeforeValue": true,
-                    "id": "euy9m2"
+                    "id": "exgpvp9"
                   }
                 ]
               },
@@ -1403,15 +1389,13 @@
                           "textField": "",
                           "ru": "",
                           "name": "",
-                          "value": "Value",
-                          "attributes": {}
+                          "value": "",
+                          "attributes": ""
                         },
                         "label3": {
                           "en": "",
                           "ru": ""
-                        },
-                        "en": "",
-                        "ru": ""
+                        }
                       }
                     ],
                     "encrypted": false,
@@ -1437,7 +1421,6 @@
                     "components": [
                       {
                         "label": "",
-                        "title": "",
                         "hideLabel": true,
                         "scrollableContent": false,
                         "collapsible": false,
@@ -1471,13 +1454,16 @@
                                 "components": [
                                   {
                                     "label": "Label",
-                                    "hideLabel": true,
                                     "mask": false,
                                     "tableView": true,
                                     "alwaysEnabled": false,
                                     "disableInlineEdit": false,
-                                    "triggerChangeWhenCalculate": false,
+                                    "defaultValue": {
+                                      "ru": "",
+                                      "en": ""
+                                    },
                                     "encrypted": false,
+                                    "triggerChangeWhenCalculate": false,
                                     "validate": {
                                       "customMessage": "",
                                       "json": ""
@@ -1492,132 +1478,8 @@
                                     "customConditional": "",
                                     "logic": [],
                                     "attributes": {},
-                                    "type": "container",
+                                    "type": "mlText",
                                     "input": true,
-                                    "components": [
-                                      {
-                                        "label": "Columns",
-                                        "disableInlineEdit": false,
-                                        "columns": [
-                                          {
-                                            "components": [
-                                              {
-                                                "label": "Label En",
-                                                "disableInlineEdit": false,
-                                                "allowMultipleMasks": false,
-                                                "showWordCount": false,
-                                                "showCharCount": false,
-                                                "tableView": true,
-                                                "alwaysEnabled": false,
-                                                "defaultValue": "",
-                                                "inputFormat": "plain",
-                                                "triggerChangeWhenCalculate": false,
-                                                "encrypted": false,
-                                                "validate": {
-                                                  "customMessage": "",
-                                                  "json": ""
-                                                },
-                                                "key": "en",
-                                                "properties": {},
-                                                "conditional": {
-                                                  "show": "",
-                                                  "when": "",
-                                                  "json": ""
-                                                },
-                                                "customConditional": "",
-                                                "logic": [],
-                                                "attributes": {},
-                                                "type": "textfield",
-                                                "input": true,
-                                                "tags": [],
-                                                "widget": {
-                                                  "type": ""
-                                                }
-                                              }
-                                            ],
-                                            "xs": 0,
-                                            "sm": 12,
-                                            "md": 6,
-                                            "lg": 0,
-                                            "xl": 0,
-                                            "classes": "",
-                                            "type": "column",
-                                            "input": false,
-                                            "hideOnChildrenHidden": false,
-                                            "key": "column",
-                                            "tableView": true,
-                                            "label": "Column",
-                                            "index": 0
-                                          },
-                                          {
-                                            "xs": 0,
-                                            "sm": 12,
-                                            "md": 6,
-                                            "lg": 0,
-                                            "xl": 0,
-                                            "classes": "",
-                                            "index": 1,
-                                            "type": "column",
-                                            "input": false,
-                                            "hideOnChildrenHidden": false,
-                                            "key": "column",
-                                            "tableView": true,
-                                            "label": "Column",
-                                            "components": [
-                                              {
-                                                "label": "Label Ru",
-                                                "disableInlineEdit": false,
-                                                "allowMultipleMasks": false,
-                                                "showWordCount": false,
-                                                "showCharCount": false,
-                                                "tableView": true,
-                                                "alwaysEnabled": false,
-                                                "defaultValue": "",
-                                                "inputFormat": "plain",
-                                                "triggerChangeWhenCalculate": false,
-                                                "encrypted": false,
-                                                "validate": {
-                                                  "customMessage": "",
-                                                  "json": ""
-                                                },
-                                                "key": "ru",
-                                                "properties": {},
-                                                "conditional": {
-                                                  "json": "",
-                                                  "show": "",
-                                                  "when": ""
-                                                },
-                                                "customConditional": "",
-                                                "logic": [],
-                                                "attributes": {},
-                                                "type": "textfield",
-                                                "input": true,
-                                                "tags": [],
-                                                "widget": {
-                                                  "type": ""
-                                                }
-                                              }
-                                            ]
-                                          }
-                                        ],
-                                        "mask": false,
-                                        "tableView": false,
-                                        "alwaysEnabled": false,
-                                        "key": "columns8",
-                                        "properties": {},
-                                        "conditional": {
-                                          "json": "",
-                                          "show": "",
-                                          "when": ""
-                                        },
-                                        "customConditional": "",
-                                        "logic": [],
-                                        "attributes": {},
-                                        "type": "columns",
-                                        "input": false,
-                                        "tags": []
-                                      }
-                                    ],
                                     "tags": []
                                   }
                                 ],
@@ -2832,7 +2694,7 @@
               "customPrivate": false
             },
             "scrollableContent": false,
-            "id": "ettazu5"
+            "id": "exxs8dq"
           }
         ],
         "tags": [],
@@ -2870,7 +2732,7 @@
         "theme": "default",
         "breadcrumb": "default",
         "lazyLoad": false,
-        "id": "elxch0d"
+        "id": "e9dh75e"
       },
       {
         "label": "Columns",
@@ -2930,7 +2792,7 @@
               "when": null,
               "eq": ""
             },
-            "id": "ehtux5r"
+            "id": "epgr6zh"
           },
           {
             "xs": 0,
@@ -3015,7 +2877,7 @@
                 "rightIcon": "",
                 "action": "submit",
                 "removeIndents": false,
-                "id": "ej8cbsa"
+                "id": "efndezn"
               }
             ],
             "placeholder": "",
@@ -3058,7 +2920,7 @@
               "when": null,
               "eq": ""
             },
-            "id": "epb9tzr"
+            "id": "eul6jlk"
           }
         ],
         "mask": false,
@@ -3116,7 +2978,7 @@
         "inlineColumns": false,
         "autoAdjust": false,
         "hideOnChildrenHidden": false,
-        "id": "eix9rp7"
+        "id": "em78zk"
       }
     ]
   },
