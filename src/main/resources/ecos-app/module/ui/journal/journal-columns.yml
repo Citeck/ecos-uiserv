@@ -1,0 +1,11 @@
+
+id: journal-columns
+label: { ru: Выбор колонок, en: Select columns }
+
+columns:
+
+  - name: label
+    label: { en: Label , ru: Наименование }
+
+  - name: name
+    label: { en: System name, ru: Системное имя }
