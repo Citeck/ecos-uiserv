@@ -57,7 +57,7 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
-    public Set<JournalDto> getAll(int max, int skipCount, Predicate predicate) {
+    public List<JournalDto> getAll(int max, int skipCount, Predicate predicate) {
 
         PageRequest page = PageRequest.of(
             skipCount / max,
@@ -68,7 +68,7 @@ public class JournalServiceImpl implements JournalService {
         return journalRepository.findAll(toSpec(predicate), page)
             .stream()
             .map(journalMapper::entityToDto)
-            .collect(Collectors.toSet());
+            .collect(Collectors.toList());
     }
 
     @Override

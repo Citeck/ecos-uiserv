@@ -18,12 +18,15 @@ actions:
 columns:
 
   - name: moduleId
+    type: text
     label: { ru: Идентификатор, en: Id }
 
   - name: formKey
+    type: text
     label: { ru: Ключ формы, en: Form key }
 
   - name: title
+    type: text
     label: { ru: Название, en: Name }
 
   - name: description

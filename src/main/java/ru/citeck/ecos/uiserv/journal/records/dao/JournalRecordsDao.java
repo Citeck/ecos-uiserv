@@ -75,7 +75,7 @@ public class JournalRecordsDao extends LocalRecordsDao
                 max = 10000;
             }
 
-            Set<JournalDto> journals = journalService.getAll(max, recordsQuery.getSkipCount(), predicate);
+            List<JournalDto> journals = journalService.getAll(max, recordsQuery.getSkipCount(), predicate);
 
             result.setRecords(new ArrayList<>(journals));
             result.setTotalCount(journalService.getCount(predicate));

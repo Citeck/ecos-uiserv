@@ -18,6 +18,7 @@ actions:
 columns:
 
   - name: moduleId
+    type: text
     label: { ru: Идентификатор, en: Id }
 
   - name: typeRef

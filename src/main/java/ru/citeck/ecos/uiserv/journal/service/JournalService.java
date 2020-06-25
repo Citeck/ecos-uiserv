@@ -13,7 +13,7 @@ public interface JournalService {
 
     JournalDto getJournalById(String id);
 
-    Set<JournalDto> getAll(int max, int skipCount, Predicate predicate);
+    List<JournalDto> getAll(int max, int skipCount, Predicate predicate);
 
     JournalDto getById(String id);
 

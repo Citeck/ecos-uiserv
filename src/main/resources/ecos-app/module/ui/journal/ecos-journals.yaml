@@ -18,6 +18,7 @@ actions:
 columns:
 
   - name: moduleId
+    type: text
     label: { ru: Идентификатор, en: Id }
 
   - name: sourceId
@@ -27,4 +28,5 @@ columns:
     label: { ru: Тип ECOS, en: ECOS Type }
 
   - name: label
+    type: text
     label: { ru: Название, en: Name }
