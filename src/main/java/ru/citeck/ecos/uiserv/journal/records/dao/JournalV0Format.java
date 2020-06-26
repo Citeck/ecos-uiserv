@@ -9,7 +9,7 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.journal.dto.JournalColumnDto;
-import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
+import ru.citeck.ecos.uiserv.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.journal.dto.legacy0.Attribute;
 import ru.citeck.ecos.uiserv.journal.dto.legacy0.CreateVariant;
 import ru.citeck.ecos.uiserv.journal.dto.legacy0.JournalConfig;
@@ -27,7 +27,7 @@ public class JournalV0Format implements JournalModelFormat<JournalConfig> {
     private final EcosTypeUtils typeUtils;
 
     @Override
-    public JournalConfig convert(JournalDto dto) {
+    public JournalConfig convert(JournalWithMeta dto) {
 
         Locale currentLocale = LocaleContextHolder.getLocale();
 

@@ -23,6 +23,7 @@ import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDAO;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
+import ru.citeck.ecos.uiserv.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.journal.dto.legacy0.JournalConfig;
 import ru.citeck.ecos.uiserv.journal.dto.legacy0.JournalConfigResp;
 import ru.citeck.ecos.uiserv.journal.dto.legacy0.JournalTypeDto;
@@ -77,7 +78,7 @@ public class JournalV0RecordsDao extends LocalRecordsDAO
 
     @Override
     public RecordsQueryResult<JournalConfig> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
-        RecordsQueryResult<JournalDto> journalsResult = journalRecordsDao.queryLocalRecords(recordsQuery, metaField);
+        RecordsQueryResult<JournalWithMeta> journalsResult = journalRecordsDao.queryLocalRecords(recordsQuery, metaField);
         return new RecordsQueryResult<>(journalsResult, converter::convert);
     }
 
@@ -93,10 +94,10 @@ public class JournalV0RecordsDao extends LocalRecordsDAO
 
         List<JournalConfig> result = new ArrayList<>();
 
-        List<JournalDto> journals = journalRecordsDao.getLocalRecordsMeta(refsForConfigQuery, metaField);
+        List<JournalWithMeta> journals = journalRecordsDao.getLocalRecordsMeta(refsForConfigQuery, metaField);
         for (int i = 0; i < journals.size(); i++) {
 
-            JournalDto dto = journals.get(i);
+            JournalWithMeta dto = journals.get(i);
             RecordRef ref = list.get(i);
 
             if (StringUtils.isBlank(dto.getId())) {

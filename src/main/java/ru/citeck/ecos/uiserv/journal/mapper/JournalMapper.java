@@ -7,11 +7,17 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.records2.RecordConstants;
 import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.records2.predicate.PredicateUtils;
+import ru.citeck.ecos.records2.predicate.model.AndPredicate;
+import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records2.predicate.model.ValuePredicate;
 import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
 import ru.citeck.ecos.uiserv.journal.dto.JournalColumnDto;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.journal.dto.JournalSortBy;
+import ru.citeck.ecos.uiserv.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.journal.dto.legacy1.GroupAction;
 import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
 
@@ -26,9 +32,9 @@ public class JournalMapper {
 
     private final JournalRepository repository;
 
-    public JournalDto entityToDto(JournalEntity entity) {
+    public JournalWithMeta entityToDto(JournalEntity entity) {
 
-        JournalDto dto = new JournalDto();
+        JournalWithMeta dto = new JournalWithMeta();
         dto.setId(entity.getExtId());
         dto.setEditable(entity.getEditable());
 
@@ -45,6 +51,11 @@ public class JournalMapper {
         dto.setSortBy(Json.getMapper().read(entity.getSortBy(), SortByList.class));
         dto.setGroupActions(Json.getMapper().read(entity.getGroupActions(), GroupActionsList.class));
 
+        dto.setModified(entity.getLastModifiedDate());
+        dto.setModifier(entity.getLastModifiedBy());
+        dto.setCreated(entity.getCreatedDate());
+        dto.setCreator(entity.getCreatedBy());
+
         if (dto.getAttributes() == null) {
             dto.setAttributes(ObjectData.create());
         }
@@ -53,6 +64,24 @@ public class JournalMapper {
         }
         if (dto.getPredicate() == null) {
             dto.setPredicate(ObjectData.create());
+        }
+        if (RecordRef.isNotEmpty(dto.getTypeRef())) {
+            Predicate fullPredicate;
+            Predicate typePredicate = ValuePredicate.eq("_type", dto.getTypeRef().toString());
+            if (dto.getPredicate() != null) {
+                Predicate basePredicate = dto.getPredicate().getAs(Predicate.class);
+                List<String> atts = PredicateUtils.getAllPredicateAttributes(basePredicate);
+                if (atts.contains(RecordConstants.ATT_ECOS_TYPE) || atts.contains(RecordConstants.ATT_TYPE)) {
+                    fullPredicate = basePredicate;
+                } else {
+                    fullPredicate = AndPredicate.of(basePredicate, typePredicate);
+                }
+            } else {
+                fullPredicate = typePredicate;
+            }
+            dto.setFullPredicate(Json.getMapper().convert(fullPredicate, ObjectData.class));
+        } else {
+            dto.setFullPredicate(dto.getPredicate());
         }
 
         dto.getColumns().forEach(c -> {

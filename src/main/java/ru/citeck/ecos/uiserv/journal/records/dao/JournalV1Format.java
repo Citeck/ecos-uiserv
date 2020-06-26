@@ -10,7 +10,7 @@ import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.journal.dto.ColumnController;
 import ru.citeck.ecos.uiserv.journal.dto.JournalColumnDto;
-import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
+import ru.citeck.ecos.uiserv.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.journal.dto.legacy1.CreateVariant;
 import ru.citeck.ecos.uiserv.journal.dto.legacy1.Column;
 import ru.citeck.ecos.uiserv.journal.dto.legacy1.Formatter;
@@ -31,7 +31,7 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
     private final EcosTypeUtils typeUtils;
 
     @Override
-    public JournalConfigResp convert(JournalDto dto) {
+    public JournalConfigResp convert(JournalWithMeta dto) {
 
         JournalConfigResp resp = new JournalConfigResp();
         resp.setId(dto.getId());
@@ -52,7 +52,7 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
         if (dto.getMetaRecord() != null) {
             meta.setMetaRecord(dto.getMetaRecord().toString());
         }
-        meta.setPredicate(DataValue.create(dto.getPredicate()));
+        meta.setPredicate(DataValue.create(dto.getFullPredicate()));
         if (meta.getPredicate().isNull()) {
             meta.setPredicate(DataValue.createObj());
         }

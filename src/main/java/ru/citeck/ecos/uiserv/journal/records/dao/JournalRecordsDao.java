@@ -27,6 +27,7 @@ import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
+import ru.citeck.ecos.uiserv.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.journal.service.JournalService;
 import ru.citeck.ecos.uiserv.journal.service.type.TypeJournalService;
 
@@ -36,8 +37,8 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class JournalRecordsDao extends LocalRecordsDao
-                               implements LocalRecordsQueryWithMetaDao<JournalDto>,
-                                          LocalRecordsMetaDao<JournalDto>,
+                               implements LocalRecordsQueryWithMetaDao<JournalWithMeta>,
+                                          LocalRecordsMetaDao<JournalWithMeta>,
                                           MutableRecordsLocalDao<JournalRecordsDao.JournalRecord> {
 
     public static final String LANG_QUERY_BY_LIST_ID = "list-id";
@@ -46,14 +47,14 @@ public class JournalRecordsDao extends LocalRecordsDao
     private final TypeJournalService typeJournalService;
 
     @Override
-    public RecordsQueryResult<JournalDto> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
+    public RecordsQueryResult<JournalWithMeta> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
 
-        RecordsQueryResult<JournalDto> result = new RecordsQueryResult<>();
+        RecordsQueryResult<JournalWithMeta> result = new RecordsQueryResult<>();
 
         if (LANG_QUERY_BY_LIST_ID.equals(recordsQuery.getLanguage())) {
 
             QueryByListId queryByListId = recordsQuery.getQuery(QueryByListId.class);
-            List<JournalDto> journals = journalService.getJournalsByJournalList(queryByListId.getListId());
+            List<JournalWithMeta> journals = journalService.getJournalsByJournalList(queryByListId.getListId());
             journals.forEach(j -> result.addRecord(new JournalRecord(j)));
 
             return result;
@@ -75,7 +76,7 @@ public class JournalRecordsDao extends LocalRecordsDao
                 max = 10000;
             }
 
-            List<JournalDto> journals = journalService.getAll(max, recordsQuery.getSkipCount(), predicate);
+            List<JournalWithMeta> journals = journalService.getAll(max, recordsQuery.getSkipCount(), predicate);
 
             result.setRecords(new ArrayList<>(journals));
             result.setTotalCount(journalService.getCount(predicate));
@@ -91,13 +92,13 @@ public class JournalRecordsDao extends LocalRecordsDao
     }
 
     @Override
-    public List<JournalDto> getLocalRecordsMeta(List<RecordRef> list, MetaField metaField) {
+    public List<JournalWithMeta> getLocalRecordsMeta(List<RecordRef> list, MetaField metaField) {
 
         return list.stream()
             .map(ref -> {
-                JournalDto dto;
+                JournalWithMeta dto;
                 if (RecordRef.isEmpty(ref)) {
-                    dto = new JournalDto();
+                    dto = new JournalWithMeta();
                 } else {
                     String id = ref.getId();
                     if (id.startsWith(TypeJournalService.JOURNAL_ID_PREFIX)) {
@@ -111,7 +112,7 @@ public class JournalRecordsDao extends LocalRecordsDao
                         dto = journalService.getById(ref.getId());
                     }
                     if (dto == null) {
-                        dto = new JournalDto();
+                        dto = new JournalWithMeta();
                     }
                 }
                 return new JournalRecord(dto);
@@ -140,9 +141,9 @@ public class JournalRecordsDao extends LocalRecordsDao
         return records.stream()
             .map(RecordRef::getId)
             .map(id -> {
-                JournalDto dto = journalService.getJournalById(id);
+                JournalWithMeta dto = journalService.getJournalById(id);
                 if (dto == null) {
-                    dto = new JournalDto();
+                    dto = new JournalWithMeta();
                     dto.setId(id);
                 }
                 return new JournalRecord(dto);
@@ -182,9 +183,9 @@ public class JournalRecordsDao extends LocalRecordsDao
         private RecordRef typeRef;
     }
 
-    public static class JournalRecord extends JournalDto {
+    public static class JournalRecord extends JournalWithMeta {
 
-        JournalRecord(JournalDto dto) {
+        JournalRecord(JournalWithMeta dto) {
             super(dto);
         }
 

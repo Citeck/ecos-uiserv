@@ -12,9 +12,7 @@ import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.records2.predicate.model.Predicates;
-import ru.citeck.ecos.records2.request.query.RecordsQuery;
-import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
-import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
+import ru.citeck.ecos.uiserv.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.journal.service.JournalService;
 import ru.citeck.ecos.uiserv.service.form.EcosFormModel;
 import ru.citeck.ecos.uiserv.service.form.EcosFormService;
@@ -22,7 +20,6 @@ import ru.citeck.ecos.uiserv.service.form.EcosFormService;
 import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -36,8 +33,8 @@ public class TypeJournalService {
     private final JournalService journalService;
     private final JournalByFormGenerator byFormGenerator;
 
-    private LoadingCache<RecordRef, Optional<JournalDto>> journalByTypeCache;
-    private LoadingCache<String, Optional<JournalDto>> journalByFormIdCache;
+    private LoadingCache<RecordRef, Optional<JournalWithMeta>> journalByTypeCache;
+    private LoadingCache<String, Optional<JournalWithMeta>> journalByFormIdCache;
 
     @PostConstruct
     public void init() {
@@ -55,14 +52,14 @@ public class TypeJournalService {
         formService.addChangeListener(form -> journalByFormIdCache.invalidate(form.getId()));
     }
 
-    public Optional<JournalDto> getJournalForType(RecordRef typeRef) {
+    public Optional<JournalWithMeta> getJournalForType(RecordRef typeRef) {
         if (RecordRef.isEmpty(typeRef)) {
             return Optional.empty();
         }
         return journalByTypeCache.getUnchecked(typeRef);
     }
 
-    private Optional<JournalDto> getJournalForTypeImpl(RecordRef typeRef) {
+    private Optional<JournalWithMeta> getJournalForTypeImpl(RecordRef typeRef) {
 
         if (RecordRef.isEmpty(typeRef)) {
             return Optional.empty();
@@ -78,7 +75,7 @@ public class TypeJournalService {
             return Optional.empty();
         }
 
-        Optional<JournalDto> journal = getJournal(
+        Optional<JournalWithMeta> journal = getJournal(
             typeRef,
             typeMeta.getSourceId(),
             typeMeta.getJournal(),
@@ -90,7 +87,7 @@ public class TypeJournalService {
         return journal;
     }
 
-    private Optional<JournalDto> getJournalForTypeImpl(List<RecordRef> types, int idx) {
+    private Optional<JournalWithMeta> getJournalForTypeImpl(List<RecordRef> types, int idx) {
 
         if (types == null || types.isEmpty() || idx >= types.size()) {
             return Optional.empty();
@@ -108,7 +105,7 @@ public class TypeJournalService {
             return Optional.empty();
         }
 
-        Optional<JournalDto> journal = getJournal(
+        Optional<JournalWithMeta> journal = getJournal(
             typeRef,
             meta.getSourceId(),
             meta.getJournal(),
@@ -120,13 +117,13 @@ public class TypeJournalService {
         return journal;
     }
 
-    private Optional<JournalDto> getJournal(RecordRef typeRef,
-                                            String sourceId,
-                                            RecordRef journalRef,
-                                            RecordRef formRef) {
+    private Optional<JournalWithMeta> getJournal(RecordRef typeRef,
+                                                 String sourceId,
+                                                 RecordRef journalRef,
+                                                 RecordRef formRef) {
 
         if (RecordRef.isNotEmpty(journalRef)) {
-            JournalDto journal = journalService.getJournalById(journalRef.getId());
+            JournalWithMeta journal = journalService.getJournalById(journalRef.getId());
             if (journal != null) {
                 return Optional.of(journal);
             }
@@ -134,7 +131,7 @@ public class TypeJournalService {
         if (RecordRef.isNotEmpty(formRef)) {
             return journalByFormIdCache.getUnchecked(formRef.getId())
                 .map(dto -> {
-                    JournalDto result = new JournalDto(dto);
+                    JournalWithMeta result = new JournalWithMeta(dto);
                     result.setTypeRef(typeRef);
                     result.setSourceId(sourceId);
                     result.setPredicate(ObjectData.create(Predicates.eq("_etype", typeRef.toString())));
@@ -145,14 +142,14 @@ public class TypeJournalService {
         return Optional.empty();
     }
 
-    private Optional<JournalDto> getJournalByFormIdImpl(String formId) {
+    private Optional<JournalWithMeta> getJournalByFormIdImpl(String formId) {
 
         EcosFormModel form = formService.getFormById(formId).orElse(null);
         if (form == null) {
             return Optional.empty();
         }
 
-        JournalDto journal = new JournalDto();
+        JournalWithMeta journal = new JournalWithMeta();
         byFormGenerator.fillData(journal, form);
 
         if (journal.getColumns().isEmpty()) {

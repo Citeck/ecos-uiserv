@@ -13,6 +13,7 @@ import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
+import ru.citeck.ecos.uiserv.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
 import ru.citeck.ecos.uiserv.journal.mapper.JournalMapper;
 
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@DependsOn("liquibase")
+@DependsOn({"liquibase", "recordsServiceFactoryConfiguration"})
 @RequiredArgsConstructor
 public class JournalServiceImpl implements JournalService {
 
@@ -51,13 +52,13 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
-    public JournalDto getJournalById(String id) {
+    public JournalWithMeta getJournalById(String id) {
         Optional<JournalEntity> entity = journalRepository.findByExtId(id);
         return entity.map(journalMapper::entityToDto).orElse(null);
     }
 
     @Override
-    public List<JournalDto> getAll(int max, int skipCount, Predicate predicate) {
+    public List<JournalWithMeta> getAll(int max, int skipCount, Predicate predicate) {
 
         PageRequest page = PageRequest.of(
             skipCount / max,
@@ -72,7 +73,7 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
-    public JournalDto getById(String id) {
+    public JournalWithMeta getById(String id) {
         JournalEntity journal = journalRepository.findByExtId(id).orElse(null);
         if (journal == null) {
             return null;
@@ -81,7 +82,7 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
-    public Set<JournalDto> getAll(int maxItems, int skipCount) {
+    public Set<JournalWithMeta> getAll(int maxItems, int skipCount) {
 
         PageRequest page = PageRequest.of(
             skipCount / maxItems,
@@ -95,7 +96,7 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
-    public Set<JournalDto> getAll(Set<String> extIds) {
+    public Set<JournalWithMeta> getAll(Set<String> extIds) {
         return journalRepository.findAllByExtIdIn(extIds).stream()
             .map(journalMapper::entityToDto)
             .collect(Collectors.toSet());
@@ -118,7 +119,7 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
-    public JournalDto save(JournalDto dto) {
+    public JournalWithMeta save(JournalDto dto) {
 
         if (dto.getColumns() == null
             || dto.getColumns().stream().noneMatch(c -> StringUtils.isNotBlank(c.getName()))) {
@@ -129,7 +130,7 @@ public class JournalServiceImpl implements JournalService {
         JournalEntity journalEntity = journalMapper.dtoToEntity(dto);
         JournalEntity storedJournalEntity = journalRepository.save(journalEntity);
 
-        JournalDto journalDto = journalMapper.entityToDto(storedJournalEntity);
+        JournalWithMeta journalDto = journalMapper.entityToDto(storedJournalEntity);
 
         updateJournalLists(journalDto);
 
@@ -161,7 +162,7 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
-    public List<JournalDto> getJournalsByJournalList(String journalListId) {
+    public List<JournalWithMeta> getJournalsByJournalList(String journalListId) {
 
         if (StringUtils.isBlank(journalListId)) {
             return Collections.emptyList();

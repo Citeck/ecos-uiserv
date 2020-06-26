@@ -1,10 +1,10 @@
 package ru.citeck.ecos.uiserv.journal.records.dao;
 
-import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
+import ru.citeck.ecos.uiserv.journal.dto.JournalWithMeta;
 
 public interface JournalModelFormat<T> {
 
-    T convert(JournalDto dto);
+    T convert(JournalWithMeta dto);
 
     int getVersion();
 }

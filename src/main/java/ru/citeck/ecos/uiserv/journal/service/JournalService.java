@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.journal.service;
 
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
+import ru.citeck.ecos.uiserv.journal.dto.JournalWithMeta;
 
 import java.util.List;
 import java.util.Set;
@@ -11,15 +12,15 @@ public interface JournalService {
 
     long getLastModifiedTimeMs();
 
-    JournalDto getJournalById(String id);
+    JournalWithMeta getJournalById(String id);
 
-    List<JournalDto> getAll(int max, int skipCount, Predicate predicate);
+    List<JournalWithMeta> getAll(int max, int skipCount, Predicate predicate);
 
-    JournalDto getById(String id);
+    JournalWithMeta getById(String id);
 
-    Set<JournalDto> getAll(int maxItems, int skipCount);
+    Set<JournalWithMeta> getAll(int maxItems, int skipCount);
 
-    Set<JournalDto> getAll(Set<String> extIds);
+    Set<JournalWithMeta> getAll(Set<String> extIds);
 
     long getCount();
 
@@ -27,9 +28,9 @@ public interface JournalService {
 
     void onJournalChanged(Consumer<JournalDto> consumer);
 
-    JournalDto save(JournalDto dto);
+    JournalWithMeta save(JournalDto dto);
 
     void delete(String id);
 
-    List<JournalDto> getJournalsByJournalList(String journalListId);
+    List<JournalWithMeta> getJournalsByJournalList(String journalListId);
 }

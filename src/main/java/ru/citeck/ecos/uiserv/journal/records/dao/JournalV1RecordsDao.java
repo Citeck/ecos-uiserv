@@ -13,7 +13,7 @@ import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
-import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
+import ru.citeck.ecos.uiserv.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.journal.dto.legacy1.JournalConfigResp;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class JournalV1RecordsDao  extends LocalRecordsDao
 
     @Override
     public RecordsQueryResult<JournalConfigResp> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
-        RecordsQueryResult<JournalDto> journalsResult = journalRecordsDao.queryLocalRecords(recordsQuery, metaField);
+        RecordsQueryResult<JournalWithMeta> journalsResult = journalRecordsDao.queryLocalRecords(recordsQuery, metaField);
         return new RecordsQueryResult<>(journalsResult, converter::convert);
     }
 
@@ -47,10 +47,10 @@ public class JournalV1RecordsDao  extends LocalRecordsDao
 
         List<JournalConfigResp> result = new ArrayList<>();
 
-        List<JournalDto> journals = journalRecordsDao.getLocalRecordsMeta(list, metaField);
+        List<JournalWithMeta> journals = journalRecordsDao.getLocalRecordsMeta(list, metaField);
         for (int i = 0; i < journals.size(); i++) {
 
-            JournalDto dto = journals.get(i);
+            JournalWithMeta dto = journals.get(i);
             RecordRef ref = list.get(i);
 
             if (StringUtils.isBlank(dto.getId())) {
@@ -66,7 +66,7 @@ public class JournalV1RecordsDao  extends LocalRecordsDao
                     boolean wasResolved = false;
                     if (!Objects.equals(configResp.getId(), ref.getId())) {
                         List<RecordRef> newRef = Collections.singletonList(RecordRef.valueOf(configResp.getId()));
-                        List<JournalDto> meta = journalRecordsDao.getLocalRecordsMeta(newRef, metaField);
+                        List<JournalWithMeta> meta = journalRecordsDao.getLocalRecordsMeta(newRef, metaField);
                         if (meta.size() == 1 && StringUtils.isNotBlank(meta.get(0).getId())) {
                             result.add(converter.convert(meta.get(0)));
                             wasResolved = true;
