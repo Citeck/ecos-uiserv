@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 
 @Component
 public class IconRecords extends LocalRecordsDao
-                         implements LocalRecordsQueryWithMetaDao<IconDto>,
-                                    LocalRecordsMetaDao<IconDto>,
-                                    MutableRecordsLocalDao<IconDto> {
+    implements LocalRecordsQueryWithMetaDao<IconDto>,
+    LocalRecordsMetaDao<IconDto>,
+    MutableRecordsLocalDao<IconDto> {
 
     private static final String ID = "icon";
     private final IconService iconService;
