@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.service.icon;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeType;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.uiserv.domain.IconEntity;
@@ -72,6 +73,11 @@ public class IconService {
         dto.setData(entity.getData());
         dto.setModified(entity.getLastModifiedDate());
 
+        String mimeTypeStr = entity.getMimeType();
+        if (mimeTypeStr != null) {
+            dto.setMimetype(MimeType.valueOf(mimeTypeStr));
+        }
+
         return dto;
     }
 
@@ -97,6 +103,11 @@ public class IconService {
         entity.setConfig(Json.getMapper().toString(dto.getConfig()));
         entity.setFamily(family);
         entity.setData(dto.getByteData());
+
+        MimeType mimeType = dto.getMimetype();
+        if (mimeType != null) {
+            entity.setMimeType(mimeType.toString());
+        }
 
         return entity;
     }
