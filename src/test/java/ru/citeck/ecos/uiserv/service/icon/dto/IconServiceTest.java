@@ -78,7 +78,7 @@ public class IconServiceTest {
         assertEquals(id, saved.getId());
         assertEquals(type, saved.getType());
         assertEquals(family, saved.getFamily());
-        assertEquals(data, saved.getData());
+        assertEquals(data, saved.getByteData());
         assertNotNull(saved.getModified());
     }
 
