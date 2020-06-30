@@ -22,6 +22,9 @@ public class IconEntity extends AbstractAuditingEntity {
     private String config;
     private byte[] data;
 
+    @Column(name = "mimetype")
+    private String mimeType;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
