@@ -20,8 +20,8 @@ columns:
     visible: false
 
   - name: cm:name
-    label: { ru: Имя, en: Name }
-    attribute: ".disp"
+    label: { ru: Название, en: Name }
+    attribute: "cm:name"
     type: text
 
   - name: cm:title
