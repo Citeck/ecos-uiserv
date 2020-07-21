@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
+@Deprecated
 public class FileViewCaching<TView> {
     private final Map<String, Optional<Versioned<TView>>> cache = new ConcurrentHashMap<>();
     private final Function<String, Optional<File>> fetcher;

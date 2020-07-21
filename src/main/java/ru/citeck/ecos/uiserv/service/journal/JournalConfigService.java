@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
+@Deprecated
 @Transactional
 public class JournalConfigService {
     private final FileViewCaching<JournalConfigDownstream> caching;

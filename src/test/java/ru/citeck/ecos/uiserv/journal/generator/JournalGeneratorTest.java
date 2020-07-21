@@ -1,22 +1,19 @@
 package ru.citeck.ecos.uiserv.journal.generator;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.uiserv.journal.dto.JournalColumnDto;
-import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
-import ru.citeck.ecos.uiserv.journal.service.type.JournalByFormGenerator;
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDto;
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDto;
+import ru.citeck.ecos.uiserv.domain.journal.service.type.JournalByFormGenerator;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 public class JournalGeneratorTest {

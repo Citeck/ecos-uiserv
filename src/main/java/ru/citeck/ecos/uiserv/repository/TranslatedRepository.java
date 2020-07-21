@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 /**
  * Spring Data  repository for the Translated entity.
  */
+@Deprecated
 @SuppressWarnings("unused")
 @Repository
 public interface TranslatedRepository extends JpaRepository<Translated, Long> {

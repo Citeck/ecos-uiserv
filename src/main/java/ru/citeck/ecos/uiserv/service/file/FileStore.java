@@ -18,6 +18,7 @@ import javax.transaction.Transactional;
 import java.util.Map;
 import java.util.Optional;
 
+@Deprecated
 @Component
 public class FileStore {
 

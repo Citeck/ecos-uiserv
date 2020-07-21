@@ -11,6 +11,7 @@ import java.util.Optional;
 /**
  * Spring Data  repository for the Translation entity.
  */
+@Deprecated
 @SuppressWarnings("unused")
 @Repository
 public interface TranslationRepository extends JpaRepository<Translation, Long> {

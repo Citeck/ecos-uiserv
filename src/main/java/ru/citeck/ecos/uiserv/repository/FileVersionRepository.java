@@ -12,6 +12,7 @@ import java.util.Optional;
 /**
  * Spring Data  repository for the MenuConfigVersion entity.
  */
+@Deprecated
 @SuppressWarnings("unused")
 @Repository
 public interface FileVersionRepository extends JpaRepository<FileVersion, Long> {

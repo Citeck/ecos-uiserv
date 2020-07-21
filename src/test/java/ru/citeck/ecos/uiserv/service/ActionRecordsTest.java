@@ -8,22 +8,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records2.request.query.RecordsQuery;
-import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
-import ru.citeck.ecos.records2.request.result.RecordsResult;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.service.action.ActionRecords;
+import ru.citeck.ecos.uiserv.domain.action.api.records.ActionRecords;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Sergey Artamonov

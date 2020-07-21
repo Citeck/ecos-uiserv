@@ -1,19 +1,11 @@
 package ru.citeck.ecos.uiserv.service.menu;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
-import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.repository.MenuRepository;
-
-import java.util.Optional;
+import ru.citeck.ecos.uiserv.domain.menu.service.MenuService;
+import ru.citeck.ecos.uiserv.domain.menu.repo.MenuRepository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
 
 //@RunWith(SpringRunner.class)
 //@SpringBootTest(classes = Application.class)

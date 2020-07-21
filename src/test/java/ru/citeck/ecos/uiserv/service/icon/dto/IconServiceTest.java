@@ -8,9 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.IconEntity;
-import ru.citeck.ecos.uiserv.repository.IconRepository;
-import ru.citeck.ecos.uiserv.service.icon.IconService;
+import ru.citeck.ecos.uiserv.domain.icon.repo.IconEntity;
+import ru.citeck.ecos.uiserv.domain.icon.dto.IconDto;
+import ru.citeck.ecos.uiserv.domain.icon.repo.IconRepository;
+import ru.citeck.ecos.uiserv.domain.icon.service.IconService;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;

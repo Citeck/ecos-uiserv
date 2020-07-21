@@ -28,6 +28,7 @@ import java.util.zip.ZipInputStream;
 
 @Service
 @Transactional
+@Deprecated
 @Slf4j
 public class FileService {
     private static final int MAX_SIZE = 10 * 1024 * 1024;

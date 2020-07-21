@@ -12,6 +12,7 @@ import java.util.Optional;
 /**
  * Spring Data repository for the File entity.
  */
+@Deprecated
 @Repository
 public interface FileRepository extends JpaRepository<File, Long>, JpaSpecificationExecutor<File> {
 

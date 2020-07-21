@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.metarepo.EcosMetaRepo;
-import ru.citeck.ecos.uiserv.service.dashdoard.DashboardEntityService;
+import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardEntityService;
 
 import javax.annotation.PostConstruct;
 import java.util.*;

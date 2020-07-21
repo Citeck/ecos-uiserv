@@ -8,8 +8,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.service.form.EcosFormModel;
-import ru.citeck.ecos.uiserv.service.form.EcosFormService;
+import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
+import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
 
 import java.util.Arrays;
 import java.util.Collections;

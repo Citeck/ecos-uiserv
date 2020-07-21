@@ -15,7 +15,7 @@ import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
-import ru.citeck.ecos.uiserv.records.evaluator.UserInRoleEvaluator;
+import ru.citeck.ecos.uiserv.domain.evaluator.service.UserInRoleEvaluator;
 
 import java.util.*;
 

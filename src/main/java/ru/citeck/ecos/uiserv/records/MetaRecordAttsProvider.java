@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.source.dao.local.meta.MetaAttributesSupplier;
 import ru.citeck.ecos.records2.source.dao.local.meta.MetaRecordsDaoAttsProvider;
-import ru.citeck.ecos.uiserv.journal.service.JournalService;
-import ru.citeck.ecos.uiserv.service.menu.MenuService;
+import ru.citeck.ecos.uiserv.domain.journal.service.JournalService;
+import ru.citeck.ecos.uiserv.domain.menu.service.MenuService;
 
 import javax.annotation.PostConstruct;
 import java.util.Collections;

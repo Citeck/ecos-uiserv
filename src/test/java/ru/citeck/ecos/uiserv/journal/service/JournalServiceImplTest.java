@@ -1,23 +1,14 @@
 package ru.citeck.ecos.uiserv.journal.service;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
-import ru.citeck.ecos.uiserv.journal.dto.JournalDto;
-import ru.citeck.ecos.uiserv.journal.mapper.JournalMapper;
-import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import ru.citeck.ecos.uiserv.domain.journal.service.mapper.JournalMapper;
+import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
+import ru.citeck.ecos.uiserv.domain.journal.service.JournalServiceImpl;
 
 @ExtendWith(SpringExtension.class)
 public class JournalServiceImplTest {

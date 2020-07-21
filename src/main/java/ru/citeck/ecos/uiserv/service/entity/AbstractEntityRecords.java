@@ -16,6 +16,7 @@ import ru.citeck.ecos.uiserv.service.RecordNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Deprecated
 public abstract class AbstractEntityRecords<T extends EntityDto> extends CrudRecordsDAO<T> {
 
     protected BaseEntityService<T> entityService;

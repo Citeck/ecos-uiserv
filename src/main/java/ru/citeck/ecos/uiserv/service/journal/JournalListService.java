@@ -11,7 +11,6 @@ import ru.citeck.ecos.uiserv.domain.File;
 import ru.citeck.ecos.uiserv.domain.FileType;
 import ru.citeck.ecos.uiserv.domain.FileVersion;
 import ru.citeck.ecos.uiserv.repository.FileRepository;
-import ru.citeck.ecos.uiserv.service.i18n.I18nService;
 import ru.citeck.ecos.uiserv.service.file.FileService;
 
 import javax.persistence.criteria.CriteriaBuilder;

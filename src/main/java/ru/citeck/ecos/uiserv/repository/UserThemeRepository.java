@@ -10,7 +10,7 @@ import ru.citeck.ecos.uiserv.domain.UserTheme;
 import javax.persistence.LockModeType;
 import java.util.Optional;
 
-
+@Deprecated
 @SuppressWarnings("unused")
 @Repository
 public interface UserThemeRepository extends JpaRepository<UserTheme, Long> {

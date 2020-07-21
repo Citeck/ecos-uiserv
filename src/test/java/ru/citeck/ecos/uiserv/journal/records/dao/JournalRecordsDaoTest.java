@@ -23,10 +23,10 @@ import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
 import ru.citeck.ecos.records2.source.dao.local.RecordsDaoBuilder;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.journal.domain.JournalEntity;
-import ru.citeck.ecos.uiserv.journal.mapper.JournalMapper;
-import ru.citeck.ecos.uiserv.journal.repository.JournalRepository;
-import ru.citeck.ecos.uiserv.repository.ActionRepository;
+import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
+import ru.citeck.ecos.uiserv.domain.journal.service.mapper.JournalMapper;
+import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
+import ru.citeck.ecos.uiserv.domain.action.repo.ActionRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;

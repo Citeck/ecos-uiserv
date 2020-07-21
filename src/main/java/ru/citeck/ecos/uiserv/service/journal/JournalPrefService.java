@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Deprecated
 @Transactional
 public class JournalPrefService {
     private final FileViewCaching<JournalPreferences> caching;
