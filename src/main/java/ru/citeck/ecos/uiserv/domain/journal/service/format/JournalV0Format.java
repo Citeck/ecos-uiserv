@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.journal.api.records.format;
+package ru.citeck.ecos.uiserv.domain.journal.service.format;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -14,8 +14,8 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.Attribute;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.CreateVariant;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.JournalConfig;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.JournalTypeDto;
-import ru.citeck.ecos.uiserv.domain.journal.api.records.utils.CreateVariantDto;
-import ru.citeck.ecos.uiserv.domain.journal.api.records.utils.EcosTypeUtils;
+import ru.citeck.ecos.uiserv.domain.journal.service.format.utils.CreateVariantDto;
+import ru.citeck.ecos.uiserv.domain.journal.service.format.utils.EcosTypeUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;

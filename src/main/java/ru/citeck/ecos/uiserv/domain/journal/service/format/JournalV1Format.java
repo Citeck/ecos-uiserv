@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.journal.api.records.format;
+package ru.citeck.ecos.uiserv.domain.journal.service.format;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -8,8 +8,8 @@ import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.uiserv.domain.journal.api.records.utils.CreateVariantDto;
-import ru.citeck.ecos.uiserv.domain.journal.api.records.utils.EcosTypeUtils;
+import ru.citeck.ecos.uiserv.domain.journal.service.format.utils.CreateVariantDto;
+import ru.citeck.ecos.uiserv.domain.journal.service.format.utils.EcosTypeUtils;
 import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnController;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDto;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;

@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.journal.api.records.utils;
+package ru.citeck.ecos.uiserv.domain.journal.service.format.utils;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.journal.api.records.format;
+package ru.citeck.ecos.uiserv.domain.journal.api.records;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.uiserv.domain.journal.api.records.JournalRecordsDao;
-import ru.citeck.ecos.uiserv.domain.journal.api.records.format.JournalV1Format;
+import ru.citeck.ecos.uiserv.domain.journal.service.format.JournalV1Format;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy1.JournalConfigResp;
 

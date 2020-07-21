@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.journal.api.records.format;
+package ru.citeck.ecos.uiserv.domain.journal.api.records;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -23,7 +23,7 @@ import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDAO;
 import ru.citeck.ecos.uiserv.domain.journal.api.records.JournalRecordsDao;
-import ru.citeck.ecos.uiserv.domain.journal.api.records.format.JournalV0Format;
+import ru.citeck.ecos.uiserv.domain.journal.service.format.JournalV0Format;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.JournalConfig;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.JournalConfigResp;
