@@ -23,7 +23,10 @@ public class MenuApi {
             throw new IllegalArgumentException("Expecting username");
         }
 
-        ResolvedMenuDto menu = menuService.getMenuForUser(username);
+        ResolvedMenuDto menu = menuService.getResolvedMenuForUser(username);
+        if (menu == null) {
+            menu = new ResolvedMenuDto();
+        }
 
         return ResponseEntity.ok()
             .header("ecos-uiserv-menu-version", "0.1")

@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.domain.menu.api.records;
 
 import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
 import ecos.com.fasterxml.jackson210.annotation.JsonValue;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -60,19 +61,23 @@ public class MenuRecords extends LocalRecordsDao
             return new RecordsQueryResult<>(new ArrayList<>(menuService.getAllAuthoritiesWithMenu()));
         }
 
-        if ("criteria".equals(recordsQuery.getLanguage())
-            || "predicate".equals(recordsQuery.getLanguage())) {
+        if (!"predicate".equals(recordsQuery.getLanguage())
+            && !"criteria".equals(recordsQuery.getLanguage())) {
 
-            RecordsQueryResult<Object> result = new RecordsQueryResult<>();
-            result.setRecords(menuService.getAllMenus()
-                .stream()
-                .map(MenuRecord::new)
-                .collect(Collectors.toList()));
-
-            return result;
+            MenuQuery menuQuery = recordsQuery.getQuery(MenuQuery.class);
+            if (menuQuery != null && StringUtils.isNotBlank(menuQuery.user)) {
+                MenuDto menuDto = menuService.getMenuForUser(menuQuery.user);
+                return RecordsQueryResult.of(new MenuRecord(menuDto));
+            }
         }
 
-        return new RecordsQueryResult<>();
+        RecordsQueryResult<Object> result = new RecordsQueryResult<>();
+        result.setRecords(menuService.getAllMenus()
+            .stream()
+            .map(MenuRecord::new)
+            .collect(Collectors.toList()));
+
+        return result;
     }
 
     @Override
@@ -117,6 +122,11 @@ public class MenuRecords extends LocalRecordsDao
                 .orElseGet(() -> new MenuDto(id)))
             .map(MenuRecord::new)
             .collect(Collectors.toList());
+    }
+
+    @Data
+    public static class MenuQuery {
+        private String user;
     }
 
     public static class MenuRecord extends MenuDto {

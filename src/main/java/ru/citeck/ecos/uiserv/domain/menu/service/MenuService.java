@@ -103,20 +103,28 @@ public class MenuService {
         return dto;
     }
 
-    public ResolvedMenuDto getMenuForUser(String username) {
-        final Set<String> userAuthorities = new HashSet<>(authoritiesSupport.queryUserAuthorities(username));
+    public MenuDto getMenuForUser(String username) {
+        Set<String> userAuthorities = new HashSet<>(authoritiesSupport.queryUserAuthorities(username));
+        return getMenuForUser(username, userAuthorities);
+    }
 
-        MenuDto foundDto = Stream.<Supplier<Optional<MenuDto>>>of(
+    public MenuDto getMenuForUser(String username, Set<String> authorities) {
+
+        return Stream.<Supplier<Optional<MenuDto>>>of(
             () -> findMenuByUsername(username),
-            () -> findByAuthorities(userAuthorities),
+            () -> findByAuthorities(authorities),
             this::findByDefaultAuthority
         ).map(Supplier::get)
             .filter(Optional::isPresent)
             .map(Optional::get)
             .findFirst()
             .orElseGet(this::findDefaultMenu);
+    }
 
-        return resolveMenu(foundDto, userAuthorities);
+    public ResolvedMenuDto getResolvedMenuForUser(String username) {
+        Set<String> userAuthorities = new HashSet<>(authoritiesSupport.queryUserAuthorities(username));
+        MenuDto dto = getMenuForUser(username, userAuthorities);
+        return resolveMenu(dto, userAuthorities);
     }
 
     private Optional<MenuDto> findMenuByUsername(String username) {
@@ -160,6 +168,9 @@ public class MenuService {
     }
 
     private ResolvedMenuDto resolveMenu(MenuDto menuDto, Set<String> allUserAuthorities) {
+        if (menuDto == null) {
+            return null;
+        }
         return new MenuFactory(
             allUserAuthorities,
             i18nService::getMessage,
