@@ -26,6 +26,7 @@ import java.util.Collection;
 @EnableConfigurationProperties({LiquibaseProperties.class, ApplicationProperties.class})
 @EnableDiscoveryClient
 @EnableJpaRepositories({
+    "ru.citeck.ecos.uiserv.app.*.repo",
     "ru.citeck.ecos.uiserv.domain.*.repo"
 })
 public class Application {
