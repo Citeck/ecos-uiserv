@@ -17,12 +17,12 @@ import ru.citeck.ecos.records2.evaluator.evaluators.AlwaysFalseEvaluator;
 import ru.citeck.ecos.records2.evaluator.evaluators.AlwaysTrueEvaluator;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.uiserv.domain.action.repo.ActionEntity;
-import ru.citeck.ecos.uiserv.domain.EvaluatorEntity;
+import ru.citeck.ecos.uiserv.domain.evaluator.repo.EvaluatorEntity;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionConfirmDto;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionModule;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionResultDto;
 import ru.citeck.ecos.uiserv.domain.action.repo.ActionRepository;
-import ru.citeck.ecos.uiserv.security.SecurityUtils;
+import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

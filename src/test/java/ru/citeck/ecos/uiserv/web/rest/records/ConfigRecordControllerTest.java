@@ -17,8 +17,8 @@ import ru.citeck.ecos.records2.request.rest.RestHandler;
 import ru.citeck.ecos.records2.spring.web.rest.RecordsRestApi;
 import ru.citeck.ecos.records2.spring.config.RecordsServiceFactoryConfiguration;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.service.config.dto.ConfigDto;
-import ru.citeck.ecos.uiserv.service.config.ConfigEntityService;
+import ru.citeck.ecos.uiserv.domain.config.dto.ConfigDto;
+import ru.citeck.ecos.uiserv.domain.config.service.ConfigEntityService;
 import ru.citeck.ecos.uiserv.web.rest.TestEntityRecordUtil;
 import ru.citeck.ecos.uiserv.web.rest.TestUtil;
 

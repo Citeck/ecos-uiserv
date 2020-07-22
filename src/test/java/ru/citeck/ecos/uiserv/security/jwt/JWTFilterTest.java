@@ -1,6 +1,6 @@
 package ru.citeck.ecos.uiserv.security.jwt;
 
-import ru.citeck.ecos.uiserv.security.AuthoritiesConstants;
+import ru.citeck.ecos.uiserv.app.security.constants.AuthoritiesConstants;
 import io.github.jhipster.config.JHipsterProperties;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -15,6 +15,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
+import ru.citeck.ecos.uiserv.app.security.service.jwt.JWTFilter;
+import ru.citeck.ecos.uiserv.app.security.service.jwt.TokenProvider;
 
 import java.util.Collections;
 

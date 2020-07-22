@@ -13,7 +13,7 @@ import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluatorService;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.config.UiServProperties;
+import ru.citeck.ecos.uiserv.app.application.props.UiServProperties;
 
 import java.io.IOException;
 

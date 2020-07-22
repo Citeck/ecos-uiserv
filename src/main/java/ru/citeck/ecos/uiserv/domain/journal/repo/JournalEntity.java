@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.journal.repo;
 
 import lombok.Data;
-import ru.citeck.ecos.uiserv.domain.AbstractAuditingEntity;
+import ru.citeck.ecos.uiserv.domain.common.repo.AbstractAuditingEntity;
 
 import javax.persistence.*;
 

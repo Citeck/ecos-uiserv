@@ -2,7 +2,7 @@ package ru.citeck.ecos.uiserv.domain.icon.repo;
 
 import lombok.Data;
 import lombok.ToString;
-import ru.citeck.ecos.uiserv.domain.AbstractAuditingEntity;
+import ru.citeck.ecos.uiserv.domain.common.repo.AbstractAuditingEntity;
 
 import javax.persistence.*;
 import java.util.Objects;

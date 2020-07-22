@@ -1,7 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.userconfig.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.citeck.ecos.uiserv.domain.UserConfigurationEntity;
 
 public interface UserConfigurationsRepository extends JpaRepository<UserConfigurationEntity, Long> {
     UserConfigurationEntity findByExternalId(String externalId);

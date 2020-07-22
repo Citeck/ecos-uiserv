@@ -1,8 +1,8 @@
 package ru.citeck.ecos.uiserv.domain.action.repo;
 
 import lombok.Data;
-import ru.citeck.ecos.uiserv.domain.AbstractAuditingEntity;
-import ru.citeck.ecos.uiserv.domain.EvaluatorEntity;
+import ru.citeck.ecos.uiserv.domain.common.repo.AbstractAuditingEntity;
+import ru.citeck.ecos.uiserv.domain.evaluator.repo.EvaluatorEntity;
 
 import javax.persistence.*;
 import java.util.Objects;

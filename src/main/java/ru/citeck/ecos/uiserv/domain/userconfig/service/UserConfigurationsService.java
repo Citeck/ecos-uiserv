@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.uiserv.domain.UserConfigurationEntity;
+import ru.citeck.ecos.uiserv.domain.userconfig.repo.UserConfigurationEntity;
 import ru.citeck.ecos.uiserv.domain.userconfig.dto.UserConfigurationDto;
 import ru.citeck.ecos.uiserv.domain.userconfig.repo.UserConfigurationsRepository;
-import ru.citeck.ecos.uiserv.security.SecurityUtils;
+import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @Service
 @Transactional
 public class UserConfigurationsService {
-    
+
     @Value("${max-user-configurations-persisted}")
     private Integer limit;
 

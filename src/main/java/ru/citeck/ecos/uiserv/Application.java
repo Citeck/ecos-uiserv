@@ -1,8 +1,8 @@
 package ru.citeck.ecos.uiserv;
 
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import ru.citeck.ecos.uiserv.config.ApplicationProperties;
-import ru.citeck.ecos.uiserv.config.DefaultProfileUtil;
+import ru.citeck.ecos.uiserv.app.application.props.ApplicationProperties;
+import ru.citeck.ecos.uiserv.app.application.initializer.DefaultProfileUtil;
 
 import io.github.jhipster.config.JHipsterConstants;
 
@@ -26,7 +26,6 @@ import java.util.Collection;
 @EnableConfigurationProperties({LiquibaseProperties.class, ApplicationProperties.class})
 @EnableDiscoveryClient
 @EnableJpaRepositories({
-    "ru.citeck.ecos.uiserv.*.repository",
     "ru.citeck.ecos.uiserv.domain.*.repo"
 })
 public class Application {

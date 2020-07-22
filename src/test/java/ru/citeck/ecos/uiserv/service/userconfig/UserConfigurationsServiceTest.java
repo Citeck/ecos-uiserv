@@ -14,7 +14,7 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.userconfig.service.UserConfigurationsService;
 import ru.citeck.ecos.uiserv.domain.userconfig.dto.UserConfigurationDto;
-import ru.citeck.ecos.uiserv.domain.UserConfigurationEntity;
+import ru.citeck.ecos.uiserv.domain.userconfig.repo.UserConfigurationEntity;
 import ru.citeck.ecos.uiserv.domain.userconfig.repo.UserConfigurationsRepository;
 
 import java.time.Instant;

@@ -5,10 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.utils.StringUtils;
-import ru.citeck.ecos.uiserv.domain.File;
-import ru.citeck.ecos.uiserv.domain.FileType;
+import ru.citeck.ecos.uiserv.domain.file.repo.File;
+import ru.citeck.ecos.uiserv.domain.file.repo.FileType;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
-import ru.citeck.ecos.uiserv.service.file.FileService;
+import ru.citeck.ecos.uiserv.domain.file.service.FileService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

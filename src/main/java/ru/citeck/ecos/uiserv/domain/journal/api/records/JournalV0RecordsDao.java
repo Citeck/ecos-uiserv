@@ -22,13 +22,12 @@ import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDAO;
-import ru.citeck.ecos.uiserv.domain.journal.api.records.JournalRecordsDao;
 import ru.citeck.ecos.uiserv.domain.journal.service.format.JournalV0Format;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.JournalConfig;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.JournalConfigResp;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.JournalTypeDto;
-import ru.citeck.ecos.uiserv.security.SecurityUtils;
+import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.*;

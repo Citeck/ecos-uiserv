@@ -8,9 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.FileType;
-import ru.citeck.ecos.uiserv.service.file.FileService;
-import ru.citeck.ecos.uiserv.service.journal.JournalPrefService;
+import ru.citeck.ecos.uiserv.domain.file.repo.FileType;
+import ru.citeck.ecos.uiserv.domain.file.service.FileService;
+import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

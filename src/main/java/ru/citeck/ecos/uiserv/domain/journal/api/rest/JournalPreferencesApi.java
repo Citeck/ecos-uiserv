@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.citeck.ecos.uiserv.domain.FileType;
-import ru.citeck.ecos.uiserv.service.file.FileService;
-import ru.citeck.ecos.uiserv.service.journal.JournalPrefService;
-import ru.citeck.ecos.uiserv.web.rest.errors.JournalPrefsNotFoundException;
+import ru.citeck.ecos.uiserv.domain.file.repo.FileType;
+import ru.citeck.ecos.uiserv.domain.file.service.FileService;
+import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService;
+import ru.citeck.ecos.uiserv.app.web.exception.JournalPrefsNotFoundException;
 
 import java.util.Optional;
 

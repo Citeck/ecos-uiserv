@@ -6,8 +6,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import ru.citeck.ecos.uiserv.service.config.dto.ConfigDto;
-import ru.citeck.ecos.uiserv.service.config.ConfigEntityService;
+import ru.citeck.ecos.uiserv.domain.config.dto.ConfigDto;
+import ru.citeck.ecos.uiserv.domain.config.service.ConfigEntityService;
 
 import java.util.ArrayList;
 import java.util.List;

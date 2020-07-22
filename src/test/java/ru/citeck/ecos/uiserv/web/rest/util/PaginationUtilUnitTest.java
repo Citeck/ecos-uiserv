@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
+import ru.citeck.ecos.uiserv.app.web.service.util.PaginationUtil;
 
 /**
  * Tests based on parsing algorithm in app/components/util/pagination-util.service.js

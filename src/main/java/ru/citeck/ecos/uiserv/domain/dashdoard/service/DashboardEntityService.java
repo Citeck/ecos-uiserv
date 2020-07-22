@@ -5,9 +5,9 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.OldDashboardDto;
-import ru.citeck.ecos.uiserv.domain.FileType;
-import ru.citeck.ecos.uiserv.service.entity.AbstractBaseEntityService;
-import ru.citeck.ecos.uiserv.service.file.FileService;
+import ru.citeck.ecos.uiserv.domain.file.repo.FileType;
+import ru.citeck.ecos.uiserv.domain.common.service.AbstractBaseEntityService;
+import ru.citeck.ecos.uiserv.domain.file.service.FileService;
 
 import java.util.*;
 

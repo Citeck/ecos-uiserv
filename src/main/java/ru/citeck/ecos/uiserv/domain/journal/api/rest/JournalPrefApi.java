@@ -6,10 +6,10 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import ru.citeck.ecos.uiserv.domain.FileType;
-import ru.citeck.ecos.uiserv.service.file.FileService;
-import ru.citeck.ecos.uiserv.service.journal.JournalPrefService;
-import ru.citeck.ecos.uiserv.web.rest.errors.JournalPrefsNotFoundException;
+import ru.citeck.ecos.uiserv.domain.file.repo.FileType;
+import ru.citeck.ecos.uiserv.domain.file.service.FileService;
+import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService;
+import ru.citeck.ecos.uiserv.app.web.exception.JournalPrefsNotFoundException;
 
 import java.io.IOException;
 import java.util.Collections;

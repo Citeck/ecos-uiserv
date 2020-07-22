@@ -124,7 +124,7 @@ public class JournalServiceImpl implements JournalService {
         if (dto.getColumns() == null
             || dto.getColumns().stream().noneMatch(c -> StringUtils.isNotBlank(c.getName()))) {
 
-            throw new IllegalStateException("Columns is a mandatory for journal config");
+            throw new IllegalStateException("Columns is a mandatory for journal config. Journal: " + dto);
         }
 
         JournalEntity journalEntity = journalMapper.dtoToEntity(dto);

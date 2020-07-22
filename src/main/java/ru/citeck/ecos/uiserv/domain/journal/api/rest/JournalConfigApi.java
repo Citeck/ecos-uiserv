@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.citeck.ecos.uiserv.service.journal.JournalConfigService;
+import ru.citeck.ecos.uiserv.domain.journal.service.JournalConfigService;
 
 import java.util.Locale;
 
