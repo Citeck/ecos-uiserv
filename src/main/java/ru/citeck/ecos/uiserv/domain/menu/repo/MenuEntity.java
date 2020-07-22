@@ -2,7 +2,7 @@ package ru.citeck.ecos.uiserv.domain.menu.repo;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.citeck.ecos.uiserv.domain.common.repo.AbstractAuditingEntity;
+import ru.citeck.ecos.uiserv.app.common.repo.AbstractAuditingEntity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;

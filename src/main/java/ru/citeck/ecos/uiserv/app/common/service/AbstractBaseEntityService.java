@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.common.service;
+package ru.citeck.ecos.uiserv.app.common.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;

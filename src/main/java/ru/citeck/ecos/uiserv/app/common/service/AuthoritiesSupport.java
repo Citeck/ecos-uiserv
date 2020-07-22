@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.common.service;
+package ru.citeck.ecos.uiserv.app.common.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

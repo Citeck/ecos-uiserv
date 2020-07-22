@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.common.service;
+package ru.citeck.ecos.uiserv.app.common.service;
 
 
 public interface EntityDto {

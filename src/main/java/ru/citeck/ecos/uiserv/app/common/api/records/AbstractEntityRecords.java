@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.common.api.records;
+package ru.citeck.ecos.uiserv.app.common.api.records;
 
 import lombok.Data;
 import org.apache.commons.lang.StringUtils;
@@ -10,9 +10,9 @@ import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.CrudRecordsDAO;
-import ru.citeck.ecos.uiserv.domain.common.service.EntityDto;
-import ru.citeck.ecos.uiserv.domain.common.exception.RecordNotFoundException;
-import ru.citeck.ecos.uiserv.domain.common.service.BaseEntityService;
+import ru.citeck.ecos.uiserv.app.common.service.EntityDto;
+import ru.citeck.ecos.uiserv.app.common.exception.RecordNotFoundException;
+import ru.citeck.ecos.uiserv.app.common.service.BaseEntityService;
 
 import java.util.*;
 import java.util.stream.Collectors;

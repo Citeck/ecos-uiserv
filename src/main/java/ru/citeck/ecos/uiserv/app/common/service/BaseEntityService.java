@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.common.service;
+package ru.citeck.ecos.uiserv.app.common.service;
 
 import ru.citeck.ecos.records2.RecordRef;
 

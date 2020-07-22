@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.uiserv.domain.common.service.AbstractBaseEntityService;
+import ru.citeck.ecos.uiserv.app.common.service.AbstractBaseEntityService;
 import ru.citeck.ecos.uiserv.domain.config.dto.ConfigDto;
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType;
 import ru.citeck.ecos.uiserv.domain.file.service.FileService;

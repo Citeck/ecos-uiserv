@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.common.repo;
+package ru.citeck.ecos.uiserv.app.audit.repo;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;

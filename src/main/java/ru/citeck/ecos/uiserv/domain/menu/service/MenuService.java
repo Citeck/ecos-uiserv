@@ -8,7 +8,7 @@ import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.uiserv.app.application.props.ApplicationProperties;
 import ru.citeck.ecos.uiserv.domain.menu.repo.MenuEntity;
 import ru.citeck.ecos.uiserv.domain.menu.repo.MenuRepository;
-import ru.citeck.ecos.uiserv.domain.common.service.AuthoritiesSupport;
+import ru.citeck.ecos.uiserv.app.common.service.AuthoritiesSupport;
 import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDeployModule;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;

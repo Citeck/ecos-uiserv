@@ -10,8 +10,8 @@ import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.uiserv.app.application.props.UiServProperties;
 import ru.citeck.ecos.uiserv.domain.config.service.ConfigEntityService;
 import ru.citeck.ecos.uiserv.domain.config.dto.ConfigDto;
-import ru.citeck.ecos.uiserv.domain.common.service.EntityDto;
-import ru.citeck.ecos.uiserv.domain.common.api.records.AbstractEntityRecords;
+import ru.citeck.ecos.uiserv.app.common.service.EntityDto;
+import ru.citeck.ecos.uiserv.app.common.api.records.AbstractEntityRecords;
 
 import java.util.ArrayList;
 import java.util.List;

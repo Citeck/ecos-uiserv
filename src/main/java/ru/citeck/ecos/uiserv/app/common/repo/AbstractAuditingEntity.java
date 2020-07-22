@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.common.repo;
+package ru.citeck.ecos.uiserv.app.common.repo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.envers.Audited;

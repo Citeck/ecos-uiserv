@@ -1,6 +1,6 @@
 package ru.citeck.ecos.uiserv.app.audit.service;
 
-import ru.citeck.ecos.uiserv.domain.common.repo.PersistentAuditEvent;
+import ru.citeck.ecos.uiserv.app.audit.repo.PersistentAuditEvent;
 
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
