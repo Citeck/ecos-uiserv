@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface MenuRepository extends JpaRepository<MenuEntity, Long> {
@@ -23,4 +24,10 @@ public interface MenuRepository extends JpaRepository<MenuEntity, Long> {
 
     @Query("SELECT max(m.lastModifiedDate) FROM MenuEntity m")
     Optional<Instant> getLastModifiedTime();
+
+    @Query(
+        value = "SELECT DISTINCT authority FROM ecos_menu_authority",
+        nativeQuery = true
+    )
+    Set<String> getAllAuthoritiesWithMenu();
 }

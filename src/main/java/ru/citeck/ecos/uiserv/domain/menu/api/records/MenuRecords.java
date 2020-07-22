@@ -2,7 +2,9 @@ package ru.citeck.ecos.uiserv.domain.menu.api.records;
 
 import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
 import ecos.com.fasterxml.jackson210.annotation.JsonValue;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
@@ -15,43 +17,53 @@ import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
 import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
-import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
-import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDAO;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDAO;
+import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
+import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDao;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class MenuRecords extends LocalRecordsDAO
-    implements LocalRecordsMetaDAO<MenuRecords.MenuRecord>,
-               LocalRecordsQueryWithMetaDAO<MenuRecords.MenuRecord>,
-               MutableRecordsLocalDAO<MenuRecords.MenuRecord> {
+@RequiredArgsConstructor
+public class MenuRecords extends LocalRecordsDao
+    implements LocalRecordsMetaDao<MenuRecords.MenuRecord>,
+               LocalRecordsQueryWithMetaDao<Object>,
+               MutableRecordsLocalDao<MenuRecords.MenuRecord> {
 
     private static final String ID = "menu";
+    private static final String AUTHORITIES_QUERY_LANG = "authorities";
+
     private final MenuService menuService;
 
-    public MenuRecords(MenuService menuService) {
+    {
         setId(ID);
-        this.menuService = menuService;
     }
 
+    @NotNull
     @Override
-    public List<MenuRecord> getValuesToMutate(List<RecordRef> records) {
+    public List<MenuRecord> getValuesToMutate(@NotNull List<RecordRef> records) {
         return getLocalRecordsMeta(records, null);
     }
 
+    @NotNull
     @Override
-    public RecordsQueryResult<MenuRecord> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
+    public RecordsQueryResult<Object> queryLocalRecords(@NotNull RecordsQuery recordsQuery,
+                                                        @NotNull MetaField metaField) {
+
+        if (AUTHORITIES_QUERY_LANG.equals(recordsQuery.getLanguage())) {
+            return new RecordsQueryResult<>(new ArrayList<>(menuService.getAllAuthoritiesWithMenu()));
+        }
 
         if ("criteria".equals(recordsQuery.getLanguage())
             || "predicate".equals(recordsQuery.getLanguage())) {
 
-            RecordsQueryResult<MenuRecord> result = new RecordsQueryResult<>();
+            RecordsQueryResult<Object> result = new RecordsQueryResult<>();
             result.setRecords(menuService.getAllMenus()
                 .stream()
                 .map(MenuRecord::new)

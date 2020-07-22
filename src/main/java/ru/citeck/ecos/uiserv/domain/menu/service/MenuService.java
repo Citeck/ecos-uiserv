@@ -51,6 +51,10 @@ public class MenuService {
         return mapToDto(menuRepository.save(entity));
     }
 
+    public Set<String> getAllAuthoritiesWithMenu() {
+        return menuRepository.getAllAuthoritiesWithMenu();
+    }
+
     public List<MenuDto> getAllMenus() {
         return menuRepository.findAll()
             .stream()
