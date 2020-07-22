@@ -28,6 +28,7 @@ import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -89,11 +90,9 @@ public class MenuRecords extends LocalRecordsDao
                 throw new IllegalArgumentException("Parameter 'id' is mandatory for menu record");
             }
 
-            //todo: delete this when editor will be ready
             if (dto.getId().equals("default-menu")) {
-                throw new IllegalArgumentException("Default menu can't be changed yet. Please, chose other ID");
+                dto.setId(UUID.randomUUID().toString());
             }
-            //===========================================
 
             MenuDto saved = menuService.save(dto);
             result.addRecord(new RecordMeta(saved.getId()));
