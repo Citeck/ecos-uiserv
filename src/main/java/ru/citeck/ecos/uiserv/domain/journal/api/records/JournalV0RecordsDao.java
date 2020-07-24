@@ -19,9 +19,9 @@ import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.request.query.QueryConsistency;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
-import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDAO;
+import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.uiserv.domain.journal.service.format.JournalV0Format;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.JournalConfig;
@@ -37,9 +37,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JournalV0RecordsDao extends LocalRecordsDAO
-    implements LocalRecordsQueryWithMetaDAO<JournalConfig>,
-    LocalRecordsMetaDAO<JournalConfig> {
+public class JournalV0RecordsDao extends LocalRecordsDao
+    implements LocalRecordsQueryWithMetaDao<JournalConfig>,
+    LocalRecordsMetaDao<JournalConfig> {
 
     private static final String PROXY_URI = "http://alfresco/share/proxy/alfresco/";
     private static final String CONFIG_URI = PROXY_URI + "api/journals/journals-config?nodeRef=";

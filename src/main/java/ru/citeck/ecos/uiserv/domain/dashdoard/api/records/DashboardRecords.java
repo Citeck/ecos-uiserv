@@ -5,6 +5,7 @@ import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
 import ecos.com.fasterxml.jackson210.annotation.JsonValue;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.ObjectData;
@@ -20,10 +21,10 @@ import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
 import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
-import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
-import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDAO;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDAO;
+import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
+import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDao;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
 
@@ -32,10 +33,10 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class DashboardRecords extends LocalRecordsDAO
-                              implements LocalRecordsQueryWithMetaDAO<DashboardRecords.DashboardRecord>,
-                                         LocalRecordsMetaDAO<DashboardRecords.DashboardRecord>,
-                                         MutableRecordsLocalDAO<DashboardRecords.DashboardRecord> {
+public class DashboardRecords extends LocalRecordsDao
+                              implements LocalRecordsQueryWithMetaDao<DashboardRecords.DashboardRecord>,
+                                         LocalRecordsMetaDao<DashboardRecords.DashboardRecord>,
+                                         MutableRecordsLocalDao<DashboardRecords.DashboardRecord> {
 
     private static final RecordRef DEFAULT_TYPE = RecordRef.valueOf("emodel/type@user-dashboard");
 
@@ -52,7 +53,8 @@ public class DashboardRecords extends LocalRecordsDAO
     }
 
     @Override
-    public RecordsQueryResult<DashboardRecord> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
+    public RecordsQueryResult<DashboardRecord> queryLocalRecords(@NotNull RecordsQuery recordsQuery,
+                                                                 @NotNull MetaField metaField) {
 
         Query query = recordsQuery.getQuery(Query.class);
 
@@ -91,7 +93,8 @@ public class DashboardRecords extends LocalRecordsDAO
     }
 
     @Override
-    public List<DashboardRecord> getLocalRecordsMeta(List<RecordRef> list, MetaField metaField) {
+    public List<DashboardRecord> getLocalRecordsMeta(@NotNull List<RecordRef> list,
+                                                     @NotNull MetaField metaField) {
         return list.stream()
             .map(this::getDashboardByRef)
             .collect(Collectors.toList());
@@ -120,15 +123,17 @@ public class DashboardRecords extends LocalRecordsDAO
         return result;
     }
 
+    @NotNull
     @Override
-    public List<DashboardRecord> getValuesToMutate(List<RecordRef> list) {
+    public List<DashboardRecord> getValuesToMutate(@NotNull List<RecordRef> list) {
         return list.stream()
             .map(ref -> new DashboardRecord(getDashboardByRef(ref)))
             .collect(Collectors.toList());
     }
 
+    @NotNull
     @Override
-    public RecordsMutResult save(List<DashboardRecord> values) {
+    public RecordsMutResult save(@NotNull List<DashboardRecord> values) {
         RecordsMutResult result = new RecordsMutResult();
         values.forEach(value -> {
             DashboardDto dashboardDto = dashboardService.saveDashboard(value);

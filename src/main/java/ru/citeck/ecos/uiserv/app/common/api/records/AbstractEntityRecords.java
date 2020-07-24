@@ -2,14 +2,16 @@ package ru.citeck.ecos.uiserv.app.common.api.records;
 
 import lombok.Data;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
 import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
 import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
-import ru.citeck.ecos.records2.source.dao.local.CrudRecordsDAO;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsCrudDao;
 import ru.citeck.ecos.uiserv.app.common.service.EntityDto;
 import ru.citeck.ecos.uiserv.app.common.exception.RecordNotFoundException;
 import ru.citeck.ecos.uiserv.app.common.service.BaseEntityService;
@@ -18,7 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Deprecated
-public abstract class AbstractEntityRecords<T extends EntityDto> extends CrudRecordsDAO<T> {
+public abstract class AbstractEntityRecords<T extends EntityDto> extends LocalRecordsCrudDao<T> {
 
     protected BaseEntityService<T> entityService;
 
@@ -55,7 +57,7 @@ public abstract class AbstractEntityRecords<T extends EntityDto> extends CrudRec
     }
 
     @Override
-    public List<T> getMetaValues(List<RecordRef> records) {
+    public List<T> getLocalRecordsMeta(@NotNull List<RecordRef> records, @NotNull MetaField metaField) {
         return records.stream()
             .map(RecordRef::getId)
             .map(id -> Optional.of(id)
@@ -68,7 +70,7 @@ public abstract class AbstractEntityRecords<T extends EntityDto> extends CrudRec
     }
 
     @Override
-    public RecordsQueryResult<T> getMetaValues(RecordsQuery recordsQuery) {
+    public RecordsQueryResult<T> queryLocalRecords(@NotNull RecordsQuery recordsQuery, @NotNull MetaField field) {
 
         String language = recordsQuery.getLanguage();
         if (StringUtils.isNotBlank(language)) {

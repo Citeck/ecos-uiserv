@@ -2,10 +2,12 @@ package ru.citeck.ecos.uiserv.domain.config.api.records;
 
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.uiserv.app.application.props.UiServProperties;
 import ru.citeck.ecos.uiserv.domain.config.service.ConfigEntityService;
@@ -82,7 +84,7 @@ public class ConfigRecords extends AbstractEntityRecords<ConfigDto> {
     }
 
     @Override
-    public List<ConfigDto> getMetaValues(List<RecordRef> records) {
+    public List<ConfigDto> getLocalRecordsMeta(@NotNull List<RecordRef> records, @NotNull MetaField metaField) {
         List<ConfigDto> result = new ArrayList<>();
         for (RecordRef recordRef : records) {
             String id = recordRef.getId();

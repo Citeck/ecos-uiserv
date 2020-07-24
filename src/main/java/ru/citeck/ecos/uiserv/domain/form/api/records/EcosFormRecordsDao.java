@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
@@ -15,6 +16,7 @@ import ru.citeck.ecos.records2.QueryContext;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
+import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate;
@@ -24,7 +26,7 @@ import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.request.query.page.SkipPage;
-import ru.citeck.ecos.records2.source.dao.local.CrudRecordsDAO;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsCrudDao;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
 
@@ -33,7 +35,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class EcosFormRecordsDao extends CrudRecordsDAO<EcosFormRecordsDao.EcosFormModelDownstream> {
+public class EcosFormRecordsDao extends LocalRecordsCrudDao<EcosFormRecordsDao.EcosFormModelDownstream> {
 
     public static final String ID = "eform";
 
@@ -51,7 +53,7 @@ public class EcosFormRecordsDao extends CrudRecordsDAO<EcosFormRecordsDao.EcosFo
     }
 
     @Override
-    public List<EcosFormModelDownstream> getValuesToMutate(List<RecordRef> records) {
+    public List<EcosFormModelDownstream> getValuesToMutate(@NotNull List<RecordRef> records) {
         return records.stream()
             .map(RecordRef::getId)
             .map(id ->
@@ -100,7 +102,8 @@ public class EcosFormRecordsDao extends CrudRecordsDAO<EcosFormRecordsDao.EcosFo
     }
 
     @Override
-    public List<EcosFormModelDownstream> getMetaValues(List<RecordRef> records) {
+    public List<EcosFormModelDownstream> getLocalRecordsMeta(@NotNull List<RecordRef> records,
+                                                             @NotNull MetaField metaField) {
         return records.stream()
             .map(RecordRef::getId)
             .map(id -> Optional.of(id)
@@ -117,7 +120,8 @@ public class EcosFormRecordsDao extends CrudRecordsDAO<EcosFormRecordsDao.EcosFo
     }
 
     @Override
-    public RecordsQueryResult<EcosFormModelDownstream> getMetaValues(RecordsQuery recordsQuery) {
+    public RecordsQueryResult<EcosFormModelDownstream> queryLocalRecords(@NotNull RecordsQuery recordsQuery,
+                                                                         @NotNull MetaField field) {
 
         RecordsQueryResult<EcosFormModelDownstream> result = new RecordsQueryResult<>();
 

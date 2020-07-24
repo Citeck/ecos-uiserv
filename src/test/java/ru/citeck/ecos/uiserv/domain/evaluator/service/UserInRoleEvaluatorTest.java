@@ -13,13 +13,13 @@ import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluatorService;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
-import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
+import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.uiserv.domain.evaluator.service.UserInRoleEvaluator;
 
 import java.util.*;
 
-public class UserInRoleEvaluatorTest extends LocalRecordsDAO implements LocalRecordsMetaDAO<Object> {
+public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRecordsMetaDao<Object> {
 
     private static final String ID = "userInRoleEvaluatorTest";
     private static final String TEST_USERNAME = "$CURRENT";

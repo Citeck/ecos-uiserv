@@ -10,8 +10,8 @@ import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluatorService;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
-import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDAO;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDAO;
+import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
+import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.uiserv.domain.evaluator.service.IsLockedEvaluator;
 
 import java.util.Collections;
@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class IsLockedEvaluatorTest extends LocalRecordsDAO implements LocalRecordsMetaDAO<Object> {
+public class IsLockedEvaluatorTest extends LocalRecordsDao implements LocalRecordsMetaDao<Object> {
 
     private static final String ID = "isLockedEvaluatorTest";
 
