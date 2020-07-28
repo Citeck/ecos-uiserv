@@ -27,7 +27,7 @@ public class ConfigRecords extends AbstractEntityRecords<ConfigDto> {
 
     public static final String ID = "config";
 
-    private UiServProperties properties;
+    private final UiServProperties properties;
 
     @Autowired
     public ConfigRecords(ConfigEntityService entityService,

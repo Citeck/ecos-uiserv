@@ -191,10 +191,9 @@ public class MenuService {
     }
 
     public void deleteByExtId(String menuId) {
-        if (StringUtils.isBlank(menuId)) {
+        if (StringUtils.isBlank(menuId) || menuId.equals(DEFAULT_MENU_ID)) {
             return;
         }
-
         menuRepository.deleteByExtId(menuId);
     }
 
