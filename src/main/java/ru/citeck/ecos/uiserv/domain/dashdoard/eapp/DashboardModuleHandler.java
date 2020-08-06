@@ -12,7 +12,6 @@ import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
 
 import java.util.Collections;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -36,10 +35,6 @@ public class DashboardModuleHandler implements EcosModuleHandler<DashboardDto> {
     @Nullable
     @Override
     public ModuleWithMeta<DashboardDto> prepareToDeploy(@NotNull DashboardDto dashboardModule) {
-        Optional<DashboardDto> dashboardById = dashboardService.getDashboardById(dashboardModule.getId());
-        if (dashboardById.isPresent()) {
-            return null;
-        }
         return getModuleMeta(dashboardModule);
     }
 
