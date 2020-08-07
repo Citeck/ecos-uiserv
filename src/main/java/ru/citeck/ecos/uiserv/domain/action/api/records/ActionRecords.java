@@ -16,7 +16,6 @@ import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
-import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
 import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
@@ -30,10 +29,9 @@ import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.commons.utils.StringUtils;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.uiserv.domain.action.service.ActionService;
-import ru.citeck.ecos.uiserv.domain.action.dto.ActionModule;
+import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto;
 
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -150,7 +148,7 @@ public class ActionRecords extends LocalRecordsDao
 
         for (RecordInfo info : recordsInfo) {
 
-            List<ActionModule> actions = expandResultActions(info.getResultActions(), info.getRecordActions());
+            List<ActionDto> actions = expandResultActions(info.getResultActions(), info.getRecordActions());
             if (actions == null) {
                 actions = Collections.emptyList();
             }
@@ -198,11 +196,11 @@ public class ActionRecords extends LocalRecordsDao
                 .map(RecordInfo::getRecordRef)
                 .collect(Collectors.toList());
 
-            Map<RecordRef, List<ActionModule>> actionsRes = actionService.getActions(refs, new ArrayList<>(actions));
+            Map<RecordRef, List<ActionDto>> actionsRes = actionService.getActions(refs, new ArrayList<>(actions));
 
             records.forEach(info -> {
 
-                List<ActionModule> recordActions = new ArrayList<>(actionsRes.get(info.getRecordRef()));
+                List<ActionDto> recordActions = new ArrayList<>(actionsRes.get(info.getRecordRef()));
 
                 recordActions.sort((a0, a1) -> {
 
@@ -272,36 +270,18 @@ public class ActionRecords extends LocalRecordsDao
         }
     }
 
-    private List<ActionModule> expandResultActions(List<ActionModule> resultActions, List<ActionModule> recordActions) {
+    private List<ActionDto> expandResultActions(List<ActionDto> resultActions, List<ActionDto> recordActions) {
         if (resultActions == null) {
             return recordActions;
         }
         if (resultActions.isEmpty()) {
             return Collections.emptyList();
         }
-        List<ActionModule> filteredActions = new ArrayList<>();
+        List<ActionDto> filteredActions = new ArrayList<>();
         resultActions.forEach(action -> {
             if ("record-actions".equals(action.getType())) {
                 ObjectData config = action.getConfig();
-                DataValue typeActionConfigKey = config != null ? config.get("key") : null;
-                if (typeActionConfigKey != null && !typeActionConfigKey.isNull()) {
-                    Pattern configKeyPattern = Pattern.compile(
-                        typeActionConfigKey.asText()
-                            .replace(".", "\\.")
-                            .replace("*", "[^.]+")
-                            .replace("#", ".*"));
-
-                    recordActions.forEach(recordAction -> {
-
-                        if (recordAction.getKey() != null &&
-                                configKeyPattern.matcher(recordAction.getKey()).matches()) {
-
-                            filteredActions.add(recordAction);
-                        }
-                    });
-                } else {
-                    filteredActions.addAll(recordActions);
-                }
+                filteredActions.addAll(recordActions);
             } else {
                 filteredActions.add(action);
             }
@@ -349,7 +329,7 @@ public class ActionRecords extends LocalRecordsDao
         private String id = UUID.randomUUID().toString();
 
         private String record;
-        private List<ActionModule> actions;
+        private List<ActionDto> actions;
     }
 
     @Data
@@ -360,8 +340,8 @@ public class ActionRecords extends LocalRecordsDao
 
         private RecordRef type = RecordRef.EMPTY;
 
-        private List<ActionModule> recordActions = Collections.emptyList();
-        private List<ActionModule> resultActions = Collections.emptyList();
+        private List<ActionDto> recordActions = Collections.emptyList();
+        private List<ActionDto> resultActions = Collections.emptyList();
 
         private List<RecordRef> actionIds;
 
@@ -393,10 +373,9 @@ public class ActionRecords extends LocalRecordsDao
             if (actions != null && actions.size() > 0) {
 
                 recordActions = actions.stream().map(a -> {
-                    ActionModule module = new ActionModule();
+                    ActionDto module = new ActionDto();
                     module.setId(a.id);
                     module.setName(createMLText(a.name));
-                    module.setKey(a.key);
                     module.setIcon(a.icon);
                     module.setType(a.type);
                     module.setConfig(a.config);
@@ -424,9 +403,9 @@ public class ActionRecords extends LocalRecordsDao
         }
     }
 
-    public static class ActionRecord extends ActionModule {
+    public static class ActionRecord extends ActionDto {
 
-        public ActionRecord(ActionModule model) {
+        public ActionRecord(ActionDto model) {
             super(model);
         }
 
@@ -464,8 +443,8 @@ public class ActionRecords extends LocalRecordsDao
 
         @JsonValue
         @com.fasterxml.jackson.annotation.JsonValue
-        public ActionModule toJson() {
-            return new ActionModule(this);
+        public ActionDto toJson() {
+            return new ActionDto(this);
         }
     }
 }

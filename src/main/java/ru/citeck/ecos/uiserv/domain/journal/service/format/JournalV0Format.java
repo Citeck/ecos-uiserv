@@ -14,7 +14,7 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.Attribute;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.CreateVariant;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.JournalConfig;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.JournalTypeDto;
-import ru.citeck.ecos.uiserv.domain.journal.service.format.util.CreateVariantDto;
+import ru.citeck.ecos.uiserv.domain.journal.dto.CreateVariantDto;
 import ru.citeck.ecos.uiserv.domain.journal.service.format.util.EcosTypeUtils;
 
 import java.util.*;

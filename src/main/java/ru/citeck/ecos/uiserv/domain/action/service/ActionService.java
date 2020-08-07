@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
@@ -16,18 +17,13 @@ import ru.citeck.ecos.records2.evaluator.RecordEvaluatorService;
 import ru.citeck.ecos.records2.evaluator.evaluators.AlwaysFalseEvaluator;
 import ru.citeck.ecos.records2.evaluator.evaluators.AlwaysTrueEvaluator;
 import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.uiserv.domain.action.dto.*;
 import ru.citeck.ecos.uiserv.domain.action.repo.ActionEntity;
 import ru.citeck.ecos.uiserv.domain.evaluator.repo.EvaluatorEntity;
-import ru.citeck.ecos.uiserv.domain.action.dto.ActionConfirmDto;
-import ru.citeck.ecos.uiserv.domain.action.dto.ActionModule;
-import ru.citeck.ecos.uiserv.domain.action.dto.ActionResultDto;
 import ru.citeck.ecos.uiserv.domain.action.repo.ActionRepository;
 import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -39,11 +35,11 @@ public class ActionService {
     private final RecordEvaluatorService evaluatorsService;
     private final ActionRepository actionRepository;
 
-    private Consumer<ActionModule> changeListener;
+    private Consumer<ActionDto> changeListener;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    public ActionModule getAction(String id) {
+    public ActionDto getAction(String id) {
         return entityToDto(actionRepository.findByExtId(id));
     }
 
@@ -51,7 +47,7 @@ public class ActionService {
         return (int) actionRepository.count();
     }
 
-    public List<ActionModule> getActions(int max, int skip) {
+    public List<ActionDto> getActions(int max, int skip) {
 
         PageRequest page = PageRequest.of(skip / max, max, Sort.by(Sort.Direction.DESC, "id"));
 
@@ -61,13 +57,13 @@ public class ActionService {
             .collect(Collectors.toList());
     }
 
-    public void updateAction(ActionModule action) {
+    public void updateAction(ActionDto action) {
         ActionEntity actionEntity = dtoToEntity(action);
         actionEntity = actionRepository.save(actionEntity);
         changeListener.accept(entityToDto(actionEntity));
     }
 
-    public void onActionChanged(Consumer<ActionModule> listener) {
+    public void onActionChanged(Consumer<ActionDto> listener) {
         changeListener = listener;
     }
 
@@ -78,9 +74,9 @@ public class ActionService {
         }
     }
 
-    private List<ActionModule> getActionModules(List<RecordRef> actionRefs) {
+    private List<ActionDto> getActionModules(List<RecordRef> actionRefs) {
 
-        List<ActionModule> result = new ArrayList<>();
+        List<ActionDto> result = new ArrayList<>();
 
         for (RecordRef ref : actionRefs) {
             ActionEntity entity = actionRepository.findByExtId(ref.getId());
@@ -94,9 +90,24 @@ public class ActionService {
         return result;
     }
 
-    public Map<RecordRef, List<ActionModule>> getActions(List<RecordRef> recordRefs, List<RecordRef> actions) {
+    public Map<RecordRef, List<ActionDto>> getActions(List<RecordRef> recordRefs, List<RecordRef> actions) {
+        RecordsActionsDto actionsForRecords = getActionsForRecords(recordRefs, actions);
+        Map<RecordRef, List<ActionDto>> result = new HashMap<>();
+        Map<String, ActionDto> actionById = new HashMap<>();
+        actionsForRecords.getActions().forEach(a -> actionById.put(a.getId(), a));
+        actionsForRecords.getRecordActions().forEach( (recordRef, refActions) ->
+            result.put(recordRef,
+                       refActions
+                            .stream()
+                            .map(a -> actionById.get(a))
+                            .collect(Collectors.toList()))
+        );
+        return result;
+    }
 
-        List<ActionModule> actionsModules = getActionModules(actions);
+    public RecordsActionsDto getActionsForRecords(List<RecordRef> recordRefs, List<RecordRef> actions) {
+
+        List<ActionDto> actionsModules = getActionModules(actions);
 
         List<RecordEvaluatorDto> evaluators = actionsModules.stream()
             .map(a -> {
@@ -123,35 +134,45 @@ public class ActionService {
         model.put("alfMeta", RecordRef.valueOf("alfresco/meta@"));
 
         Map<RecordRef, List<Boolean>> evalResultByRecord = evaluatorsService.evaluate(recordRefs, evaluators, model);
-        Map<RecordRef, List<ActionModule>> actionsByRecord = new HashMap<>();
+
+        Map<RecordRef, Set<String>> recordActionsByRef = new HashMap<>();
 
         for (RecordRef recordRef : recordRefs) {
 
             List<Boolean> evalResult = evalResultByRecord.get(recordRef);
-            List<ActionModule> recordActions = new ArrayList<>();
+            Set<String> recordActions = new HashSet<>();
 
             for (int j = 0; j < actionsModules.size(); j++) {
                 if (evalResult.get(j)) {
-                    recordActions.add(actionsModules.get(j));
+                    recordActions.add(actionsModules.get(j).getId());
                 }
             }
 
-            actionsByRecord.put(recordRef, recordActions);
+            recordActionsByRef.put(recordRef, recordActions);
         }
 
-        return actionsByRecord;
+        RecordsActionsDto recordsActions = new RecordsActionsDto();
+        recordsActions.setRecordActions(recordActionsByRef);
+        recordsActions.setActions(actionsModules);
+
+        return recordsActions;
     }
 
-    private ActionModule entityToDto(ActionEntity actionEntity) {
+    private ActionDto entityToDto(ActionEntity actionEntity) {
 
-        ActionModule action = new ActionModule();
+        ActionDto action = new ActionDto();
         action.setId(actionEntity.getExtId());
         action.setIcon(actionEntity.getIcon());
         action.setName(Json.getMapper().read(actionEntity.getName(), MLText.class));
-        action.setKey(actionEntity.getKey());
+        action.setPluralName(Json.getMapper().read(actionEntity.getPluralName(), MLText.class));
         action.setType(actionEntity.getType());
         action.setConfirm(Json.getMapper().read(actionEntity.getConfirm(), ActionConfirmDto.class));
         action.setResult(Json.getMapper().read(actionEntity.getResult(), ActionResultDto.class));
+
+        DataValue features = Json.getMapper().read(actionEntity.getFeatures(), DataValue.class);
+        if (features != null && features.isNotNull()) {
+            action.setFeatures(features.asMap(String.class, Boolean.class));
+        }
 
         String configJson = actionEntity.getConfigJson();
         if (configJson != null) {
@@ -183,7 +204,7 @@ public class ActionService {
         return action;
     }
 
-    private ActionEntity dtoToEntity(ActionModule action) {
+    private ActionEntity dtoToEntity(ActionDto action) {
 
         ActionEntity actionEntity = actionRepository.findByExtId(action.getId());
         if (actionEntity == null) {
@@ -192,11 +213,12 @@ public class ActionService {
         }
 
         actionEntity.setIcon(action.getIcon());
-        actionEntity.setKey(action.getKey());
         actionEntity.setName(Json.getMapper().toString(action.getName()));
+        actionEntity.setPluralName(Json.getMapper().toString(action.getPluralName()));
         actionEntity.setType(action.getType());
         actionEntity.setConfirm(Json.getMapper().toString(action.getConfirm()));
         actionEntity.setResult(Json.getMapper().toString(action.getResult()));
+        actionEntity.setFeatures(Json.getMapper().toString(action.getFeatures()));
 
         if (action.getConfig() != null) {
             try {

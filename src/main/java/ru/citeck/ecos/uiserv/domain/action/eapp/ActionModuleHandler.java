@@ -8,36 +8,36 @@ import ru.citeck.ecos.apps.module.handler.EcosModuleHandler;
 import ru.citeck.ecos.apps.module.handler.ModuleMeta;
 import ru.citeck.ecos.apps.module.handler.ModuleWithMeta;
 import ru.citeck.ecos.uiserv.domain.action.service.ActionService;
-import ru.citeck.ecos.uiserv.domain.action.dto.ActionModule;
+import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto;
 
 import java.util.Collections;
 import java.util.function.Consumer;
 
 @Component
 @RequiredArgsConstructor
-public class ActionModuleHandler implements EcosModuleHandler<ActionModule> {
+public class ActionModuleHandler implements EcosModuleHandler<ActionDto> {
 
     private final ActionService actionService;
 
     @Override
-    public void deployModule(@NotNull ActionModule actionModule) {
+    public void deployModule(@NotNull ActionDto actionModule) {
         actionService.updateAction(actionModule);
     }
 
     @NotNull
     @Override
-    public ModuleWithMeta<ActionModule> getModuleMeta(@NotNull ActionModule module) {
+    public ModuleWithMeta<ActionDto> getModuleMeta(@NotNull ActionDto module) {
         return new ModuleWithMeta<>(module, new ModuleMeta(module.getId(), Collections.emptyList()));
     }
 
     @Override
-    public void listenChanges(@NotNull Consumer<ActionModule> consumer) {
+    public void listenChanges(@NotNull Consumer<ActionDto> consumer) {
         actionService.onActionChanged(consumer);
     }
 
     @Nullable
     @Override
-    public ModuleWithMeta<ActionModule> prepareToDeploy(@NotNull ActionModule actionModule) {
+    public ModuleWithMeta<ActionDto> prepareToDeploy(@NotNull ActionDto actionModule) {
         return getModuleMeta(actionModule);
     }
 

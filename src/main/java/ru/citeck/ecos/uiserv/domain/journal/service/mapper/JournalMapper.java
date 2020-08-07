@@ -13,11 +13,8 @@ import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.AndPredicate;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records2.predicate.model.ValuePredicate;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDto;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSortBy;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
+import ru.citeck.ecos.uiserv.domain.journal.dto.*;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDto;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy1.GroupAction;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
 
@@ -50,6 +47,7 @@ public class JournalMapper {
         dto.setGroupBy(Json.getMapper().read(entity.getGroupBy(), StrList.class));
         dto.setSortBy(Json.getMapper().read(entity.getSortBy(), SortByList.class));
         dto.setGroupActions(Json.getMapper().read(entity.getGroupActions(), GroupActionsList.class));
+        dto.setCreateVariants(Json.getMapper().read(entity.getCreateVariants(), CreateVariantsList.class));
 
         dto.setModified(entity.getLastModifiedDate());
         dto.setModifier(entity.getLastModifiedBy());
@@ -128,6 +126,8 @@ public class JournalMapper {
         entity.setGroupBy(Json.getMapper().toString(getNotBlank(dto.getGroupBy(), v -> v)));
         entity.setGroupActions(Json.getMapper().toString(getNotBlank(dto.getGroupActions(), GroupAction::getId)));
         entity.setSortBy(Json.getMapper().toString(getNotBlank(dto.getSortBy(), JournalSortBy::getAttribute)));
+        entity.setCreateVariants(Json.getMapper().toString(getNotBlank(dto.getCreateVariants(),
+            v -> RecordRef.valueOf(v.getRecordRef()).toString())));
 
         return entity;
     }
@@ -146,4 +146,5 @@ public class JournalMapper {
     public static class StrList extends ArrayList<String> {}
     public static class SortByList extends ArrayList<JournalSortBy> {}
     public static class GroupActionsList extends ArrayList<GroupAction> {}
+    public static class CreateVariantsList extends ArrayList<CreateVariantDto> {}
 }

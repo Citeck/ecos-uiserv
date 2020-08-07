@@ -22,7 +22,6 @@ public class ActionEntity extends AbstractAuditingEntity {
     private String name;
     private String type;
     private String icon;
-    private String key;
 
     @Lob
     @Column(name = "config_json")
@@ -34,6 +33,8 @@ public class ActionEntity extends AbstractAuditingEntity {
 
     private String confirm;
     private String result;
+    private String features;
+    private String pluralName;
 
     @Override
     public boolean equals(Object o) {

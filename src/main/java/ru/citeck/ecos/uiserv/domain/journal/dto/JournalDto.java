@@ -95,6 +95,8 @@ public class JournalDto {
     @Deprecated
     private List<GroupAction> groupActions;
 
+    private List<CreateVariantDto> createVariants;
+
     public JournalDto() {
     }
 
@@ -115,5 +117,6 @@ public class JournalDto {
         this.columns = DataValue.create(other.columns).asList(JournalColumnDto.class);
         this.attributes = mapper.copy(other.attributes);
         this.groupActions = DataValue.create(other.groupActions).asList(GroupAction.class);
+        this.createVariants = DataValue.create(other.createVariants).asList(CreateVariantDto.class);
     }
 }

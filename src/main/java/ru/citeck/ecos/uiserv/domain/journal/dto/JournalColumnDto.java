@@ -31,7 +31,7 @@ public class JournalColumnDto {
      * Attribute to load data.
      * Can be complex, e.g. ecos:counterparty.ecos:inn?str
      *
-     * Optional. If not specified field 'name' should be used to load data
+     * Optional. If not specified field 'name' will be used to load data
      *
      * @see ru.citeck.ecos.records2.RecordsService#getAttribute(RecordRef, String)
      */

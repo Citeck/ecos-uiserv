@@ -6,6 +6,7 @@ import ecos.com.fasterxml.jackson210.annotation.JsonValue;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
@@ -47,7 +48,8 @@ public class JournalRecordsDao extends LocalRecordsDao
     private final TypeJournalService typeJournalService;
 
     @Override
-    public RecordsQueryResult<JournalWithMeta> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
+    public RecordsQueryResult<JournalWithMeta> queryLocalRecords(@NotNull RecordsQuery recordsQuery,
+                                                                 @NotNull MetaField metaField) {
 
         RecordsQueryResult<JournalWithMeta> result = new RecordsQueryResult<>();
 
@@ -92,7 +94,8 @@ public class JournalRecordsDao extends LocalRecordsDao
     }
 
     @Override
-    public List<JournalWithMeta> getLocalRecordsMeta(List<RecordRef> list, MetaField metaField) {
+    public List<JournalWithMeta> getLocalRecordsMeta(@NotNull List<RecordRef> list,
+                                                     @NotNull MetaField metaField) {
 
         return list.stream()
             .map(ref -> {
@@ -135,8 +138,9 @@ public class JournalRecordsDao extends LocalRecordsDao
         return result;
     }
 
+    @NotNull
     @Override
-    public List<JournalRecord> getValuesToMutate(List<RecordRef> records) {
+    public List<JournalRecord> getValuesToMutate(@NotNull List<RecordRef> records) {
 
         return records.stream()
             .map(RecordRef::getId)
@@ -151,8 +155,9 @@ public class JournalRecordsDao extends LocalRecordsDao
             .collect(Collectors.toList());
     }
 
+    @NotNull
     @Override
-    public RecordsMutResult save(List<JournalRecord> values) {
+    public RecordsMutResult save(@NotNull List<JournalRecord> values) {
 
         RecordsMutResult result = new RecordsMutResult();
 

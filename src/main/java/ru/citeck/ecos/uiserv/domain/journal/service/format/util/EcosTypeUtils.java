@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
+import ru.citeck.ecos.uiserv.domain.journal.dto.CreateVariantDto;
 
 import javax.annotation.PostConstruct;
 import java.util.Collections;
@@ -52,6 +53,7 @@ public class EcosTypeUtils {
     }
 
     private Optional<TypeMeta> getTypeMetaImpl(RecordRef typeRef) {
+        // Do not remove Optional. Interface can be changed with @Nullable
         return Optional.ofNullable(recordsService.getMeta(typeRef, TypeMeta.class));
     }
 

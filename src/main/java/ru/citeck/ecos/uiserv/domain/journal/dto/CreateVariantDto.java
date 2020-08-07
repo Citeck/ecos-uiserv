@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.journal.service.format.util;
+package ru.citeck.ecos.uiserv.domain.journal.dto;
 
 import lombok.Data;
 import ru.citeck.ecos.commons.data.MLText;
