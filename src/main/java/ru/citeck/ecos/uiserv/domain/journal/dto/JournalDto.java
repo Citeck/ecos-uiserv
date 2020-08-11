@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+@JsonInclude(value = JsonInclude.Include.NON_DEFAULT)
 public class JournalDto {
 
     /**

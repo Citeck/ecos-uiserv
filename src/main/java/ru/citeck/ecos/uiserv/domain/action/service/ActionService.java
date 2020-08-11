@@ -37,7 +37,7 @@ public class ActionService {
 
     private Consumer<ActionDto> changeListener;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public ActionDto getAction(String id) {
         return entityToDto(actionRepository.findByExtId(id));
@@ -99,7 +99,7 @@ public class ActionService {
             result.put(recordRef,
                        refActions
                             .stream()
-                            .map(a -> actionById.get(a))
+                            .map(actionById::get)
                             .collect(Collectors.toList()))
         );
         return result;
