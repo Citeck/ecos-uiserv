@@ -1,6 +1,5 @@
 {
     "id": "upload-new-version",
-    "key": "upload.new.version",
     "name": {
         "ru": "Загрузить новую версию",
         "en": "Upload New Version"

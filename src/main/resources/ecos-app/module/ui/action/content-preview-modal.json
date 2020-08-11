@@ -1,6 +1,5 @@
 {
     "id": "content-preview-modal",
-    "key": "crud.preview.content",
     "name": {
         "ru": "Просмотреть",
         "en": "View"

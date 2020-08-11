@@ -52,23 +52,23 @@ public class JournalDto {
      * This predicate can't be changed by user
      * and always should be joined by other filter predicates by AND
      */
-    private ObjectData predicate;
+    private ObjectData predicate = ObjectData.create();
 
     /**
      * Group records by specified attributes.
      */
-    private List<String> groupBy;
+    private List<String> groupBy = new ArrayList<>();
 
     /**
      * Default sorting.
      */
-    private List<JournalSortBy> sortBy;
+    private List<JournalSortBy> sortBy = new ArrayList<>();
 
     /**
      * Actions for every entity in a table.
      * Can be filtered for specific entities by evaluator.
      */
-    private List<RecordRef> actions;
+    private List<RecordRef> actions = new ArrayList<>();
 
     /**
      * Can attributes of entities in a table be edited or not.
@@ -87,15 +87,15 @@ public class JournalDto {
      * Custom attributes for temporal or very specific
      * parameters which can't be added as field for this DTO
      */
-    private ObjectData attributes;
+    private ObjectData attributes = ObjectData.create();
 
     /**
      * This actions in future will be moved to 'actions' field
      */
     @Deprecated
-    private List<GroupAction> groupActions;
+    private List<GroupAction> groupActions = new ArrayList<>();
 
-    private List<CreateVariantDto> createVariants;
+    private List<CreateVariantDto> createVariants = new ArrayList<>();
 
     public JournalDto() {
     }

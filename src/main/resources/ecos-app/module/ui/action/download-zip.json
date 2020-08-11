@@ -1,0 +1,10 @@
+{
+    "id": "download-zip",
+    "type": "download-zip",
+    "evaluator": {
+        "type": "has-attribute",
+        "config": {
+            "attribute": "_content"
+        }
+    }
+}

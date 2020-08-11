@@ -1,6 +1,5 @@
 {
     "id": "edit",
-    "key": "crud.edit",
     "name": {
         "ru": "Редактировать Свойства",
         "en": "Edit Properties"

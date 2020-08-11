@@ -4,7 +4,6 @@
         "en": "Download",
         "ru": "Скачать"
     },
-    "key": "content.download",
     "type": "download",
     "evaluator": {
         "type": "has-attribute",

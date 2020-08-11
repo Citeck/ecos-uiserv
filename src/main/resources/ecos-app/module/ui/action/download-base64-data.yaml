@@ -5,8 +5,6 @@ name:
     ru: Скачать
     en: Download
 
-key: download.data.base64
-
 type: download
 config:
     downloadType: base64

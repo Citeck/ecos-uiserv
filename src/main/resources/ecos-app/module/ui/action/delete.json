@@ -1,6 +1,5 @@
 {
     "id": "delete",
-    "key": "crud.delete",
     "name": {
         "ru": "Удалить",
         "en": "Delete"
