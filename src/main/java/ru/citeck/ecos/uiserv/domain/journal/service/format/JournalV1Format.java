@@ -7,6 +7,7 @@ import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.records2.QueryContext;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.domain.journal.dto.CreateVariantDto;
 import ru.citeck.ecos.uiserv.domain.journal.service.format.util.EcosTypeUtils;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -39,6 +41,16 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
         if (resp.getParams() == null) {
             resp.setParams(new HashMap<>());
         }
+        if (dto.getSortBy() != null && dto.getSortBy().size() > 0) {
+            String sortValue = Json.getMapper().toString(dto.getSortBy().stream().map(sort -> {
+                ObjectData targetSort = ObjectData.create();
+                targetSort.set("id", sort.getAttribute());
+                targetSort.set("order", sort.isAscending() ? "asc": "desc");
+                return targetSort;
+            }).collect(Collectors.toList()));
+            resp.getParams().put("defaultSortBy", sortValue);
+        }
+
         resp.setSourceId(dto.getSourceId());
 
         JournalMeta meta = new JournalMeta();
@@ -59,9 +71,23 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
         if (dto.getLabel() != null) {
             meta.setTitle(dto.getLabel().getClosestValue(LocaleContextHolder.getLocale()));
         }
-        meta.setCreateVariants(getCreateVariants(dto.getTypeRef()));
-        meta.setGroupActions(dto.getGroupActions());
 
+        if (dto.getCreateVariants() != null && !dto.getCreateVariants().isEmpty()) {
+
+            meta.setCreateVariants(dto.getCreateVariants().stream().map(variant -> {
+                CreateVariant variantV1 = new CreateVariant();
+                variantV1.setAttributes(variant.getAttributes().getData().asMap(String.class, String.class));
+                variantV1.setCanCreate(true);
+                variantV1.setFormId(variant.getFormRef().toString());
+                variantV1.setRecordRef(variant.getRecordRef().toString());
+                variantV1.setTitle(MLText.getClosestValue(variant.getName(), QueryContext.getCurrent().getLocale()));
+                return variantV1;
+            }).collect(Collectors.toList()));
+        } else {
+            meta.setCreateVariants(getCreateVariants(dto.getTypeRef()));
+        }
+
+        meta.setGroupActions(dto.getGroupActions());
         resp.setMeta(meta);
 
         List<Column> columns = new ArrayList<>();
