@@ -43,6 +43,7 @@ public class JournalRecordsDao extends LocalRecordsDao
                                           MutableRecordsLocalDao<JournalRecordsDao.JournalRecord> {
 
     public static final String LANG_QUERY_BY_LIST_ID = "list-id";
+    public static final String LANG_QUERY_SITE_JOURNALS = "site-journals";
 
     private final JournalService journalService;
     private final TypeJournalService typeJournalService;
@@ -59,6 +60,11 @@ public class JournalRecordsDao extends LocalRecordsDao
             List<JournalWithMeta> journals = journalService.getJournalsByJournalList(queryByListId.getListId());
             journals.forEach(j -> result.addRecord(new JournalRecord(j)));
 
+            return result;
+
+        } else if (LANG_QUERY_SITE_JOURNALS.equals(recordsQuery.getLanguage())) {
+
+            journalService.getJournalsWithSite().forEach(j -> result.addRecord(new JournalRecord(j)));
             return result;
         }
 

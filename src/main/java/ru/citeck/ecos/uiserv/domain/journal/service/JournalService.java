@@ -33,4 +33,6 @@ public interface JournalService {
     void delete(String id);
 
     List<JournalWithMeta> getJournalsByJournalList(String journalListId);
+
+    List<JournalWithMeta> getJournalsWithSite();
 }

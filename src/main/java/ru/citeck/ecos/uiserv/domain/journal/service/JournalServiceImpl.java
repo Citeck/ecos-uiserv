@@ -35,8 +35,8 @@ public class JournalServiceImpl implements JournalService {
 
     private Consumer<JournalDto> changeListener;
 
-    private final Map<String, Set<String>> typesByJournalListId = new ConcurrentHashMap<>();
-    private final Map<String, String> journalListByTypeId = new ConcurrentHashMap<>();
+    private final Map<String, Set<String>> journalsByJournalListId = new ConcurrentHashMap<>();
+    private final Map<String, String> journalListByJournalId = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() {
@@ -162,13 +162,29 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
+    public List<JournalWithMeta> getJournalsWithSite() {
+        Set<String> journalIds = new HashSet<>();
+        journalsByJournalListId.forEach((listId, journals) -> {
+            if (listId.startsWith("site-") && listId.endsWith("-main")) {
+                journalIds.addAll(journals);
+            }
+        });
+        return journalIds.stream()
+            .map(journalRepository::findByExtId)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(journalMapper::entityToDto)
+            .collect(Collectors.toList());
+    }
+
+    @Override
     public List<JournalWithMeta> getJournalsByJournalList(String journalListId) {
 
         if (StringUtils.isBlank(journalListId)) {
             return Collections.emptyList();
         }
 
-        return typesByJournalListId.getOrDefault(journalListId, Collections.emptySet())
+        return journalsByJournalListId.getOrDefault(journalListId, Collections.emptySet())
             .stream()
             .map(journalRepository::findByExtId)
             .filter(Optional::isPresent)
@@ -184,14 +200,14 @@ public class JournalServiceImpl implements JournalService {
 
         if (StringUtils.isNotBlank(listId)) {
 
-            Set<String> listJournals = typesByJournalListId.computeIfAbsent(listId, id ->
+            Set<String> listJournals = journalsByJournalListId.computeIfAbsent(listId, id ->
                 Collections.newSetFromMap(new ConcurrentHashMap<>())
             );
 
-            String listIdBefore = journalListByTypeId.get(journalDto.getId());
+            String listIdBefore = journalListByJournalId.get(journalDto.getId());
             if (StringUtils.isNotBlank(listIdBefore)) {
                 if (!listIdBefore.equals(listId)) {
-                    Set<String> listBefore = typesByJournalListId.computeIfAbsent(listIdBefore, id ->
+                    Set<String> listBefore = journalsByJournalListId.computeIfAbsent(listIdBefore, id ->
                         Collections.newSetFromMap(new ConcurrentHashMap<>())
                     );
                     listBefore.remove(journalDto.getId());
@@ -201,19 +217,19 @@ public class JournalServiceImpl implements JournalService {
                 listJournals.add(journalDto.getId());
             }
 
-            journalListByTypeId.put(journalDto.getId(), listId);
+            journalListByJournalId.put(journalDto.getId(), listId);
 
         } else {
 
-            String listIdBefore = journalListByTypeId.get(journalDto.getId());
+            String listIdBefore = journalListByJournalId.get(journalDto.getId());
 
             if (StringUtils.isNotBlank(listIdBefore)) {
 
-                typesByJournalListId.computeIfAbsent(listIdBefore, id ->
+                journalsByJournalListId.computeIfAbsent(listIdBefore, id ->
                     Collections.newSetFromMap(new ConcurrentHashMap<>())
                 ).remove(journalDto.getId());
 
-                journalListByTypeId.remove(journalDto.getId());
+                journalListByJournalId.remove(journalDto.getId());
             }
         }
     }

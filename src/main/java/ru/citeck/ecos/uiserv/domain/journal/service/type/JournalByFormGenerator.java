@@ -8,7 +8,7 @@ import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnController;
+import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnControl;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDto;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
@@ -75,12 +75,12 @@ public class JournalByFormGenerator {
                 break;
         }
 
-        ColumnController controller = new ColumnController();
+        ColumnControl controller = new ColumnControl();
         controller.setType(compType);
         controller.setConfig(ObjectData.create(component));
         controller.getConfig().remove("type");
 
-        column.setController(controller);
+        column.setControl(controller);
 
         return column;
     }

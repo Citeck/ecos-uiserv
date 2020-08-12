@@ -4,7 +4,7 @@ import lombok.Data;
 import ru.citeck.ecos.commons.data.ObjectData;
 
 @Data
-public class ColumnController {
+public class ColumnControl {
     private String type;
     private ObjectData config;
 }

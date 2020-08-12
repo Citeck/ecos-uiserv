@@ -10,7 +10,7 @@ import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.domain.journal.dto.CreateVariantDto;
 import ru.citeck.ecos.uiserv.domain.journal.service.format.util.EcosTypeUtils;
-import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnController;
+import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnControl;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDto;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy1.CreateVariant;
@@ -91,7 +91,7 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
                 respColumn.setType(column.getType());
                 respColumn.setVisible(!Boolean.TRUE.equals(column.getHidden()));
 
-                ColumnController controller = column.getController();
+                ColumnControl controller = column.getControl();
 
                 if (controller != null) {
 

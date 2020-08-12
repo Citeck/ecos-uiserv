@@ -38,10 +38,10 @@ public class JournalColumnDto {
     private String attribute;
 
     /**
-     * Configuration for controller.
-     * Controller should define formatter, editor and filter rules.
+     * Configuration for control.
+     * Control should define formatter, editor and filter rules.
      */
-    private ColumnController controller;
+    private ColumnControl control;
 
     /**
      * Data type.
