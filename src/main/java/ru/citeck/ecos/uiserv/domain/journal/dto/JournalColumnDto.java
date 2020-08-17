@@ -29,13 +29,18 @@ public class JournalColumnDto {
 
     /**
      * Attribute to load data.
-     * Can be complex, e.g. ecos:counterparty.ecos:inn?str
+     * Can be complex, e.g. ecos:counterparty.ecos:inn
      *
      * Optional. If not specified field 'name' will be used to load data
      *
      * @see ru.citeck.ecos.records2.RecordsService#getAttribute(RecordRef, String)
      */
     private String attribute;
+
+    /**
+     * Attribute inner schema. Default: "disp:.disp,val:.str"
+     */
+    private String innerSchema;
 
     /**
      * Configuration for control.

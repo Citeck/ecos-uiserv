@@ -50,8 +50,12 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
             }).collect(Collectors.toList()));
             resp.getParams().put("defaultSortBy", sortValue);
         }
+        if (Boolean.FALSE.equals(dto.getEditable())) {
+            resp.getParams().put("disableTableEditing", "true");
+        }
 
         resp.setSourceId(dto.getSourceId());
+        resp.setComputedParams(dto.getComputedParams());
 
         JournalMeta meta = new JournalMeta();
         meta.setNodeRef(dto.getId());
@@ -64,7 +68,7 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
         if (dto.getMetaRecord() != null) {
             meta.setMetaRecord(dto.getMetaRecord().toString());
         }
-        meta.setPredicate(DataValue.create(dto.getFullPredicate()));
+        meta.setPredicate(DataValue.create(dto.getPredicate()));
         if (meta.getPredicate().isNull()) {
             meta.setPredicate(DataValue.createObj());
         }
@@ -97,6 +101,9 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
             for (JournalColumnDto column : dto.getColumns()) {
 
                 Column respColumn = new Column();
+                respColumn.setControl(column.getControl());
+                respColumn.setInnerSchema(column.getInnerSchema());
+                respColumn.setHidden(Boolean.TRUE.equals(column.getHidden()));
 
                 if (column.getLabel() != null) {
                     respColumn.setText(column.getLabel().getClosestValue(LocaleContextHolder.getLocale()));
@@ -115,7 +122,7 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
                 respColumn.setSearchable(Boolean.TRUE.equals(column.getSearchable()));
                 respColumn.setSortable(Boolean.TRUE.equals(column.getSortable()));
                 respColumn.setType(column.getType());
-                respColumn.setVisible(!Boolean.TRUE.equals(column.getHidden()));
+                respColumn.setVisible(!Boolean.FALSE.equals(column.getVisible()));
 
                 ColumnControl controller = column.getControl();
 

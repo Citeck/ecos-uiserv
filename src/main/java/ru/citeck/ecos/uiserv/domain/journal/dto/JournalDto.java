@@ -97,6 +97,8 @@ public class JournalDto {
 
     private List<CreateVariantDto> createVariants = new ArrayList<>();
 
+    private List<ComputedParamDto> computedParams = new ArrayList<>();
+
     public JournalDto() {
     }
 
@@ -118,5 +120,6 @@ public class JournalDto {
         this.attributes = mapper.copy(other.attributes);
         this.groupActions = DataValue.create(other.groupActions).asList(GroupAction.class);
         this.createVariants = DataValue.create(other.createVariants).asList(CreateVariantDto.class);
+        this.computedParams = DataValue.create(other.computedParams).asList(ComputedParamDto.class);
     }
 }

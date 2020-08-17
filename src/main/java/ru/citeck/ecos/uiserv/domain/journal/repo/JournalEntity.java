@@ -43,4 +43,6 @@ public class JournalEntity extends AbstractAuditingEntity {
     private String groupActions;
 
     private String createVariants;
+
+    private String computedParams;
 }

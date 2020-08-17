@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.domain.journal.dto.legacy1;
 
 import lombok.Data;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
+import ru.citeck.ecos.uiserv.domain.journal.dto.ComputedParamDto;
 
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ public class JournalConfigResp {
     private JournalMeta meta;
     private List<Column> columns;
     private Map<String, String> params;
+    private List<ComputedParamDto> computedParams;
 
     @MetaAtt(".disp")
     public String getDisplayName() {

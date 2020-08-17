@@ -7,12 +7,7 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.records2.RecordConstants;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.predicate.PredicateUtils;
-import ru.citeck.ecos.records2.predicate.model.AndPredicate;
-import ru.citeck.ecos.records2.predicate.model.Predicate;
-import ru.citeck.ecos.records2.predicate.model.ValuePredicate;
 import ru.citeck.ecos.uiserv.domain.journal.dto.*;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy1.GroupAction;
@@ -48,6 +43,7 @@ public class JournalMapper {
         dto.setSortBy(Json.getMapper().read(entity.getSortBy(), SortByList.class));
         dto.setGroupActions(Json.getMapper().read(entity.getGroupActions(), GroupActionsList.class));
         dto.setCreateVariants(Json.getMapper().read(entity.getCreateVariants(), CreateVariantsList.class));
+        dto.setComputedParams(Json.getMapper().read(entity.getComputedParams(), ComputedParamsList.class));
 
         dto.setModified(entity.getLastModifiedDate());
         dto.setModifier(entity.getLastModifiedBy());
@@ -62,24 +58,6 @@ public class JournalMapper {
         }
         if (dto.getPredicate() == null) {
             dto.setPredicate(ObjectData.create());
-        }
-        if (RecordRef.isNotEmpty(dto.getTypeRef())) {
-            Predicate fullPredicate;
-            Predicate typePredicate = ValuePredicate.eq("_type", dto.getTypeRef().toString());
-            if (dto.getPredicate() != null) {
-                Predicate basePredicate = dto.getPredicate().getAs(Predicate.class);
-                List<String> atts = PredicateUtils.getAllPredicateAttributes(basePredicate);
-                if (atts.contains(RecordConstants.ATT_ECOS_TYPE) || atts.contains(RecordConstants.ATT_TYPE)) {
-                    fullPredicate = basePredicate;
-                } else {
-                    fullPredicate = AndPredicate.of(basePredicate, typePredicate);
-                }
-            } else {
-                fullPredicate = typePredicate;
-            }
-            dto.setFullPredicate(Json.getMapper().convert(fullPredicate, ObjectData.class));
-        } else {
-            dto.setFullPredicate(dto.getPredicate());
         }
 
         dto.getColumns().forEach(c -> {
@@ -128,13 +106,15 @@ public class JournalMapper {
         entity.setSortBy(Json.getMapper().toString(getNotBlank(dto.getSortBy(), JournalSortBy::getAttribute)));
         entity.setCreateVariants(Json.getMapper().toString(getNotBlank(dto.getCreateVariants(),
             v -> RecordRef.valueOf(v.getRecordRef()).toString())));
+        entity.setComputedParams(Json.getMapper().toString(getNotBlank(dto.getComputedParams(),
+            ComputedParamDto::getName)));
 
         return entity;
     }
 
     private <T> List<T> getNotBlank(List<T> list, Function<T, String> getValueToCheck) {
         if (list == null) {
-            return list;
+            return null;
         }
         return list.stream()
             .filter(element -> StringUtils.isNotBlank(getValueToCheck.apply(element)))
@@ -147,4 +127,5 @@ public class JournalMapper {
     public static class SortByList extends ArrayList<JournalSortBy> {}
     public static class GroupActionsList extends ArrayList<GroupAction> {}
     public static class CreateVariantsList extends ArrayList<CreateVariantDto> {}
+    public static class ComputedParamsList extends ArrayList<ComputedParamDto> {}
 }
