@@ -13,6 +13,7 @@ import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
+import ru.citeck.ecos.records2.graphql.meta.value.field.EmptyMetaField;
 import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
 import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
 import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
@@ -50,7 +51,7 @@ public class MenuRecords extends LocalRecordsDao
     @NotNull
     @Override
     public List<MenuRecord> getValuesToMutate(@NotNull List<RecordRef> records) {
-        return getLocalRecordsMeta(records, null);
+        return getLocalRecordsMeta(records, EmptyMetaField.INSTANCE);
     }
 
     @NotNull
@@ -67,7 +68,7 @@ public class MenuRecords extends LocalRecordsDao
 
             MenuQuery menuQuery = recordsQuery.getQuery(MenuQuery.class);
             if (menuQuery != null && StringUtils.isNotBlank(menuQuery.user)) {
-                MenuDto menuDto = menuService.getMenuForUser(menuQuery.user);
+                MenuDto menuDto = menuService.getMenuForUser(menuQuery.user, menuQuery.version);
                 return RecordsQueryResult.of(new MenuRecord(menuDto));
             }
         }
@@ -81,8 +82,9 @@ public class MenuRecords extends LocalRecordsDao
         return result;
     }
 
+    @NotNull
     @Override
-    public RecordsMutResult save(List<MenuRecord> values) {
+    public RecordsMutResult save(@NotNull List<MenuRecord> values) {
 
         RecordsMutResult result = new RecordsMutResult();
         values.forEach(dto -> {
@@ -114,7 +116,8 @@ public class MenuRecords extends LocalRecordsDao
     }
 
     @Override
-    public List<MenuRecord> getLocalRecordsMeta(List<RecordRef> records, MetaField metaField) {
+    public List<MenuRecord> getLocalRecordsMeta(@NotNull List<RecordRef> records,
+                                                @NotNull MetaField metaField) {
         return records.stream()
             .map(RecordRef::getId)
             .map(id -> menuService.getMenu(id)
@@ -126,6 +129,7 @@ public class MenuRecords extends LocalRecordsDao
     @Data
     public static class MenuQuery {
         private String user;
+        private Integer version;
     }
 
     public static class MenuRecord extends MenuDto {
@@ -143,6 +147,12 @@ public class MenuRecords extends LocalRecordsDao
 
         public void setModuleId(String value) {
             setId(value);
+        }
+
+        @Override
+        public Integer getVersion() {
+            Integer result = super.getVersion();
+            return result != null ? result : 0;
         }
 
         @MetaAtt(".disp")

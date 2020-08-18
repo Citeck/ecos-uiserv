@@ -18,7 +18,7 @@ public class MenuDto {
     private String id;
     private String type;
     private List<String> authorities;
-    private float priority;
+    private Integer version;
 
     private Map<String, SubMenuDto> subMenu;
 
@@ -29,6 +29,7 @@ public class MenuDto {
     public MenuDto(MenuDto other) {
         this.id = other.id;
         this.type = other.type;
+        this.version = other.version;
         this.authorities = DataValue.create(other.authorities).toStrList();
         this.subMenu = DataValue.create(other.subMenu).asMap(String.class, SubMenuDto.class);
     }

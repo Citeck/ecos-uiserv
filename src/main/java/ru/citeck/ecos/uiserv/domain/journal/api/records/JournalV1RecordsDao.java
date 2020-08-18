@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.domain.journal.api.records;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -13,7 +14,6 @@ import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
-import ru.citeck.ecos.uiserv.domain.journal.api.records.JournalRecordsDao;
 import ru.citeck.ecos.uiserv.domain.journal.service.format.JournalV1Format;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy1.JournalConfigResp;
@@ -39,13 +39,16 @@ public class JournalV1RecordsDao  extends LocalRecordsDao
     private final RestTemplate recordsRestTemplate;
 
     @Override
-    public RecordsQueryResult<JournalConfigResp> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
-        RecordsQueryResult<JournalWithMeta> journalsResult = journalRecordsDao.queryLocalRecords(recordsQuery, metaField);
+    public RecordsQueryResult<JournalConfigResp> queryLocalRecords(@NotNull RecordsQuery recordsQuery,
+                                                                   @NotNull MetaField metaField) {
+        RecordsQueryResult<JournalWithMeta> journalsResult =
+            journalRecordsDao.queryLocalRecords(recordsQuery, metaField);
         return new RecordsQueryResult<>(journalsResult, converter::convert);
     }
 
     @Override
-    public List<JournalConfigResp> getLocalRecordsMeta(List<RecordRef> list, MetaField metaField) {
+    public List<JournalConfigResp> getLocalRecordsMeta(@NotNull List<RecordRef> list,
+                                                       @NotNull MetaField metaField) {
 
         List<JournalConfigResp> result = new ArrayList<>();
 

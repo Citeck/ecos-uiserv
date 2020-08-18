@@ -55,7 +55,7 @@ public class XmlMenuReader implements MenuReader {
             .collect(Collectors.toList());
         dto.setAuthorities(authorities);
 
-        dto.setPriority(0);
+        dto.setVersion(null);
         dto.setSubMenu(parseSubMenusFromItems(config.getItems()));
 
         return dto;

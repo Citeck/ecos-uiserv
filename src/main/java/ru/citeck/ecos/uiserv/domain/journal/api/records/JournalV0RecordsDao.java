@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
@@ -77,13 +78,15 @@ public class JournalV0RecordsDao extends LocalRecordsDao
     }
 
     @Override
-    public RecordsQueryResult<JournalConfig> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
+    public RecordsQueryResult<JournalConfig> queryLocalRecords(@NotNull RecordsQuery recordsQuery,
+                                                               @NotNull MetaField metaField) {
         RecordsQueryResult<JournalWithMeta> journalsResult = journalRecordsDao.queryLocalRecords(recordsQuery, metaField);
         return new RecordsQueryResult<>(journalsResult, converter::convert);
     }
 
     @Override
-    public List<JournalConfig> getLocalRecordsMeta(List<RecordRef> list, MetaField metaField) {
+    public List<JournalConfig> getLocalRecordsMeta(@NotNull List<RecordRef> list,
+                                                   @NotNull MetaField metaField) {
 
         String user = SecurityUtils.getCurrentUserLoginFromRequestContext();
         Locale locale = LocaleContextHolder.getLocale();

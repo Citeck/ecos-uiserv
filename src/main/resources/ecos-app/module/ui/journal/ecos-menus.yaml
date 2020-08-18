@@ -21,6 +21,9 @@ columns:
     type: text
     label: { ru: Идентификатор, en: Id }
 
+  - name: version
+    label: { ru: Версия модели, en: Model Version }
+
   - name: authorities
     attribute: authorities[]?str
     label: { ru: Группы или пользователи, en: Groups or users }

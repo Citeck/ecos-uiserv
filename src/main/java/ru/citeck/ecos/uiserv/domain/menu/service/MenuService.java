@@ -80,7 +80,7 @@ public class MenuService {
         entity.setTenant("");
         entity.setType(menuDto.getType());
         entity.setAuthorities(new ArrayList<>(menuDto.getAuthorities()));
-        entity.setPriority(menuDto.getPriority());
+        entity.setVersion(menuDto.getVersion());
         entity.setItems(Json.getMapper().toString(menuDto.getSubMenu()));
 
         return entity;
@@ -98,17 +98,17 @@ public class MenuService {
         dto.setType(entity.getType());
         dto.setAuthorities(new ArrayList<>(entity.getAuthorities()));
         dto.setSubMenu(Json.getMapper().read(entity.getItems(), SubMenus.class));
-        dto.setPriority(entity.getPriority());
+        dto.setVersion(entity.getVersion());
 
         return dto;
     }
 
-    public MenuDto getMenuForUser(String username) {
+    public MenuDto getMenuForUser(String username, Integer version) {
         Set<String> userAuthorities = new HashSet<>(authoritiesSupport.queryUserAuthorities(username));
-        return getMenuForUser(username, userAuthorities);
+        return getMenuForUser(username, userAuthorities, version);
     }
 
-    public MenuDto getMenuForUser(String username, Set<String> authorities) {
+    public MenuDto getMenuForUser(String username, Set<String> authorities, Integer version) {
 
         return Stream.<Supplier<Optional<MenuDto>>>of(
             () -> findMenuByUsername(username),
@@ -117,13 +117,18 @@ public class MenuService {
         ).map(Supplier::get)
             .filter(Optional::isPresent)
             .map(Optional::get)
+            .filter(config -> {
+                int confVersion = config.getVersion() != null ? config.getVersion() : 0;
+                int argVersion = version != null ? version : 0;
+                return confVersion == argVersion;
+            })
             .findFirst()
             .orElseGet(this::findDefaultMenu);
     }
 
     public ResolvedMenuDto getResolvedMenuForUser(String username) {
         Set<String> userAuthorities = new HashSet<>(authoritiesSupport.queryUserAuthorities(username));
-        MenuDto dto = getMenuForUser(username, userAuthorities);
+        MenuDto dto = getMenuForUser(username, userAuthorities, null);
         return resolveMenu(dto, userAuthorities);
     }
 
