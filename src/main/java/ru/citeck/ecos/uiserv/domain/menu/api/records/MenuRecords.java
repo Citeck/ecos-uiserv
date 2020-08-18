@@ -92,7 +92,7 @@ public class MenuRecords extends LocalRecordsDao
                 throw new IllegalArgumentException("Parameter 'id' is mandatory for menu record");
             }
 
-            if (dto.getId().equals("default-menu")) {
+            if (dto.getId().equals("default-menu") || dto.getId().equals("default-menu-v1")) {
                 dto.setId(UUID.randomUUID().toString());
             }
 

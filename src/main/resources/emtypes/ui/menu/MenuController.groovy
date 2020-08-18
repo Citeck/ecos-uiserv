@@ -8,7 +8,9 @@ import org.slf4j.LoggerFactory
 import org.w3c.dom.Document
 import org.xml.sax.SAXException
 import ru.citeck.ecos.apps.module.controller.ModuleController
+import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.io.file.EcosFile
+import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.commons.utils.FileUtils
 
 import javax.xml.parsers.DocumentBuilder
@@ -35,8 +37,8 @@ return new ModuleController<Module, Unit>() {
 
         try {
             Module module = new Module()
-            module.setId(getMenuId(data))
             module.setFilename(file.getPath().getFileName().toString())
+            module.setId(getMenuId(data, module.getFilename()))
             module.setData(data)
             return module
 
@@ -46,19 +48,30 @@ return new ModuleController<Module, Unit>() {
         }
     }
 
-    private String getMenuId(byte[] data) throws ParserConfigurationException, IOException, SAXException {
+    private String getMenuId(byte[] data, String fileName) throws ParserConfigurationException,
+                                                                  IOException, SAXException {
 
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance()
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder()
-        Document document = docBuilder.parse(new ByteArrayInputStream(data))
+        if (fileName.endsWith(".json")) {
 
-        return document.getElementsByTagName("id").item(0).getTextContent()
+            return Json.getMapper().read(data, ObjectData.class).get("id").asText()
+
+        } else {
+            DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance()
+            DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder()
+            Document document = docBuilder.parse(new ByteArrayInputStream(data))
+
+            return document.getElementsByTagName("id").item(0).getTextContent()
+        }
     }
 
     @Override
     void write(@NotNull EcosFile root, Module module, Unit config) {
 
-        String name = FileUtils.getValidName(module.getId()) + ".xml"
+        String extension = ".xml";
+        if (module.getFilename().endsWith(".json")) {
+            extension = ".json";
+        }
+        String name = FileUtils.getValidName(module.getId()) + extension;
 
         root.createFile(name, (Function1<OutputStream, Unit>) {
             OutputStream out -> out.write(module.getData())

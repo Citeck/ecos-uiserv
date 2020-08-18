@@ -31,6 +31,7 @@ public class MenuService {
 
     private static final String DEFAULT_AUTHORITY = "default";
     private static final String DEFAULT_MENU_ID = "default-menu";
+    private static final String DEFAULT_MENU_V1_ID = "default-menu-v1";
 
     private final MenuRepository menuRepository;
     private final MenuReaderService readerService;
@@ -123,7 +124,7 @@ public class MenuService {
                 return confVersion == argVersion;
             })
             .findFirst()
-            .orElseGet(this::findDefaultMenu);
+            .orElseGet(() -> findDefaultMenu(version));
     }
 
     public ResolvedMenuDto getResolvedMenuForUser(String username) {
@@ -167,9 +168,15 @@ public class MenuService {
         return orderedAuthorities;
     }
 
-    private MenuDto findDefaultMenu() {
-        return getMenu(DEFAULT_MENU_ID)
-            .orElseThrow(() -> new RuntimeException("Cannot load default menu"));
+    private MenuDto findDefaultMenu(Integer version) {
+        int intVersion = version != null ? version : 0;
+        Optional<MenuDto> result;
+        if (intVersion == 1) {
+            result = getMenu(DEFAULT_MENU_V1_ID);
+        } else {
+            result = getMenu(DEFAULT_MENU_ID);
+        }
+        return result.orElseThrow(() -> new RuntimeException("Cannot load default menu. Version: " + version));
     }
 
     private ResolvedMenuDto resolveMenu(MenuDto menuDto, Set<String> allUserAuthorities) {
@@ -196,7 +203,10 @@ public class MenuService {
     }
 
     public void deleteByExtId(String menuId) {
-        if (StringUtils.isBlank(menuId) || menuId.equals(DEFAULT_MENU_ID)) {
+        if (StringUtils.isBlank(menuId)
+            || menuId.equals(DEFAULT_MENU_ID)
+            || menuId.equals(DEFAULT_MENU_V1_ID)) {
+
             return;
         }
         menuRepository.deleteByExtId(menuId);
