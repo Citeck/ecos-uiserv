@@ -31,6 +31,7 @@ public class MenuService {
 
     private static final String DEFAULT_AUTHORITY = "default";
     private static final String DEFAULT_MENU_ID = "default-menu";
+    private static final String DEFAULT_MENU_V1_ID = "default-menu-v1";
 
     private final MenuRepository menuRepository;
     private final MenuReaderService readerService;
@@ -80,7 +81,7 @@ public class MenuService {
         entity.setTenant("");
         entity.setType(menuDto.getType());
         entity.setAuthorities(new ArrayList<>(menuDto.getAuthorities()));
-        entity.setPriority(menuDto.getPriority());
+        entity.setVersion(menuDto.getVersion());
         entity.setItems(Json.getMapper().toString(menuDto.getSubMenu()));
 
         return entity;
@@ -98,17 +99,17 @@ public class MenuService {
         dto.setType(entity.getType());
         dto.setAuthorities(new ArrayList<>(entity.getAuthorities()));
         dto.setSubMenu(Json.getMapper().read(entity.getItems(), SubMenus.class));
-        dto.setPriority(entity.getPriority());
+        dto.setVersion(entity.getVersion());
 
         return dto;
     }
 
-    public MenuDto getMenuForUser(String username) {
+    public MenuDto getMenuForUser(String username, Integer version) {
         Set<String> userAuthorities = new HashSet<>(authoritiesSupport.queryUserAuthorities(username));
-        return getMenuForUser(username, userAuthorities);
+        return getMenuForUser(username, userAuthorities, version);
     }
 
-    public MenuDto getMenuForUser(String username, Set<String> authorities) {
+    public MenuDto getMenuForUser(String username, Set<String> authorities, Integer version) {
 
         return Stream.<Supplier<Optional<MenuDto>>>of(
             () -> findMenuByUsername(username),
@@ -117,13 +118,18 @@ public class MenuService {
         ).map(Supplier::get)
             .filter(Optional::isPresent)
             .map(Optional::get)
+            .filter(config -> {
+                int confVersion = config.getVersion() != null ? config.getVersion() : 0;
+                int argVersion = version != null ? version : 0;
+                return confVersion == argVersion;
+            })
             .findFirst()
-            .orElseGet(this::findDefaultMenu);
+            .orElseGet(() -> findDefaultMenu(version));
     }
 
     public ResolvedMenuDto getResolvedMenuForUser(String username) {
         Set<String> userAuthorities = new HashSet<>(authoritiesSupport.queryUserAuthorities(username));
-        MenuDto dto = getMenuForUser(username, userAuthorities);
+        MenuDto dto = getMenuForUser(username, userAuthorities, null);
         return resolveMenu(dto, userAuthorities);
     }
 
@@ -162,9 +168,15 @@ public class MenuService {
         return orderedAuthorities;
     }
 
-    private MenuDto findDefaultMenu() {
-        return getMenu(DEFAULT_MENU_ID)
-            .orElseThrow(() -> new RuntimeException("Cannot load default menu"));
+    private MenuDto findDefaultMenu(Integer version) {
+        int intVersion = version != null ? version : 0;
+        Optional<MenuDto> result;
+        if (intVersion == 1) {
+            result = getMenu(DEFAULT_MENU_V1_ID);
+        } else {
+            result = getMenu(DEFAULT_MENU_ID);
+        }
+        return result.orElseThrow(() -> new RuntimeException("Cannot load default menu. Version: " + version));
     }
 
     private ResolvedMenuDto resolveMenu(MenuDto menuDto, Set<String> allUserAuthorities) {
@@ -191,7 +203,10 @@ public class MenuService {
     }
 
     public void deleteByExtId(String menuId) {
-        if (StringUtils.isBlank(menuId) || menuId.equals(DEFAULT_MENU_ID)) {
+        if (StringUtils.isBlank(menuId)
+            || menuId.equals(DEFAULT_MENU_ID)
+            || menuId.equals(DEFAULT_MENU_V1_ID)) {
+
             return;
         }
         menuRepository.deleteByExtId(menuId);

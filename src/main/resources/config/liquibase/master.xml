@@ -40,6 +40,7 @@
     <include file="changelog/20200602000000_add_config_for_icons.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20200630000000_add_mimetype_for_icon_table.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20200807000000_update_journal_and_actions.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20200818000000_add_version_to_menu.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20200817000000_add_journal_computed_params.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

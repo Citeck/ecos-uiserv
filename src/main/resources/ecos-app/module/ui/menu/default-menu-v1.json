@@ -1,0 +1,129 @@
+{
+  "id": "default-menu-v1",
+  "type": "LEFT_MENU",
+  "authorities": [
+    "GROUP_EVERYONE"
+  ],
+  "version": 1,
+  "subMenu": {
+    "left": {
+      "items": [
+        {
+          "id": "9c01e71f-b792-4481-ba09-a35b3ed38955",
+          "label": {
+            "ru": "Задачи",
+            "en": "Tasks"
+          },
+          "hidden": false,
+          "type": "HEADER-DIVIDER",
+          "config": {}
+        },
+        {
+          "id": "3b006d2b-adbe-4bc1-81f9-8341a7c95c52",
+          "label": {
+            "en": "Текущие Задачи"
+          },
+          "icon": "ui/icon@icon-empty",
+          "hidden": false,
+          "type": "JOURNAL",
+          "config": {
+            "recordRef": "uiserv/journal_all@active-tasks"
+          }
+        },
+        {
+          "id": "f2edcd1c-fd21-4c1e-8519-a073a82cddfa",
+          "label": {
+            "en": "Завершенные задачи"
+          },
+          "icon": "ui/icon@icon-empty",
+          "hidden": false,
+          "type": "JOURNAL",
+          "config": {
+            "recordRef": "uiserv/journal_all@completed-tasks"
+          }
+        },
+        {
+          "id": "9753b5c7-8795-449d-a786-910b7e30d8ba",
+          "label": {
+            "en": "На контроле"
+          },
+          "icon": "ui/icon@icon-empty",
+          "hidden": false,
+          "type": "JOURNAL",
+          "config": {
+            "recordRef": "uiserv/journal_all@controlled"
+          }
+        },
+        {
+          "id": "bf76bb92-e239-4a44-b20d-93c303a66b60",
+          "label": {
+            "en": "Задачи подчиненных"
+          },
+          "icon": "ui/icon@icon-empty",
+          "hidden": false,
+          "type": "JOURNAL",
+          "config": {
+            "recordRef": "uiserv/journal_all@subordinate-tasks"
+          }
+        },
+        {
+          "id": "5481ff62-b5b5-42a3-b1cd-bd08c4390eee",
+          "label": {
+            "en": "Статистика по задачам"
+          },
+          "icon": "ui/icon@icon-empty",
+          "hidden": false,
+          "type": "JOURNAL",
+          "config": {
+            "recordRef": "uiserv/journal_all@task-statistic"
+          }
+        },
+        {
+          "id": "a436a767-7493-42fe-b554-b311955fbad0",
+          "label": {
+            "en": "Созданные задачи"
+          },
+          "icon": "ui/icon@icon-empty",
+          "hidden": false,
+          "type": "JOURNAL",
+          "config": {
+            "recordRef": "uiserv/journal_all@initiator-tasks"
+          }
+        },
+        {
+          "id": "b5d4a714-f598-42a5-8add-91fa46b5b179",
+          "label": {
+            "ru": "Разделы"
+          },
+          "hidden": false,
+          "type": "HEADER-DIVIDER",
+          "config": {}
+        },
+        {
+          "id": "04e37773-f97c-4432-953e-0b3ebfbd6712",
+          "label": {
+            "ru": "Кейсы"
+          },
+          "icon": "ui/icon@icon-empty",
+          "hidden": false,
+          "type": "SECTION",
+          "config": {},
+          "items": [
+            {
+              "id": "5d894b7d-56d0-4f2a-9618-1fb52e74dd17",
+              "label": {
+                "en": "Стандартный кейс"
+              },
+              "icon": "ui/icon@icon-empty",
+              "hidden": false,
+              "type": "JOURNAL",
+              "config": {
+                "recordRef": "uiserv/journal_all@general-case"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
