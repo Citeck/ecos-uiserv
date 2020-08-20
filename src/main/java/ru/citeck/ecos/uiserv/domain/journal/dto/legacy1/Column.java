@@ -2,7 +2,6 @@ package ru.citeck.ecos.uiserv.domain.journal.dto.legacy1;
 
 import lombok.Data;
 import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnControl;
-
 import java.util.Map;
 
 @Data

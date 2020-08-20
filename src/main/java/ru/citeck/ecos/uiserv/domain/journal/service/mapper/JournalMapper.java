@@ -35,6 +35,7 @@ public class JournalMapper {
         dto.setLabel(Json.getMapper().read(entity.getLabel(), MLText.class));
         dto.setTypeRef(RecordRef.valueOf(entity.getTypeRef()));
         dto.setPredicate(Json.getMapper().read(entity.getPredicate(), ObjectData.class));
+        dto.setQueryData(Json.getMapper().read(entity.getQueryData(), ObjectData.class));
         dto.setActions(Json.getMapper().read(entity.getActions(), RecordRefsList.class));
         dto.setAttributes(Json.getMapper().read(entity.getAttributes(), ObjectData.class));
         dto.setMetaRecord(RecordRef.valueOf(entity.getMetaRecord()));
@@ -43,7 +44,7 @@ public class JournalMapper {
         dto.setSortBy(Json.getMapper().read(entity.getSortBy(), SortByList.class));
         dto.setGroupActions(Json.getMapper().read(entity.getGroupActions(), GroupActionsList.class));
         dto.setCreateVariants(Json.getMapper().read(entity.getCreateVariants(), CreateVariantsList.class));
-        dto.setComputedParams(Json.getMapper().read(entity.getComputedParams(), ComputedParamsList.class));
+        dto.setComputed(Json.getMapper().read(entity.getComputed(), ComputedParamsList.class));
 
         dto.setModified(entity.getLastModifiedDate());
         dto.setModifier(entity.getLastModifiedBy());
@@ -97,6 +98,7 @@ public class JournalMapper {
         entity.setLabel(Json.getMapper().toString(dto.getLabel()));
         entity.setTypeRef(RecordRef.toString(dto.getTypeRef()));
         entity.setPredicate(Json.getMapper().toString(dto.getPredicate()));
+        entity.setQueryData(Json.getMapper().toString(dto.getQueryData()));
         entity.setActions(Json.getMapper().toString(dto.getActions()));
         entity.setAttributes(Json.getMapper().toString(dto.getAttributes()));
         entity.setMetaRecord(RecordRef.toString(dto.getMetaRecord()));
@@ -106,7 +108,7 @@ public class JournalMapper {
         entity.setSortBy(Json.getMapper().toString(getNotBlank(dto.getSortBy(), JournalSortBy::getAttribute)));
         entity.setCreateVariants(Json.getMapper().toString(getNotBlank(dto.getCreateVariants(),
             v -> RecordRef.valueOf(v.getRecordRef()).toString())));
-        entity.setComputedParams(Json.getMapper().toString(getNotBlank(dto.getComputedParams(),
+        entity.setComputed(Json.getMapper().toString(getNotBlank(dto.getComputed(),
             ComputedParamDto::getName)));
 
         return entity;

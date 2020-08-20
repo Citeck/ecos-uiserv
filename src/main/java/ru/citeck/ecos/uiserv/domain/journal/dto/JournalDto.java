@@ -27,12 +27,12 @@ public class JournalDto {
     /**
      * Journal label. Field for information.
      */
-    private MLText label;
+    private MLText label = new MLText();
 
     /**
      * Records source ID.
      */
-    private String sourceId;
+    private String sourceId = "";
 
     /**
      * Record to load metadata from edge.
@@ -53,6 +53,8 @@ public class JournalDto {
      * and always should be joined by other filter predicates by AND
      */
     private ObjectData predicate = ObjectData.create();
+
+    private ObjectData queryData = ObjectData.create();
 
     /**
      * Group records by specified attributes.
@@ -97,7 +99,7 @@ public class JournalDto {
 
     private List<CreateVariantDto> createVariants = new ArrayList<>();
 
-    private List<ComputedParamDto> computedParams = new ArrayList<>();
+    private List<ComputedParamDto> computed = new ArrayList<>();
 
     public JournalDto() {
     }
@@ -112,6 +114,7 @@ public class JournalDto {
         this.metaRecord = other.metaRecord;
         this.typeRef = other.typeRef;
         this.predicate = mapper.copy(other.predicate);
+        this.queryData = mapper.copy(other.queryData);
         this.groupBy = mapper.copy(other.groupBy);
         this.sortBy = mapper.copy(other.sortBy);
         this.actions = mapper.copy(other.actions);
@@ -120,6 +123,6 @@ public class JournalDto {
         this.attributes = mapper.copy(other.attributes);
         this.groupActions = DataValue.create(other.groupActions).asList(GroupAction.class);
         this.createVariants = DataValue.create(other.createVariants).asList(CreateVariantDto.class);
-        this.computedParams = DataValue.create(other.computedParams).asList(ComputedParamDto.class);
+        this.computed = DataValue.create(other.computed).asList(ComputedParamDto.class);
     }
 }

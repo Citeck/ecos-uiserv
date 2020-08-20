@@ -32,6 +32,8 @@ public class JournalEntity extends AbstractAuditingEntity {
 
     private String predicate;
 
+    private String queryData;
+
     private Boolean editable;
 
     private String attributes;
@@ -44,5 +46,5 @@ public class JournalEntity extends AbstractAuditingEntity {
 
     private String createVariants;
 
-    private String computedParams;
+    private String computed;
 }

@@ -4,14 +4,18 @@ import ecos.com.fasterxml.jackson210.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.RecordRef;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
-@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(value = JsonInclude.Include.NON_DEFAULT)
 public class JournalColumnDto {
 
     /**
@@ -38,14 +42,13 @@ public class JournalColumnDto {
     private String attribute;
 
     /**
-     * Attribute inner schema. Default: "disp:.disp,val:.str"
+     * Inner schema in base attribute.
      */
     private String innerSchema;
 
-    /**
-     * Configuration for control.
-     * Control should define formatter, editor and filter rules.
-     */
+    @NotNull
+    private List<ColumnFormatter> formatters = new ArrayList<>();
+
     private ColumnControl control;
 
     /**

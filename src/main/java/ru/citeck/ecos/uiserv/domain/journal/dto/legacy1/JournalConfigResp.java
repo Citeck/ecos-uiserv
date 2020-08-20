@@ -15,7 +15,7 @@ public class JournalConfigResp {
     private JournalMeta meta;
     private List<Column> columns;
     private Map<String, String> params;
-    private List<ComputedParamDto> computedParams;
+    private List<ComputedParamDto> computed;
 
     @MetaAtt(".disp")
     public String getDisplayName() {

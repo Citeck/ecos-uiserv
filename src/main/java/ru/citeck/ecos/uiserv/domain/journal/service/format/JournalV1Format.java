@@ -9,16 +9,9 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.QueryContext;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.uiserv.domain.journal.dto.CreateVariantDto;
+import ru.citeck.ecos.uiserv.domain.journal.dto.*;
+import ru.citeck.ecos.uiserv.domain.journal.dto.legacy1.*;
 import ru.citeck.ecos.uiserv.domain.journal.service.format.util.EcosTypeUtils;
-import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnControl;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDto;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
-import ru.citeck.ecos.uiserv.domain.journal.dto.legacy1.CreateVariant;
-import ru.citeck.ecos.uiserv.domain.journal.dto.legacy1.JournalMeta;
-import ru.citeck.ecos.uiserv.domain.journal.dto.legacy1.Column;
-import ru.citeck.ecos.uiserv.domain.journal.dto.legacy1.Formatter;
-import ru.citeck.ecos.uiserv.domain.journal.dto.legacy1.JournalConfigResp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,7 +48,7 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
         }
 
         resp.setSourceId(dto.getSourceId());
-        resp.setComputedParams(dto.getComputedParams());
+        resp.setComputed(dto.getComputed());
 
         JournalMeta meta = new JournalMeta();
         meta.setNodeRef(dto.getId());
