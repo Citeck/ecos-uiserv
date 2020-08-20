@@ -14,6 +14,8 @@ public interface JournalService {
 
     JournalWithMeta getJournalById(String id);
 
+    String getJournalsListIdByJournalId(String journalId);
+
     List<JournalWithMeta> getAll(int max, int skipCount, Predicate predicate);
 
     JournalWithMeta getById(String id);
