@@ -9,14 +9,19 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.records2.RecordMeta;
+import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records2.request.query.QueryConsistency;
+import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.domain.journal.service.mapper.JournalMapper;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
 
+import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.*;
@@ -32,11 +37,12 @@ public class JournalServiceImpl implements JournalService {
 
     private final JournalRepository journalRepository;
     private final JournalMapper journalMapper;
+    private final RecordsService recordsService;
 
     private Consumer<JournalDto> changeListener;
 
     private final Map<String, Set<String>> journalsByJournalListId = new ConcurrentHashMap<>();
-    private final Map<String, String> journalListByJournalId = new ConcurrentHashMap<>();
+    private final Map<String, String> journalsListByJournalId = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() {
@@ -177,6 +183,36 @@ public class JournalServiceImpl implements JournalService {
             .collect(Collectors.toList());
     }
 
+    @Nullable
+    @Override
+    public String getJournalsListIdByJournalId(String journalId) {
+
+        if (StringUtils.isBlank(journalId)) {
+            return null;
+        }
+
+        String journalsListId = journalsListByJournalId.get(journalId);
+
+        if (journalsListId == null) {
+
+            RecordsQuery recordsQuery = new RecordsQuery();
+            recordsQuery.setQuery("=journal:journalType:\"" + journalId + "\"");
+            recordsQuery.setLanguage("fts-alfresco");
+            recordsQuery.setConsistency(QueryConsistency.EVENTUAL);
+            recordsQuery.setSourceId("alfresco/");
+            recordsQuery.setMaxItems(1);
+
+            Map<String, String> attributes = Collections.singletonMap("list-id", "assoc_src_journal:journals.cm:name");
+            RecordMeta meta = recordsService.queryRecord(recordsQuery, attributes).orElse(null);
+            if (meta != null && meta.has("list-id")) {
+                return meta.get("list-id").asText();
+            }
+        } else {
+            return journalsListId;
+        }
+        return null;
+    }
+
     @Override
     public List<JournalWithMeta> getJournalsByJournalList(String journalListId) {
 
@@ -204,7 +240,7 @@ public class JournalServiceImpl implements JournalService {
                 Collections.newSetFromMap(new ConcurrentHashMap<>())
             );
 
-            String listIdBefore = journalListByJournalId.get(journalDto.getId());
+            String listIdBefore = journalsListByJournalId.get(journalDto.getId());
             if (StringUtils.isNotBlank(listIdBefore)) {
                 if (!listIdBefore.equals(listId)) {
                     Set<String> listBefore = journalsByJournalListId.computeIfAbsent(listIdBefore, id ->
@@ -217,11 +253,11 @@ public class JournalServiceImpl implements JournalService {
                 listJournals.add(journalDto.getId());
             }
 
-            journalListByJournalId.put(journalDto.getId(), listId);
+            journalsListByJournalId.put(journalDto.getId(), listId);
 
         } else {
 
-            String listIdBefore = journalListByJournalId.get(journalDto.getId());
+            String listIdBefore = journalsListByJournalId.get(journalDto.getId());
 
             if (StringUtils.isNotBlank(listIdBefore)) {
 
@@ -229,7 +265,7 @@ public class JournalServiceImpl implements JournalService {
                     Collections.newSetFromMap(new ConcurrentHashMap<>())
                 ).remove(journalDto.getId());
 
-                journalListByJournalId.remove(journalDto.getId());
+                journalsListByJournalId.remove(journalDto.getId());
             }
         }
     }
