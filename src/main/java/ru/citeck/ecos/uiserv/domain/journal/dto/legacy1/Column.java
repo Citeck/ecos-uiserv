@@ -1,7 +1,9 @@
 package ru.citeck.ecos.uiserv.domain.journal.dto.legacy1;
 
 import lombok.Data;
-import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnControl;
+import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnFormatter;
+
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -14,8 +16,10 @@ public class Column {
     private String attribute;
     private String schema;
     private String innerSchema;
-    private ColumnControl control;
+    // control from new config
     private Formatter formatter;
+    // new formatters
+    private List<ColumnFormatter> formatters;
     private Map<String, String> params;
     private boolean isDefault;
     private boolean isSearchable;

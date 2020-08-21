@@ -94,7 +94,7 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
             for (JournalColumnDto column : dto.getColumns()) {
 
                 Column respColumn = new Column();
-                respColumn.setControl(column.getControl());
+                respColumn.setFormatters(column.getFormatters());
                 respColumn.setInnerSchema(column.getInnerSchema());
                 respColumn.setHidden(Boolean.TRUE.equals(column.getHidden()));
 
@@ -117,19 +117,19 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
                 respColumn.setType(column.getType());
                 respColumn.setVisible(!Boolean.TRUE.equals(column.getHidden()));
 
-                ColumnControl controller = column.getControl();
+                ColumnControl control = column.getControl();
 
-                if (controller != null) {
+                if (control != null) {
 
                     Formatter respFormatter = new Formatter();
-                    respFormatter.setName(controller.getType());
-                    respFormatter.setParams(controller.getConfig());
+                    respFormatter.setName(control.getType());
+                    respFormatter.setParams(control.getConfig());
                     respColumn.setFormatter(respFormatter);
 
-                    String type = controller.getType();
+                    String type = control.getType();
 
                     if ("selectJournal".equals(type)) {
-                        String journalId = controller.getConfig().get("journalId").asText();
+                        String journalId = control.getConfig().get("journalId").asText();
                         if (!journalId.isEmpty()) {
                             respColumn.setEditorKey(journalId);
                         }
