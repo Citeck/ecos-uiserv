@@ -26,7 +26,7 @@ public class JournalServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        journalService = new JournalServiceImpl(journalRepository, journalMapper);
+        journalService = new JournalServiceImpl(journalRepository, journalMapper, recordsService);
     }
 
     /*@Test
