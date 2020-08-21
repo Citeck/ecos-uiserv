@@ -103,6 +103,9 @@ public class ResolvedJournalRecordsDao extends LocalRecordsDao
                 if (MLText.isEmpty(columnDto.getLabel())) {
                     edgeAtts.add("title");
                 }
+                if (columnDto.getMultiple() == null) {
+                    edgeAtts.add("multiple");
+                }
 
                 if (!edgeAtts.isEmpty()) {
                     if (edgeAtts.size() == 1) {
@@ -130,6 +133,9 @@ public class ResolvedJournalRecordsDao extends LocalRecordsDao
                     }
                     if (value.has("title")) {
                         dto.setLabel(new MLText(value.get("title").asText()));
+                    }
+                    if (value.has("multiple")) {
+                        dto.setMultiple(value.get("multiple").asBoolean());
                     }
                 }
             });

@@ -4,13 +4,9 @@ import ecos.com.fasterxml.jackson210.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.RecordRef;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -46,8 +42,7 @@ public class JournalColumnDto {
      */
     private String innerSchema;
 
-    @NotNull
-    private List<ColumnFormatter> formatters = new ArrayList<>();
+    private ColumnFormatter formatter;
 
     private ColumnControl control;
 
@@ -88,6 +83,8 @@ public class JournalColumnDto {
      * This parameter required when some extra data is required to load.
      */
     private Boolean hidden;
+
+    private Boolean multiple;
 
     /**
      * Custom attributes for temporal or very specific

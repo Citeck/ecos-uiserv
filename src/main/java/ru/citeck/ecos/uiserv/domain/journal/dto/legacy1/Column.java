@@ -3,7 +3,6 @@ package ru.citeck.ecos.uiserv.domain.journal.dto.legacy1;
 import lombok.Data;
 import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnFormatter;
 
-import java.util.List;
 import java.util.Map;
 
 @Data
@@ -19,7 +18,7 @@ public class Column {
     // control from new config
     private Formatter formatter;
     // new formatters
-    private List<ColumnFormatter> formatters;
+    private ColumnFormatter newFormatter;
     private Map<String, String> params;
     private boolean isDefault;
     private boolean isSearchable;
@@ -28,4 +27,5 @@ public class Column {
     private boolean hidden;
     private boolean isGroupable;
     private boolean batchEdit;
+    private Boolean multiple;
 }
