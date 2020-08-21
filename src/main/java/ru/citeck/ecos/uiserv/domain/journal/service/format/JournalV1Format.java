@@ -115,7 +115,7 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
                 respColumn.setSearchable(Boolean.TRUE.equals(column.getSearchable()));
                 respColumn.setSortable(Boolean.TRUE.equals(column.getSortable()));
                 respColumn.setType(column.getType());
-                respColumn.setVisible(!Boolean.FALSE.equals(column.getVisible()));
+                respColumn.setVisible(!Boolean.TRUE.equals(column.getHidden()));
 
                 ColumnControl controller = column.getControl();
 
