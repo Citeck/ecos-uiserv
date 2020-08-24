@@ -26,6 +26,7 @@ public class Column {
     private boolean isVisible;
     private boolean hidden;
     private boolean isGroupable;
+    private boolean isEditable;
     private boolean batchEdit;
     private Boolean multiple;
 }
