@@ -105,6 +105,9 @@ public class JournalColumnDto {
         editable = other.editable;
         visible = other.visible;
         hidden = other.hidden;
+        multiple = other.multiple;
         attributes = ObjectData.deepCopy(other.attributes);
+        innerSchema = other.innerSchema;
+        formatter = Json.getMapper().copy(other.formatter);
     }
 }
