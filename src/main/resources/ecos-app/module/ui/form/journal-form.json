@@ -47,7 +47,9 @@
       "Value": "Значение",
       "Add Another": "Добавить",
       "Group actions": "Групповые действия",
-      "Save": "Сохранить"
+      "Save": "Сохранить",
+      "Control": "Контрол",
+      "Config": "Конфигурация"
     },
     "en": {
       "Load columns": "Load columns",
@@ -85,7 +87,9 @@
       "Value": "Value",
       "Add Another": "Add Another",
       "Group actions": "Group actions",
-      "Save": "Save"
+      "Save": "Save",
+      "Control": "Control",
+      "Config": "Config"
     }
   },
   "definition": {
@@ -378,6 +382,10 @@
                         "label3": {
                           "en": "",
                           "ru": ""
+                        },
+                        "control": {
+                          "type": "",
+                          "config": {}
                         }
                       }
                     ],
@@ -511,6 +519,53 @@
                                         ],
                                         "collapsed": true,
                                         "row": "0-3"
+                                      },
+                                      {
+                                        "title": "Control",
+                                        "collapsible": true,
+                                        "key": "panel2",
+                                        "type": "panel",
+                                        "input": false,
+                                        "components": [
+                                          {
+                                            "label": "columnControl",
+                                            "hideLabel": true,
+                                            "key": "control",
+                                            "type": "container",
+                                            "input": true,
+                                            "components": [
+                                              {
+                                                "label": "Type",
+                                                "defaultValue": "",
+                                                "key": "type",
+                                                "type": "textfield",
+                                                "input": true
+                                              },
+                                              {
+                                                "label": "Config",
+                                                "keyLabel": "",
+                                                "key": "config",
+                                                "type": "datamap",
+                                                "input": true,
+                                                "valueComponent": {
+                                                  "type": "textfield",
+                                                  "key": "value",
+                                                  "label": "Value",
+                                                  "defaultValue": "Value",
+                                                  "input": true,
+                                                  "conditional": {
+                                                    "show": null,
+                                                    "when": null,
+                                                    "eq": "",
+                                                    "json": ""
+                                                  }
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        ],
+                                        "collapsed": true,
+                                        "lazyLoad": false
                                       }
                                     ],
                                     "type": "column",
@@ -518,6 +573,7 @@
                                     "key": "column",
                                     "label": "Column",
                                     "index": 0
+
                                   },
                                   {
                                     "index": 1,

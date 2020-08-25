@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 
 @Data
@@ -86,4 +87,19 @@ public class JournalColumnDto {
      * parameters which can't be added as field for this DTO
      */
     private ObjectData attributes;
+
+    public JournalColumnDto(JournalColumnDto other) {
+        name = other.name;
+        label = MLText.copy(other.label);
+        attribute = other.attribute;
+        control = Json.getMapper().copy(other.control);
+        type = other.type;
+        searchable = other.searchable;
+        sortable = other.sortable;
+        groupable = other.groupable;
+        editable = other.editable;
+        visible = other.visible;
+        hidden = other.hidden;
+        attributes = ObjectData.deepCopy(other.attributes);
+    }
 }

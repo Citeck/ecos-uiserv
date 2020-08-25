@@ -114,8 +114,16 @@ public class JournalMapper {
             entity.setExtId(dto.getId());
         }
 
+        List<JournalColumnDto> columns = getNotBlank(dto.getColumns(), JournalColumnDto::getName);
+        columns.forEach(column -> {
+            ColumnControl control = column.getControl();
+            if (control != null && StringUtils.isBlank(control.getType())) {
+                column.setControl(null);
+            }
+        });
+
+        entity.setColumns(Json.getMapper().toString(columns));
         entity.setEditable(dto.getEditable());
-        entity.setColumns(Json.getMapper().toString(getNotBlank(dto.getColumns(), JournalColumnDto::getName)));
         entity.setLabel(Json.getMapper().toString(dto.getLabel()));
         entity.setTypeRef(RecordRef.toString(dto.getTypeRef()));
         entity.setPredicate(Json.getMapper().toString(dto.getPredicate()));
