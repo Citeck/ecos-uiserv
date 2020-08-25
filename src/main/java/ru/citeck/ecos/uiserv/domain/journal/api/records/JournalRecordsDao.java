@@ -27,6 +27,8 @@ import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
+import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnControl;
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDto;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDto;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService;
@@ -206,6 +208,49 @@ public class JournalRecordsDao extends LocalRecordsDao
 
         public void setModuleId(String value) {
             setId(value);
+        }
+
+        @Override
+        public void setColumns(List<JournalColumnDto> columns) {
+            /*
+            // todo
+            if (columns != null) {
+                columns.forEach(c -> {
+                    // convert {"key": "{\"json\":\"value\"}"} to {"key": {"json": "value"}}
+                    ColumnControl control = c.getControl();
+                    if (control != null) {
+                        ObjectData config = control.getConfig();
+                        if (config.size() > 0) {
+                            ObjectData newConfig = ObjectData.create();
+                            for (String key : config.fieldNamesList()) {
+                                DataValue value = config.get(key);
+                                if (value.isTextual()) {
+                                    newConfig.set(key, value.asText());
+                                } else {
+                                    newConfig.set(key, value);
+                                }
+                            }
+                            control.setConfig(newConfig);
+                        }
+                    }
+                });
+            }*/
+            super.setColumns(columns);
+        }
+
+        @Override
+        public List<JournalColumnDto> getColumns() {
+            return super.getColumns().stream().map(c -> {
+                if (c.getControl() == null) {
+                    c = new JournalColumnDto(c);
+                    ColumnControl columnControl = new ColumnControl();
+                    c.setControl(columnControl);
+                }
+                if (c.getControl().getConfig() == null) {
+                    c.getControl().setConfig(ObjectData.create());
+                }
+                return c;
+            }).collect(Collectors.toList());
         }
 
         @MetaAtt(".type")
