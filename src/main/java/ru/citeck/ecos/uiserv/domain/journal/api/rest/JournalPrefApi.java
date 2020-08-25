@@ -78,8 +78,8 @@ public class JournalPrefApi {
         if (StringUtils.isBlank(username)) {
             throw new IllegalArgumentException("Username cannot be empty");
         }
-        if (username.contains("@")) {
-            throw new IllegalArgumentException("Username cannot contain @");
+        if (username.contains("people@")) {
+            throw new IllegalArgumentException("Username cannot contain people@");
         }
     }
 
