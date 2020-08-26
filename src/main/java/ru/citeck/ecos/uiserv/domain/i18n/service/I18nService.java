@@ -158,6 +158,8 @@ public class I18nService {
 
     private synchronized void ensureInitialized() {
         if (!initialized.get()) {
+            messagesByLocale.clear();
+            defaultMessages = Collections.emptyMap();
             registerAll();
             cacheKey = LocalDateTime.now().toString();
             defaultMessages = messagesByLocale.getOrDefault("en", Collections.emptyMap());
