@@ -1,21 +1,30 @@
 package ru.citeck.ecos.uiserv.domain.i18n.service;
 
+import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.utils.MandatoryParam;
+import ru.citeck.ecos.records2.predicate.PredicateUtils;
+import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.domain.i18n.repo.I18nEntity;
 import ru.citeck.ecos.uiserv.domain.i18n.dto.I18nDto;
 import ru.citeck.ecos.uiserv.domain.i18n.repo.I18nRepository;
+import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +35,49 @@ public class I18nService {
     private final Map<String, Map<String, String>> messagesByLocale = new ConcurrentHashMap<>();
     private Map<String, String> defaultMessages = Collections.emptyMap();
 
-    private AtomicBoolean initialized = new AtomicBoolean();
+    private final AtomicBoolean initialized = new AtomicBoolean();
     private String cacheKey;
+
+    @Nullable
+    public I18nDto getById(String id) {
+        return toDto(repo.findByTenantAndExtId("", id).orElse(null));
+    }
+
+    public List<I18nDto> getAll(int max, int skipCount) {
+
+        PageRequest page = PageRequest.of(
+            skipCount / max,
+            max,
+            Sort.by(Sort.Direction.DESC, "id")
+        );
+
+        return repo.findAll(page)
+            .stream()
+            .map(this::toDto)
+            .collect(Collectors.toList());
+    }
+
+    public long getCount() {
+        return repo.count();
+    }
+
+    public List<I18nDto> getAll(int max, int skipCount, Predicate predicate) {
+
+        PageRequest page = PageRequest.of(
+            skipCount / max,
+            max,
+            Sort.by(Sort.Direction.DESC, "id")
+        );
+
+        return repo.findAll(toSpec(predicate), page)
+            .stream()
+            .map(this::toDto)
+            .collect(Collectors.toList());
+    }
+
+    public long getCount(Predicate predicate) {
+        return repo.count(toSpec(predicate));
+    }
 
     public I18nDto upload(I18nDto dto) {
 
@@ -99,6 +149,13 @@ public class I18nService {
         return StringUtils.isNotBlank(localizedString) ? localizedString : key;
     }
 
+    public void delete(String id) {
+        repo.findByTenantAndExtId("", id).ifPresent(entity -> {
+            repo.delete(entity);
+            initialized.set(false);
+        });
+    }
+
     private synchronized void ensureInitialized() {
         if (!initialized.get()) {
             registerAll();
@@ -153,7 +210,11 @@ public class I18nService {
         return entity;
     }
 
-    private I18nDto toDto(I18nEntity entity) {
+    private I18nDto toDto(@Nullable I18nEntity entity) {
+
+        if (entity == null) {
+            return null;
+        }
 
         I18nDto dto = new I18nDto();
 
@@ -165,9 +226,27 @@ public class I18nService {
         return dto;
     }
 
+    private Specification<I18nEntity> toSpec(Predicate predicate) {
+
+        PredicateDto predicateDto = PredicateUtils.convertToDto(predicate, PredicateDto.class);
+        Specification<I18nEntity> spec = null;
+
+        if (StringUtils.isNotBlank(predicateDto.moduleId)) {
+            spec = (root, query, builder) ->
+                builder.like(builder.lower(root.get("extId")), "%" + predicateDto.moduleId.toLowerCase() + "%");
+        }
+
+        return spec;
+    }
+
     public static class StrList extends ArrayList<String> {
     }
 
     public static class StrToStrListMap extends HashMap<String, List<String>> {
+    }
+
+    @Data
+    public static class PredicateDto {
+        private String moduleId;
     }
 }

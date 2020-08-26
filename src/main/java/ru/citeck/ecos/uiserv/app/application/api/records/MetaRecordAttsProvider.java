@@ -12,10 +12,12 @@ import ru.citeck.ecos.records2.request.query.SortBy;
 import ru.citeck.ecos.records2.rest.RemoteRecordsUtils;
 import ru.citeck.ecos.records2.source.dao.local.meta.MetaAttributesSupplier;
 import ru.citeck.ecos.records2.source.dao.local.meta.MetaRecordsDaoAttsProvider;
+import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService;
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService;
 
 import javax.annotation.PostConstruct;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -28,12 +30,15 @@ import java.util.concurrent.Future;
 public class MetaRecordAttsProvider implements MetaAttributesSupplier {
 
     private static final String ATT_MENU_CACHE_KEY = "menu-cache-key";
+    private static final String ATT_I18N_CACHE_KEY = "i18n-cache-key";
+
     private static final long TYPES_CHECK_INTERVAL = 5000;
 
     private final JournalService journalService;
     private final MenuService menuService;
     private final MetaRecordsDaoAttsProvider provider;
     private final RecordsService recordsService;
+    private final I18nService i18nService;
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -49,7 +54,7 @@ public class MetaRecordAttsProvider implements MetaAttributesSupplier {
 
     @Override
     public List<String> getAttributesList() {
-        return Collections.singletonList(ATT_MENU_CACHE_KEY);
+        return Arrays.asList(ATT_MENU_CACHE_KEY, ATT_I18N_CACHE_KEY);
     }
 
     private void updateTypesChangedTime() {
@@ -91,12 +96,21 @@ public class MetaRecordAttsProvider implements MetaAttributesSupplier {
     @Override
     public Object getAttribute(String attribute, MetaField field) {
 
-        syncTypesChangedTime();
+        switch (attribute) {
+            case ATT_MENU_CACHE_KEY:
 
-        return Objects.hash(
-            journalService.getLastModifiedTimeMs(),
-            menuService.getLastModifiedTimeMs(),
-            lastModifiedType
-        );
+                syncTypesChangedTime();
+
+                return Objects.hash(
+                    journalService.getLastModifiedTimeMs(),
+                    menuService.getLastModifiedTimeMs(),
+                    i18nService.getCacheKey(),
+                    lastModifiedType
+                );
+            case ATT_I18N_CACHE_KEY:
+                return i18nService.getCacheKey();
+        }
+
+        return null;
     }
 }
