@@ -108,7 +108,7 @@ public class MetaRecordAttsProvider implements MetaAttributesSupplier {
                     lastModifiedType
                 );
             case ATT_I18N_CACHE_KEY:
-                return Objects.hash(i18nService.getCacheKey());
+                return i18nService.getCacheKey();
         }
 
         return null;

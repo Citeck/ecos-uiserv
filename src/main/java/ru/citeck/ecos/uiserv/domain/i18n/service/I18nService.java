@@ -18,9 +18,8 @@ import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.domain.i18n.repo.I18nEntity;
 import ru.citeck.ecos.uiserv.domain.i18n.dto.I18nDto;
 import ru.citeck.ecos.uiserv.domain.i18n.repo.I18nRepository;
-import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -41,6 +40,12 @@ public class I18nService {
     @Nullable
     public I18nDto getById(String id) {
         return toDto(repo.findByTenantAndExtId("", id).orElse(null));
+    }
+
+    public long getLastModifiedTimeMs() {
+        return repo.getLastModifiedTime()
+            .map(Instant::toEpochMilli)
+            .orElse(0L);
     }
 
     public List<I18nDto> getAll(int max, int skipCount) {
@@ -161,7 +166,7 @@ public class I18nService {
             messagesByLocale.clear();
             defaultMessages = Collections.emptyMap();
             registerAll();
-            cacheKey = LocalDateTime.now().toString();
+            cacheKey = getLastModifiedTimeMs() + "-" + getCount();
             defaultMessages = messagesByLocale.getOrDefault("en", Collections.emptyMap());
             initialized.set(true);
         }

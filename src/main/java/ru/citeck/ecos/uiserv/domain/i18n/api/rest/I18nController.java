@@ -24,7 +24,7 @@ public class I18nController {
     public HttpEntity<byte[]> getMessagesByLocale(@RequestParam(required = false) String id) {
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setCacheControl(CacheControl.maxAge(100, TimeUnit.MINUTES)
+        headers.setCacheControl(CacheControl.maxAge(4, TimeUnit.HOURS)
             .mustRevalidate()
             .cachePublic()
         );
