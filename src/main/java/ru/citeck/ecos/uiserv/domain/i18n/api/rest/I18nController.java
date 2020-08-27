@@ -24,7 +24,10 @@ public class I18nController {
     public HttpEntity<byte[]> getMessagesByLocale(@RequestParam(required = false) String id) {
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setCacheControl(CacheControl.maxAge(100, TimeUnit.MINUTES).mustRevalidate());
+        headers.setCacheControl(CacheControl.maxAge(100, TimeUnit.MINUTES)
+            .mustRevalidate()
+            .cachePublic()
+        );
 
         return new HttpEntity<>(Json.getMapper().toBytes(i18nService.getMessagesForLocale(id)), headers);
     }
