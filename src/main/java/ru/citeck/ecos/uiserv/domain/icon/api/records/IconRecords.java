@@ -26,7 +26,7 @@ public class IconRecords extends LocalRecordsDao
     LocalRecordsMetaDao<IconDto>,
     MutableRecordsLocalDao<IconDto> {
 
-    private static final String ID = "icon";
+    public static final String ID = "icon";
     private final IconService iconService;
 
     public IconRecords(IconService iconService) {
