@@ -98,7 +98,10 @@ public class ThemeService {
     }
 
     public void delete(String id) {
-        themeRepo.findFirstByExtId(id).ifPresent(themeRepo::delete);
+        if (!"ecos".equals(id)) {
+            themeRepo.findFirstByExtId(id).ifPresent(themeRepo::delete);
+            stylesCache.invalidateAll();
+        }
     }
 
     @NotNull

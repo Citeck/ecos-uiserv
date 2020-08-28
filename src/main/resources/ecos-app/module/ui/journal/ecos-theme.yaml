@@ -11,6 +11,7 @@ attributes:
 
 actions:
   - uiserv/action@download-base64-data-zip
+  - uiserv/action@delete
 
 columns:
 

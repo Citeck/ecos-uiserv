@@ -1,0 +1,10 @@
+
+{
+  "name": {
+    "ru": "Тема ECOS",
+    "en": "ECOS theme"
+  },
+  "images": {
+    "logo": "uiserv/icon@theme/ecos/logo.png"
+  }
+}

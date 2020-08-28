@@ -197,6 +197,8 @@ uiserv:
             value: '[]'
         restrict-access-to-edit-dashboard:
             value: false
+        active-theme:
+            value: ecos
 
 
     ecos-records:
