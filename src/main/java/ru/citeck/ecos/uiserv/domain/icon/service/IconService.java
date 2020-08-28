@@ -10,6 +10,7 @@ import ru.citeck.ecos.uiserv.domain.icon.repo.IconEntity;
 import ru.citeck.ecos.uiserv.domain.icon.repo.IconRepository;
 import ru.citeck.ecos.uiserv.domain.icon.dto.IconDto;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -61,6 +62,12 @@ public class IconService {
             .stream()
             .map(this::mapToDto)
             .collect(Collectors.toList());
+    }
+
+    public String getCacheKey() {
+        return iconRepository.getLastModifiedTime()
+            .map(Instant::toEpochMilli)
+            .orElse(0L) + "-" + iconRepository.count();
     }
 
     private IconDto mapToDto(IconEntity entity) {

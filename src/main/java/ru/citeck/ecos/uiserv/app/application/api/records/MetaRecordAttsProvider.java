@@ -13,6 +13,7 @@ import ru.citeck.ecos.records2.rest.RemoteRecordsUtils;
 import ru.citeck.ecos.records2.source.dao.local.meta.MetaAttributesSupplier;
 import ru.citeck.ecos.records2.source.dao.local.meta.MetaRecordsDaoAttsProvider;
 import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService;
+import ru.citeck.ecos.uiserv.domain.icon.service.IconService;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService;
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService;
 import ru.citeck.ecos.uiserv.domain.theme.service.ThemeService;
@@ -33,6 +34,7 @@ public class MetaRecordAttsProvider implements MetaAttributesSupplier {
     private static final String ATT_MENU_CACHE_KEY = "menu-cache-key";
     private static final String ATT_I18N_CACHE_KEY = "i18n-cache-key";
     private static final String ATT_THEME_CACHE_KEY = "theme-cache-key";
+    private static final String ATT_IMAGES_CACHE_KEY = "images-cache-key";
 
     private static final long TYPES_CHECK_INTERVAL = 5000;
 
@@ -42,6 +44,7 @@ public class MetaRecordAttsProvider implements MetaAttributesSupplier {
     private final RecordsService recordsService;
     private final I18nService i18nService;
     private final ThemeService themeService;
+    private final IconService iconService;
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -57,7 +60,12 @@ public class MetaRecordAttsProvider implements MetaAttributesSupplier {
 
     @Override
     public List<String> getAttributesList() {
-        return Arrays.asList(ATT_MENU_CACHE_KEY, ATT_I18N_CACHE_KEY, ATT_THEME_CACHE_KEY);
+        return Arrays.asList(
+            ATT_MENU_CACHE_KEY,
+            ATT_I18N_CACHE_KEY,
+            ATT_THEME_CACHE_KEY,
+            ATT_IMAGES_CACHE_KEY
+        );
     }
 
     private void updateTypesChangedTime() {
@@ -118,7 +126,14 @@ public class MetaRecordAttsProvider implements MetaAttributesSupplier {
 
             case ATT_THEME_CACHE_KEY:
 
-                return themeService.getCacheKey();
+                return Objects.hash(
+                    themeService.getCacheKey(),
+                    iconService.getCacheKey()
+                );
+
+            case ATT_IMAGES_CACHE_KEY:
+
+                return iconService.getCacheKey();
         }
 
         return null;
