@@ -1,0 +1,23 @@
+
+id: ecos-theme
+label: { ru: Темы, en: Themes }
+
+typeRef: emodel/type@theme
+sourceId: uiserv/theme
+
+attributes:
+  actionFormatter: '' #include include/legacy-actions.js
+  journalsListId: global-system
+
+actions:
+  - uiserv/action@download-base64-data-zip
+
+columns:
+
+  - name: moduleId
+    type: text
+    label: { ru: Идентификатор, en: Id }
+
+  - name: name
+    type: text
+    label: { ru: Имя, en: Name }

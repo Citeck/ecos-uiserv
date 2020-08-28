@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.theme.api.rest;
+package ru.citeck.ecos.uiserv.domain.theme_old.api.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.CacheControl;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-import ru.citeck.ecos.uiserv.domain.theme.service.ThemeService;
+import ru.citeck.ecos.uiserv.domain.theme_old.service.ThemeServiceOld;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +30,7 @@ import java.util.function.Supplier;
 @Transactional
 public class ThemeApi {
     @Autowired
-    private ThemeService themeService;
+    private ThemeServiceOld themeService;
 
     //by default, Spring serves static resources right at context root
     //format argument is theme id, that's why only alphanumeric characters are accepted as theme id by uiserv
@@ -100,10 +100,10 @@ public class ThemeApi {
         return genericGetLogoOverride(() -> themeService.getMobileLogoOverride(username), eTag);
     }
 
-    private ResponseEntity<byte[]> genericGetLogoOverride(Supplier<ThemeService.LogoFile> logoLoader,
+    private ResponseEntity<byte[]> genericGetLogoOverride(Supplier<ThemeServiceOld.LogoFile> logoLoader,
                                                           String requestETag) {
         //todo don't eager-load bytes[] unless we're sure it's not status 304
-        final ThemeService.LogoFile logoFile = logoLoader.get();
+        final ThemeServiceOld.LogoFile logoFile = logoLoader.get();
 
         if (logoFile == null)
             return ResponseEntity.notFound().build();

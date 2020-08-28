@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.theme.repo;
+package ru.citeck.ecos.uiserv.domain.theme_old.repo;
 
 import lombok.Getter;
 import lombok.Setter;

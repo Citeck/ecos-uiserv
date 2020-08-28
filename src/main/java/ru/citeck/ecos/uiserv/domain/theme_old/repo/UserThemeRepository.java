@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.theme.repo;
+package ru.citeck.ecos.uiserv.domain.theme_old.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;

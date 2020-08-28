@@ -1,0 +1,17 @@
+
+id: theme
+
+name:
+  en: Theme
+  ru: Тема
+
+system: true
+
+journal: uiserv/journal@ecos-theme
+
+createVariants:
+
+  - id: upload-theme
+    name: { ru: Загрузить тему, en: Upload theme }
+    recordRef: uiserv/theme@
+    formRef: uiserv/eform@ecos-module-upload

@@ -15,6 +15,7 @@ import ru.citeck.ecos.records2.source.dao.local.meta.MetaRecordsDaoAttsProvider;
 import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService;
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService;
+import ru.citeck.ecos.uiserv.domain.theme.service.ThemeService;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
@@ -31,6 +32,7 @@ public class MetaRecordAttsProvider implements MetaAttributesSupplier {
 
     private static final String ATT_MENU_CACHE_KEY = "menu-cache-key";
     private static final String ATT_I18N_CACHE_KEY = "i18n-cache-key";
+    private static final String ATT_THEME_CACHE_KEY = "theme-cache-key";
 
     private static final long TYPES_CHECK_INTERVAL = 5000;
 
@@ -39,6 +41,7 @@ public class MetaRecordAttsProvider implements MetaAttributesSupplier {
     private final MetaRecordsDaoAttsProvider provider;
     private final RecordsService recordsService;
     private final I18nService i18nService;
+    private final ThemeService themeService;
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -54,7 +57,7 @@ public class MetaRecordAttsProvider implements MetaAttributesSupplier {
 
     @Override
     public List<String> getAttributesList() {
-        return Arrays.asList(ATT_MENU_CACHE_KEY, ATT_I18N_CACHE_KEY);
+        return Arrays.asList(ATT_MENU_CACHE_KEY, ATT_I18N_CACHE_KEY, ATT_THEME_CACHE_KEY);
     }
 
     private void updateTypesChangedTime() {
@@ -97,6 +100,7 @@ public class MetaRecordAttsProvider implements MetaAttributesSupplier {
     public Object getAttribute(String attribute, MetaField field) {
 
         switch (attribute) {
+
             case ATT_MENU_CACHE_KEY:
 
                 syncTypesChangedTime();
@@ -107,8 +111,14 @@ public class MetaRecordAttsProvider implements MetaAttributesSupplier {
                     i18nService.getCacheKey(),
                     lastModifiedType
                 );
+
             case ATT_I18N_CACHE_KEY:
+
                 return i18nService.getCacheKey();
+
+            case ATT_THEME_CACHE_KEY:
+
+                return themeService.getCacheKey();
         }
 
         return null;
