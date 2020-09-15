@@ -4,8 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.uiserv.app.application.props.ApplicationProperties;
+import ru.citeck.ecos.uiserv.domain.config.api.records.ConfigRecords;
 import ru.citeck.ecos.uiserv.domain.menu.repo.MenuEntity;
 import ru.citeck.ecos.uiserv.domain.menu.repo.MenuRepository;
 import ru.citeck.ecos.uiserv.app.common.service.AuthoritiesSupport;
@@ -20,16 +24,14 @@ import ru.citeck.ecos.uiserv.domain.menu.service.resolving.resolvers.MenuItemsRe
 
 import java.time.Instant;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class MenuService {
 
-    private static final String DEFAULT_AUTHORITY = "default";
+    private static final String DEFAULT_AUTHORITY = "GROUP_EVERYONE";
     private static final String DEFAULT_MENU_ID = "default-menu";
     private static final String DEFAULT_MENU_V1_ID = "default-menu-v1";
 
@@ -37,8 +39,9 @@ public class MenuService {
     private final MenuReaderService readerService;
     private final I18nService i18nService;
     private final AuthoritiesSupport authoritiesSupport;
-    private final ApplicationProperties applicationProperties;
     private final List<MenuItemsResolver> resolvers;
+
+    private final RecordsService recordsService;
 
     public long getLastModifiedTimeMs() {
         return menuRepository.getLastModifiedTime()
@@ -105,66 +108,80 @@ public class MenuService {
     }
 
     public MenuDto getMenuForUser(String username, Integer version) {
-        Set<String> userAuthorities = new HashSet<>(authoritiesSupport.queryUserAuthorities(username));
-        return getMenuForUser(username, userAuthorities, version);
+        return getMenuForUser(username, null, version);
     }
 
     public MenuDto getMenuForUser(String username, Set<String> authorities, Integer version) {
 
-        return Stream.<Supplier<Optional<MenuDto>>>of(
-            () -> findMenuByUsername(username),
-            () -> findByAuthorities(authorities),
-            this::findByDefaultAuthority
-        ).map(Supplier::get)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .filter(config -> {
-                int confVersion = config.getVersion() != null ? config.getVersion() : 0;
-                int argVersion = version != null ? version : 0;
-                return confVersion == argVersion;
-            })
-            .findFirst()
-            .orElseGet(() -> findDefaultMenu(version));
+        MenuDto menu = findFirstByAuthorities(Collections.singletonList(username), version)
+            .orElseGet(() -> {
+
+                Set<String> authToRequest =  new HashSet<>(authorities != null ?
+                    authorities : authoritiesSupport.queryUserAuthorities(username));
+
+                authToRequest.remove(username);
+                List<String> orderedAuthorities = getOrderedAuthorities(authToRequest);
+                return findFirstByAuthorities(orderedAuthorities, version).orElse(null);
+            });
+        if (menu == null) {
+            menu = findDefaultMenu(version);
+        }
+        return menu;
     }
 
     public ResolvedMenuDto getResolvedMenuForUser(String username) {
-        Set<String> userAuthorities = new HashSet<>(authoritiesSupport.queryUserAuthorities(username));
-        MenuDto dto = getMenuForUser(username, userAuthorities, null);
-        return resolveMenu(dto, userAuthorities);
+        Set<String> authorities = new HashSet<>(authoritiesSupport.queryUserAuthorities(username));
+        MenuDto dto = getMenuForUser(username, authorities, null);
+        return resolveMenu(dto, authorities);
     }
 
-    private Optional<MenuDto> findMenuByUsername(String username) {
-        return getMenu(username);
+    private boolean compareVersion(Integer v0, Integer v1) {
+        if (v0 == null) {
+            v0 = 0;
+        }
+        if (v1 == null) {
+            v1 = 0;
+        }
+        return v0.equals(v1);
     }
 
-    private Optional<MenuDto> findByAuthorities(Set<String> userAuthorities) {
-        List<String> orderedAuthorities = getOrderedAuthorities(userAuthorities);
-
-        return findFirstByAuthorities(orderedAuthorities);
+    private boolean isDefaultMenu(String id) {
+        return DEFAULT_MENU_ID.equals(id) || DEFAULT_MENU_V1_ID.equals(id);
     }
 
-    private Optional<MenuDto> findByDefaultAuthority() {
-        return findFirstByAuthorities(Collections.singletonList(DEFAULT_AUTHORITY));
-    }
-
-    private Optional<MenuDto> findFirstByAuthorities(List<String> authorities) {
+    private Optional<MenuDto> findFirstByAuthorities(List<String> authorities, Integer version) {
         return authorities.stream()
             .map(menuRepository::findAllByAuthoritiesContains)
             .flatMap(List::stream)
-            .filter(entity -> !DEFAULT_MENU_ID.equals(entity.getExtId()))
+            .filter(menu -> compareVersion(menu.getVersion(), version))
+            .filter(entity -> !isDefaultMenu(entity.getExtId()))
             .map(this::mapToDto)
             .findFirst();
     }
 
     private List<String> getOrderedAuthorities(Set<String> userAuthorities) {
+
+        DataValue priorityArr = recordsService.getAtt(
+            RecordRef.create(ConfigRecords.ID, "menu-group-priority"), "value?json");
+
+        List<String> priority = new ArrayList<>();
+        priorityArr.forEach(v -> {
+            String id = v.get("id").asText();
+            if (StringUtils.isNotBlank(id)) {
+                priority.add(id);
+            }
+        });
+
         Set<String> allUserAuthorities = new HashSet<>(userAuthorities);
-        List<String> defaultOrder = new ArrayList<>(applicationProperties.getMenuConfigAuthorityOrder());
-        defaultOrder.retainAll(allUserAuthorities);
-        allUserAuthorities.removeAll(defaultOrder);
+        allUserAuthorities.remove(DEFAULT_AUTHORITY);
+        priority.retainAll(allUserAuthorities);
+        allUserAuthorities.removeAll(priority);
 
         List<String> orderedAuthorities = new LinkedList<>();
-        orderedAuthorities.addAll(defaultOrder);
+        orderedAuthorities.addAll(priority);
         orderedAuthorities.addAll(allUserAuthorities);
+        orderedAuthorities.add(DEFAULT_AUTHORITY);
+
         return orderedAuthorities;
     }
 
@@ -203,10 +220,7 @@ public class MenuService {
     }
 
     public void deleteByExtId(String menuId) {
-        if (StringUtils.isBlank(menuId)
-            || menuId.equals(DEFAULT_MENU_ID)
-            || menuId.equals(DEFAULT_MENU_V1_ID)) {
-
+        if (StringUtils.isBlank(menuId) || isDefaultMenu(menuId)) {
             return;
         }
         menuRepository.deleteByExtId(menuId);
