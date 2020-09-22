@@ -1,0 +1,11 @@
+{
+    "id": "view-content-in-browser",
+    "name": {
+        "ru": "Просмотреть в браузере",
+        "en": "View in browser"
+    },
+    "type": "open-url",
+    "config": {
+        "url": "/share/proxy/alfresco/citeck/print/content?nodeRef=${recordRef}&download=false"
+    }
+}
