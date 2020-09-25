@@ -1,5 +1,5 @@
 {
-  "id": "default-menu-for-everyone-v1",
+  "id": "default-menu-v1",
   "type": "LEFT_MENU",
   "authorities": [
     "GROUP_EVERYONE"

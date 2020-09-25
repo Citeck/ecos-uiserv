@@ -2,7 +2,7 @@
   "id": "deafult-menu-for-admin-v1",
   "type": "LEFT_MENU",
   "authorities": [
-    "admin"
+    "GROUP_ALFRESCO_ADMINISTRATORS"
   ],
   "version": 1,
   "subMenu": {
