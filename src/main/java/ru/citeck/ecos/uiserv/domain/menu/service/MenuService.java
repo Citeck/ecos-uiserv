@@ -213,7 +213,7 @@ public class MenuService {
         }
 
         if (StringUtils.isBlank(dto.getId())) {
-            throw new IllegalArgumentException("Id param in menu dto is mandatory");
+            dto.setId(UUID.randomUUID().toString());
         }
 
         return mapToDto(menuRepository.save(mapToEntity(dto)));

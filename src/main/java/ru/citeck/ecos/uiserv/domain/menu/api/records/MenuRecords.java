@@ -120,8 +120,7 @@ public class MenuRecords extends LocalRecordsDao
                                                 @NotNull MetaField metaField) {
         return records.stream()
             .map(RecordRef::getId)
-            .map(id -> menuService.getMenu(id)
-                .orElseGet(() -> new MenuDto(id)))
+            .map(id -> menuService.getMenu(id).orElseGet(() -> new MenuDto("")))
             .map(MenuRecord::new)
             .collect(Collectors.toList());
     }
