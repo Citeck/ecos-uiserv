@@ -4,9 +4,9 @@
     "en": "ECOS theme"
   },
   "images": {
-    "logo": "uiserv/icon@theme/ecos/logo.png",
-    "login-logo": "uiserv/icon@theme/ecos/login-logo.png",
-    "menu-left-logo-large": "uiserv/icon@theme/ecos/menu-left-logo-large.png",
-    "menu-left-logo-small": "uiserv/icon@theme/ecos/menu-left-logo-small.png"
+    "logo": "/image/logo.png",
+    "login-logo": "/image/login-logo.png",
+    "menu-left-logo-large": "/image/menu-left-logo-large.png",
+    "menu-left-logo-small": "/image/menu-left-logo-small.png"
   }
 }
