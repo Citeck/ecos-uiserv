@@ -42,16 +42,12 @@ public class ThemeController {
 
     @GetMapping(path = "/current", produces = MediaType.TEXT_PLAIN_VALUE)
     public String getCurrentTheme() {
-        return themeService.getCurrentTheme();
+        return themeService.getActiveTheme();
     }
 
     @GetMapping(path = "/{themeId}/style/{styleId}", produces = "text/css;charset=UTF-8")
     public HttpEntity<byte[]> getThemeStyle(@PathVariable("themeId") String themeId,
                                             @PathVariable("styleId") String styleId) {
-
-        if ("null".equals(themeId) || StringUtils.isBlank(themeId)) {
-            themeId = getCurrentTheme();
-        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setCacheControl(CacheControl.maxAge(4, TimeUnit.HOURS)
@@ -70,10 +66,6 @@ public class ThemeController {
     @GetMapping(path = "/{themeId}/image/{imageId}")
     public HttpEntity<byte[]> getThemeImage(@PathVariable("themeId") String themeId,
                                             @PathVariable("imageId") String imageId) {
-
-        if ("null".equals(themeId) || StringUtils.isBlank(themeId)) {
-            themeId = getCurrentTheme();
-        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setCacheControl(CacheControl.maxAge(4, TimeUnit.HOURS)

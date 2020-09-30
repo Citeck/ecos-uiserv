@@ -43,8 +43,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ThemeService {
 
+    public static final String ECOS_THEME_ID = "ecos";
+    public static final String NULL_THEME_ID = "null";
+
     public static final String CURRENT_THEME_CONFIG_KEY = "active-theme";
     public static final String RES_TYPE_IMAGE = "image";
+    public static final String ACTIVE_THEME_ID = "active";
     public static final String RES_TYPE_STYLE = "style";
     public static final String ICON_REF_PREFIX = "uiserv/" + IconRecords.ID + "@";
 
@@ -58,6 +62,8 @@ public class ThemeService {
     private final IconService iconService;
 
     private LoadingCache<ResourceKey, ResourceData> resourcesCache;
+    private LoadingCache<String, String> activeThemeCache;
+    private String prevActiveTheme = null;
 
     @PostConstruct
     public void init() {
@@ -65,15 +71,28 @@ public class ThemeService {
             .maximumSize(20)
             .expireAfterWrite(5, TimeUnit.MINUTES)
             .build(CacheLoader.from(this::getResourceImpl));
+        activeThemeCache = CacheBuilder.newBuilder()
+            .maximumSize(1)
+            .expireAfterWrite(10, TimeUnit.SECONDS)
+            .build(CacheLoader.from(this::getActiveThemeImpl));
     }
 
-    public String getCurrentTheme() {
+    public String getActiveTheme() {
+        String res = activeThemeCache.getUnchecked(ACTIVE_THEME_ID);
+        if (!Objects.equals(prevActiveTheme, res)) {
+            resourcesCache.invalidateAll();
+            prevActiveTheme = res;
+        }
+        return res;
+    }
+
+    private String getActiveThemeImpl() {
 
         String theme = recordsService.getAtt(
             RecordRef.create(ConfigRecords.ID, CURRENT_THEME_CONFIG_KEY), "value?str").asText();
 
         if (StringUtils.isBlank(theme) || theme.equals("null")) {
-            theme = "ecos";
+            theme = ECOS_THEME_ID;
         }
 
         return theme;
@@ -128,7 +147,7 @@ public class ThemeService {
     }
 
     public void delete(String id) {
-        if (!"ecos".equals(id)) {
+        if (!ECOS_THEME_ID.equals(id)) {
             themeRepo.findFirstByExtId(id).ifPresent(themeRepo::delete);
             resourcesCache.invalidateAll();
         }
@@ -139,6 +158,7 @@ public class ThemeService {
         if (StringUtils.isBlank(name)) {
             return EMPTY_RESOURCE;
         }
+        themeId = fixThemeId(themeId);
         if (!name.endsWith(".css")) {
             name = name + ".css";
         }
@@ -150,7 +170,20 @@ public class ThemeService {
 
     @NotNull
     public ResourceData getImage(String themeId, String name) {
+        if (StringUtils.isBlank(name)) {
+            return EMPTY_RESOURCE;
+        }
+        themeId = fixThemeId(themeId);
         return resourcesCache.getUnchecked(new ResourceKey(themeId, RES_TYPE_IMAGE, name));
+    }
+
+    private String fixThemeId(String themeId) {
+        if (StringUtils.isBlank(themeId)) {
+            themeId = "ecos";
+        } else if (themeId.equals(NULL_THEME_ID) || themeId.equals(ACTIVE_THEME_ID)) {
+            themeId = getActiveTheme();
+        }
+        return themeId;
     }
 
     @NotNull
@@ -173,8 +206,8 @@ public class ThemeService {
             return EMPTY_RESOURCE;
         }
 
-        String fileName = null;
-        byte[] data = null;
+        byte[] data;
+        String fileName;
 
         if (path.startsWith("/")) {
 
@@ -209,7 +242,7 @@ public class ThemeService {
     public String getCacheKey() {
         return themeRepo.getLastModifiedTime()
             .map(Instant::toEpochMilli)
-            .orElse(0L) + "-" + themeRepo.count();
+            .orElse(0L) + "-" + themeRepo.count() + "-" + getActiveTheme();
     }
 
     @Nullable
