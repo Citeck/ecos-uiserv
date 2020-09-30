@@ -152,7 +152,7 @@ public class MenuRecords extends LocalRecordsDao
         }
 
         public MenuPermissions getPermissions() {
-            return new MenuPermissions(!isDefaultMenu());
+            return new MenuPermissions(!isDefaultMenu() && getVersion() > 0);
         }
 
         public String getModuleId() {
@@ -198,8 +198,6 @@ public class MenuRecords extends LocalRecordsDao
         public MenuDto toJson() {
             return new MenuDto(this);
         }
-
-
     }
 
     public static class MenuPermissions implements MetaValue {
