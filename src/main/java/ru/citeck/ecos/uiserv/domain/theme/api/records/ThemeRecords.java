@@ -3,7 +3,6 @@ package ru.citeck.ecos.uiserv.domain.theme.api.records;
 import ecos.com.fasterxml.jackson210.annotation.JsonIgnore;
 import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.compress.archivers.zip.ZipUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.ObjectData;
@@ -74,8 +73,7 @@ public class ThemeRecords extends LocalRecordsDao implements LocalRecordsQueryWi
     }
 
     @Override
-    public List<ThemeRecord> getLocalRecordsMeta(@NotNull List<RecordRef> list,
-                                                     @NotNull MetaField metaField) {
+    public List<ThemeRecord> getLocalRecordsMeta(@NotNull List<RecordRef> list, @NotNull MetaField metaField) {
 
         return list.stream()
             .map(ref -> {
@@ -199,11 +197,15 @@ public class ThemeRecords extends LocalRecordsDao implements LocalRecordsQueryWi
             this.setImages(meta.getImages());
             this.setName(meta.getName());
 
-            Map<String, byte[]> styles = new HashMap<>();
-            for (EcosFile file : theme.findFiles("**.css")) {
-                styles.put(file.getName().substring(0, file.getName().length() - 4), file.readAsBytes());
+            Map<String, byte[]> resources = new HashMap<>();
+            for (EcosFile file : theme.findFiles()) {
+                String name = file.getName();
+                if (ThemeService.RES_EXTENSIONS.stream().anyMatch(name::endsWith)) {
+                    String path = "/" + theme.getPath().relativize(file.getPath()).toString();
+                    resources.put(path, file.readAsBytes());
+                }
             }
-            this.setStyles(styles);
+            this.setResources(resources);
         }
 
         public byte[] getData() {
@@ -222,9 +224,9 @@ public class ThemeRecords extends LocalRecordsDao implements LocalRecordsQueryWi
             }
             dir.createFile("meta.json", metaData);
 
-            if (getStyles() != null) {
-                for (Map.Entry<String, byte[]> entry : getStyles().entrySet()) {
-                    dir.createFile(entry.getKey() + ".css", entry.getValue());
+            if (getResources() != null) {
+                for (Map.Entry<String, byte[]> entry : getResources().entrySet()) {
+                    dir.createFile(entry.getKey().substring(1), entry.getValue());
                 }
             }
             return ZipUtils.writeZipAsBytes(root);

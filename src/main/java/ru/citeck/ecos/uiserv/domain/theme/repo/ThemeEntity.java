@@ -27,7 +27,7 @@ public class ThemeEntity extends AbstractAuditingEntity {
     @NotNull
     private String name;
 
-    private byte[] styles;
+    private byte[] resources;
 
     @Override
     public boolean equals(Object o) {

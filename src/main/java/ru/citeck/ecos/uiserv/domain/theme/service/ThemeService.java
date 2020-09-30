@@ -6,6 +6,7 @@ import com.google.common.cache.LoadingCache;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,40 +14,69 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeTypeUtils;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.io.file.mem.EcosMemDir;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.utils.ZipUtils;
 import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.uiserv.domain.config.api.records.ConfigRecords;
+import ru.citeck.ecos.uiserv.domain.icon.api.records.IconRecords;
+import ru.citeck.ecos.uiserv.domain.icon.dto.IconDto;
+import ru.citeck.ecos.uiserv.domain.icon.service.IconService;
+import ru.citeck.ecos.uiserv.domain.theme.dto.ResourceData;
 import ru.citeck.ecos.uiserv.domain.theme.dto.ThemeDto;
 import ru.citeck.ecos.uiserv.domain.theme.repo.ThemeEntity;
 import ru.citeck.ecos.uiserv.domain.theme.repo.ThemeRepository;
 
 import javax.annotation.PostConstruct;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ThemeService {
 
-    private final ThemeRepository themeRepo;
+    public static final String CURRENT_THEME_CONFIG_KEY = "active-theme";
+    public static final String RES_TYPE_IMAGE = "image";
+    public static final String RES_TYPE_STYLE = "style";
+    public static final String ICON_REF_PREFIX = "uiserv/" + IconRecords.ID + "@";
 
-    private LoadingCache<StyleKey, byte[]> stylesCache;
+    // ThemeController.groovy should has the same constants
+    public static final List<String> RES_EXTENSIONS = Arrays.asList("png", "jpeg", "jpg", "svg", "css");
+
+    private static final ResourceData EMPTY_RESOURCE = new ResourceData(null, null);
+
+    private final ThemeRepository themeRepo;
+    private final RecordsService recordsService;
+    private final IconService iconService;
+
+    private LoadingCache<ResourceKey, ResourceData> resourcesCache;
 
     @PostConstruct
     public void init() {
-        stylesCache = CacheBuilder.newBuilder()
+        resourcesCache = CacheBuilder.newBuilder()
             .maximumSize(20)
             .expireAfterWrite(5, TimeUnit.MINUTES)
-            .build(CacheLoader.from(this::getStyleImpl));
+            .build(CacheLoader.from(this::getResourceImpl));
+    }
+
+    public String getCurrentTheme() {
+
+        String theme = recordsService.getAtt(
+            RecordRef.create(ConfigRecords.ID, CURRENT_THEME_CONFIG_KEY), "value?str").asText();
+
+        if (StringUtils.isBlank(theme) || theme.equals("null")) {
+            theme = "ecos";
+        }
+
+        return theme;
     }
 
     public List<ThemeDto> getAll(int max, int skipCount) {
@@ -91,7 +121,7 @@ public class ThemeService {
             try {
                 return toDto(themeRepo.save(entity));
             } finally {
-                stylesCache.invalidateAll();
+                resourcesCache.invalidateAll();
             }
         }
         return null;
@@ -100,31 +130,80 @@ public class ThemeService {
     public void delete(String id) {
         if (!"ecos".equals(id)) {
             themeRepo.findFirstByExtId(id).ifPresent(themeRepo::delete);
-            stylesCache.invalidateAll();
+            resourcesCache.invalidateAll();
         }
     }
 
     @NotNull
-    public byte[] getStyle(String themeId, String name) {
-        return stylesCache.getUnchecked(new StyleKey(themeId, name));
+    public ResourceData getStyle(String themeId, String name) {
+        if (StringUtils.isBlank(name)) {
+            return EMPTY_RESOURCE;
+        }
+        if (!name.endsWith(".css")) {
+            name = name + ".css";
+        }
+        if (name.charAt(0) != '/') {
+            name = '/' + name;
+        }
+        return resourcesCache.getUnchecked(new ResourceKey(themeId, RES_TYPE_STYLE, name));
     }
 
     @NotNull
-    private byte[] getStyleImpl(StyleKey key) {
+    public ResourceData getImage(String themeId, String name) {
+        return resourcesCache.getUnchecked(new ResourceKey(themeId, RES_TYPE_IMAGE, name));
+    }
 
-        if (StringUtils.isBlank(key.getName()) || StringUtils.isBlank(key.getThemeId())) {
-            return new byte[0];
+    @NotNull
+    private ResourceData getResourceImpl(ResourceKey key) {
+
+        if (StringUtils.isBlank(key.getPath()) || StringUtils.isBlank(key.getThemeId())) {
+            return EMPTY_RESOURCE;
         }
+
         ThemeDto dto = toDto(themeRepo.findFirstByExtId(key.getThemeId()).orElse(null));
         if (dto == null) {
-            return new byte[0];
+            return EMPTY_RESOURCE;
         }
-        String name = key.getName();
-        if (name.endsWith(".css")) {
-            name = name.replaceAll("\\.css$", "");
+
+        String path = key.getPath();
+        if (key.getType().equals("image")) {
+            path = dto.getImages().get(path);
         }
-        byte[] data = dto.getStyles().get(name);
-        return data != null ? data : new byte[0];
+        if (StringUtils.isBlank(path)) {
+            return EMPTY_RESOURCE;
+        }
+
+        String fileName = null;
+        byte[] data = null;
+
+        if (path.startsWith("/")) {
+
+            data = dto.getResources().get(path);
+            fileName = path.substring(path.lastIndexOf('/') + 1);
+
+        } else if (path.startsWith(ICON_REF_PREFIX)) {
+
+            String localId = path.replaceFirst(ICON_REF_PREFIX, "");
+            IconDto iconDto = iconService.findById(localId).orElse(null);
+            if (iconDto == null) {
+                return EMPTY_RESOURCE;
+            }
+
+            data = iconDto.getByteData();
+            fileName = iconDto.getId();
+            if (!fileName.contains(".") && iconDto.getMimetype() != null) {
+                if (MimeTypeUtils.IMAGE_JPEG.equals(iconDto.getMimetype())) {
+                    fileName += ".jpg";
+                } else {
+                    fileName += ".png";
+                }
+            }
+        } else {
+            log.error("Unsupported resource path: '" + path + "'");
+            return EMPTY_RESOURCE;
+        }
+
+        return new ResourceData(StringUtils.defaultString(fileName), data != null ? data : new byte[0]);
     }
 
     public String getCacheKey() {
@@ -138,10 +217,6 @@ public class ThemeService {
         return toDto(themeRepo.findFirstByExtId(id).orElse(null));
     }
 
-    public ThemeDto getWithStyles(String id) {
-        return toDto(themeRepo.findFirstByExtId(id).orElse(null));
-    }
-
     private ThemeDto toDto(ThemeEntity entity) {
 
         if (entity == null) {
@@ -151,20 +226,19 @@ public class ThemeService {
         ThemeDto dto = new ThemeDto();
 
         dto.setId(entity.getExtId());
-        dto.setImages(Json.getMapper().readMap(entity.getImages(), String.class, RecordRef.class));
+        dto.setImages(Json.getMapper().readMap(entity.getImages(), String.class, String.class));
         dto.setName(Json.getMapper().read(entity.getName(), MLText.class));
 
-        Map<String, byte[]> styles = new HashMap<>();
-        dto.setStyles(styles);
+        Map<String, byte[]> resources = new HashMap<>();
+        dto.setResources(resources);
 
-        byte[] stylesData = entity.getStyles();
-        if (stylesData == null) {
+        byte[] resourcesData = entity.getResources();
+        if (resourcesData == null) {
             return dto;
         }
-        EcosMemDir stylesDir = ZipUtils.extractZip(stylesData);
-        stylesDir.getChildren().forEach(child -> {
-            String name = child.getName().replaceAll("\\.css$", "");
-            styles.put(name, child.readAsBytes());
+        EcosMemDir stylesDir = ZipUtils.extractZip(resourcesData);
+        stylesDir.findFiles().forEach(f -> {
+            resources.put(f.getPath().toString().replace("\\", "/"), f.readAsBytes());
         });
 
         return dto;
@@ -194,13 +268,13 @@ public class ThemeService {
         entity.setImages(Json.getMapper().toString(dto.getImages()));
         entity.setName(Json.getMapper().toString(dto.getName()));
 
-        Map<String, byte[]> styles = dto.getStyles();
-        if (styles == null) {
-            entity.setStyles(null);
+        Map<String, byte[]> resources = dto.getResources();
+        if (resources == null) {
+            entity.setResources(null);
         } else {
-            EcosMemDir stylesDir = new EcosMemDir();
-            styles.forEach((name, data) -> stylesDir.createFile(name + ".css", data));
-            entity.setStyles(ZipUtils.writeZipAsBytes(stylesDir));
+            EcosMemDir resourcesDir = new EcosMemDir();
+            resources.forEach(resourcesDir::createFile);
+            entity.setResources(ZipUtils.writeZipAsBytes(resourcesDir));
         }
 
         return entity;
@@ -211,7 +285,7 @@ public class ThemeService {
         PredicateDto predicateDto = PredicateUtils.convertToDto(predicate, PredicateDto.class);
         Specification<ThemeEntity> spec = null;
 
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(predicateDto.moduleId)) {
+        if (StringUtils.isNotBlank(predicateDto.moduleId)) {
             spec = (root, query, builder) ->
                 builder.like(builder.lower(root.get("extId")), "%" + predicateDto.moduleId.toLowerCase() + "%");
         }
@@ -226,8 +300,9 @@ public class ThemeService {
 
     @Data
     @AllArgsConstructor
-    private static final class StyleKey {
+    private static final class ResourceKey {
         private String themeId;
-        private String name;
+        private String type;
+        private String path;
     }
 }

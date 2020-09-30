@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.domain.theme.api.rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -9,16 +10,13 @@ import org.springframework.http.MediaType;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.citeck.ecos.commons.io.file.std.EcosStdFile;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.uiserv.domain.icon.api.records.IconRecords;
-import ru.citeck.ecos.uiserv.domain.icon.dto.IconDto;
-import ru.citeck.ecos.uiserv.domain.icon.service.IconService;
-import ru.citeck.ecos.uiserv.domain.theme.dto.ThemeDto;
+import ru.citeck.ecos.uiserv.domain.theme.dto.ResourceData;
 import ru.citeck.ecos.uiserv.domain.theme.service.ThemeService;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -28,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 public class ThemeController {
 
     private final ThemeService themeService;
-    private final IconService iconService;
 
     private byte[] notFoundImageData;
     private MediaType notFoundImageType;
@@ -43,53 +40,57 @@ public class ThemeController {
         notFoundImageType = guessMediaType(notFoundFile.getName());
     }
 
-    @GetMapping(path = "/{themeId}/style/{styleId}", produces = "text/css")
+    @GetMapping(path = "/current", produces = MediaType.TEXT_PLAIN_VALUE)
+    public String getCurrentTheme() {
+        return themeService.getCurrentTheme();
+    }
+
+    @GetMapping(path = "/{themeId}/style/{styleId}", produces = "text/css;charset=UTF-8")
     public HttpEntity<byte[]> getThemeStyle(@PathVariable("themeId") String themeId,
                                             @PathVariable("styleId") String styleId) {
+
+        if ("null".equals(themeId) || StringUtils.isBlank(themeId)) {
+            themeId = getCurrentTheme();
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setCacheControl(CacheControl.maxAge(4, TimeUnit.HOURS)
             .mustRevalidate()
             .cachePublic()
         );
-        return new HttpEntity<>(themeService.getStyle(themeId, styleId), headers);
+
+        ResourceData data = themeService.getStyle(themeId, styleId);
+        byte[] bytes = data.getData();
+        if (bytes == null || bytes.length == 0) {
+            bytes = ".undefined-style {}".getBytes(StandardCharsets.UTF_8);
+        }
+        return new HttpEntity<>(bytes, headers);
     }
 
     @GetMapping(path = "/{themeId}/image/{imageId}")
     public HttpEntity<byte[]> getThemeImage(@PathVariable("themeId") String themeId,
                                             @PathVariable("imageId") String imageId) {
 
+        if ("null".equals(themeId) || StringUtils.isBlank(themeId)) {
+            themeId = getCurrentTheme();
+        }
+
         HttpHeaders headers = new HttpHeaders();
         headers.setCacheControl(CacheControl.maxAge(4, TimeUnit.HOURS)
             .mustRevalidate()
             .cachePublic()
         );
 
-        ThemeDto theme = themeService.getTheme(themeId);
-
-        if (theme == null || theme.getImages() == null)  {
+        ResourceData data = themeService.getImage(themeId, imageId);
+        byte[] bytes = data.getData();
+        if (bytes == null || bytes.length == 0) {
             return getNotFoundImageEntity(headers);
         }
 
-        RecordRef imageRef = theme.getImages().get(imageId);
-        if (RecordRef.isEmpty(imageRef)) {
-            return getNotFoundImageEntity(headers);
-        }
+        MediaType mediaType = guessMediaType(data.getFileName());
+        headers.setContentType(mediaType);
 
-        if (imageRef.getSourceId().equals(IconRecords.ID)) {
-            IconDto iconDto = iconService.findById(imageRef.getId()).orElse(null);
-            if (iconDto == null) {
-                return getNotFoundImageEntity(headers);
-            }
-            byte[] bytes = iconDto.getByteData();
-            MediaType mediaType = iconDto.getMimetype() != null ?
-                MediaType.valueOf(iconDto.getMimetype().toString()) : guessMediaType(iconDto.getId());
-            headers.setContentType(mediaType);
-            return new HttpEntity<>(bytes, headers);
-        }
-
-        log.error("Unsupported image ref: " + imageRef);
-        return getNotFoundImageEntity(headers);
+        return new HttpEntity<>(bytes, headers);
     }
 
     private MediaType guessMediaType(String fileName) {
