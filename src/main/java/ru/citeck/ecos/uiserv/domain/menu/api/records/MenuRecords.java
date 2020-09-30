@@ -152,7 +152,7 @@ public class MenuRecords extends LocalRecordsDao
         }
 
         public MenuPermissions getPermissions() {
-            return new MenuPermissions(!isDefaultMenu() && getVersion() > 0);
+            return new MenuPermissions(!isDefaultMenu());
         }
 
         public String getModuleId() {
