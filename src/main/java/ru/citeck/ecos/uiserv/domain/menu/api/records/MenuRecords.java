@@ -13,6 +13,7 @@ import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
+import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
 import ru.citeck.ecos.records2.graphql.meta.value.field.EmptyMetaField;
 import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
 import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
@@ -23,6 +24,7 @@ import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
+import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService;
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
 
@@ -43,6 +45,7 @@ public class MenuRecords extends LocalRecordsDao
     private static final String AUTHORITIES_QUERY_LANG = "authorities";
 
     private final MenuService menuService;
+    private final I18nService i18nService;
 
     {
         setId(ID);
@@ -131,13 +134,25 @@ public class MenuRecords extends LocalRecordsDao
         private Integer version;
     }
 
-    public static class MenuRecord extends MenuDto {
+    public class MenuRecord extends MenuDto {
 
         public MenuRecord(MenuDto model) {
             super(model);
         }
 
         public MenuRecord() {
+        }
+
+        public boolean isDefaultMenu() {
+            return menuService.isDefaultMenu(getId());
+        }
+
+        public String getDefaultMenuForJournal() {
+            return i18nService.getMessage(isDefaultMenu() ? "label.yes" : "label.no");
+        }
+
+        public MenuPermissions getPermissions() {
+            return new MenuPermissions(!isDefaultMenu());
         }
 
         public String getModuleId() {
@@ -159,6 +174,15 @@ public class MenuRecords extends LocalRecordsDao
             return getId();
         }
 
+        public String getAuthoritiesForJournal() {
+            List<String> authorities = getAuthorities();
+            if (authorities == null) {
+                return "";
+            }
+            return authorities.stream().filter(it -> !"GROUP_EVERYONE".equals(it))
+                .collect(Collectors.joining(", "));
+        }
+
         @JsonProperty("_content")
         public void setContent(List<ObjectData> content) {
 
@@ -173,6 +197,25 @@ public class MenuRecords extends LocalRecordsDao
         @com.fasterxml.jackson.annotation.JsonValue
         public MenuDto toJson() {
             return new MenuDto(this);
+        }
+
+
+    }
+
+    public static class MenuPermissions implements MetaValue {
+
+        boolean editable;
+
+        MenuPermissions(boolean editable) {
+            this.editable = editable;
+        }
+
+        @Override
+        public boolean has(@NotNull String name) {
+            if ("Write".equals(name)) {
+                return editable;
+            }
+            return true;
         }
     }
 }

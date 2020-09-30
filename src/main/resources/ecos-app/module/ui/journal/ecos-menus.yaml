@@ -24,6 +24,8 @@ columns:
   - name: version
     label: { ru: Версия модели, en: Model Version }
 
-  - name: authorities
-    attribute: authorities[]?str
+  - name: authoritiesForJournal
     label: { ru: Группы или пользователи, en: Groups or users }
+
+  - name: defaultMenuForJournal
+    label: { ru: Меню по умолчанию, en: Default menu }

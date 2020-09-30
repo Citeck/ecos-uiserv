@@ -8,7 +8,6 @@ import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.uiserv.app.application.props.ApplicationProperties;
 import ru.citeck.ecos.uiserv.domain.config.api.records.ConfigRecords;
 import ru.citeck.ecos.uiserv.domain.menu.repo.MenuEntity;
 import ru.citeck.ecos.uiserv.domain.menu.repo.MenuRepository;
@@ -35,6 +34,10 @@ public class MenuService {
     private static final String DEFAULT_MENU_ID = "default-menu";
     private static final String DEFAULT_MENU_V1_ID = "default-menu-v1";
 
+    public static final List<String> DEFAULT_MENUS = Arrays.asList(
+        DEFAULT_MENU_ID,
+        DEFAULT_MENU_V1_ID
+    );
     private final MenuRepository menuRepository;
     private final MenuReaderService readerService;
     private final I18nService i18nService;
@@ -145,8 +148,8 @@ public class MenuService {
         return v0.equals(v1);
     }
 
-    private boolean isDefaultMenu(String id) {
-        return DEFAULT_MENU_ID.equals(id) || DEFAULT_MENU_V1_ID.equals(id);
+    public boolean isDefaultMenu(String id) {
+        return id != null && DEFAULT_MENUS.contains(id);
     }
 
     private Optional<MenuDto> findFirstByAuthorities(List<String> authorities, Integer version) {

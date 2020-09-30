@@ -3,6 +3,14 @@
     "locales": ["en", "ru"],
     "order": 0,
     "messages": {
+        "label.yes": [
+          "Yes",
+          "Да"
+        ],
+        "label.no": [
+          "No",
+          "Нет"
+        ],
         "menu.header.tasks": [
             "Tasks",
             "Задачи"
@@ -131,7 +139,7 @@
             "Income package tasks",
             "Задачи разбора входящих"
         ],
-       
+
         "menuconfig_menuconfig.type.menuconfig_menuConfig.title": [
             "Menu configurations model",
             "Модель конфигурации меню"
