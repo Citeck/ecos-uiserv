@@ -13,4 +13,7 @@ public interface ThemeRepository extends JpaRepository<ThemeEntity, Long>, JpaSp
 
     @Query("SELECT max(m.lastModifiedDate) FROM ThemeEntity m")
     Optional<Instant> getLastModifiedTime();
+
+    @Query("SELECT m.parentRef FROM ThemeEntity m WHERE m.extId = ?1")
+    Optional<String> getParentRef(String extId);
 }

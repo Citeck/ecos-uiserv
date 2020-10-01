@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ThemeService {
 
-    public static final String ECOS_THEME_ID = "ecos";
+    public static final String DEFAULT_THEME_ID = "ecos";
     public static final String NULL_THEME_ID = "null";
 
     public static final String CURRENT_THEME_CONFIG_KEY = "active-theme";
@@ -70,7 +70,7 @@ public class ThemeService {
         resourcesCache = CacheBuilder.newBuilder()
             .maximumSize(20)
             .expireAfterWrite(5, TimeUnit.MINUTES)
-            .build(CacheLoader.from(this::getResourceImpl));
+            .build(CacheLoader.from(this::getInhResourceImpl));
         activeThemeCache = CacheBuilder.newBuilder()
             .maximumSize(1)
             .expireAfterWrite(10, TimeUnit.SECONDS)
@@ -92,7 +92,7 @@ public class ThemeService {
             RecordRef.create(ConfigRecords.ID, CURRENT_THEME_CONFIG_KEY), "value?str").asText();
 
         if (StringUtils.isBlank(theme) || theme.equals("null")) {
-            theme = ECOS_THEME_ID;
+            theme = DEFAULT_THEME_ID;
         }
 
         return theme;
@@ -147,7 +147,7 @@ public class ThemeService {
     }
 
     public void delete(String id) {
-        if (!ECOS_THEME_ID.equals(id)) {
+        if (!DEFAULT_THEME_ID.equals(id)) {
             themeRepo.findFirstByExtId(id).ifPresent(themeRepo::delete);
             resourcesCache.invalidateAll();
         }
@@ -184,6 +184,27 @@ public class ThemeService {
             themeId = getActiveTheme();
         }
         return themeId;
+    }
+
+    private ResourceData getInhResourceImpl(ResourceKey key) {
+
+        ResourceData result = getResourceImpl(key);
+
+        if (DEFAULT_THEME_ID.equals(key.getThemeId())
+                || (result.getData() != null && result.getData().length > 0)) {
+
+            return result;
+        }
+
+        String parentThemeId;
+        String parentRef = themeRepo.getParentRef(key.getThemeId()).orElse(null);
+        if (StringUtils.isBlank(parentRef)) {
+            parentThemeId = DEFAULT_THEME_ID;
+        } else {
+            parentThemeId = RecordRef.valueOf(parentRef).getId();
+        }
+
+        return getInhResourceImpl(new ResourceKey(parentThemeId, key.type, key.path));
     }
 
     @NotNull
@@ -261,6 +282,7 @@ public class ThemeService {
         dto.setId(entity.getExtId());
         dto.setImages(Json.getMapper().readMap(entity.getImages(), String.class, String.class));
         dto.setName(Json.getMapper().read(entity.getName(), MLText.class));
+        dto.setParentRef(RecordRef.valueOf(entity.getParentRef()));
 
         Map<String, byte[]> resources = new HashMap<>();
         dto.setResources(resources);
@@ -300,6 +322,7 @@ public class ThemeService {
 
         entity.setImages(Json.getMapper().toString(dto.getImages()));
         entity.setName(Json.getMapper().toString(dto.getName()));
+        entity.setParentRef(RecordRef.toString(dto.getParentRef()));
 
         Map<String, byte[]> resources = dto.getResources();
         if (resources == null) {

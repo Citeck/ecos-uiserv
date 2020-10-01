@@ -29,6 +29,8 @@ public class ThemeEntity extends AbstractAuditingEntity {
 
     private byte[] resources;
 
+    private String parentRef;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

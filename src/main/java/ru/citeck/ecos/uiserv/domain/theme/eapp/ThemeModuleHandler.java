@@ -9,6 +9,7 @@ import ru.citeck.ecos.apps.module.handler.EcosModuleHandler;
 import ru.citeck.ecos.apps.module.handler.ModuleMeta;
 import ru.citeck.ecos.apps.module.handler.ModuleWithMeta;
 import ru.citeck.ecos.commons.data.MLText;
+import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.domain.theme.dto.ThemeDto;
 import ru.citeck.ecos.uiserv.domain.theme.service.ThemeService;
 
@@ -30,6 +31,7 @@ public class ThemeModuleHandler implements EcosModuleHandler<ThemeModuleHandler.
         theme.setResources(module.getResources());
         theme.setName(module.getMeta().getName());
         theme.setImages(module.getMeta().getImages());
+        theme.setParentRef(module.getMeta().getParentRef());
 
         themeService.deploy(theme);
     }
@@ -67,6 +69,7 @@ public class ThemeModuleHandler implements EcosModuleHandler<ThemeModuleHandler.
     @Data
     public static class DeployModuleMeta {
         private MLText name;
+        private RecordRef parentRef;
         private Map<String, String> images = new HashMap<>();
     }
 }
