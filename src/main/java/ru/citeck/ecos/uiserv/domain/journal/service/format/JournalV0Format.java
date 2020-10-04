@@ -19,6 +19,7 @@ import ru.citeck.ecos.uiserv.domain.journal.service.format.util.EcosTypeUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
@@ -68,14 +69,18 @@ public class JournalV0Format implements JournalModelFormat<JournalConfig> {
         config.setCriteria(Collections.emptyList());
         config.setPredicate(dto.getPredicate() != null ? ObjectData.create(dto.getPredicate()) : null);
         config.setTitle(MLText.getClosestValue(dto.getLabel(), currentLocale));
-        config.setCreateVariants(getCreateVariants(dto.getTypeRef()));
+        config.setCreateVariants(getCreateVariants(dto));
 
         return config;
     }
 
-    private List<CreateVariant> getCreateVariants(RecordRef typeRef) {
+    private List<CreateVariant> getCreateVariants(JournalWithMeta dto) {
 
-        List<CreateVariantDto> variants = typeUtils.getCreateVariants(typeRef);
+        List<CreateVariantDto> typeVariants = typeUtils.getCreateVariants(dto.getTypeRef());
+        List<CreateVariantDto> journalVariants = dto.getCreateVariants();
+        List<CreateVariantDto> variants = Stream.concat(typeVariants.stream(), journalVariants.stream())
+            .collect(Collectors.toList());
+
         Locale locale = LocaleContextHolder.getLocale();
 
         return variants.stream().map(cv -> {
