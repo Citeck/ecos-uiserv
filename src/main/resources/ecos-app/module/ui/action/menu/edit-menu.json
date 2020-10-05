@@ -1,0 +1,28 @@
+{
+  "id": "edit-menu",
+  "name": {
+    "ru": "Редактировать",
+    "en": "Edit"
+  },
+  "type": "edit-menu",
+  "evaluator": {
+    "type": "predicate",
+    "config": {
+      "predicate": {
+        "t": "and",
+        "val": [
+          {
+            "t": "ge",
+            "att": "version?num",
+            "val": 1
+          },
+          {
+            "t": "eq",
+            "att": "defaultMenu?bool",
+            "val": false
+          }
+        ]
+      }
+    }
+  }
+}

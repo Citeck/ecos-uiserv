@@ -1,0 +1,18 @@
+{
+  "id": "copy-menu",
+  "name": {
+    "ru": "Копировать",
+    "en": "Copy"
+  },
+  "type": "module-copy",
+  "evaluator": {
+    "type": "predicate",
+    "config": {
+      "predicate": {
+        "t": "ge",
+        "att": "version?num",
+        "val": 1
+      }
+    }
+  }
+}
