@@ -123,5 +123,4 @@ public class JournalPrefService {
         private String owner; //user or null
         private JsonNode preferences;
     }
-
 }

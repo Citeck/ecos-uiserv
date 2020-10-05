@@ -6,16 +6,17 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType;
 import ru.citeck.ecos.uiserv.domain.file.service.FileService;
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSettingsDto;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService;
 import ru.citeck.ecos.uiserv.app.web.exception.JournalPrefsNotFoundException;
+import ru.citeck.ecos.uiserv.domain.journal.service.JournalSettingsService;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/journalprefs")
@@ -26,12 +27,18 @@ public class JournalPrefApi {
     private final FileService fileService;
     private final ObjectMapper objectMapper;
 
+    private final JournalSettingsService journalSettingsService;
+
     /**
      * Now need to use GET method from v2 package.
      */
     @Deprecated
     @GetMapping
     public JsonNode getJournalPrefs(@RequestParam String id) {
+        JournalSettingsDto settings = journalSettingsService.getById(id);
+        if (settings != null) {
+            return settings.getSettings().getAs(JsonNode.class);
+        }
         Optional<JournalPrefService.JournalPreferences> optionalJournalPrefs = journalPrefService.getJournalPrefs(id);
         return optionalJournalPrefs.orElseThrow(() -> new JournalPrefsNotFoundException(id)).getData();
     }
@@ -44,24 +51,49 @@ public class JournalPrefApi {
     public void putJournalPrefs(@RequestParam String id,
                                 @RequestBody byte[] bytes) {
         validateBody(bytes);
-        fileService.deployFileOverride(FileType.JOURNALPREFS, id, null, bytes);
+
+        JournalSettingsDto dto = journalSettingsService.getById(id);
+        if (dto == null) {
+            fileService.deployFileOverride(FileType.JOURNALPREFS, id, null, bytes);
+            return;
+        }
+        dto.setSettings(Json.getMapper().read(bytes, ObjectData.class));
+
+        if (dto.getSettings() != null) {
+            dto.setName(dto.getSettings().get("title").asText());
+        }
+        journalSettingsService.save(dto);
     }
 
     @DeleteMapping("/id/{journalViewPrefsId}")
     public void deleteJournalPrefs(@PathVariable String journalViewPrefsId) {
-        fileService.deployFileOverride(FileType.JOURNALPREFS, journalViewPrefsId, null, null,
-            Collections.emptyMap());
+
+        boolean deleted = journalSettingsService.delete(journalViewPrefsId);
+        if (!deleted) {
+            fileService.deployFileOverride(FileType.JOURNALPREFS, journalViewPrefsId, null, null,
+                Collections.emptyMap());
+        }
     }
 
     @PostMapping
     public String postJournalPrefs(@RequestParam String journalId,
-                                   @RequestParam(required = false) JournalPrefService.TargetType target,
                                    @ModelAttribute("username") @NonNull String username,
                                    @RequestBody byte[] bytes) {
-        validateUsername(username);
+
+        username = validateUsername(username);
         validateBody(bytes);
-        return journalPrefService.deployOverride(UUID.randomUUID().toString(), bytes,
-            username, target, journalId);
+
+        JournalSettingsDto journalSettingsDto = new JournalSettingsDto();
+        journalSettingsDto.setSettings(Json.getMapper().read(bytes, ObjectData.class));
+        journalSettingsDto.setJournalId(journalId);
+
+        if (journalSettingsDto.getSettings() != null) {
+            journalSettingsDto.setName(journalSettingsDto.getSettings().get("title").asText());
+        }
+        journalSettingsDto.setAuthority(username);
+
+        JournalSettingsDto result = journalSettingsService.save(journalSettingsDto);
+        return result.getId();
     }
 
     @GetMapping("/list")
@@ -70,17 +102,28 @@ public class JournalPrefApi {
                                                                            String username,
                                                                        @RequestParam(defaultValue = "true")
                                                                            Boolean includeUserLocal) {
-        validateUsername(username);
-        return journalPrefService.find(journalId, username, includeUserLocal);
+        username = validateUsername(username);
+
+        List<JournalSettingsDto> settings = journalSettingsService.getSettings(username, journalId);
+        List<JournalPrefService.JournalPreferences> preferences =
+            journalPrefService.find(journalId, username, includeUserLocal);
+
+        preferences = preferences == null ? new ArrayList<>() : new ArrayList<>(preferences);
+        settings.stream().map(s ->
+            new JournalPrefService.JournalPreferences(s.getId(), s.getSettings().getAs(JsonNode.class))
+        ).forEach(preferences::add);
+
+        return preferences;
     }
 
-    private void validateUsername(String username) {
+    private String validateUsername(String username) {
         if (StringUtils.isBlank(username)) {
             throw new IllegalArgumentException("Username cannot be empty");
         }
         if (username.contains("people@")) {
-            throw new IllegalArgumentException("Username cannot contain people@");
+            return username.replaceFirst("people@", "");
         }
+        return username;
     }
 
     private void validateBody(byte[] body) {
