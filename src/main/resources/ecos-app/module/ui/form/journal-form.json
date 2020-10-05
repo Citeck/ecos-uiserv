@@ -226,7 +226,7 @@
                           {
                             "label": "Actions",
                             "multiple": true,
-                            "journalId": "ecos-actions",
+                            "journalId": "ui-actions",
                             "key": "actions",
                             "type": "selectJournal",
                             "input": true,
