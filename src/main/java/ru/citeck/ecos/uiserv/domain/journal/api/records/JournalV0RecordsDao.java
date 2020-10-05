@@ -23,6 +23,7 @@ import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
+import ru.citeck.ecos.uiserv.domain.journal.dto.ResolvedJournalDto;
 import ru.citeck.ecos.uiserv.domain.journal.service.format.JournalV0Format;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.JournalConfig;
@@ -47,7 +48,7 @@ public class JournalV0RecordsDao extends LocalRecordsDao
     private static final String TYPE_URI = PROXY_URI + "api/journals/types/";
     private static final String NODE_REF_PREFIX = "workspace://";
 
-    private final JournalRecordsDao journalRecordsDao;
+    private final ResolvedJournalRecordsDao journalRecordsDao;
     private final JournalV0Format converter;
     private final RecordsService recordsService;
 
@@ -80,7 +81,7 @@ public class JournalV0RecordsDao extends LocalRecordsDao
     @Override
     public RecordsQueryResult<JournalConfig> queryLocalRecords(@NotNull RecordsQuery recordsQuery,
                                                                @NotNull MetaField metaField) {
-        RecordsQueryResult<JournalWithMeta> journalsResult = journalRecordsDao.queryLocalRecords(recordsQuery, metaField);
+        RecordsQueryResult<ResolvedJournalDto> journalsResult = journalRecordsDao.queryLocalRecords(recordsQuery, metaField);
         return new RecordsQueryResult<>(journalsResult, converter::convert);
     }
 
@@ -97,7 +98,7 @@ public class JournalV0RecordsDao extends LocalRecordsDao
 
         List<JournalConfig> result = new ArrayList<>();
 
-        List<JournalWithMeta> journals = journalRecordsDao.getLocalRecordsMeta(refsForConfigQuery, metaField);
+        List<ResolvedJournalDto> journals = journalRecordsDao.getLocalRecordsMeta(refsForConfigQuery, metaField);
         for (int i = 0; i < journals.size(); i++) {
 
             JournalWithMeta dto = journals.get(i);
