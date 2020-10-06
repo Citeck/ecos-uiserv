@@ -20,13 +20,17 @@ columns:
 
   - name: moduleId
     type: text
+    editable: false
     label: { ru: Идентификатор, en: Id }
 
   - name: version
+    editable: false
     label: { ru: Версия модели, en: Model Version }
 
   - name: authoritiesForJournal
+    editable: false
     label: { ru: Группы или пользователи, en: Groups or users }
 
   - name: defaultMenuForJournal
+    editable: false
     label: { ru: Меню по умолчанию, en: Default menu }
