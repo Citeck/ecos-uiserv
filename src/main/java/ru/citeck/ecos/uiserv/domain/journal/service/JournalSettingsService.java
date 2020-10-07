@@ -35,6 +35,16 @@ public class JournalSettingsService {
         return toDto(entity);
     }
 
+
+    @Nullable
+    public JournalSettingsDto getById(String id, String authority) {
+        JournalSettingsEntity entity = repo.findByExtIdAndAuthority(id, authority);
+        if (entity == null) {
+            return null;
+        }
+        return toDto(entity);
+    }
+
     public boolean delete(String id) {
         JournalSettingsEntity entity = repo.findByExtId(id);
         if (entity != null) {

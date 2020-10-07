@@ -13,5 +13,7 @@ public interface JournalSettingsRepository
 
     JournalSettingsEntity findByExtId(String id);
 
+    JournalSettingsEntity findByExtIdAndAuthority(String id, String authority);
+
     List<JournalSettingsEntity> findAllByAuthorityAndJournalId(String authority, String journalId);
 }

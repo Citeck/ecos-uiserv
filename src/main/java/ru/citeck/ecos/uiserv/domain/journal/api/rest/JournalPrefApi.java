@@ -34,9 +34,14 @@ public class JournalPrefApi {
      */
     @Deprecated
     @GetMapping
-    public JsonNode getJournalPrefs(@RequestParam String id) {
+    public JsonNode getJournalPrefs(@RequestParam String id,
+                                    @ModelAttribute("username") @NonNull String username) {
+
         JournalSettingsDto settings = journalSettingsService.getById(id);
         if (settings != null) {
+            if (!username.equals(settings.getAuthority())) {
+                throw new RuntimeException("Access denied");
+            }
             return settings.getSettings().getAs(JsonNode.class);
         }
         Optional<JournalPrefService.JournalPreferences> optionalJournalPrefs = journalPrefService.getJournalPrefs(id);
@@ -49,13 +54,17 @@ public class JournalPrefApi {
     @Deprecated
     @PutMapping
     public void putJournalPrefs(@RequestParam String id,
-                                @RequestBody byte[] bytes) {
+                                @RequestBody byte[] bytes,
+                                @ModelAttribute("username") @NonNull String username) {
         validateBody(bytes);
 
         JournalSettingsDto dto = journalSettingsService.getById(id);
         if (dto == null) {
             fileService.deployFileOverride(FileType.JOURNALPREFS, id, null, bytes);
             return;
+        }
+        if (!username.equals(dto.getAuthority())) {
+            throw new RuntimeException("Access denied");
         }
         dto.setSettings(Json.getMapper().read(bytes, ObjectData.class));
 
@@ -66,10 +75,17 @@ public class JournalPrefApi {
     }
 
     @DeleteMapping("/id/{journalViewPrefsId}")
-    public void deleteJournalPrefs(@PathVariable String journalViewPrefsId) {
+    public void deleteJournalPrefs(@PathVariable String journalViewPrefsId,
+                                   @ModelAttribute("username") @NonNull String username) {
 
-        boolean deleted = journalSettingsService.delete(journalViewPrefsId);
-        if (!deleted) {
+        JournalSettingsDto settings = journalSettingsService.getById(journalViewPrefsId);
+        if (settings != null) {
+            if (!username.equals(settings.getAuthority())) {
+                throw new RuntimeException("Access denied");
+            } else {
+                journalSettingsService.delete(journalViewPrefsId);
+            }
+        } else {
             fileService.deployFileOverride(FileType.JOURNALPREFS, journalViewPrefsId, null, null,
                 Collections.emptyMap());
         }
