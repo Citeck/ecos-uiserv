@@ -111,11 +111,19 @@ public class MenuFactory {
             return false;
         }
 
-        DataValue groupName = evaluator.getConfig().get("groupName");
-        if (groupName.isNull()) {
+        DataValue groupNameValue = evaluator.getConfig().get("groupName");
+        if (groupNameValue.isNull()) {
             return false;
         }
-        return authorities.contains(groupName.asText());
+
+        String[] groupNames = groupNameValue.asText().split(",");
+        for (String groupName: groupNames) {
+            if (authorities.contains(groupName.trim())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private List<ResolvedMenuItemDto> resolve(MenuItemDto child, ResolvedMenuItemDto context) {
