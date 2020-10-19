@@ -1,0 +1,11 @@
+
+id: dev-module
+
+name:
+  en: Dev module
+  ru: Dev module
+
+system: true
+
+actions:
+  - uiserv/action@record-actions

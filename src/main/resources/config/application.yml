@@ -200,7 +200,6 @@ uiserv:
         active-theme:
             value: ecos
 
-
     ecos-records:
         apps:
             alfresco:
