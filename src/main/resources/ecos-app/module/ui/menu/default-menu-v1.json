@@ -326,6 +326,28 @@
                   "config": {
                     "recordRef": "uiserv/journal_all@tax-unloading-tasks"
                   }
+                },
+                {
+                  "id": "eb529867-4234-4946-9364-add0112ad816",
+                  "label": {
+                    "ru": "Каталог"
+                  },
+                  "hidden": false,
+                  "type": "ARBITRARY",
+                  "config": {
+                    "url": "/share/page/site/ecos-tr/documentlibrary"
+                  }
+                },
+                {
+                  "id": "ef9be5fb-1913-4203-857c-ed72b472ce3b",
+                  "label": {
+                    "ru": "Календарь"
+                  },
+                  "hidden": false,
+                  "type": "ARBITRARY",
+                  "config": {
+                    "url": "/share/page/site/ecos-tr/calendar"
+                  }
                 }
               ]
             },
@@ -776,15 +798,49 @@
                   "config": {
                     "recordRef": "uiserv/journal_all@ecos-users-by-months"
                   }
+                },
+                {
+                  "id": "8fc8ad7a-e123-408b-b2af-b7d315e1923e",
+                  "label": {
+                    "ru": "Каталог"
+                  },
+                  "hidden": false,
+                  "type": "ARBITRARY",
+                  "config": {
+                    "url": "/share/page/site/jira-processes/documentlibrary"
+                  }
+                },
+                {
+                  "id": "f500bd24-d11a-46b2-abc9-ce465df5d44d",
+                  "label": {
+                    "ru": "Календаарь"
+                  },
+                  "hidden": false,
+                  "type": "ARBITRARY",
+                  "config": {
+                    "url": "/share/page/site/jira-processes/calendar"
+                  }
                 }
               ]
             },
             {
-              "id": "2b73864b-e853-4153-bf36-d54ba2f63e7f",
+              "id": "71532ed9-ff9c-409d-9ae7-2159e06b4b74",
               "label": {
-                "ru": "Создать сайт"
+                "ru": "Поиск разделов"
               },
-              "icon": "ui/icon@icon-empty",
+              "icon": "ui/icon@i-leftmenu-find-section",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/share/page/custom-site-finder"
+              }
+            },
+            {
+              "id": "24b9dee8-f473-435a-9d30-9e9ae633d244",
+              "label": {
+                "ru": "Создать раздел"
+              },
+              "icon": "ui/icon@i-leftmenu-new-section",
               "hidden": false,
               "type": "SECTION",
               "config": {}
@@ -1172,7 +1228,7 @@
                 {
                   "id": "b318cc23-426b-4f51-8106-b509887d5025",
                   "label": {
-                    "en": "Journal"
+                    "en": "Типы запросов"
                   },
                   "hidden": false,
                   "type": "JOURNAL",

@@ -1216,7 +1216,7 @@
                 {
                   "id": "b318cc23-426b-4f51-8106-b509887d5025",
                   "label": {
-                    "en": "Journal"
+                    "en": "Типы запросов"
                   },
                   "hidden": false,
                   "type": "JOURNAL",
