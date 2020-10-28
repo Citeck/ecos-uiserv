@@ -1598,7 +1598,7 @@
               "hidden": false,
               "type": "ARBITRARY",
               "config": {
-                "url": "/share/page/dev-tools"
+                "url": "/v2/dev-tools"
               }
             },
             {
