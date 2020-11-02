@@ -12,7 +12,7 @@ import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
-import ru.citeck.ecos.uiserv.domain.evaluator.service.IsLockedEvaluator;
+import ru.citeck.ecos.records3.record.request.RequestContext;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,12 +24,11 @@ public class IsLockedEvaluatorTest extends LocalRecordsDao implements LocalRecor
     private static final String ID = "isLockedEvaluatorTest";
 
     private RecordEvaluatorService evaluatorsService;
+    private RecordsServiceFactory factory = new RecordsServiceFactory();
 
     @Before
     public void setup() {
         setId(ID);
-
-        RecordsServiceFactory factory = new RecordsServiceFactory();
 
         recordsService = factory.getRecordsService();
         recordsService.register(this);
@@ -67,7 +66,9 @@ public class IsLockedEvaluatorTest extends LocalRecordsDao implements LocalRecor
         RecordRef recordRef = RecordRef.create(ID, "documentId");
 
         //  act
-        boolean result = evaluatorsService.evaluate(recordRef, evaluatorDto, model);
+
+        boolean result = RequestContext.doWithCtxJ(factory, data -> data.withCtxAtts(model), ctx ->
+            evaluatorsService.evaluate(recordRef, evaluatorDto));
 
         //  assert
         Assert.assertTrue(result);
@@ -88,7 +89,8 @@ public class IsLockedEvaluatorTest extends LocalRecordsDao implements LocalRecor
         RecordRef recordRef = RecordRef.create(ID, "documentId");
 
         //  act
-        boolean result = evaluatorsService.evaluate(recordRef, evaluatorDto, model);
+        boolean result = RequestContext.doWithCtxJ(factory, data -> data.withCtxAtts(model), ctx ->
+            evaluatorsService.evaluate(recordRef, evaluatorDto));
 
         //  assert
         Assert.assertFalse(result);

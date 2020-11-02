@@ -16,12 +16,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.RecordsDaoBuilder;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
+import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
 import ru.citeck.ecos.uiserv.domain.journal.service.mapper.JournalMapper;
@@ -62,7 +62,7 @@ public class JournalRecordsDaoTest {
         actionRepository.deleteAll();
 
         recordsService.register(RecordsDaoBuilder.create("emodel/type")
-            .addRecord(RecordRef.valueOf("journal"), ObjectData.create())
+            .addRecord("journal", ObjectData.create())
             .build());
     }
 

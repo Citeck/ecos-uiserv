@@ -105,7 +105,7 @@ public class MetaRecordAttsProvider implements MetaAttributesSupplier {
     }
 
     @Override
-    public Object getAttribute(String attribute, MetaField field) {
+    public Object getAttribute(String attribute) {
 
         switch (attribute) {
 

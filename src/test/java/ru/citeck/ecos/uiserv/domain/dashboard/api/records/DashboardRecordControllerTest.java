@@ -17,8 +17,8 @@ import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.request.rest.RestHandler;
-import ru.citeck.ecos.records2.spring.web.rest.RecordsRestApi;
-import ru.citeck.ecos.records2.spring.config.RecordsServiceFactoryConfiguration;
+import ru.citeck.ecos.records3.spring.config.RecordsServiceFactoryConfiguration;
+import ru.citeck.ecos.records3.spring.web.rest.RecordsRestApi;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
@@ -67,7 +67,7 @@ public class DashboardRecordControllerTest {
 
     @Before
     public void setup() {
-        RecordsRestApi recordsApi = new RecordsRestApi(factoryConfig.getRestHandler());
+        RecordsRestApi recordsApi = new RecordsRestApi(factoryConfig);
         this.mockRecordsApi = MockMvcBuilders
             .standaloneSetup(recordsApi)
             .build();

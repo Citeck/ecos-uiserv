@@ -3,8 +3,8 @@ package ru.citeck.ecos.uiserv.app.application.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.spring.web.rest.ContextAttributesSupplier;
-import ru.citeck.ecos.records2.spring.web.rest.RecordsRestApi;
+import ru.citeck.ecos.records3.spring.web.rest.ContextAttributesSupplier;
+import ru.citeck.ecos.records3.spring.web.rest.RecordsRestApi;
 import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils;
 
 import javax.annotation.PostConstruct;

@@ -15,7 +15,7 @@ import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
-import ru.citeck.ecos.uiserv.domain.evaluator.service.UserInRoleEvaluator;
+import ru.citeck.ecos.records3.record.request.RequestContext;
 
 import java.util.*;
 
@@ -26,13 +26,13 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
     private static final String TEST_WRONG_USERNAME = "WRONG_USER";
 
     private RecordEvaluatorService evaluatorsService;
+    private RecordsServiceFactory factory;
 
     @Before
     public void setup() {
         setId(ID);
 
-        RecordsServiceFactory factory = new RecordsServiceFactory();
-
+        factory = new RecordsServiceFactory();
         recordsService = factory.getRecordsService();
         recordsService.register(this);
 
@@ -60,7 +60,8 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
         TestCaseRole.currentUsername = TEST_USERNAME;
 
         //  act
-        boolean result = evaluatorsService.evaluate(recordRef, evaluatorDto, model);
+        boolean result = RequestContext.doWithCtxJ(factory, data -> data.withCtxAtts(model), ctx ->
+            evaluatorsService.evaluate(recordRef, evaluatorDto));
 
         //  assert
         Assert.assertTrue(result);
@@ -86,7 +87,8 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
         TestCaseRole.currentUsername = TEST_USERNAME;
 
         //  act
-        boolean result = evaluatorsService.evaluate(recordRef, evaluatorDto, model);
+        boolean result = RequestContext.doWithCtxJ(factory, data -> data.withCtxAtts(model), ctx ->
+            evaluatorsService.evaluate(recordRef, evaluatorDto));
 
         //  assert
         Assert.assertTrue(result);
@@ -112,7 +114,8 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
         TestCaseRole.currentUsername = TEST_WRONG_USERNAME;
 
         //  act
-        boolean result = evaluatorsService.evaluate(recordRef, evaluatorDto, model);
+        boolean result = RequestContext.doWithCtxJ(factory, data -> data.withCtxAtts(model), ctx ->
+            evaluatorsService.evaluate(recordRef, evaluatorDto));
 
         //  assert
         Assert.assertFalse(result);
@@ -138,7 +141,8 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
         TestCaseRole.currentUsername = TEST_USERNAME;
 
         //  act
-        boolean result = evaluatorsService.evaluate(recordRef, evaluatorDto, model);
+        boolean result = RequestContext.doWithCtxJ(factory, data -> data.withCtxAtts(model), ctx ->
+            evaluatorsService.evaluate(recordRef, evaluatorDto));
 
         //  assert
         Assert.assertFalse(result);
@@ -163,7 +167,8 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
         TestCaseRole.currentUsername = TEST_WRONG_USERNAME;
 
         //  act
-        boolean result = evaluatorsService.evaluate(recordRef, evaluatorDto, model);
+        boolean result = RequestContext.doWithCtxJ(factory, data -> data.withCtxAtts(model), ctx ->
+            evaluatorsService.evaluate(recordRef, evaluatorDto));
 
         //  assert
         Assert.assertFalse(result);

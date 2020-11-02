@@ -127,14 +127,7 @@ public class ActionService {
                 return recordEvaluatorDto;
             }).collect(Collectors.toList());
 
-        Map<String, RecordRef> model = new HashMap<>();
-
-        String requestUsername = SecurityUtils.getCurrentUserLoginFromRequestContext();
-        model.put("user", RecordRef.valueOf("alfresco/people@" + requestUsername));
-        model.put("alfMeta", RecordRef.valueOf("alfresco/meta@"));
-
-        Map<RecordRef, List<Boolean>> evalResultByRecord = evaluatorsService.evaluate(recordRefs, evaluators, model);
-
+        Map<RecordRef, List<Boolean>> evalResultByRecord = evaluatorsService.evaluate(recordRefs, evaluators);
         Map<RecordRef, Set<String>> recordActionsByRef = new HashMap<>();
 
         for (RecordRef recordRef : recordRefs) {

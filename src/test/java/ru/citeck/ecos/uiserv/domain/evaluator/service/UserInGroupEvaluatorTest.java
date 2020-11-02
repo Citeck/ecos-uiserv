@@ -16,23 +16,22 @@ import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
+import ru.citeck.ecos.records3.record.request.RequestContext;
 
 import java.util.*;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UserInGroupEvaluatorTest extends LocalRecordsDao implements LocalRecordsMetaDao<Object> {
 
-
     private static final String ID = "userInGroupEvaluatorTest";
     private RecordEvaluatorService evaluatorsService;
+    private final RecordsServiceFactory factory = new RecordsServiceFactory();
 
     @Before
     public void setup() {
         setId(ID);
-
-        RecordsServiceFactory factory = new RecordsServiceFactory();
 
         recordsService = factory.getRecordsService();
         recordsService.register(this);
@@ -58,7 +57,10 @@ public class UserInGroupEvaluatorTest extends LocalRecordsDao implements LocalRe
 
         TestUserAuthorities.userAuthorities = Collections.emptyList();
 
-        assertFalse(evaluatorsService.evaluate(recordRef, evaluatorDto, model));
+        RequestContext.doWithCtxJ(factory, data -> data.withCtxAtts(model), ctx -> {
+            assertFalse(evaluatorsService.evaluate(recordRef, evaluatorDto));
+            return null;
+        });
     }
 
     @Test
@@ -78,7 +80,10 @@ public class UserInGroupEvaluatorTest extends LocalRecordsDao implements LocalRe
 
         TestUserAuthorities.userAuthorities = Collections.singletonList("userRole");
 
-        assertFalse(evaluatorsService.evaluate(recordRef, evaluatorDto, model));
+        RequestContext.doWithCtxJ(factory, data -> data.withCtxAtts(model), ctx -> {
+            assertFalse(evaluatorsService.evaluate(recordRef, evaluatorDto));
+            return null;
+        });
     }
 
     @Test
@@ -102,7 +107,10 @@ public class UserInGroupEvaluatorTest extends LocalRecordsDao implements LocalRe
             "anotherRole"
         );
 
-        assertTrue(evaluatorsService.evaluate(recordRef, evaluatorDto, model));
+        RequestContext.doWithCtxJ(factory, data -> data.withCtxAtts(model), ctx -> {
+            assertTrue(evaluatorsService.evaluate(recordRef, evaluatorDto));
+            return null;
+        });
     }
 
     @Test
@@ -130,7 +138,10 @@ public class UserInGroupEvaluatorTest extends LocalRecordsDao implements LocalRe
             "includedRole1"
         );
 
-        assertTrue(evaluatorsService.evaluate(recordRef, evaluatorDto, model));
+        RequestContext.doWithCtxJ(factory, data -> data.withCtxAtts(model), ctx -> {
+            assertTrue(evaluatorsService.evaluate(recordRef, evaluatorDto));
+            return null;
+        });
     }
 
     @Override
