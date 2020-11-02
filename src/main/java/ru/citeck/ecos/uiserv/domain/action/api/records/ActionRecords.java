@@ -291,13 +291,13 @@ public class ActionRecords extends LocalRecordsDao
 
     @Data
     public static class RecordTypeMeta {
-        @MetaAtt("_etype?id")
+        @AttName("_etype?id")
         private String type;
     }
 
     @Data
     public static class ActionsDtoMeta {
-        @MetaAtt("_actions[]")
+        @AttName("_actions[]")
         private List<RecordActionDto> actions;
     }
 
@@ -313,7 +313,7 @@ public class ActionRecords extends LocalRecordsDao
 
     @Data
     public static class ActionsRefMeta {
-        @MetaAtt("_actions[]?str")
+        @AttName("_actions[]?str")
         private List<RecordRef> actions;
     }
 
@@ -420,7 +420,7 @@ public class ActionRecords extends LocalRecordsDao
             setId(value);
         }
 
-        @MetaAtt(".disp")
+        @AttName(".disp")
         public String getDisplayName() {
             MLText mlName = getName();
             String name = mlName != null ? mlName.getClosestValue(QueryContext.getCurrent().getLocale()) : null;

@@ -32,7 +32,7 @@ public class IsAdminEvaluator implements RecordEvaluator<Class<IsAdminEvaluator.
 
     @Data
     public static class Meta {
-        @MetaAtt("$user.isAdmin?bool")
+        @AttName("$user.isAdmin?bool")
         private Boolean isAdmin;
     }
 }

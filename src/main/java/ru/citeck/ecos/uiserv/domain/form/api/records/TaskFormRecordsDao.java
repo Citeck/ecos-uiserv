@@ -282,9 +282,9 @@ public class TaskFormRecordsDao extends LocalRecordsDao
     @Data
     public static class TaskInfo {
         private String id;
-        @MetaAtt(".disp")
+        @AttName(".disp")
         private String taskDisp;
-        @MetaAtt("_formKey?str")
+        @AttName("_formKey?str")
         private String formKey;
     }
 

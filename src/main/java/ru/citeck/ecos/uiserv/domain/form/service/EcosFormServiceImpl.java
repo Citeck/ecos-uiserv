@@ -241,7 +241,7 @@ public class EcosFormServiceImpl implements EcosFormService {
     public static class FormKeys {
         private final static String ATT_FORM_KEY = "_formKey";
 
-        @MetaAtt(ATT_FORM_KEY)
+        @AttName(ATT_FORM_KEY)
         @Getter
         @Setter
         private List<String> keys;
@@ -250,7 +250,7 @@ public class EcosFormServiceImpl implements EcosFormService {
     public static class ViewFormKeys extends FormKeys {
         private final static String ATT_VIEW_FORM_KEY = "_viewFormKey";
 
-        @MetaAtt(ATT_VIEW_FORM_KEY)
+        @AttName(ATT_VIEW_FORM_KEY)
         @Getter
         @Setter
         private List<String> viewKeys;

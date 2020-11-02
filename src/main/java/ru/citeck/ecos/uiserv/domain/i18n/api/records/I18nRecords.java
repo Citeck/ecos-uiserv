@@ -164,13 +164,13 @@ public class I18nRecords extends LocalRecordsDao implements LocalRecordsQueryWit
             setId(value);
         }
 
-        @MetaAtt(".type")
+        @AttName(".type")
         public RecordRef getEcosType() {
             return RecordRef.valueOf("emodel/type@i18n");
         }
 
         @JsonIgnore
-        @MetaAtt(".disp")
+        @AttName(".disp")
         public String getDisplayName() {
             return super.getId();
         }

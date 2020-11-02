@@ -228,7 +228,7 @@ public class EcosFormRecordsDao extends LocalRecordsCrudDao<EcosFormRecordsDao.E
             setId(value);
         }
 
-        @MetaAtt(".disp")
+        @AttName(".disp")
         public String getDisplayName() {
             String name = MLText.getClosestValue(getTitle(), QueryContext.getCurrent().getLocale());
             if (StringUtils.isBlank(name)) {

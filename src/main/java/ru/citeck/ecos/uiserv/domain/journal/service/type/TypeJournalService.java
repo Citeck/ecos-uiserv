@@ -165,7 +165,7 @@ public class TypeJournalService {
         private RecordRef journal;
         private RecordRef form;
 
-        @MetaAtt("parents[]?id")
+        @AttName("parents[]?id")
         private List<RecordRef> parentsRefs;
     }
 

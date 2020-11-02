@@ -253,13 +253,13 @@ public class JournalRecordsDao extends LocalRecordsDao
             }).collect(Collectors.toList());
         }
 
-        @MetaAtt(".type")
+        @AttName(".type")
         public RecordRef getEcosType() {
             return RecordRef.valueOf("emodel/type@journal");
         }
 
         @JsonIgnore
-        @MetaAtt(".disp")
+        @AttName(".disp")
         public String getDisplayName() {
             String name = MLText.getClosestValue(getLabel(), QueryContext.getCurrent().getLocale());
             return StringUtils.isNotBlank(name) ? name : "Journal";

@@ -9,6 +9,7 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
+import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardEntity;
 import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardRepository;
@@ -74,9 +75,6 @@ public class DashboardService {
         if (dashboards.isEmpty() && expandType) {
 
             ExpandedTypeMeta typeMeta = recordsService.getMeta(type, ExpandedTypeMeta.class);
-            if (typeMeta == null) {
-                return Optional.empty();
-            }
             for (ParentMeta parent : typeMeta.getParents()) {
                 if (!Objects.equals(parent.inhDashboardType, typeMeta.inhDashboardType)) {
                     return Optional.empty();
@@ -157,6 +155,7 @@ public class DashboardService {
 
     @Data
     public static class ParentMeta {
+        @AttName("?id")
         private String id;
         private String inhDashboardType;
     }

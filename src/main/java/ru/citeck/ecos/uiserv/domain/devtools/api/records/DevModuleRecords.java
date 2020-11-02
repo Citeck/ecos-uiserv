@@ -128,14 +128,14 @@ public class DevModuleRecords extends LocalRecordsDao implements LocalRecordsQue
 
         private final String id;
 
-        @MetaAtt("_actions")
+        @AttName("_actions")
         private List<ActionDto> actions;
 
         public String getModuleId() {
             return id;
         }
 
-        @MetaAtt(".type")
+        @AttName(".type")
         public RecordRef getEcosType() {
             return RecordRef.valueOf("emodel/type@dev-module");
         }

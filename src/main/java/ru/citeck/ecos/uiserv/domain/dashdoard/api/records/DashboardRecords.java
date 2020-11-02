@@ -160,7 +160,7 @@ public class DashboardRecords extends LocalRecordsDao
         }
 
         @JsonIgnore
-        @MetaAtt(".disp")
+        @AttName(".disp")
         public String getDisplayName() {
             String result = getId();
             return result != null ? result : "Dashboard";

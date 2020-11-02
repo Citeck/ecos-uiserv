@@ -17,7 +17,7 @@ public class JournalConfigResp {
     private Map<String, String> params;
     private List<ComputedParamDto> computed;
 
-    @MetaAtt(".disp")
+    @AttName(".disp")
     public String getDisplayName() {
         if (meta == null) {
             return "Journal";

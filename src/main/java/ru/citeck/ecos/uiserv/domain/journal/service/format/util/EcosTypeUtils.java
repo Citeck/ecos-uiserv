@@ -59,9 +59,9 @@ public class EcosTypeUtils {
 
     @Data
     public static class TypeMeta {
-        @MetaAtt("inhCreateVariants[]?json")
+        @AttName("inhCreateVariants[]?json")
         private List<CreateVariantDto> createVariants;
-        @MetaAtt("_actions[]?id")
+        @AttName("_actions[]?id")
         private List<RecordRef> actions;
     }
 }

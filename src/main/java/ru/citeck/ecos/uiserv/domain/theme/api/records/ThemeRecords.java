@@ -155,13 +155,13 @@ public class ThemeRecords extends LocalRecordsDao implements LocalRecordsQueryWi
             setId(value);
         }
 
-        @MetaAtt(".type")
+        @AttName(".type")
         public RecordRef getEcosType() {
             return RecordRef.valueOf("emodel/type@theme");
         }
 
         @JsonIgnore
-        @MetaAtt(".disp")
+        @AttName(".disp")
         public String getDisplayName() {
             return super.getId();
         }

@@ -10,14 +10,14 @@ import java.time.Instant;
 @EqualsAndHashCode(callSuper = false)
 public class JournalWithMeta extends JournalDto {
 
-    @MetaAtt("_modified")
+    @AttName("_modified")
     private Instant modified;
-    @MetaAtt("_modifier")
+    @AttName("_modifier")
     private String modifier;
 
-    @MetaAtt("_creator")
+    @AttName("_creator")
     private Instant created;
-    @MetaAtt("_creator")
+    @AttName("_creator")
     private String creator;
 
     public JournalWithMeta() {

@@ -78,7 +78,7 @@ public class JournalsResolver {
 
 
     protected static class JournalListAtts {
-        @MetaAtt("journal:journals")
+        @AttName("journal:journals")
         private List<JournalAtts> journals;
 
         public List<JournalAtts> getJournals() {
@@ -184,7 +184,7 @@ public class JournalsResolver {
         private String id; //NodeRef
         private String name;
         private String title;
-        @MetaAtt("journal:journalType")
+        @AttName("journal:journalType")
         private String journalType;
     }
 

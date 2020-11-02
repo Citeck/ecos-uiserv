@@ -119,9 +119,9 @@ public class AllJournalRecordsDao extends LocalRecordsDao
 
     @Data
     public static class AlfJournalMeta {
-        @MetaAtt(".disp")
+        @AttName(".disp")
         private String label;
-        @MetaAtt("journal:journalType")
+        @AttName("journal:journalType")
         private String id;
     }
 

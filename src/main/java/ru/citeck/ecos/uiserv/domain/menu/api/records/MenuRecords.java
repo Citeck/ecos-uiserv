@@ -169,7 +169,7 @@ public class MenuRecords extends LocalRecordsDao
             return result != null ? result : 0;
         }
 
-        @MetaAtt(".disp")
+        @AttName(".disp")
         public String getDisplayName() {
             return getId();
         }

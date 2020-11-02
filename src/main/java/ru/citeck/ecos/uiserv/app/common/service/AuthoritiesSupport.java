@@ -25,7 +25,7 @@ public class AuthoritiesSupport {
     }
 
     private static class PersonAtts {
-        @MetaAtt(".att(n:'authorities'){atts(n:'list')}")
+        @AttName(".att(n:'authorities'){atts(n:'list')}")
         private List<String> authorities;
 
         public List<String> getAuthorities() {
