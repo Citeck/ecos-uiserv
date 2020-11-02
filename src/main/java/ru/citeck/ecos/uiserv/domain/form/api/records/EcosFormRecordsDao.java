@@ -15,7 +15,6 @@ import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.QueryContext;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
@@ -27,6 +26,7 @@ import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.request.query.page.SkipPage;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsCrudDao;
+import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
 

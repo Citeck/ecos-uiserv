@@ -3,7 +3,7 @@ package ru.citeck.ecos.uiserv.domain.evaluator.service;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluator;
-import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
+import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName;
 
 @Component
 public class IsAdminEvaluator implements RecordEvaluator<Class<IsAdminEvaluator.Meta>, IsAdminEvaluator.Meta,

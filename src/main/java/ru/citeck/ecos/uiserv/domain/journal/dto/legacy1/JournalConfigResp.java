@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.journal.dto.legacy1;
 
 import lombok.Data;
-import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
+import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.domain.journal.dto.ComputedParamDto;
 
 import java.util.List;
