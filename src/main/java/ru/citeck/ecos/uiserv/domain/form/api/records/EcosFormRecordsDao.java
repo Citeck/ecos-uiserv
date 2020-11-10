@@ -8,25 +8,26 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.QueryContext;
-import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate;
-import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
-import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
-import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
-import ru.citeck.ecos.records2.request.query.RecordsQuery;
-import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
-import ru.citeck.ecos.records2.request.query.page.SkipPage;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsCrudDao;
+import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
+import ru.citeck.ecos.records3.record.op.atts.dao.RecordAttsDao;
 import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName;
+import ru.citeck.ecos.records3.record.op.delete.dao.RecordDeleteDao;
+import ru.citeck.ecos.records3.record.op.delete.dto.DelStatus;
+import ru.citeck.ecos.records3.record.op.mutate.dao.RecordMutateDtoDao;
+import ru.citeck.ecos.records3.record.op.query.dao.RecordsQueryDao;
+import ru.citeck.ecos.records3.record.op.query.dto.RecsQueryRes;
+import ru.citeck.ecos.records3.record.op.query.dto.query.QueryPage;
+import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
 
@@ -35,95 +36,79 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class EcosFormRecordsDao extends LocalRecordsCrudDao<EcosFormRecordsDao.EcosFormModelDownstream> {
+public class EcosFormRecordsDao extends AbstractRecordsDao
+    implements RecordsQueryDao,
+               RecordMutateDtoDao<EcosFormRecordsDao.EcosFormModelDownstream>,
+               RecordDeleteDao,
+               RecordAttsDao {
 
     public static final String ID = "eform";
 
     private static final String FORMS_FOR_TYPE_LANG = "forms-for-type";
 
-    private static final RecordRef DEFAULT_FORM_ID = RecordRef.create(ID, "DEFAULT");
-    private static final RecordRef ECOS_FORM_ID = RecordRef.create(ID, "ECOS_FORM");
+    private static final String DEFAULT_FORM_ID = "DEFAULT";
+    private static final String ECOS_FORM_ID = "ECOS_FORM";
 
-    private static final Set<RecordRef> SYSTEM_FORMS = new HashSet<>(Arrays.asList(DEFAULT_FORM_ID, ECOS_FORM_ID));
+    private static final Set<String> SYSTEM_FORMS = new HashSet<>(Arrays.asList(DEFAULT_FORM_ID, ECOS_FORM_ID));
 
     private final EcosFormService eformFormService;
 
-    {
-        setId(ID);
+    @NotNull
+    @Override
+    public String getId() {
+        return ID;
     }
 
     @Override
-    public List<EcosFormModelDownstream> getValuesToMutate(@NotNull List<RecordRef> records) {
-        return records.stream()
-            .map(RecordRef::getId)
-            .map(id ->
-                Optional.of(id)
-                    .filter(str -> !str.isEmpty())
-                    .map(x -> eformFormService.getFormById(x)
-                        .orElseThrow(() -> new IllegalArgumentException("Form with id " + id + " not found!")))
-                    .map(EcosFormModel::new) //defensive copy, even though getFormById probably creates new instance
-                    .orElseGet(EcosFormModel::new))
-            .map(this::toDownstream)
-            .collect(Collectors.toList());
+    public EcosFormModelDownstream getRecToMutate(@NotNull String formId) {
+        return toDownstream(Optional.of(formId)
+            .filter(str -> !str.isEmpty())
+            .map(x -> eformFormService.getFormById(x)
+                .orElseThrow(() -> new IllegalArgumentException("Form with id " + formId + " not found!")))
+            .map(EcosFormModel::new) //defensive copy, even though getFormById probably creates new instance
+            .orElseGet(EcosFormModel::new));
     }
 
     private EcosFormModelDownstream toDownstream(EcosFormModel model) {
         return new EcosFormModelDownstream(model);
     }
 
+    @NotNull
     @Override
-    public RecordsMutResult save(List<EcosFormModelDownstream> values) {
+    public String saveMutatedRec(EcosFormModelDownstream ecosFormModelDownstream) {
+        return eformFormService.save(ecosFormModelDownstream);
+    }
 
-        RecordsMutResult result = new RecordsMutResult();
+    @NotNull
+    @Override
+    public DelStatus delete(@NotNull String formId) {
 
-        for (final EcosFormModel model : values) {
-            result.addRecord(new RecordMeta(eformFormService.save(model)));
+        if (SYSTEM_FORMS.contains(formId)) {
+            return DelStatus.PROTECTED;
         }
-
-        return result;
+        eformFormService.delete(formId);
+        return DelStatus.OK;
     }
 
+    @Nullable
     @Override
-    public RecordsDelResult delete(RecordsDeletion deletion) {
-
-        List<RecordMeta> resultRecords = new ArrayList<>();
-
-        deletion.getRecords()
-            .stream()
-            .filter(r -> !SYSTEM_FORMS.contains(r))
-            .forEach(r -> {
-                eformFormService.delete(r.getId());
-                resultRecords.add(new RecordMeta(r));
-            });
-
-        RecordsDelResult result = new RecordsDelResult();
-        result.setRecords(resultRecords);
-        return result;
+    public Object getRecordAtts(@NotNull String formId) {
+        return toDownstream(Optional.of(formId)
+            .filter(str -> !str.isEmpty())
+            .map(x -> eformFormService.getFormById(x)
+                .orElseThrow(() -> new IllegalArgumentException("Form with id " + formId + " not found!")))
+            .orElseGet(() -> {
+                final EcosFormModel form = new EcosFormModelDownstream(new EcosFormModel());
+                form.setId("");
+                return form;
+            }));
     }
 
+    @Nullable
     @Override
-    public List<EcosFormModelDownstream> getLocalRecordsMeta(@NotNull List<RecordRef> records,
-                                                             @NotNull MetaField metaField) {
-        return records.stream()
-            .map(RecordRef::getId)
-            .map(id -> Optional.of(id)
-                .filter(str -> !str.isEmpty())
-                .map(x -> eformFormService.getFormById(x)
-                    .orElseThrow(() -> new IllegalArgumentException("Form with id " + id + " not found!")))
-                .orElseGet(() -> {
-                    final EcosFormModel form = new EcosFormModelDownstream(new EcosFormModel());
-                    form.setId("");
-                    return form;
-                }))
-            .map(this::toDownstream)
-            .collect(Collectors.toList());
-    }
+    public RecsQueryRes<?> queryRecords(@NotNull RecordsQuery recordsQuery) {
 
-    @Override
-    public RecordsQueryResult<EcosFormModelDownstream> queryLocalRecords(@NotNull RecordsQuery recordsQuery,
-                                                                         @NotNull MetaField field) {
-
-        RecordsQueryResult<EcosFormModelDownstream> result = new RecordsQueryResult<>();
+        RecsQueryRes<EcosFormModelDownstream> result = new RecsQueryRes<>();
 
         Query query = null;
         if (StringUtils.isBlank(recordsQuery.getLanguage())) {
@@ -135,7 +120,6 @@ public class EcosFormRecordsDao extends LocalRecordsCrudDao<EcosFormRecordsDao.E
             FormsForTypeQuery formsForTypeQuery = recordsQuery.getQuery(FormsForTypeQuery.class);
             if (RecordRef.isEmpty(formsForTypeQuery.typeRef)) {
                 return result;
-
             }
 
             result.addRecords(eformFormService.getAllFormsForType(formsForTypeQuery.getTypeRef()).stream()
@@ -147,14 +131,9 @@ public class EcosFormRecordsDao extends LocalRecordsCrudDao<EcosFormRecordsDao.E
 
         if (query == null) {
 
-            int max = 10;
-            int skipCount = 0;
-
-            SkipPage page = recordsQuery.getSkipPage();
-            if (page != null) {
-                max = page.getMaxItems();
-                skipCount = page.getSkipCount();
-            }
+            QueryPage page = recordsQuery.getPage();
+            int max = page.getMaxItems();
+            int skipCount = page.getSkipCount();
 
             Predicate predicate = VoidPredicate.INSTANCE;
             if (PredicateService.LANGUAGE_PREDICATE.equals(recordsQuery.getLanguage())) {

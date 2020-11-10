@@ -53,16 +53,32 @@ public class EcosFormServiceImpl implements EcosFormService {
     @Override
     public List<EcosFormModel> getAllForms(Predicate predicate, int max, int skip) {
 
-        FilterPredicate dto = PredicateUtils.convertToDto(predicate, FilterPredicate.class);
-
         PageRequest page = PageRequest.of(skip / max, max, Sort.by(Sort.Direction.DESC, "id"));
 
-        if (dto != null && StringUtils.isNotBlank(dto.getModuleId())) {
+        FilterPredicate dto = PredicateUtils.convertToDto(predicate, FilterPredicate.class);
+        if (dto == null) {
+            return formsRepository.findAll(page).stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+        }
 
-            Specification<EcosFormEntity> idSpec = (root, query, builder) ->
+        Specification<EcosFormEntity> spec = null;
+        if (StringUtils.isNotBlank(dto.getModuleId())) {
+            spec = (root, query, builder) ->
                 builder.like(builder.lower(root.get("extId")), "%" + dto.getModuleId().toLowerCase() + "%");
+        }
+        if (StringUtils.isNotBlank(dto.getTitle())) {
+            spec = orSpec(spec, (root, query, builder) ->
+                builder.like(builder.lower(root.get("title")), "%" + dto.getTitle().toLowerCase() + "%"));
+        }
+        if (StringUtils.isNotBlank(dto.getFormKey())) {
+            spec = orSpec(spec, (root, query, builder) ->
+                builder.like(builder.lower(root.get("formKey")), "%" + dto.getFormKey().toLowerCase() + "%"));
+        }
 
-            return formsRepository.findAll(idSpec, page).stream()
+        if (spec != null) {
+
+            return formsRepository.findAll(spec, page).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
 
@@ -72,6 +88,16 @@ public class EcosFormServiceImpl implements EcosFormService {
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
         }
+    }
+
+    private Specification<EcosFormEntity> orSpec(Specification<EcosFormEntity> spec0,
+                                                 Specification<EcosFormEntity> spec1) {
+        if (spec0 == null) {
+            return spec1;
+        } else if (spec1 == null) {
+            return spec0;
+        }
+        return spec0.or(spec1);
     }
 
     @Override
@@ -230,6 +256,8 @@ public class EcosFormServiceImpl implements EcosFormService {
     @Data
     public static class FilterPredicate {
         private String moduleId;
+        private String formKey;
+        private String title;
     }
 
     @Data
