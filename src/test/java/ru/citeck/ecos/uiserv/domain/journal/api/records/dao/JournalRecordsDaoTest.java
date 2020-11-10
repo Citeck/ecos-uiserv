@@ -191,7 +191,7 @@ public class JournalRecordsDaoTest {
                 "        \"attributes\",\n" +
                 "        \"columns[]?json\",\n" +
                 "        \"actions[]\",\n" +
-                "        \"metaRecord?str\"\n" +
+                "        \"metaRecord?id\"\n" +
                 "    ]\n" +
                 "}"))
             .andExpect(status().isOk())
@@ -205,7 +205,7 @@ public class JournalRecordsDaoTest {
             //.andExpect(jsonPath("$.attributes.columns", is(journalEntity.getColumns())))
             //.andExpect(jsonPath("$['attributes']['actions[]'][0]", is(actions.get(0).toString())))
             //.andExpect(jsonPath("$['attributes']['actions[]'][1]", is(actions.get(1).toString())))
-            .andExpect(jsonPath("$.attributes.metaRecord?str", is(journalEntity.getMetaRecord())));
+            .andExpect(jsonPath("$.attributes.metaRecord?id", is(journalEntity.getMetaRecord())));
     }
 
     @Component
