@@ -2,12 +2,14 @@ package ru.citeck.ecos.uiserv.domain.journal.api.records;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.records2.request.error.ErrorUtils;
 import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.predicate.PredicateUtils;
@@ -18,6 +20,8 @@ import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
+import ru.citeck.ecos.records3.record.request.RequestContext;
+import ru.citeck.ecos.records3.record.request.msg.MsgLevel;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy1.JournalConfigResp;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalServiceImpl;
@@ -26,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AllJournalRecordsDao extends LocalRecordsDao
@@ -38,7 +43,15 @@ public class AllJournalRecordsDao extends LocalRecordsDao
     @Override
     public List<JournalWithMeta> getLocalRecordsMeta(@NotNull List<RecordRef> records, @NotNull MetaField metaField) {
         return records.stream()
-            .map(r -> getJournalMeta(r, metaField))
+            .map(r -> {
+                try {
+                    return getJournalMeta(r, metaField);
+                } catch (Exception e) {
+                    RequestContext.getCurrentNotNull().addMsg(MsgLevel.ERROR, () -> ErrorUtils.convertException(e));
+                    log.error("Journal resolving error", e);
+                    return new JournalWithMeta();
+                }
+            })
             .map(JournalRecordsDao.JournalRecord::new)
             .collect(Collectors.toList());
     }
