@@ -121,7 +121,7 @@ public class ResolvedJournalRecordsDao extends LocalRecordsDao
 
             RecordMeta attributes = recordsService.getAttributes(journalDto.getMetaRecord(), attributeEdges);
 
-            attributes.forEach((name, value) -> {
+            attributes.forEachJ((name, value) -> {
                 JournalColumnDto dto = columnByName.get(name);
                 if (dto != null) {
                     dto.setType(value.get("type").asText());
