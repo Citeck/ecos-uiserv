@@ -24,5 +24,8 @@ columns:
   - name: typeRef
     label: { ru: Тип ECOS, en: ECOS Type }
 
+  - name: appliedToRef
+    label: { ru: Запись, en: Record }
+
   - name: authority
     label: { ru: Человек или группа, en: User or group }

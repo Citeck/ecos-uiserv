@@ -18,10 +18,21 @@ public interface DashboardRepository extends JpaRepository<DashboardEntity, Long
     List<DashboardEntity> findForAuthorities(String typeRef, List<String> authorities, PageRequest page);
 
     @Query("SELECT dashboard FROM DashboardEntity dashboard " +
+           "WHERE dashboard.appliedToRef = ?1 AND dashboard.authority IN ?2 " +
+           "ORDER BY dashboard.priority desc")
+    List<DashboardEntity> findForRefAndAuthorities(String nodeRef, List<String> authorities, PageRequest page);
+
+    @Query("SELECT dashboard FROM DashboardEntity dashboard " +
         "WHERE dashboard.typeRef = ?1 AND dashboard.authority IS NULL")
     Optional<DashboardEntity> findByTypeRefForAll(String typeRef);
 
+    @Query("SELECT dashboard FROM DashboardEntity dashboard " +
+        "WHERE dashboard.appliedToRef = ?1 AND dashboard.authority IS NULL")
+    Optional<DashboardEntity> findByRecordRefForAll(String typeRef);
+
     Optional<DashboardEntity> findByAuthorityAndTypeRef(String authority, String typeRef);
+
+    Optional<DashboardEntity> findByAuthorityAndAppliedToRef(String authority, String recordRef);
 
     Optional<DashboardEntity> findByExtId(String extId);
 }
