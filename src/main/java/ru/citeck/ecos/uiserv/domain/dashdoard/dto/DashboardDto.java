@@ -13,6 +13,7 @@ public class DashboardDto {
 
     private String id;
     private RecordRef typeRef;
+    private RecordRef appliedToRef;
     private String authority;
     private float priority;
 
@@ -28,6 +29,7 @@ public class DashboardDto {
         this.typeRef = other.typeRef;
         this.authority = other.authority;
         this.priority = other.priority;
+        this.appliedToRef = other.appliedToRef;
 
         this.config = ObjectData.deepCopy(other.config);
         this.attributes = ObjectData.deepCopy(other.attributes);

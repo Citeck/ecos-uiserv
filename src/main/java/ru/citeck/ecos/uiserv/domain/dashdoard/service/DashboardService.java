@@ -42,12 +42,13 @@ public class DashboardService {
         return repo.findByExtId(id).map(this::mapToDto);
     }
 
-    public Optional<DashboardDto> getForAuthority(RecordRef type,
+    public Optional<DashboardDto> getForAuthority(RecordRef recordRef,
+                                                  RecordRef type,
                                                   String user,
                                                   boolean expandType,
                                                   boolean includeForAll) {
 
-        return getEntityForUser(type, user, expandType, includeForAll).map(this::mapToDto);
+        return getEntityForUser(recordRef, type, user, expandType, includeForAll).map(this::mapToDto);
     }
 
     public DashboardDto saveDashboard(DashboardDto dashboard) {
@@ -62,7 +63,8 @@ public class DashboardService {
         repo.findByExtId(id).ifPresent(repo::delete);
     }
 
-    private Optional<DashboardEntity> getEntityForUser(RecordRef type,
+    private Optional<DashboardEntity> getEntityForUser(RecordRef recordRef,
+                                                       RecordRef type,
                                                        String user,
                                                        boolean expandType,
                                                        boolean includeForAll) {
@@ -70,7 +72,20 @@ public class DashboardService {
         List<String> authorities = StringUtils.isNotBlank(user) ?
             Collections.singletonList(user) : Collections.emptyList();
 
-        List<DashboardEntity> dashboards = findDashboardsByType(type.toString(), authorities, includeForAll);
+        List<DashboardEntity> dashboards;
+        if (!RecordRef.isEmpty(recordRef)) {
+
+            if (recordRef.getAppName().isEmpty()) {
+                recordRef = recordRef.addAppName("alfresco");
+            }
+
+            dashboards = findDashboardsByRecordRef(recordRef.toString(), authorities, includeForAll);
+            if (!dashboards.isEmpty()) {
+                return dashboards.stream().findFirst();
+            }
+        }
+
+        dashboards = findDashboardsByType(type.toString(), authorities, includeForAll);
 
         if (dashboards.isEmpty() && expandType) {
 
@@ -87,6 +102,28 @@ public class DashboardService {
         }
 
         return dashboards.stream().findFirst();
+    }
+
+    private List<DashboardEntity> findDashboardsByRecordRef(String recordRef,
+                                                            List<String> authorities,
+                                                            boolean includeForAll) {
+
+        if (!authorities.isEmpty()) {
+
+            PageRequest page = PageRequest.of(0, 1);
+            List<DashboardEntity> dashboards = repo.findForRefAndAuthorities(recordRef, authorities, page);
+            if (dashboards.isEmpty() && includeForAll) {
+                dashboards = repo.findByRecordRefForAll(recordRef)
+                    .map(Collections::singletonList)
+                    .orElse(Collections.emptyList());
+            }
+            return dashboards;
+
+        } else {
+
+            Optional<DashboardEntity> entity = repo.findByRecordRefForAll(recordRef);
+            return entity.map(Collections::singletonList).orElse(Collections.emptyList());
+        }
     }
 
     private List<DashboardEntity> findDashboardsByType(String type, List<String> authorities, boolean includeForAll) {
@@ -118,6 +155,7 @@ public class DashboardService {
         dto.setConfig(Json.getMapper().read(entity.getConfig(), ObjectData.class));
         dto.setPriority(entity.getPriority());
         dto.setTypeRef(RecordRef.valueOf(entity.getTypeRef()));
+        dto.setAppliedToRef(RecordRef.valueOf(entity.getAppliedToRef()));
 
         return dto;
     }
@@ -126,17 +164,52 @@ public class DashboardService {
 
         Optional<DashboardEntity> optEntity;
         String authority = StringUtils.isBlank(dto.getAuthority()) ? null : dto.getAuthority();
-        if (authority == null) {
-            optEntity = repo.findByTypeRefForAll(dto.getTypeRef().toString());
-        } else {
-            optEntity = repo.findByAuthorityAndTypeRef(authority, dto.getTypeRef().toString());
+        RecordRef recordRef = dto.getAppliedToRef();
+
+        if (RecordRef.isNotEmpty(recordRef) && recordRef.getAppName().isEmpty()) {
+            recordRef = recordRef.addAppName("alfresco");
         }
 
+        if (RecordRef.isEmpty(dto.getTypeRef()) && RecordRef.isEmpty(dto.getAppliedToRef())) {
+            throw new IllegalArgumentException("One of typeRef or appliedToRef should be specified");
+        }
+
+        if (authority == null) {
+            if (RecordRef.isEmpty(recordRef)) {
+                optEntity = repo.findByTypeRefForAll(dto.getTypeRef().toString());
+            } else {
+                optEntity = repo.findByRecordRefForAll(recordRef.toString());
+            }
+        } else {
+            if (RecordRef.isEmpty(recordRef)) {
+                optEntity = repo.findByAuthorityAndTypeRef(authority, dto.getTypeRef().toString());
+            } else {
+                optEntity = repo.findByAuthorityAndAppliedToRef(authority, recordRef.toString());
+            }
+        }
+
+        RecordRef finalRecordRef = recordRef;
+
         DashboardEntity entity = optEntity.orElseGet(() -> {
+
             DashboardEntity newDashboard = new DashboardEntity();
-            newDashboard.setExtId(StringUtils.isBlank(dto.getId()) ? UUID.randomUUID().toString() : dto.getId());
+
+            String extId = dto.getId();
+            if (StringUtils.isNotBlank(extId)) {
+                if (repo.findByExtId(extId).isPresent()) {
+                    extId = null;
+                }
+            }
+            if (StringUtils.isBlank(extId)) {
+                extId = UUID.randomUUID().toString();
+            }
+
+            newDashboard.setExtId(extId);
             newDashboard.setAuthority(authority);
-            newDashboard.setTypeRef(dto.getTypeRef().toString());
+            newDashboard.setTypeRef(RecordRef.toString(dto.getTypeRef()));
+            if (RecordRef.isNotEmpty(finalRecordRef)) {
+                newDashboard.setAppliedToRef(finalRecordRef.toString());
+            }
             return newDashboard;
         });
 

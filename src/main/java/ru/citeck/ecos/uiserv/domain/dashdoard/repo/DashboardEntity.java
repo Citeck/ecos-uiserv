@@ -20,6 +20,7 @@ public class DashboardEntity extends AbstractAuditingEntity {
     private String extId;
     private String typeRef;
     private String authority;
+    private String appliedToRef;
     private float priority;
     private byte[] config;
 

@@ -120,6 +120,7 @@ public class DashboardRecords extends AbstractRecordsDao
         }
 
         Optional<DashboardRecord> dashboard = dashboardService.getForAuthority(
+            query.getRecordRef(),
             query.getTypeRef(),
             query.getAuthority(),
             query.expandType,
@@ -171,7 +172,7 @@ public class DashboardRecords extends AbstractRecordsDao
     }
 
     @Data
-    private static class Query {
+    public static class Query {
         private RecordRef recordRef;
         private RecordRef typeRef;
         private String authority;
