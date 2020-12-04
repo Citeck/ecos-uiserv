@@ -9,11 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.junit4.SpringRunner
 import ru.citeck.ecos.commons.data.ObjectData
-import ru.citeck.ecos.records2.RecordMeta
 import ru.citeck.ecos.records2.RecordRef
-import ru.citeck.ecos.records2.RecordsService
-import ru.citeck.ecos.records2.request.query.RecordsQuery
 import ru.citeck.ecos.records2.source.dao.local.RecordsDaoBuilder
+import ru.citeck.ecos.records3.RecordsService
+import ru.citeck.ecos.records3.record.op.atts.dto.RecordAtts
+import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery
 import ru.citeck.ecos.uiserv.Application
 import ru.citeck.ecos.uiserv.domain.dashdoard.api.records.DashboardRecords
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto
@@ -71,11 +71,11 @@ open class DashboardRecordsTest {
             """
         ).forEach {
 
-            val newDashboard = RecordMeta()
+            val newDashboard = RecordAtts()
             newDashboard.setId(RecordRef.valueOf("dashboard@"))
-            newDashboard.attributes = ObjectData.create(it)
+            newDashboard.setAttributes(ObjectData.create(it))
 
-            data.add(newDashboard.attributes.getAs(DashboardDto::class.java)!!)
+            data.add(newDashboard.getAtts().getAs(DashboardDto::class.java)!!)
 
             recordsService.mutate(newDashboard)
         }
@@ -104,14 +104,14 @@ open class DashboardRecordsTest {
                 recsQuery.authority = config.authority
             }
 
-            val recordsQuery = RecordsQuery()
-            recordsQuery.sourceId = "dashboard"
-            recordsQuery.query = recsQuery
+            val recordsQuery = RecordsQuery.create {
+                sourceId = "dashboard"
+                withQuery(recsQuery)
+            }
+            val queryRes = recordsService.query(recordsQuery, DashboardDto::class.java)
 
-            val queryRes = recordsService.queryRecords(recordsQuery, DashboardDto::class.java)
-
-            assertEquals(1, queryRes.records.size)
-            val dashboardRecord = queryRes.records[0]
+            assertEquals(1, queryRes.getRecords().size)
+            val dashboardRecord = queryRes.getRecords()[0]
 
             assertDto(config, dashboardRecord)
         }
@@ -121,11 +121,12 @@ open class DashboardRecordsTest {
         recsQuery1.typeRef = RecordRef.valueOf("emodel/type@test-type")
         recsQuery1.recordRef = RecordRef.valueOf("workspace://SpaceStore/123")
 
-        val recordsQuery1 = RecordsQuery()
-        recordsQuery1.sourceId = "dashboard"
-        recordsQuery1.query = recsQuery1
+        val recordsQuery1 = RecordsQuery.create {
+            sourceId = "dashboard"
+            withQuery(recsQuery1)
+        }
 
-        val queryRes1 = recordsService.queryRecords(recordsQuery1, DashboardDto::class.java)
+        val queryRes1 = recordsService.query(recordsQuery1, DashboardDto::class.java)
 
         assertDto(data.firstOrNull { it.id == "with-applied-to-ref-and-authority" }, queryRes1.getRecords()[0])
 
@@ -133,11 +134,12 @@ open class DashboardRecordsTest {
         recsQuery2.typeRef = RecordRef.valueOf("emodel/type@test-type")
         recsQuery2.recordRef = RecordRef.valueOf("workspace://SpaceStore/123")
 
-        val recordsQuery2 = RecordsQuery()
-        recordsQuery2.sourceId = "dashboard"
-        recordsQuery2.query = recsQuery2
+        val recordsQuery2 = RecordsQuery.create {
+            sourceId = "dashboard"
+            withQuery(recsQuery2)
+        }
 
-        val queryRes2 = recordsService.queryRecords(recordsQuery2, DashboardDto::class.java)
+        val queryRes2 = recordsService.query(recordsQuery2, DashboardDto::class.java)
 
         assertDto(data.firstOrNull { it.id == "with-applied-to-ref" }, queryRes2.getRecords()[0])
 
@@ -145,22 +147,24 @@ open class DashboardRecordsTest {
         recsQuery3.authority = "admin"
         recsQuery3.typeRef = RecordRef.valueOf("emodel/type@test-type")
 
-        val recordsQuery3 = RecordsQuery()
-        recordsQuery3.sourceId = "dashboard"
-        recordsQuery3.query = recsQuery3
+        val recordsQuery3 = RecordsQuery.create {
+            sourceId = "dashboard"
+            withQuery(recsQuery3)
+        }
 
-        val queryRes3 = recordsService.queryRecords(recordsQuery3, DashboardDto::class.java)
+        val queryRes3 = recordsService.query(recordsQuery3, DashboardDto::class.java)
 
         assertDto(data.firstOrNull { it.id == "with-type-and-authority" }, queryRes3.getRecords()[0])
 
         val recsQuery4 = DashboardRecords.Query();
         recsQuery4.typeRef = RecordRef.valueOf("emodel/type@test-type")
 
-        val recordsQuery4 = RecordsQuery()
-        recordsQuery4.sourceId = "dashboard"
-        recordsQuery4.query = recsQuery4
+        val recordsQuery4 = RecordsQuery.create {
+            sourceId = "dashboard"
+            withQuery(recsQuery4)
+        }
 
-        val queryRes4 = recordsService.queryRecords(recordsQuery4, DashboardDto::class.java)
+        val queryRes4 = recordsService.query(recordsQuery4, DashboardDto::class.java)
 
         assertDto(data.firstOrNull { it.id == "with-type" }, queryRes4.getRecords()[0])
     }
