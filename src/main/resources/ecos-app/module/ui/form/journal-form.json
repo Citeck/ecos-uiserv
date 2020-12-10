@@ -49,7 +49,8 @@
       "Group actions": "Групповые действия",
       "Save": "Сохранить",
       "Control": "Контрол",
-      "Config": "Конфигурация"
+      "Config": "Конфигурация",
+      "columnFormatter": "Форматтер"
     },
     "en": {
       "Load columns": "Load columns",
@@ -89,7 +90,8 @@
       "Group actions": "Group actions",
       "Save": "Save",
       "Control": "Control",
-      "Config": "Config"
+      "Config": "Config",
+      "columnFormatter": "Formatter"
     }
   },
   "definition": {
@@ -531,6 +533,53 @@
                                             "label": "columnControl",
                                             "hideLabel": true,
                                             "key": "control",
+                                            "type": "container",
+                                            "input": true,
+                                            "components": [
+                                              {
+                                                "label": "Type",
+                                                "defaultValue": "",
+                                                "key": "type",
+                                                "type": "textfield",
+                                                "input": true
+                                              },
+                                              {
+                                                "label": "Config",
+                                                "keyLabel": "",
+                                                "key": "config",
+                                                "type": "datamap",
+                                                "input": true,
+                                                "valueComponent": {
+                                                  "type": "textfield",
+                                                  "key": "value",
+                                                  "label": "Value",
+                                                  "defaultValue": "Value",
+                                                  "input": true,
+                                                  "conditional": {
+                                                    "show": null,
+                                                    "when": null,
+                                                    "eq": "",
+                                                    "json": ""
+                                                  }
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        ],
+                                        "collapsed": true,
+                                        "lazyLoad": false
+                                      },
+                                      {
+                                        "title": "Formatter",
+                                        "collapsible": true,
+                                        "key": "panel5",
+                                        "type": "panel",
+                                        "input": false,
+                                        "components": [
+                                          {
+                                            "label": "columnFormatter",
+                                            "hideLabel": true,
+                                            "key": "formatter",
                                             "type": "container",
                                             "input": true,
                                             "components": [
