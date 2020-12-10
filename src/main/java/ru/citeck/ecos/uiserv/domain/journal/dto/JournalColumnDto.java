@@ -4,10 +4,13 @@ import ecos.com.fasterxml.jackson210.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -43,8 +46,11 @@ public class JournalColumnDto {
      */
     private String innerSchema;
 
+    private ColumnEditorDto editor;
+
     private ColumnFormatter formatter;
 
+    @Deprecated
     private ColumnControl control;
 
     /**
@@ -87,6 +93,10 @@ public class JournalColumnDto {
 
     private Boolean multiple;
 
+    private List<ColumnOptionDto> options;
+
+    private List<ComputedParamDto> computed;
+
     /**
      * Custom attributes for temporal or very specific
      * parameters which can't be added as field for this DTO
@@ -95,6 +105,7 @@ public class JournalColumnDto {
 
     public JournalColumnDto(JournalColumnDto other) {
         name = other.name;
+        editor = Json.getMapper().copy(other.editor);
         label = MLText.copy(other.label);
         attribute = other.attribute;
         control = Json.getMapper().copy(other.control);
@@ -109,5 +120,7 @@ public class JournalColumnDto {
         attributes = ObjectData.deepCopy(other.attributes);
         innerSchema = other.innerSchema;
         formatter = Json.getMapper().copy(other.formatter);
+        options = DataValue.create(other.options).asList(ColumnOptionDto.class);
+        computed = DataValue.create(other.computed).asList(ComputedParamDto.class);
     }
 }

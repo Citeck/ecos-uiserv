@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.journal.dto.legacy1;
 
 import lombok.Data;
+import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnEditorDto;
 import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnFormatter;
 
 import java.util.Map;
@@ -19,6 +20,7 @@ public class Column {
     private Formatter formatter;
     // new formatters
     private ColumnFormatter newFormatter;
+    private ColumnEditorDto newEditor;
     private Map<String, String> params;
     private boolean isDefault;
     private boolean isSearchable;

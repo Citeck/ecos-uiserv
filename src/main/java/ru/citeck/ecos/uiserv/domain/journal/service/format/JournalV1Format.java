@@ -96,6 +96,7 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
                 Column respColumn = new Column();
                 respColumn.setMultiple(column.getMultiple());
                 respColumn.setNewFormatter(column.getFormatter());
+                respColumn.setNewEditor(column.getEditor());
                 respColumn.setInnerSchema(column.getInnerSchema());
                 respColumn.setHidden(Boolean.TRUE.equals(column.getHidden()));
 
