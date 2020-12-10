@@ -27,10 +27,8 @@ import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
-import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnControl;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDto;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDto;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
+import ru.citeck.ecos.uiserv.domain.journal.dto.*;
+import ru.citeck.ecos.uiserv.domain.journal.dto.legacy1.Column;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService;
 import ru.citeck.ecos.uiserv.domain.journal.service.type.TypeJournalService;
 
@@ -248,6 +246,11 @@ public class JournalRecordsDao extends LocalRecordsDao
                 }
                 if (c.getControl().getConfig() == null) {
                     c.getControl().setConfig(ObjectData.create());
+                }
+                if (c.getFormatter() == null) {
+                    c = new JournalColumnDto(c);
+                    ColumnFormatter formatter = new ColumnFormatter();
+                    c.setFormatter(formatter);
                 }
                 return c;
             }).collect(Collectors.toList());
