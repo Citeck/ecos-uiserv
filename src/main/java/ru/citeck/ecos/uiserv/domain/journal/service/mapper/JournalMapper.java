@@ -117,7 +117,7 @@ public class JournalMapper {
         entity.setCreateVariants(Json.getMapper().toString(getNotBlank(dto.getCreateVariants(),
             v -> RecordRef.valueOf(v.getRecordRef()).toString())));
         entity.setComputed(Json.getMapper().toString(getNotBlank(dto.getComputed(),
-            ComputedParamDto::getName)));
+            ComputedParamDto::getId)));
 
         return entity;
     }
