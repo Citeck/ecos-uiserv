@@ -1,10 +1,10 @@
 package ru.citeck.ecos.uiserv.app.application.config;
 
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records3.spring.web.rest.ContextAttributesSupplier;
-import ru.citeck.ecos.records3.spring.web.rest.RecordsRestApi;
+import ru.citeck.ecos.records3.spring.config.RecordsServiceFactoryConfiguration;
 import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils;
 
 import javax.annotation.PostConstruct;
@@ -13,16 +13,16 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class RecordsCtxAttributesSupplier implements ContextAttributesSupplier {
+public class RecordsCtxAttributesSupplier {
 
-    private final RecordsRestApi recordsRestApi;
+    private final RecordsServiceFactoryConfiguration recordsServiceFactory;
 
     @PostConstruct
     public void init () {
-        recordsRestApi.registerContextAttsSupplier(this);
+        recordsServiceFactory.setCustomDefaultCtxAttsProvider(this::getAttributes);
     }
 
-    @Override
+    @NotNull
     public Map<String, Object> getAttributes() {
 
         Map<String, Object> model = new HashMap<>();
