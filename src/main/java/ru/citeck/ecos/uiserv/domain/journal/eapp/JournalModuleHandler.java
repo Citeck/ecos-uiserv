@@ -27,7 +27,12 @@ public class JournalModuleHandler implements EcosModuleHandler<JournalDto> {
     @NotNull
     @Override
     public ModuleWithMeta<JournalDto> getModuleMeta(@NotNull JournalDto module) {
-        return new ModuleWithMeta<>(module, new ModuleMeta(module.getId(), Collections.emptyList()));
+        return new ModuleWithMeta<>(module, new ModuleMeta(
+            module.getId(),
+            module.getLabel(),
+            Collections.emptyList(),
+            Collections.emptyList()
+        ));
     }
 
     @Override

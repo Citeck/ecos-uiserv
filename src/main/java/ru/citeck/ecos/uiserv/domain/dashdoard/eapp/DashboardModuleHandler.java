@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.apps.module.handler.EcosModuleHandler;
 import ru.citeck.ecos.apps.module.handler.ModuleMeta;
 import ru.citeck.ecos.apps.module.handler.ModuleWithMeta;
+import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
 
@@ -41,7 +42,12 @@ public class DashboardModuleHandler implements EcosModuleHandler<DashboardDto> {
     @NotNull
     @Override
     public ModuleWithMeta<DashboardDto> getModuleMeta(@NotNull DashboardDto dashboardModule) {
-        return new ModuleWithMeta<>(dashboardModule, new ModuleMeta(dashboardModule.getId(), Collections.emptyList()));
+        return new ModuleWithMeta<>(dashboardModule, new ModuleMeta(
+            dashboardModule.getId(),
+            new MLText(),
+            Collections.emptyList(),
+            Collections.emptyList()
+        ));
     }
 
     @NotNull

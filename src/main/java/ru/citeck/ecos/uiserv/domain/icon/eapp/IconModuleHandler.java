@@ -10,6 +10,7 @@ import ru.citeck.ecos.apps.module.controller.type.binary.BinModule;
 import ru.citeck.ecos.apps.module.handler.EcosModuleHandler;
 import ru.citeck.ecos.apps.module.handler.ModuleMeta;
 import ru.citeck.ecos.apps.module.handler.ModuleWithMeta;
+import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.uiserv.domain.icon.service.IconService;
@@ -67,7 +68,12 @@ public class IconModuleHandler implements EcosModuleHandler<BinModule> {
     @Override
     public ModuleWithMeta<BinModule> getModuleMeta(@NotNull BinModule module) {
         IconDto dto = convertToDto(module);
-        return new ModuleWithMeta<>(module, new ModuleMeta(dto.getId(), Collections.emptyList()));
+        return new ModuleWithMeta<>(module, new ModuleMeta(
+            dto.getId(),
+            new MLText(),
+            Collections.emptyList(),
+            Collections.emptyList())
+        );
     }
 
     @Override
