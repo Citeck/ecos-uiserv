@@ -27,7 +27,12 @@ public class ActionModuleHandler implements EcosModuleHandler<ActionDto> {
     @NotNull
     @Override
     public ModuleWithMeta<ActionDto> getModuleMeta(@NotNull ActionDto module) {
-        return new ModuleWithMeta<>(module, new ModuleMeta(module.getId(), Collections.emptyList()));
+        return new ModuleWithMeta<>(module, new ModuleMeta(
+            module.getId(),
+            module.getName(),
+            Collections.emptyList(),
+            Collections.emptyList()
+        ));
     }
 
     @Override

@@ -41,7 +41,11 @@ public class FormModuleHandler implements EcosModuleHandler<EcosFormModel> {
     @NotNull
     @Override
     public ModuleWithMeta<EcosFormModel> getModuleMeta(@NotNull EcosFormModel formModule) {
-        return new ModuleWithMeta<>(formModule, new ModuleMeta(formModule.getId(), Collections.emptyList()));
+        return new ModuleWithMeta<>(formModule, new ModuleMeta(
+            formModule.getId(),
+            formModule.getTitle(),
+            Collections.emptyList(),
+            Collections.emptyList()));
     }
 
     @NotNull
