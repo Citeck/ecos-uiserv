@@ -155,12 +155,7 @@ public class JournalRecordsDaoTest {
             "            },\n" +
             "            \"visible\": true,\n" +
             "            \"hidden\": false,\n" +
-            "            \"options\": {\n" +
-            "                \"type\": \"json\",\n" +
-            "                \"config\": {\"values\": [\n" +
-            "                    { \"value\": \"value\", \"label\": \"label\" }\n" +
-            "                ]}\n" +
-            "            },\n" +
+            "            \"options\": [],\n" +
             "            \"attributes\": {},\n" +
             "            \"filter\": {\n" +
             "                \"type\": \"journal\",\n" +
