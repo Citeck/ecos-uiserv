@@ -7,12 +7,12 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.predicate.PredicateService;
+import ru.citeck.ecos.records2.request.query.QueryConsistency;
+import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.source.common.AttributesMixin;
-import ru.citeck.ecos.records3.RecordsService;
-import ru.citeck.ecos.records3.record.op.query.dto.query.Consistency;
-import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService;
 
@@ -48,7 +48,8 @@ public class JournalsTotalCountMixin implements AttributesMixin<Unit, RecordRef>
         JournalWithMeta journal = journalService.getJournalById(meta.getId());
         StringBuilder sourceIdBuilder = new StringBuilder(journal.getSourceId());
         ObjectData journalQueryData = journal.getQueryData();
-        RecordsQuery.Builder queryBuilder = new RecordsQuery.Builder();
+
+        RecordsQuery query = new RecordsQuery();
 
         if (sourceIdBuilder.length() == 0) {
             sourceIdBuilder.append("alfresco/");
@@ -57,23 +58,22 @@ public class JournalsTotalCountMixin implements AttributesMixin<Unit, RecordRef>
         }
 
         if (journalQueryData == null || journalQueryData.getData().size() == 0) {
-            queryBuilder.setQuery(journal.getPredicate().getData());
-            queryBuilder.setLanguage(PredicateService.LANGUAGE_PREDICATE);
+            query.setQuery(journal.getPredicate().getData());
+            query.setLanguage(PredicateService.LANGUAGE_PREDICATE);
         } else {
             Map<String, DataValue> dataMap = new HashMap<>();
             dataMap.put("predicate", journal.getPredicate().getData());
             dataMap.put("data", journalQueryData.getData());
-            queryBuilder.setQuery(DataValue.create(dataMap));
-            queryBuilder.setLanguage("predicate-with-data");
+            query.setQuery(DataValue.create(dataMap));
+            query.setLanguage("predicate-with-data");
         }
 
-        RecordsQuery query = queryBuilder.withSourceId(sourceIdBuilder.toString())
-            .withConsistency(Consistency.EVENTUAL)
-            .withMaxItems(1)
-            .withSkipCount(0)
-            .build();
+        query.setSourceId(sourceIdBuilder.toString());
+        query.setConsistency(QueryConsistency.EVENTUAL);
+        query.setMaxItems(1);
+        query.setSkipCount(0);
 
-        return recordsService.query(query).getTotalCount();
+        return recordsService.queryRecords(query).getTotalCount();
     }
 
     @Override
