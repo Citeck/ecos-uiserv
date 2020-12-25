@@ -10,6 +10,7 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
+import ru.citeck.ecos.records2.graphql.meta.annotation.MetaAtt;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardEntity;
 import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardRepository;
@@ -252,10 +253,10 @@ public class DashboardService {
 
     @Data
     public static class UserMeta {
-        @AttName("$user.cm:userName")
+        @MetaAtt("$user.cm:userName")
         private String login;
 
-        @AttName("$user.isAdmin?bool")
+        @MetaAtt("$user.isAdmin?bool")
         private Boolean isAdmin;
     }
 }
