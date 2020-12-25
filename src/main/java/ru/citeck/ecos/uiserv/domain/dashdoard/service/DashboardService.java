@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
@@ -51,11 +52,26 @@ public class DashboardService {
     }
 
     public DashboardDto saveDashboard(DashboardDto dashboard) {
-
+        checkAuthorityField(dashboard);
         DashboardEntity entity = mapToEntity(dashboard);
         DashboardDto result = mapToDto(repo.save(entity));
         changeListener.accept(result);
         return result;
+    }
+
+    private void checkAuthorityField(DashboardDto dashboard) {
+        UserMeta userMeta = recordsService.getMeta(RecordRef.valueOf("meta@"), UserMeta.class);
+        if (userMeta.getIsAdmin()) {
+            return;
+        }
+
+        String currentUserLogin = userMeta.getLogin();
+        String authority = dashboard.getAuthority();
+        if (StringUtils.isBlank(authority)) {
+            dashboard.setAuthority(currentUserLogin);
+        } else if (!currentUserLogin.equals(authority)) {
+            throw new AccessDeniedException("User `" + currentUserLogin + "` can only change his dashboard");
+        }
     }
 
     public void removeDashboard(String id) {
@@ -232,5 +248,14 @@ public class DashboardService {
     public static class ParentMeta {
         private String id;
         private String inhDashboardType;
+    }
+
+    @Data
+    public static class UserMeta {
+        @AttName("$user.cm:userName")
+        private String login;
+
+        @AttName("$user.isAdmin?bool")
+        private Boolean isAdmin;
     }
 }
