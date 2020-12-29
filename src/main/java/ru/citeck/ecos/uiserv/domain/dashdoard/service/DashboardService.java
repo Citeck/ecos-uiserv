@@ -64,7 +64,7 @@ public class DashboardService {
     private void updateAuthority(DashboardDto dashboard) {
         String currentUserLogin = getCurrentUserLogin();
         RecordRef userRef = RecordRef.valueOf("alfresco/people@" + currentUserLogin);
-        boolean currentUserIsAdmin = recordsService.getAtt(userRef, "").asBoolean(false);
+        boolean currentUserIsAdmin = recordsService.getAtt(userRef, "isAdmin?bool").asBoolean(false);
 
         String authority = dashboard.getAuthority();
         if (currentUserIsAdmin) {
