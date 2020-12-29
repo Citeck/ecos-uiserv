@@ -3,12 +3,15 @@ package ru.citeck.ecos.uiserv.domain.dashdoard.service;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
+import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils;
 import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardEntity;
@@ -52,11 +55,37 @@ public class DashboardService {
     }
 
     public DashboardDto saveDashboard(DashboardDto dashboard) {
-
+        updateAuthority(dashboard);
         DashboardEntity entity = mapToEntity(dashboard);
         DashboardDto result = mapToDto(repo.save(entity));
         changeListener.accept(result);
         return result;
+    }
+
+    private void updateAuthority(DashboardDto dashboard) {
+        String currentUserLogin = getCurrentUserLogin();
+        RecordRef userRef = RecordRef.valueOf("alfresco/people@" + currentUserLogin);
+        boolean currentUserIsAdmin = recordsService.getAtt(userRef, "isAdmin?bool").asBoolean(false);
+
+        String authority = dashboard.getAuthority();
+        if (currentUserIsAdmin) {
+            return;
+        }
+
+        if (StringUtils.isBlank(authority)) {
+            dashboard.setAuthority(currentUserLogin);
+        } else if (!currentUserLogin.equals(authority)) {
+            throw new AccessDeniedException("User `" + currentUserLogin + "` can only change his dashboard");
+        }
+    }
+
+    @NotNull
+    private String getCurrentUserLogin() {
+        String currentUserLogin = SecurityUtils.getCurrentUserLoginFromRequestContext();
+        if (currentUserLogin == null) {
+            throw new RuntimeException("User is not authenticated");
+        }
+        return currentUserLogin;
     }
 
     public void removeDashboard(String id) {
