@@ -62,20 +62,28 @@ public class DashboardService {
     }
 
     private void updateAuthority(DashboardDto dashboard) {
+
         String currentUserLogin = getCurrentUserLogin();
         RecordRef userRef = RecordRef.valueOf("alfresco/people@" + currentUserLogin);
-        boolean currentUserIsAdmin = recordsService.getAtt(userRef, "isAdmin?bool").asBoolean(false);
-
         String authority = dashboard.getAuthority();
-        if (currentUserIsAdmin) {
+
+        if (currentUserLogin.equals(authority)) {
+            return;
+        }
+
+        boolean isAdmin = recordsService.getAtt(userRef, "isAdmin?bool").asBoolean(false);
+        if (isAdmin) {
             return;
         }
 
         if (StringUtils.isBlank(authority)) {
             dashboard.setAuthority(currentUserLogin);
-        } else if (!currentUserLogin.equals(authority)) {
-            throw new AccessDeniedException("User `" + currentUserLogin + "` can only change his dashboard");
+            return;
         }
+        throw new AccessDeniedException(
+            "User '" + currentUserLogin + "' can only change his dashboard. " +
+            "But tried to change dashboard for authority '" + authority + "'"
+        );
     }
 
     @NotNull
