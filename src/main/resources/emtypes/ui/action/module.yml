@@ -1,6 +1,10 @@
 
 modelVersion: "1.0"
 
+name:
+  ru: Действие
+  en: Action
+
 source-id: "action"
 
 controller:

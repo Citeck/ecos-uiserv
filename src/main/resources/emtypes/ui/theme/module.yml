@@ -1,6 +1,10 @@
 
 modelVersion: "1.0"
 
+name:
+  ru: Тема
+  en: Theme
+
 source-id: ""
 
 controller:

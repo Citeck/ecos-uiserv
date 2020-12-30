@@ -1,6 +1,10 @@
 
 modelVersion: "1.0"
 
+name:
+  ru: Меню
+  en: Menu
+
 source-id: ""
 
 controller:

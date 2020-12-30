@@ -1,6 +1,10 @@
 
 modelVersion: "1.0"
 
+name:
+  ru: Форма
+  en: Form
+
 source-id: "eform"
 
 controller:
