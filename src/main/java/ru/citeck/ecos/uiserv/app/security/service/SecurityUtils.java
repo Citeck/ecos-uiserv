@@ -6,6 +6,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
+import ru.citeck.ecos.commons.utils.ExceptionUtils;
+import ru.citeck.ecos.commons.utils.StringUtils;
+import ru.citeck.ecos.commons.utils.func.UncheckedSupplier;
 import ru.citeck.ecos.uiserv.app.security.constants.AuthoritiesConstants;
 
 import java.util.Optional;
@@ -18,6 +21,7 @@ public final class SecurityUtils {
 
     private static final String REQUEST_USERNAME_ATTRIBUTE = "requestUsername";
 
+    private static final ThreadLocal<String> currentUserName = new ThreadLocal<>();
     /**
      * Get the login of the current user.
      *
@@ -37,7 +41,23 @@ public final class SecurityUtils {
             });
     }
 
+    public static <T> T doAsUser(String userName, UncheckedSupplier<T> action) {
+        currentUserName.set(userName);
+        try {
+            return action.get();
+        } catch (Exception exception) {
+            ExceptionUtils.throwException(exception);
+            throw new RuntimeException("unreachable code");
+        } finally {
+            currentUserName.set(null);
+        }
+    }
+
     public static String getCurrentUserLoginFromRequestContext() {
+        String userName = currentUserName.get();
+        if (StringUtils.isNotBlank(userName)) {
+            return userName;
+        }
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null) {
             return (String) requestAttributes.getAttribute(REQUEST_USERNAME_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
