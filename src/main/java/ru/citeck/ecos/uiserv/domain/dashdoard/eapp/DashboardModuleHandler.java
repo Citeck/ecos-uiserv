@@ -9,6 +9,8 @@ import ru.citeck.ecos.apps.module.handler.EcosModuleHandler;
 import ru.citeck.ecos.apps.module.handler.ModuleMeta;
 import ru.citeck.ecos.apps.module.handler.ModuleWithMeta;
 import ru.citeck.ecos.commons.data.MLText;
+import ru.citeck.ecos.uiserv.app.application.constants.AppConstants;
+import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
 
@@ -25,7 +27,9 @@ public class DashboardModuleHandler implements EcosModuleHandler<DashboardDto> {
     @Override
     public void deployModule(@NotNull DashboardDto module) {
         log.info("Dashboard module received: " + module.getId() + " " + module.getTypeRef());
-        dashboardService.saveDashboard(module);
+        SecurityUtils.doAsUser(AppConstants.SYSTEM_ACCOUNT, () ->
+            dashboardService.saveDashboard(module)
+        );
     }
 
     @Override
