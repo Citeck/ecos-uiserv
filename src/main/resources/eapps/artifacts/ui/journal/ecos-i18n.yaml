@@ -1,0 +1,26 @@
+
+id: ecos-i18n
+label: { ru: Локализация, en: Localization }
+
+typeRef: emodel/type@i18n
+sourceId: uiserv/i18n
+
+attributes:
+  journalsListId: global-system
+
+actions:
+  - uiserv/action@ecos-module-download
+  - uiserv/action@delete
+  - uiserv/action@module-copy
+
+columns:
+
+  - name: moduleId
+    type: text
+    label: { ru: Идентификатор, en: Id }
+
+  - name: order
+    type: text
+    label: { ru: Порядок, en: Order }
+
+

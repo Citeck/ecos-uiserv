@@ -1,0 +1,35 @@
+
+id: ecos-menus
+label: { ru: Меню, en: Menu }
+
+typeRef: emodel/type@menu
+sourceId: uiserv/menu
+
+attributes:
+  journalsListId: global-system
+
+actions:
+  - uiserv/action@view-menu
+  - uiserv/action@ecos-module-download
+  - uiserv/action@delete
+  - uiserv/action@edit-menu
+  - uiserv/action@copy-menu
+
+columns:
+
+  - name: moduleId
+    type: text
+    editable: false
+    label: { ru: Идентификатор, en: Id }
+
+  - name: version
+    editable: false
+    label: { ru: Версия модели, en: Model Version }
+
+  - name: authoritiesForJournal
+    editable: false
+    label: { ru: Группы или пользователи, en: Groups or users }
+
+  - name: defaultMenuForJournal
+    editable: false
+    label: { ru: Меню по умолчанию, en: Default menu }

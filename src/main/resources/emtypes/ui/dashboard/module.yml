@@ -1,9 +1,0 @@
-
-modelVersion: "1.0"
-
-source-id: "dashboard"
-
-controller:
-    type: json
-
-

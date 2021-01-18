@@ -1,0 +1,15 @@
+modelVersion: "1.0"
+
+source-id: "journal"
+
+name:
+  ru: Журнал
+  en: Journal
+
+controller:
+  type: json
+  config:
+    metaFields:
+      name: 'label'
+
+
