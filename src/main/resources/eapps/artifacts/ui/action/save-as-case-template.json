@@ -1,32 +1,32 @@
 ﻿{
-    "id": "save-as-case-template",
-    "name": {
-        "ru": "Сохранить как шаблон",
-        "en": "Save as case template"
-    },
-    "type": "save-as-case-template",
+  "id": "save-as-case-template",
+  "name": {
+    "ru": "Сохранить как шаблон",
+    "en": "Save as case template"
+  },
+  "type": "save-as-case-template",
+  "config": {
+    "download": false
+  },
+  "evaluator": {
+    "type": "group",
     "config": {
-        "download": false
-    },
-    "evaluator": {
-        "type": "group",
-        "config": {
-            "joinBy": "AND",
-            "evaluators": [
-                {
-                    "type": "is-admin"
-                },
-                {
-                    "type": "predicate",
-                    "config": {
-                        "predicate": {
-                            "t": "eq",
-                            "att": ".att(n:\"aspects\"){has(n:\"icase:case\")}",
-                            "val": true
-                        }
-                    }
-                }
-            ]
+      "joinBy": "AND",
+      "evaluators": [
+        {
+          "type": "is-admin"
+        },
+        {
+          "type": "predicate",
+          "config": {
+            "predicate": {
+              "t": "eq",
+              "att": ".att(n:\"aspects\"){has(n:\"icase:case\")}",
+              "val": true
+            }
+          }
         }
+      ]
     }
+  }
 }

@@ -1,83 +1,83 @@
 {
-    "id": "site-dashboard",
-    "typeRef": "emodel/type@site",
-    "authority": null,
-    "priority": 0,
-    "config": {
-        "mobile": [
-            {
-                "id": "layout_b4b01e70-e01c-457d-abfa-aaaf0a4ca691",
-                "tab": {
-                    "label": "Вкладка",
-                    "idLayout": "layout_b4b01e70-e01c-457d-abfa-aaaf0a4ca691"
-                },
-                "type": "mobile",
-                "columns": [
-                    {
-                        "widgets": [
-                            {
-                                "dndId": "f610694c-adfe-40b0-825d-cd97a3de4912",
-                                "name": "doc-preview",
-                                "label": "dashboard-settings.widget.preview",
-                                "id": "1e65976f-fec7-44f5-841e-ffe8fc4e6699",
-                                "props": {
-                                    "id": "1e65976f-fec7-44f5-841e-ffe8fc4e6699",
-                                    "config": {
-                                        "link": ""
-                                    }
-                                }
-                            },
-                            {
-                                "dndId": "eb7b66be-bed1-4fe8-b4c3-048ad149379e",
-                                "name": "properties",
-                                "label": "dashboard-settings.widget.properties",
-                                "id": "09623c98-fce2-4c50-9dbf-3f9c6b829092",
-                                "props": {
-                                    "id": "09623c98-fce2-4c50-9dbf-3f9c6b829092",
-                                    "config": {}
-                                }
-                            }
-                        ]
-                    }
-                ]
-            }
-        ],
-        "layouts": [
-            {
-                "id": "layout_799ac5e5-9eab-4c08-af80-5ed48d768229",
-                "tab": {
-                    "label": "Основное",
-                    "idLayout": "layout_799ac5e5-9eab-4c08-af80-5ed48d768229"
-                },
-                "type": "1-column",
-                "columns": [
-                    {
-                        "widgets": [
-                            {
-                                "name": "journal",
-                                "label": "dashboard-settings.widget.journal",
-                                "dndId": "d26707f7-0dc2-494d-8209-c7ab2304af4f",
-                                "id": "83213544-1c17-4d22-9e0c-4843193bcbb0",
-                                "props": {
-                                    "id": "83213544-1c17-4d22-9e0c-4843193bcbb0",
-                                    "config": {}
-                                }
-                            },
-                            {
-                                "name": "journal",
-                                "label": "dashboard-settings.widget.journal",
-                                "dndId": "fe68b0fb-dbfd-468d-a8fc-526db3417772",
-                                "id": "3421216c-e0a1-420c-a941-cd41f7a6303f",
-                                "props": {
-                                    "id": "3421216c-e0a1-420c-a941-cd41f7a6303f",
-                                    "config": {}
-                                }
-                            }
-                        ]
-                    }
-                ]
-            }
+  "id": "site-dashboard",
+  "typeRef": "emodel/type@site",
+  "authority": null,
+  "priority": 0,
+  "config": {
+    "mobile": [
+      {
+        "id": "layout_b4b01e70-e01c-457d-abfa-aaaf0a4ca691",
+        "tab": {
+          "label": "Вкладка",
+          "idLayout": "layout_b4b01e70-e01c-457d-abfa-aaaf0a4ca691"
+        },
+        "type": "mobile",
+        "columns": [
+          {
+            "widgets": [
+              {
+                "dndId": "f610694c-adfe-40b0-825d-cd97a3de4912",
+                "name": "doc-preview",
+                "label": "dashboard-settings.widget.preview",
+                "id": "1e65976f-fec7-44f5-841e-ffe8fc4e6699",
+                "props": {
+                  "id": "1e65976f-fec7-44f5-841e-ffe8fc4e6699",
+                  "config": {
+                    "link": ""
+                  }
+                }
+              },
+              {
+                "dndId": "eb7b66be-bed1-4fe8-b4c3-048ad149379e",
+                "name": "properties",
+                "label": "dashboard-settings.widget.properties",
+                "id": "09623c98-fce2-4c50-9dbf-3f9c6b829092",
+                "props": {
+                  "id": "09623c98-fce2-4c50-9dbf-3f9c6b829092",
+                  "config": {}
+                }
+              }
+            ]
+          }
         ]
-    },
-    "attributes": {}
+      }
+    ],
+    "layouts": [
+      {
+        "id": "layout_799ac5e5-9eab-4c08-af80-5ed48d768229",
+        "tab": {
+          "label": "Основное",
+          "idLayout": "layout_799ac5e5-9eab-4c08-af80-5ed48d768229"
+        },
+        "type": "1-column",
+        "columns": [
+          {
+            "widgets": [
+              {
+                "name": "journal",
+                "label": "dashboard-settings.widget.journal",
+                "dndId": "d26707f7-0dc2-494d-8209-c7ab2304af4f",
+                "id": "83213544-1c17-4d22-9e0c-4843193bcbb0",
+                "props": {
+                  "id": "83213544-1c17-4d22-9e0c-4843193bcbb0",
+                  "config": {}
+                }
+              },
+              {
+                "name": "journal",
+                "label": "dashboard-settings.widget.journal",
+                "dndId": "fe68b0fb-dbfd-468d-a8fc-526db3417772",
+                "id": "3421216c-e0a1-420c-a941-cd41f7a6303f",
+                "props": {
+                  "id": "3421216c-e0a1-420c-a941-cd41f7a6303f",
+                  "config": {}
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "attributes": {}
 }

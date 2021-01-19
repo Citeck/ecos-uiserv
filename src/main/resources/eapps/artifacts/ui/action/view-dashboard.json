@@ -1,8 +1,8 @@
 {
-    "id": "view-dashboard",
-    "name": {
-        "ru": "Просмотреть",
-        "en": "View"
-    },
-    "type": "view"
+  "id": "view-dashboard",
+  "name": {
+    "ru": "Просмотреть",
+    "en": "View"
+  },
+  "type": "view"
 }

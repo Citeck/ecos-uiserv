@@ -1,7 +1,7 @@
 {
-    "id": "ecos-module-download",
-    "type": "download",
-    "config": {
-        "downloadType": "ecos_module"
-    }
+  "id": "ecos-module-download",
+  "type": "download",
+  "config": {
+    "downloadType": "ecos_module"
+  }
 }

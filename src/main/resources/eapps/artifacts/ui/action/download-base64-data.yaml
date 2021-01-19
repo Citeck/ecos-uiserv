@@ -2,9 +2,9 @@
 id: download-base64-data
 
 name:
-    ru: Скачать
-    en: Download
+  ru: Скачать
+  en: Download
 
 type: download
 config:
-    downloadType: base64
+  downloadType: base64

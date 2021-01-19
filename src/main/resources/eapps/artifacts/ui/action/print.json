@@ -1,18 +1,18 @@
 {
-    "id": "print",
-    "name": {
-        "ru": "Печатать",
-        "en": "Print"
-    },
-    "type": "open-url",
+  "id": "print",
+  "name": {
+    "ru": "Печатать",
+    "en": "Print"
+  },
+  "type": "open-url",
+  "config": {
+    "url": "/share/proxy/alfresco/citeck/print/printpdf?nodeRef=${recordRef}&print=true"
+  },
+  "evaluator": {
+    "type": "has-attribute",
     "config": {
-        "url": "/share/proxy/alfresco/citeck/print/printpdf?nodeRef=${recordRef}&print=true"
-    },
-    "evaluator": {
-        "type": "has-attribute",
-        "config": {
-            "attribute": "cm:content"
-        }
+      "attribute": "cm:content"
     }
+  }
 }
 

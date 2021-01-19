@@ -1,8 +1,8 @@
 {
-    "id": "content-preview-modal",
-    "name": {
-        "ru": "Просмотреть",
-        "en": "View"
-    },
-    "type": "content-preview-modal"
+  "id": "content-preview-modal",
+  "name": {
+    "ru": "Просмотреть",
+    "en": "View"
+  },
+  "type": "content-preview-modal"
 }

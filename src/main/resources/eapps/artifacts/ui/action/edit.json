@@ -1,14 +1,14 @@
 {
-    "id": "edit",
-    "name": {
-        "ru": "Редактировать Свойства",
-        "en": "Edit Properties"
-    },
-    "type": "edit",
-    "evaluator": {
-        "type": "has-permission",
-        "config": {
-            "permission": "Write"
-        }
+  "id": "edit",
+  "name": {
+    "ru": "Редактировать Свойства",
+    "en": "Edit Properties"
+  },
+  "type": "edit",
+  "evaluator": {
+    "type": "has-permission",
+    "config": {
+      "permission": "Write"
     }
+  }
 }
