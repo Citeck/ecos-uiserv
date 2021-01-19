@@ -91,7 +91,7 @@ public class JournalV1RecordsDao  extends LocalRecordsDao
                         result.add(configResp);
                     }
                 } catch (Exception e) {
-                    log.error("JournalConfig query failed. JournalId: '" + ref.getId() + "'", e);
+                    log.error("JournalConfig query failed. JournalId: '" + ref.getId() + "'");
                     result.add(converter.convert(dto));
                 }
             } else {
