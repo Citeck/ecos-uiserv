@@ -35,7 +35,7 @@ class AdminPageSections : AbstractRecordsDao(), RecordsQueryDao {
                         }""".trimIndent())
                     ),
                     PageSection(
-                        MLText("Артифакты ECOS"),
+                        MLText("Артефакты ECOS"),
                         SectionType.JOURNAL,
                         ObjectData.create("""{
                             "journalId": "ecos-artifacts"
