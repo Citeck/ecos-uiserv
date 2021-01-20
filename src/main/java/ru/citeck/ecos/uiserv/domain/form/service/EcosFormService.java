@@ -24,6 +24,8 @@ public interface EcosFormService {
 
     Optional<EcosFormModel> getFormById(String id);
 
+    List<EcosFormModel> getFormsForExactType(RecordRef typeRef);
+
     List<EcosFormModel> getAllFormsForType(RecordRef typeRef);
 
     String save(EcosFormModel model);

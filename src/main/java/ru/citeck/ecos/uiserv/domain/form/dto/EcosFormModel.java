@@ -40,5 +40,13 @@ public class EcosFormModel {
         this.definition = ObjectData.deepCopy(model.getDefinition());
         this.attributes = ObjectData.deepCopy(model.getAttributes());
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }
 

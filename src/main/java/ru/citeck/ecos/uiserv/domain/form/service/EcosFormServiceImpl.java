@@ -174,6 +174,12 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
+    public List<EcosFormModel> getFormsForExactType(RecordRef typeRef) {
+        List<EcosFormEntity> forms = formsRepository.findAllByTypeRef(typeRef.toString());
+        return forms.stream().map(this::mapToDto).collect(Collectors.toList());
+    }
+
+    @Override
     public List<EcosFormModel> getAllFormsForType(RecordRef typeRef) {
 
         List<EcosFormEntity> forms = new ArrayList<>();
