@@ -26,6 +26,20 @@ class AdminPageSections : AbstractRecordsDao(), RecordsQueryDao {
                     PageSection(
                         MLText("Инструменты разработчика"),
                         SectionType.DEV_TOOLS
+                    ),
+                    PageSection(
+                        MLText("Приложения ECOS"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "ecos-apps"
+                        }""".trimIndent())
+                    ),
+                    PageSection(
+                        MLText("Артифакты ECOS"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "ecos-artifacts"
+                        }""".trimIndent())
                     )
                 )
             ),
