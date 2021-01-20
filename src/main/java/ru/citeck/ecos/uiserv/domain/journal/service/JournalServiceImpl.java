@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.RecordMeta;
+import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
@@ -49,6 +50,20 @@ public class JournalServiceImpl implements JournalService {
         journalRepository.findAll().forEach(journal ->
             updateJournalLists(journalMapper.entityToDto(journal))
         );
+    }
+
+    @Override
+    public void updateJournalType(String journalId, RecordRef typeRef) {
+
+        if (RecordRef.isEmpty(typeRef)) {
+            return;
+        }
+
+        JournalEntity journal = journalRepository.findByExtId(journalId).orElse(null);
+        if (journal != null && StringUtils.isBlank(journal.getTypeRef())) {
+            journal.setTypeRef(typeRef.toString());
+            journalRepository.save(journal);
+        }
     }
 
     public long getLastModifiedTimeMs() {

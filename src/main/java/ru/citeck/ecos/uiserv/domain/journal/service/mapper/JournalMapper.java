@@ -104,7 +104,9 @@ public class JournalMapper {
         entity.setColumns(Json.getMapper().toString(columns));
         entity.setEditable(dto.getEditable());
         entity.setLabel(Json.getMapper().toString(dto.getLabel()));
-        entity.setTypeRef(RecordRef.toString(dto.getTypeRef()));
+        if (RecordRef.isNotEmpty(dto.getTypeRef())) {
+            entity.setTypeRef(RecordRef.toString(dto.getTypeRef()));
+        }
         entity.setPredicate(Json.getMapper().toString(dto.getPredicate()));
         entity.setQueryData(Json.getMapper().toString(dto.getQueryData()));
         entity.setActions(Json.getMapper().toString(dto.getActions()));

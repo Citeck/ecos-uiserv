@@ -12,6 +12,8 @@ public interface EcosFormService {
 
     int getCount();
 
+    void updateFormType(String formId, RecordRef typeRef);
+
     List<EcosFormModel> getAllForms(Predicate predicate, int max, int skip);
 
     List<EcosFormModel> getAllForms(int max, int skip);
