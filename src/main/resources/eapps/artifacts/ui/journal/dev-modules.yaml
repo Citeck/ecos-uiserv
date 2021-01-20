@@ -5,8 +5,7 @@ label: { ru: Dev modules, en: Dev modules }
 sourceId: uiserv/dev-module
 typeRef: emodel/type@dev-module
 
-#attributes:
-#  journalsListId: global-system
+system: true
 
 actions:
   - uiserv/action@record-actions

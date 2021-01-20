@@ -5,6 +5,8 @@ label: { ru: Темы, en: Themes }
 typeRef: emodel/type@theme
 sourceId: uiserv/theme
 
+system: true
+
 attributes:
   journalsListId: global-system
 

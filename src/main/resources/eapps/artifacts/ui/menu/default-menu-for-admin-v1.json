@@ -1,6 +1,7 @@
 {
   "id": "default-menu-for-admin-v1",
   "type": "LEFT_MENU",
+  "system": true,
   "authorities": [
     "GROUP_ALFRESCO_ADMINISTRATORS"
   ],

@@ -5,6 +5,8 @@ label: { ru: Формы, en: Forms }
 typeRef: emodel/type@form
 sourceId: uiserv/eform
 
+system: true
+
 attributes:
   journalsListId: global-system
 

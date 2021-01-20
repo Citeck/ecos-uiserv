@@ -1,6 +1,7 @@
 {
   "id": "default-menu-v1",
   "type": "LEFT_MENU",
+  "system": true,
   "authorities": [
     "GROUP_EVERYONE"
   ],

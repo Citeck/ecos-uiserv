@@ -3,6 +3,8 @@ id: ui-actions
 
 label: { ru: Действия, en: Actions }
 
+system: true
+
 typeRef: emodel/type@ui-action
 sourceId: uiserv/action
 

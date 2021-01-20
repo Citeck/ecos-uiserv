@@ -5,6 +5,8 @@ label: { ru: Меню, en: Menu }
 typeRef: emodel/type@menu
 sourceId: uiserv/menu
 
+system: true
+
 attributes:
   journalsListId: global-system
 

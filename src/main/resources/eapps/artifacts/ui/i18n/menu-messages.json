@@ -1,5 +1,6 @@
 {
   "id": "menu-messages",
+  "system": true,
   "locales": [
     "en",
     "ru"

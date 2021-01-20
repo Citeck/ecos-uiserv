@@ -1,6 +1,7 @@
 {
   "id": "journal-form",
   "formKey": "journal-form",
+  "system": true,
   "title": {
     "en": "Journal form"
   },

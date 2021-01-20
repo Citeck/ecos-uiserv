@@ -5,6 +5,8 @@ label: { ru: Журналы, en: Journals }
 typeRef: emodel/type@journal
 sourceId: uiserv/journal_all
 
+system: true
+
 columns:
 
   - name: moduleId

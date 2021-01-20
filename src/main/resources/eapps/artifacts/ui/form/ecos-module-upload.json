@@ -1,6 +1,7 @@
 {
   "id": "ecos-module-upload",
   "title": "ecos-module-upload",
+  "system": true,
   "formKey": "ecos-module-upload",
   "formMode": null,
   "description": "",

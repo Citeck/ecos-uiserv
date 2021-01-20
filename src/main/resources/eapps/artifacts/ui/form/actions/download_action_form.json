@@ -1,6 +1,7 @@
 {
   "id": "download_action_form",
   "title": "Download Action Form",
+  "system": true,
   "formKey": "action_download",
   "description": "",
   "customModule": null,

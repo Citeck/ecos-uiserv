@@ -2,6 +2,8 @@
 id: journal-columns
 label: { ru: Выбор колонок, en: Select columns }
 
+system: true
+
 columns:
 
   - name: label

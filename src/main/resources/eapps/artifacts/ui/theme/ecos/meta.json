@@ -3,6 +3,7 @@
     "ru": "Тема ECOS",
     "en": "ECOS theme"
   },
+  "system": true,
   "images": {
     "logo": "/image/logo.png",
     "login-logo": "/image/login-logo.png",
