@@ -6,6 +6,6 @@
   },
   "type": "open-url",
   "config": {
-    "url": "/share/proxy/alfresco/citeck/print/content?nodeRef=${recordRef}&download=false"
+    "url": "/gateway/alfresco/alfresco/s/citeck/print/content?nodeRef=${recordRef}&download=false"
   }
 }

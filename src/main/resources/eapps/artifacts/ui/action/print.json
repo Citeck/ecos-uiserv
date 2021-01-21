@@ -6,7 +6,7 @@
   },
   "type": "open-url",
   "config": {
-    "url": "/share/proxy/alfresco/citeck/print/printpdf?nodeRef=${recordRef}&print=true"
+    "url": "/gateway/alfresco/alfresco/citeck/print/printpdf?nodeRef=${recordRef}&print=true"
   },
   "evaluator": {
     "type": "has-attribute",

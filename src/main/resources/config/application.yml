@@ -188,6 +188,7 @@ application:
   try-header-for-username: X-Alfresco-Remote-User
 
 uiserv:
+  alfresco-service-url: 'http://alfresco/alfresco/s/'
   config:
     tabs-enabled:
       value: true
@@ -204,7 +205,7 @@ uiserv:
     apps:
       alfresco:
         rec-base-url: /alfresco/s/citeck/ecos/records/
-        rec-user-base-url: /share/proxy/alfresco/citeck/ecos/records/
+        rec-user-base-url: /alfresco/s/citeck/ecos/records/
 
     #eapps:
     #ribbon:

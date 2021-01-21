@@ -87,12 +87,26 @@ class AdminPageSections : AbstractRecordsDao(), RecordsQueryDao {
                         ObjectData.create("""{
                             "journalId": "ui-actions"
                         }""".trimIndent())
+                    ),
+                    PageSection(
+                        MLText("Дашборды"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "ecos-dashboards"
+                        }""".trimIndent())
                     )
                 )
             ),
             PageSectionGroup(
                 MLText("Конфигурация уведомлений"),
                 listOf(
+                    PageSection(
+                        MLText("Шаблоны уведомлений"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "notification-templates"
+                        }""".trimIndent())
+                    ),
                     PageSection(
                         MLText("Файлы уведомлений"),
                         SectionType.JOURNAL,

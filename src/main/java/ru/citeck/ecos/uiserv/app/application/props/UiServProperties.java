@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -16,11 +15,11 @@ import java.util.Optional;
 @ConfigurationProperties(prefix = "uiserv")
 public class UiServProperties {
 
-    @Getter
-    private final Action action = new Action();
-
     @Setter @Getter
     private Map<String, Config> config = Collections.emptyMap();
+
+    @Getter @Setter
+    private String alfrescoServiceUrl = "http://alfresco/alfresco/s/";
 
     @PostConstruct
     public void init() {
@@ -37,13 +36,5 @@ public class UiServProperties {
         private String title;
         private String description;
         private String value;
-    }
-
-    @Getter
-    @Setter
-    public static class Action {
-
-        private List<String> defaultJournalActions = UiServDefault.Action.DEFAULT_JOURNAL_ACTIONS;
-        private String getAlfJournalUrlEndpoint = UiServDefault.Action.GET_ALF_JOURNAL_URL_ENDPOINT;
     }
 }
