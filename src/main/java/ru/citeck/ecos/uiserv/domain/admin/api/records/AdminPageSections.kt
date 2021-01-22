@@ -40,6 +40,20 @@ class AdminPageSections : AbstractRecordsDao(), RecordsQueryDao {
                         ObjectData.create("""{
                             "journalId": "ecos-artifacts"
                         }""".trimIndent())
+                    ),
+                    PageSection(
+                        MLText("Патчи артифактов"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "ecos-module-patches"
+                        }""".trimIndent())
+                    ),
+                    PageSection(
+                        MLText("Конфигурация"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "ecosConfig"
+                        }""".trimIndent())
                     )
                 )
             ),
@@ -60,6 +74,13 @@ class AdminPageSections : AbstractRecordsDao(), RecordsQueryDao {
                         SectionType.JOURNAL,
                         ObjectData.create("""{
                             "journalId": "ecos-types"
+                        }""".trimIndent())
+                    ),
+                    PageSection(
+                        MLText("Шаблоны нумерации"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "number-templates"
                         }""".trimIndent())
                     )
                 )
@@ -93,6 +114,27 @@ class AdminPageSections : AbstractRecordsDao(), RecordsQueryDao {
                         SectionType.JOURNAL,
                         ObjectData.create("""{
                             "journalId": "ecos-dashboards"
+                        }""".trimIndent())
+                    ),
+                    PageSection(
+                        MLText("Темы"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "ecos-theme"
+                        }""".trimIndent())
+                    ),
+                    PageSection(
+                        MLText("Локализация"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "ecos-i18n"
+                        }""".trimIndent())
+                    ),
+                    PageSection(
+                        MLText("Меню"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "ecos-menus"
                         }""".trimIndent())
                     )
                 )
