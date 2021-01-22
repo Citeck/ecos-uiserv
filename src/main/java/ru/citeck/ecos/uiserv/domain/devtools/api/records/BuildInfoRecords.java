@@ -1,8 +1,9 @@
 package ru.citeck.ecos.uiserv.domain.devtools.api.records;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
@@ -16,10 +17,14 @@ import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
+import ru.citeck.ecos.uiserv.domain.devtools.dto.AppBuildInfo;
+import ru.citeck.ecos.uiserv.domain.devtools.dto.BuildInfo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,7 +34,7 @@ public class BuildInfoRecords extends LocalRecordsDao implements LocalRecordsQue
 
     public static final String ID = "build-info";
 
-    private final Record uiservBuildInfo;
+    private final Map<String, BuildInfoRecord> buildInfo = new ConcurrentHashMap<>();
 
     public BuildInfoRecords() {
 
@@ -49,26 +54,26 @@ public class BuildInfoRecords extends LocalRecordsDao implements LocalRecordsQue
         if (buildInfo == null) {
             buildInfo = ObjectData.create();
             buildInfo.set("buildDate", new Date().toInstant().toString());
-            buildInfo.set("commits", "[]");
         }
-        uiservBuildInfo = new Record("uiserv", "UI Server", "", buildInfo);
+        registerBuildInfo(new AppBuildInfo("uiserv", "UI Server", "", buildInfo));
     }
 
     @Override
     public RecordsQueryResult<Object> queryLocalRecords(@NotNull RecordsQuery recordsQuery,
                                                         @NotNull MetaField field) {
 
-        return new RecordsQueryResult<>(Collections.singletonList(uiservBuildInfo));
+        return new RecordsQueryResult<>(buildInfo.values()
+            .stream()
+            .map(BuildInfoRecord::getBuildInfo)
+            .collect(Collectors.toList()));
     }
 
     @Override
     public List<Object> getLocalRecordsMeta(@NotNull List<RecordRef> records, @NotNull MetaField metaField) {
 
         return records.stream().map(ref -> {
-            if (ref.getId().equals("uiserv")) {
-                return uiservBuildInfo;
-            }
-            return EmptyValue.INSTANCE;
+            BuildInfoRecord res = this.buildInfo.get(ref.getId());
+            return res != null ? res.buildInfo : EmptyValue.INSTANCE;
         }).collect(Collectors.toList());
     }
 
@@ -77,13 +82,38 @@ public class BuildInfoRecords extends LocalRecordsDao implements LocalRecordsQue
         return ID;
     }
 
+    public void registerBuildInfo(AppBuildInfo appInfo) {
+
+        String buildDateText = appInfo.getInfo().get("buildDate").asText();
+        if (StringUtils.isBlank(buildDateText)) {
+            return;
+        }
+        Instant buildDate = Instant.parse(buildDateText);
+
+        BuildInfoRecord currentRecord = this.buildInfo.get(appInfo.getId());
+        if (currentRecord != null && !buildDate.isAfter(currentRecord.buildDate)) {
+            return;
+        }
+
+        ObjectData infoData = appInfo.getInfo().deepCopy();
+        if (!infoData.has("commits")) {
+            infoData.set("commits", "[]");
+        }
+
+        this.buildInfo.put(appInfo.getId(), new BuildInfoRecord(buildDate, BuildInfo.create()
+            .withId(appInfo.getId())
+            .withDescription(appInfo.getDescription())
+            .withLabel(appInfo.getLabel())
+            .withInfo(infoData)
+            .build()
+        ));
+    }
+
     @Data
-    @RequiredArgsConstructor
-    public static class Record {
-        private final String id;
-        private final String label;
-        private final String description;
-        private final ObjectData info;
+    @AllArgsConstructor
+    private static class BuildInfoRecord {
+        final Instant buildDate;
+        final BuildInfo buildInfo;
     }
 }
 
