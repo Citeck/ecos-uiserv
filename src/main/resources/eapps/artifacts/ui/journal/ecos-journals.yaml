@@ -7,9 +7,6 @@ sourceId: uiserv/journal
 
 system: true
 
-attributes:
-  journalsListId: global-system
-
 actions:
   - uiserv/action@ecos-module-download
   - uiserv/action@delete

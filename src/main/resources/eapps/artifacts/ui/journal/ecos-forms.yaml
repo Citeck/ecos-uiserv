@@ -7,9 +7,6 @@ sourceId: uiserv/eform
 
 system: true
 
-attributes:
-  journalsListId: global-system
-
 actions:
   - uiserv/action@ecos-module-download
   - uiserv/action@delete

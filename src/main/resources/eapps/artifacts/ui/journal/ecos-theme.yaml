@@ -7,9 +7,6 @@ sourceId: uiserv/theme
 
 system: true
 
-attributes:
-  journalsListId: global-system
-
 actions:
   - uiserv/action@download-base64-data-zip
   - uiserv/action@delete

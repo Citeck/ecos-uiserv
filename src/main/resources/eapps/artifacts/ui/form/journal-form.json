@@ -480,6 +480,7 @@
                                             "defaultValue": true,
                                             "key": "visible",
                                             "type": "checkbox",
+                                            "hasThreeStates": true,
                                             "input": true
                                           },
                                           {
@@ -487,6 +488,7 @@
                                             "defaultValue": true,
                                             "key": "searchable",
                                             "type": "checkbox",
+                                            "hasThreeStates": true,
                                             "input": true
                                           },
                                           {
@@ -494,6 +496,7 @@
                                             "defaultValue": true,
                                             "key": "sortable",
                                             "type": "checkbox",
+                                            "hasThreeStates": true,
                                             "input": true
                                           },
                                           {
@@ -501,6 +504,7 @@
                                             "defaultValue": true,
                                             "key": "groupable",
                                             "type": "checkbox",
+                                            "hasThreeStates": true,
                                             "input": true
                                           },
                                           {
@@ -508,11 +512,13 @@
                                             "defaultValue": true,
                                             "key": "editable",
                                             "type": "checkbox",
+                                            "hasThreeStates": true,
                                             "input": true
                                           },
                                           {
                                             "label": "Hidden",
                                             "key": "hidden",
+                                            "hasThreeStates": true,
                                             "properties": {
                                               "attribute": "hidden"
                                             },
@@ -800,133 +806,6 @@
                         "key": "attributes",
                         "type": "datamap",
                         "input": true,
-                        "row": "0-2"
-                      }
-                    ],
-                    "tab": 3
-                  }
-                ]
-              },
-              {
-                "label": "Group Actions",
-                "key": "groupActions",
-                "components": [
-                  {
-                    "className": "",
-                    "content": "<h2 style=\"color:red\">DEPRECATED</h2>",
-                    "refreshOnChange": false,
-                    "key": "html",
-                    "type": "htmlelement",
-                    "input": false
-                  },
-                  {
-                    "label": "Group actions",
-                    "disableAddingRemovingRows": false,
-                    "addAnother": "",
-                    "addAnotherPosition": "bottom",
-                    "removePlacement": "col",
-                    "defaultOpen": false,
-                    "layoutFixed": false,
-                    "enableRowGroups": false,
-                    "multiple": true,
-                    "reorder": false,
-                    "defaultValue": [
-                      {
-                        "id": "",
-                        "container": {},
-                        "title": "",
-                        "type": "",
-                        "formKey": "",
-                        "params": {},
-                        "value": "Value",
-                        "label2": {
-                          "title": "",
-                          "ru": ""
-                        },
-                        "ru": "",
-                        "textField": "",
-                        "en": ""
-                      }
-                    ],
-                    "validate": {
-                      "minLength": "",
-                      "maxLength": ""
-                    },
-                    "key": "groupActions",
-                    "type": "datagrid",
-                    "input": true,
-                    "components": [
-                      {
-                        "key": "panel8",
-                        "type": "panel",
-                        "input": false,
-                        "components": [
-                          {
-                            "label": "Id",
-                            "defaultValue": "",
-                            "key": "id",
-                            "type": "textfield",
-                            "input": true
-                          },
-                          {
-                            "label": "Type",
-                            "defaultValue": "",
-                            "key": "type",
-                            "type": "textfield",
-                            "input": true
-                          }
-                        ],
-                        "row": "0-0"
-                      },
-                      {
-                        "key": "panel9",
-                        "type": "panel",
-                        "input": false,
-                        "components": [
-                          {
-                            "label": "Title",
-                            "defaultValue": "",
-                            "key": "title",
-                            "type": "textfield",
-                            "input": true
-                          }
-                        ],
-                        "row": "0-1"
-                      },
-                      {
-                        "title": "Form Key",
-                        "key": "panel10",
-                        "type": "panel",
-                        "input": false,
-                        "components": [
-                          {
-                            "label": "Form key",
-                            "defaultValue": "",
-                            "key": "formKey",
-                            "type": "textfield",
-                            "input": true
-                          },
-                          {
-                            "label": "Params",
-                            "keyLabel": "",
-                            "key": "params",
-                            "type": "datamap",
-                            "input": true,
-                            "valueComponent": {
-                              "type": "textfield",
-                              "key": "value",
-                              "label": "Value",
-                              "defaultValue": "Value",
-                              "input": true,
-                              "conditional": {
-                                "show": null,
-                                "when": null,
-                                "eq": "",
-                                "json": ""
-                              }
-                            }
-                          }
-                        ],
                         "row": "0-2"
                       }
                     ],

@@ -7,9 +7,6 @@ sourceId: uiserv/menu
 
 system: true
 
-attributes:
-  journalsListId: global-system
-
 actions:
   - uiserv/action@view-menu
   - uiserv/action@ecos-module-download

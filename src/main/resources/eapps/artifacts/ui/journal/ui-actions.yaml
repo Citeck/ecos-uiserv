@@ -8,9 +8,6 @@ system: true
 typeRef: emodel/type@ui-action
 sourceId: uiserv/action
 
-attributes:
-  journalsListId: global-system
-
 actions:
   - uiserv/action@ecos-module-download
   - uiserv/action@delete
