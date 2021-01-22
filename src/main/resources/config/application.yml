@@ -185,7 +185,7 @@ application:
   #A header to look for username if not found in a cookie;
   #  can turn this attempt off by setting this to empty,
   #  in particular with "-Dapplication.try-header-for-username="
-  try-header-for-username: X-Alfresco-Remote-User
+  try-header-for-username: X-ECOS-User,X-Alfresco-Remote-User
 
 uiserv:
   alfresco-service-url: 'http://alfresco/alfresco/s/'

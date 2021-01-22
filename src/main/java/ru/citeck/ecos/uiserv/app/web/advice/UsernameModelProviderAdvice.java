@@ -11,7 +11,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import ru.citeck.ecos.uiserv.app.application.props.ApplicationProperties;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 
 @ControllerAdvice
 @RequiredArgsConstructor
@@ -41,9 +40,17 @@ public class UsernameModelProviderAdvice {
     }
 
     private String tryHeaders(String checkHeader, HttpServletRequest request) {
-        return Optional.ofNullable(checkHeader)
-            .filter(x -> !x.equals(""))
-            .map(request::getHeader)
-            .orElse(null);
+
+        if (StringUtils.isBlank(checkHeader)) {
+            return null;
+        }
+        String[] headers = checkHeader.split(",");
+        for (String header : headers) {
+            String value = request.getHeader(header);
+            if (StringUtils.isNotBlank(value)) {
+                return value;
+            }
+        }
+        return null;
     }
 }
