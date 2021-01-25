@@ -467,7 +467,7 @@
                 {
                   "id": "ed5fbd6e-19b5-427e-bd04-268cd551311f",
                   "label": {
-                    "ru": "Календарь"
+                    "ru": "Каталог"
                   },
                   "hidden": false,
                   "type": "ARBITRARY",
@@ -507,6 +507,28 @@
                   "type": "JOURNAL",
                   "config": {
                     "recordRef": "uiserv/journal_all@financial-requests"
+                  }
+                },
+                {
+                  "id": "b23c4827-cb0e-4c09-a3b7-c9e95639b136",
+                  "label": {
+                    "ru": "Каталог"
+                  },
+                  "hidden": false,
+                  "type": "ARBITRARY",
+                  "config": {
+                    "url": "/share/page/site/ecos-finance/documentlibrary"
+                  }
+                },
+                {
+                  "id": "215defee-bf07-420e-84ae-47c8c77dd834",
+                  "label": {
+                    "ru": "Календарь"
+                  },
+                  "hidden": false,
+                  "type": "ARBITRARY",
+                  "config": {
+                    "url": "/share/page/site/ecos-finance/calendar"
                   }
                 }
               ]
@@ -712,139 +734,6 @@
                   }
                 }
               ]
-            },
-            {
-              "id": "59446041-bb25-4b25-b368-8088dae2a4b2",
-              "label": {
-                "ru": "Процессы JIRA"
-              },
-              "icon": "ui/icon@i-leftmenu-workflows",
-              "hidden": false,
-              "type": "SECTION",
-              "config": {},
-              "items": [
-                {
-                  "id": "2644e784-0b5f-4302-b2ff-75cbd7d1c0bb",
-                  "label": {
-                    "en": "Спринты"
-                  },
-                  "hidden": false,
-                  "type": "JOURNAL",
-                  "config": {
-                    "recordRef": "uiserv/journal_all@ecos-sprints"
-                  }
-                },
-                {
-                  "id": "8a1f8a53-0312-4ccb-900f-9fc9d4c5a887",
-                  "label": {
-                    "en": "Пользователи"
-                  },
-                  "hidden": false,
-                  "type": "JOURNAL",
-                  "config": {
-                    "recordRef": "uiserv/journal_all@ecos-users"
-                  }
-                },
-                {
-                  "id": "e79f1be9-1820-47df-b005-9a4d4a3f359e",
-                  "label": {
-                    "en": "Тикеты"
-                  },
-                  "hidden": false,
-                  "type": "JOURNAL",
-                  "config": {
-                    "recordRef": "uiserv/journal_all@ecos-issues"
-                  }
-                },
-                {
-                  "id": "4e0fcfac-57c7-4632-b984-bd47a38a7c36",
-                  "label": {
-                    "en": "Эпики"
-                  },
-                  "hidden": false,
-                  "type": "JOURNAL",
-                  "config": {
-                    "recordRef": "uiserv/journal_all@ecos-epics"
-                  }
-                },
-                {
-                  "id": "dcce6cbb-c9e6-443d-a40b-5a2939486cbe",
-                  "label": {
-                    "en": "Проекты"
-                  },
-                  "hidden": false,
-                  "type": "JOURNAL",
-                  "config": {
-                    "recordRef": "uiserv/journal_all@ecos-projects"
-                  }
-                },
-                {
-                  "id": "b5b8f4a9-cbf2-4407-a1fd-f29531126097",
-                  "label": {
-                    "en": "Версии"
-                  },
-                  "hidden": false,
-                  "type": "JOURNAL",
-                  "config": {
-                    "recordRef": "uiserv/journal_all@ecos-fix-versions"
-                  }
-                },
-                {
-                  "id": "94ac103d-19f5-49a6-a4ec-1301c324838d",
-                  "label": {
-                    "en": "Пользователи по месяцам"
-                  },
-                  "hidden": false,
-                  "type": "JOURNAL",
-                  "config": {
-                    "recordRef": "uiserv/journal_all@ecos-users-by-months"
-                  }
-                },
-                {
-                  "id": "8fc8ad7a-e123-408b-b2af-b7d315e1923e",
-                  "label": {
-                    "ru": "Каталог"
-                  },
-                  "hidden": false,
-                  "type": "ARBITRARY",
-                  "config": {
-                    "url": "/share/page/site/jira-processes/documentlibrary"
-                  }
-                },
-                {
-                  "id": "f500bd24-d11a-46b2-abc9-ce465df5d44d",
-                  "label": {
-                    "ru": "Календаарь"
-                  },
-                  "hidden": false,
-                  "type": "ARBITRARY",
-                  "config": {
-                    "url": "/share/page/site/jira-processes/calendar"
-                  }
-                }
-              ]
-            },
-            {
-              "id": "71532ed9-ff9c-409d-9ae7-2159e06b4b74",
-              "label": {
-                "ru": "Поиск разделов"
-              },
-              "icon": "ui/icon@i-leftmenu-find-section",
-              "hidden": false,
-              "type": "ARBITRARY",
-              "config": {
-                "url": "/share/page/custom-site-finder"
-              }
-            },
-            {
-              "id": "24b9dee8-f473-435a-9d30-9e9ae633d244",
-              "label": {
-                "ru": "Создать раздел"
-              },
-              "icon": "ui/icon@i-leftmenu-new-section",
-              "hidden": false,
-              "type": "SECTION",
-              "config": {}
             }
           ]
         },
