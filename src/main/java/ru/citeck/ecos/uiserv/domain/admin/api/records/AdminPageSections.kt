@@ -63,6 +63,13 @@ class AdminPageSections : AbstractRecordsDao(), RecordsQueryDao {
                     PageSection(
                         MLText("Модели бизнес-процессов"),
                         SectionType.BPM
+                    ),
+                    PageSection(
+                        MLText("CMMN Сценарии"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "ecmmn-process-def"
+                        }""".trimIndent())
                     )
                 )
             ),
