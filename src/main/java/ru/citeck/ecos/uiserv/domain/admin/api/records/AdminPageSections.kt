@@ -68,7 +68,7 @@ class AdminPageSections : AbstractRecordsDao(), RecordsQueryDao {
                         MLText("CMMN Сценарии"),
                         SectionType.JOURNAL,
                         ObjectData.create("""{
-                            "journalId": "ecmmn-process-def"
+                            "journalId": "cmmn-process-def"
                         }""".trimIndent())
                     )
                 )
