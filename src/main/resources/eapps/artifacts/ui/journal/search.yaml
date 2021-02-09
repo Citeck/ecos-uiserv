@@ -5,7 +5,7 @@ label: { ru: Поиск, en: Search }
 
 system: true
 
-attributes:
+properties:
   full-search-predicate: '{ "t": "contains", "att": "ALL", "val": "$INPUT" }'
 
 actions:

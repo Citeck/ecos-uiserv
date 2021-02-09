@@ -5,9 +5,11 @@ name:
   en: Form
   ru: Форма
 
+sourceId: uiserv/eform
+
 system: true
 
-journal: uiserv/journal@ecos-forms
+journalRef: uiserv/journal@ecos-forms
 
 createVariants:
 

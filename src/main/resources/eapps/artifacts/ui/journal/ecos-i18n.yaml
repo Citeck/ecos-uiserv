@@ -2,9 +2,6 @@
 id: ecos-i18n
 label: { ru: Локализация, en: Localization }
 
-typeRef: emodel/type@i18n
-sourceId: uiserv/i18n
-
 system: true
 
 actions:

@@ -10,13 +10,13 @@ import ru.citeck.ecos.uiserv.domain.journal.api.records.ResolvedJournalRecordsDa
 
 @Slf4j
 @Component
-class AllJournalRecordsDao(
+class V1JournalRecordsDao(
     private val resolvedJournalRecordsDao: ResolvedJournalRecordsDao
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordAttsDao {
 
-    override fun getId() = "journal_all"
+    override fun getId() = "journal_v1"
 
     override fun queryRecords(query: RecordsQuery): Any? {
         return resolvedJournalRecordsDao.queryRecords(query)

@@ -2,9 +2,6 @@
 id: ecos-dashboards
 label: { ru: Дашборды, en: Dashboards }
 
-typeRef: emodel/type@dashboard
-sourceId: uiserv/dashboard
-
 system: true
 
 actions:

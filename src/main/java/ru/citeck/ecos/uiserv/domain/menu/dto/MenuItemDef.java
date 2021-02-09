@@ -11,7 +11,7 @@ import java.util.List;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class MenuItemDto {
+public class MenuItemDef {
     public static final String TYPE_ITEM = "item";
     public static final String TYPE_RESOLVER = "resolver";
 
@@ -26,8 +26,8 @@ public class MenuItemDto {
 
     private RecordEvaluatorDto evaluator;
 
-    private MenuItemActionDto action;
-    private List<MenuItemDto> items;
+    private MenuItemActionDef action;
+    private List<MenuItemDef> items;
 
     @JsonIgnore
     public boolean isItem() {

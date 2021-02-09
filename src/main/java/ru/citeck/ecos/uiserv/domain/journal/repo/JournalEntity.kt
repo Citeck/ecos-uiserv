@@ -1,50 +1,30 @@
-package ru.citeck.ecos.uiserv.domain.journal.repo;
+package ru.citeck.ecos.uiserv.domain.journal.repo
 
-import lombok.Data;
-import ru.citeck.ecos.uiserv.app.common.repo.AbstractAuditingEntity;
-
-import javax.persistence.*;
+import ru.citeck.ecos.uiserv.app.common.repo.AbstractAuditingEntity
+import javax.persistence.*
 
 @Entity
 @Table(name = "journal")
-@Data
-public class JournalEntity extends AbstractAuditingEntity {
+class JournalEntity : AbstractAuditingEntity() {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "journal_seq_gen")
     @SequenceGenerator(name = "journal_seq_gen")
-    private Long id;
+    val id: Long? = null
 
     @Column(unique = true)
-    private String extId;
+    lateinit var extId: String
+    lateinit var columns: String
 
-    private String label;
-
-    private String sourceId;
-
-    private String groupBy;
-
-    private String sortBy;
-
-    private String metaRecord;
-
-    private String typeRef;
-
-    private String predicate;
-
-    private String queryData;
-
-    private Boolean editable;
-
-    private String attributes;
-
-    private String columns;
-
-    private String actions;
-
-    private String groupActions;
-
-    private String createVariants;
-
-    private String computed;
+    var label: String? = null
+    var groupBy: String? = null
+    var sortBy: String? = null
+    var metaRecord: String? = null
+    var typeRef: String? = null
+    var predicate: String? = null
+    var queryData: String? = null
+    var editable: Boolean? = null
+    var attributes: String? = null
+    var actions: String? = null
+    var computed: String? = null
 }

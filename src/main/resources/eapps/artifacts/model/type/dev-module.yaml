@@ -1,6 +1,10 @@
 
 id: dev-module
 
+sourceId: uiserv/dev-module
+
+journalRef: uiserv/journal@dev-modules
+
 name:
   en: Dev module
   ru: Dev module

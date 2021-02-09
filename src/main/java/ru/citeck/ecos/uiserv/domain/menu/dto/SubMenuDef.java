@@ -4,9 +4,12 @@ import ecos.com.fasterxml.jackson210.annotation.JsonInclude;
 import lombok.Data;
 import ru.citeck.ecos.commons.data.ObjectData;
 
+import java.util.List;
+
 @Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class MenuItemActionDto {
-    private String type;
+public class SubMenuDef {
+
     private ObjectData config;
+    private List<MenuItemDef> items;
 }

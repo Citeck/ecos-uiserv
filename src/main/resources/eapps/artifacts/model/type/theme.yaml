@@ -5,9 +5,10 @@ name:
   en: Theme
   ru: Тема
 
+sourceId: uiserv/theme
 system: true
 
-journal: uiserv/journal@ecos-theme
+journalRef: uiserv/journal@ecos-theme
 
 createVariants:
 

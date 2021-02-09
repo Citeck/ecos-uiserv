@@ -1,143 +1,71 @@
-package ru.citeck.ecos.uiserv.domain.journal.service.mapper;
+package ru.citeck.ecos.uiserv.domain.journal.service.mapper
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.stereotype.Component;
-import ru.citeck.ecos.commons.data.MLText;
-import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.uiserv.domain.journal.dto.*;
-import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
-import ru.citeck.ecos.uiserv.domain.journal.dto.legacy1.GroupAction;
-import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j
+import org.springframework.stereotype.Component
+import ru.citeck.ecos.commons.data.MLText
+import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.commons.json.Json.mapper
+import ru.citeck.ecos.records2.RecordRef
+import ru.citeck.ecos.records2.predicate.model.Predicate
+import ru.citeck.ecos.uiserv.domain.journal.dto.*
+import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity
+import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
-public class JournalMapper {
+class JournalMapper(
+    private val repository: JournalRepository
+) {
 
-    private final JournalRepository repository;
+    fun entityToDto(entity: JournalEntity): JournalWithMeta {
 
-    public JournalWithMeta entityToDto(JournalEntity entity) {
+        val dto = JournalWithMeta()
 
-        JournalWithMeta dto = new JournalWithMeta();
-        dto.setId(entity.getExtId());
-        dto.setEditable(entity.getEditable());
+        dto.journalDef = JournalDef.create()
+            .withId(entity.extId)
+            .withEditable(entity.editable)
+            .withLabel(mapper.read(entity.label, MLText::class.java))
+            .withTypeRef(RecordRef.valueOf(entity.typeRef))
+            .withPredicate(mapper.read(entity.predicate, Predicate::class.java))
+            .withQueryData(mapper.read(entity.queryData, ObjectData::class.java))
+            .withActions(mapper.readList(entity.actions, RecordRef::class.java))
+            .withProperties(mapper.read(entity.attributes, ObjectData::class.java))
+            .withMetaRecord(RecordRef.valueOf(entity.metaRecord))
+            .withGroupBy(mapper.readList(entity.groupBy, String::class.java))
+            .withSortBy(mapper.readList(entity.sortBy, JournalSortByDef::class.java))
+            .withComputed(mapper.readList(entity.computed, JournalComputedDef::class.java))
+            .withColumns(mapper.readList(entity.columns, JournalColumnDef::class.java))
+            .build()
 
-        ColumnsList columns = Json.getMapper().read(entity.getColumns(), ColumnsList.class);
-        dto.setColumns(columns != null ? columns : Collections.emptyList());
-        dto.setLabel(Json.getMapper().read(entity.getLabel(), MLText.class));
-        dto.setTypeRef(RecordRef.valueOf(entity.getTypeRef()));
-        dto.setPredicate(Json.getMapper().read(entity.getPredicate(), ObjectData.class));
-        dto.setQueryData(Json.getMapper().read(entity.getQueryData(), ObjectData.class));
-        dto.setActions(Json.getMapper().read(entity.getActions(), RecordRefsList.class));
-        dto.setAttributes(Json.getMapper().read(entity.getAttributes(), ObjectData.class));
-        dto.setMetaRecord(RecordRef.valueOf(entity.getMetaRecord()));
-        dto.setSourceId(entity.getSourceId());
-        dto.setGroupBy(Json.getMapper().read(entity.getGroupBy(), StrList.class));
-        dto.setSortBy(Json.getMapper().read(entity.getSortBy(), SortByList.class));
-        dto.setGroupActions(Json.getMapper().read(entity.getGroupActions(), GroupActionsList.class));
-        dto.setCreateVariants(Json.getMapper().read(entity.getCreateVariants(), CreateVariantsList.class));
-        dto.setComputed(Json.getMapper().read(entity.getComputed(), ComputedParamsList.class));
+        dto.modified = entity.lastModifiedDate
+        dto.modifier = entity.lastModifiedBy
+        dto.created = entity.createdDate
+        dto.creator = entity.createdBy
 
-        dto.setModified(entity.getLastModifiedDate());
-        dto.setModifier(entity.getLastModifiedBy());
-        dto.setCreated(entity.getCreatedDate());
-        dto.setCreator(entity.getCreatedBy());
-
-        if (dto.getAttributes() == null) {
-            dto.setAttributes(ObjectData.create());
-        }
-        if (dto.getEditable() == null) {
-            dto.setEditable(true);
-        }
-        if (dto.getPredicate() == null) {
-            dto.setPredicate(ObjectData.create());
-        }
-
-        dto.getColumns().forEach(c -> {
-            if (c.getVisible() == null) {
-                c.setVisible(true);
-            }
-            if (c.getEditable() == null) {
-                c.setEditable(true);
-            }
-            if (c.getGroupable() == null) {
-                c.setGroupable(true);
-            }
-            if (c.getSearchable() == null) {
-                c.setSearchable(true);
-            }
-            if (c.getSortable() == null) {
-                c.setSortable(true);
-            }
-            if (c.getAttributes() == null) {
-                c.setAttributes(ObjectData.create());
-            }
-        });
-
-        return dto;
+        return dto
     }
 
-    public JournalEntity dtoToEntity(JournalDto dto) {
+    fun dtoToEntity(journal: JournalDef): JournalEntity {
 
-        JournalEntity entity = repository.findByExtId(dto.getId()).orElse(null);
+        var entity = repository.findByExtId(journal.id).orElse(null)
         if (entity == null) {
-            entity = new JournalEntity();
-            entity.setExtId(dto.getId());
+            entity = JournalEntity()
+            entity.extId = journal.id
         }
 
-        List<JournalColumnDto> columns = getNotBlank(dto.getColumns(), JournalColumnDto::getName);
-        columns.forEach(column -> {
-            ColumnControl control = column.getControl();
-            if (control != null && StringUtils.isBlank(control.getType())) {
-                column.setControl(null);
-            }
-        });
+        entity.columns = mapper.toString(journal.columns)!!
+        entity.editable = journal.editable
+        entity.label = mapper.toString(journal.label)
+        entity.typeRef = RecordRef.toString(journal.typeRef)
+        entity.predicate = mapper.toString(journal.predicate)
+        entity.queryData = mapper.toString(journal.queryData)
+        entity.actions = mapper.toString(journal.actions)
+        entity.attributes = mapper.toString(journal.properties)
+        entity.metaRecord = RecordRef.toString(journal.metaRecord)
+        entity.groupBy = mapper.toString(journal.groupBy)
+        entity.sortBy = mapper.toString(journal.sortBy)
+        entity.computed = mapper.toString(journal.computed)
 
-        entity.setColumns(Json.getMapper().toString(columns));
-        entity.setEditable(dto.getEditable());
-        entity.setLabel(Json.getMapper().toString(dto.getLabel()));
-        if (RecordRef.isNotEmpty(dto.getTypeRef())) {
-            entity.setTypeRef(RecordRef.toString(dto.getTypeRef()));
-        }
-        entity.setPredicate(Json.getMapper().toString(dto.getPredicate()));
-        entity.setQueryData(Json.getMapper().toString(dto.getQueryData()));
-        entity.setActions(Json.getMapper().toString(dto.getActions()));
-        entity.setAttributes(Json.getMapper().toString(dto.getAttributes()));
-        entity.setMetaRecord(RecordRef.toString(dto.getMetaRecord()));
-        entity.setSourceId(dto.getSourceId());
-        entity.setGroupBy(Json.getMapper().toString(getNotBlank(dto.getGroupBy(), v -> v)));
-        entity.setGroupActions(Json.getMapper().toString(getNotBlank(dto.getGroupActions(), GroupAction::getId)));
-        entity.setSortBy(Json.getMapper().toString(getNotBlank(dto.getSortBy(), JournalSortBy::getAttribute)));
-        entity.setCreateVariants(Json.getMapper().toString(getNotBlank(dto.getCreateVariants(),
-            v -> RecordRef.valueOf(v.getRecordRef()).toString())));
-        entity.setComputed(Json.getMapper().toString(getNotBlank(dto.getComputed(),
-            ComputedParamDto::getId)));
-
-        return entity;
+        return entity
     }
-
-    private <T> List<T> getNotBlank(List<T> list, Function<T, String> getValueToCheck) {
-        if (list == null) {
-            return null;
-        }
-        return list.stream()
-            .filter(element -> StringUtils.isNotBlank(getValueToCheck.apply(element)))
-            .collect(Collectors.toList());
-    }
-
-    public static class ColumnsList extends ArrayList<JournalColumnDto> {}
-    public static class RecordRefsList extends ArrayList<RecordRef> {}
-    public static class StrList extends ArrayList<String> {}
-    public static class SortByList extends ArrayList<JournalSortBy> {}
-    public static class GroupActionsList extends ArrayList<GroupAction> {}
-    public static class CreateVariantsList extends ArrayList<CreateVariantDto> {}
-    public static class ComputedParamsList extends ArrayList<ComputedParamDto> {}
 }

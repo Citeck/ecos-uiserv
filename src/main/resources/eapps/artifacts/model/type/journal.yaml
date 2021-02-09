@@ -7,8 +7,10 @@ name:
 
 system: true
 
+sourceId: uiserv/journal
+
 form: uiserv/eform@journal-form
-journal: uiserv/journal@ecos-journals
+journalRef: uiserv/journal@ecos-journals
 
 createVariants:
 

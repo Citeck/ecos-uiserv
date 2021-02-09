@@ -5,9 +5,6 @@ label: { ru: Действия, en: Actions }
 
 system: true
 
-typeRef: emodel/type@ui-action
-sourceId: uiserv/action
-
 actions:
   - uiserv/action@ecos-module-download
   - uiserv/action@delete

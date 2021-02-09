@@ -13,9 +13,9 @@ import ru.citeck.ecos.uiserv.domain.menu.repo.MenuEntity;
 import ru.citeck.ecos.uiserv.domain.menu.repo.MenuRepository;
 import ru.citeck.ecos.uiserv.app.common.service.AuthoritiesSupport;
 import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService;
-import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDeployModule;
+import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDeployArtifact;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
-import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDto;
+import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef;
 import ru.citeck.ecos.uiserv.domain.menu.service.format.MenuReaderService;
 import ru.citeck.ecos.uiserv.domain.menu.service.resolving.MenuFactory;
 import ru.citeck.ecos.uiserv.domain.menu.service.resolving.ResolvedMenuDto;
@@ -23,6 +23,8 @@ import ru.citeck.ecos.uiserv.domain.menu.service.resolving.resolvers.MenuItemsRe
 
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,16 +48,22 @@ public class MenuService {
 
     private final RecordsService recordsService;
 
+    private final List<Consumer<MenuDto>> onChangeListeners = new CopyOnWriteArrayList<>();
+
     public long getLastModifiedTimeMs() {
         return menuRepository.getLastModifiedTime()
             .map(Instant::toEpochMilli)
             .orElse(0L);
     }
 
-    public MenuDto upload(MenuDeployModule module) {
+    public MenuDto upload(MenuDeployArtifact module) {
+
         MenuDto menuDto = readerService.readMenu(module.getData(), module.getFilename());
         MenuEntity entity = mapToEntity(menuDto);
-        return mapToDto(menuRepository.save(entity));
+
+        MenuDto result = mapToDto(menuRepository.save(entity));
+        onChangeListeners.forEach(it -> it.accept(result));
+        return result;
     }
 
     public Set<String> getAllAuthoritiesWithMenu() {
@@ -211,6 +219,7 @@ public class MenuService {
     }
 
     public MenuDto save(MenuDto dto) {
+
         if (dto == null) {
             throw new IllegalArgumentException("Dto cannot be null");
         }
@@ -219,7 +228,9 @@ public class MenuService {
             dto.setId(UUID.randomUUID().toString());
         }
 
-        return mapToDto(menuRepository.save(mapToEntity(dto)));
+        MenuDto result = mapToDto(menuRepository.save(mapToEntity(dto)));
+        onChangeListeners.forEach(it -> it.accept(result));
+        return result;
     }
 
     public void deleteByExtId(String menuId) {
@@ -229,6 +240,10 @@ public class MenuService {
         menuRepository.deleteByExtId(menuId);
     }
 
-    public static class SubMenus extends HashMap<String, SubMenuDto> {
+    public void addOnChangeListener(Consumer<MenuDto> listener) {
+        onChangeListeners.add(listener);
+    }
+
+    public static class SubMenus extends HashMap<String, SubMenuDef> {
     }
 }

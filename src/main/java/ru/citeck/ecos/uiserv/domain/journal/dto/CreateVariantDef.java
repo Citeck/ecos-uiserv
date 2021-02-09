@@ -6,7 +6,7 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.RecordRef;
 
 @Data
-public class CreateVariantDto {
+public class CreateVariantDef {
     private String id;
     private MLText name;
     private RecordRef formRef;

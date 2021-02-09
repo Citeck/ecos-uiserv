@@ -2,9 +2,6 @@
 id: dev-modules
 label: { ru: Dev modules, en: Dev modules }
 
-sourceId: uiserv/dev-module
-typeRef: emodel/type@dev-module
-
 system: true
 
 actions:

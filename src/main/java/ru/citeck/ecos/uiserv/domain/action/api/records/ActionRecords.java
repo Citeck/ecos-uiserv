@@ -28,6 +28,7 @@ import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.commons.utils.StringUtils;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
+import ru.citeck.ecos.records3.record.request.RequestContext;
 import ru.citeck.ecos.uiserv.domain.action.service.ActionService;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto;
 
@@ -392,14 +393,7 @@ public class ActionRecords extends LocalRecordsDao
             if (text == null) {
                 text = "null";
             }
-            MLText ml = new MLText();
-            QueryContext currentCtx = QueryContext.getCurrent();
-            if (currentCtx != null) {
-                ml.set(currentCtx.getLocale(), text);
-            } else {
-                ml.set(text);
-            }
-            return ml;
+            return MLText.EMPTY.withValue(RequestContext.getLocale(), text);
         }
     }
 

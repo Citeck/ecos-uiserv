@@ -114,16 +114,9 @@
                       {
                         "components": [
                           {
-                            "label": "Module ID",
+                            "label": "Journal ID",
                             "defaultValue": "",
-                            "key": "moduleId",
-                            "type": "textfield",
-                            "input": true
-                          },
-                          {
-                            "label": "Source ID",
-                            "defaultValue": "",
-                            "key": "sourceId",
+                            "key": "localId",
                             "type": "textfield",
                             "input": true
                           },

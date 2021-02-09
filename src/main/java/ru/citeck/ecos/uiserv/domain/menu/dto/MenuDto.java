@@ -20,7 +20,7 @@ public class MenuDto {
     private List<String> authorities;
     private Integer version;
 
-    private Map<String, SubMenuDto> subMenu;
+    private Map<String, SubMenuDef> subMenu;
 
     public MenuDto(String id) {
         this.id = id;
@@ -31,7 +31,7 @@ public class MenuDto {
         this.type = other.type;
         this.version = other.version;
         this.authorities = DataValue.create(other.authorities).toStrList();
-        this.subMenu = DataValue.create(other.subMenu).asMap(String.class, SubMenuDto.class);
+        this.subMenu = DataValue.create(other.subMenu).asMap(String.class, SubMenuDef.class);
     }
 }
 

@@ -3,7 +3,6 @@ package ru.citeck.ecos.uiserv.domain.journal.api.records;
 import kotlin.Unit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.RecordRef;
@@ -13,6 +12,7 @@ import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.request.query.QueryConsistency;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.source.common.AttributesMixin;
+import ru.citeck.ecos.uiserv.domain.journal.api.records.legacy.AllJournalRecordsDao;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService;
 
@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
 @RequiredArgsConstructor
 @Slf4j
 public class JournalsTotalCountMixin implements AttributesMixin<Unit, RecordRef> {
@@ -35,7 +34,7 @@ public class JournalsTotalCountMixin implements AttributesMixin<Unit, RecordRef>
 
     @PostConstruct
     public void init() {
-        allJournalRecordsDao.addAttributesMixin(this);
+        //allJournalRecordsDao.addAttributesMixin(this);
     }
 
     @Override
@@ -45,9 +44,10 @@ public class JournalsTotalCountMixin implements AttributesMixin<Unit, RecordRef>
 
     @Override
     public Object getAttribute(String attribute, RecordRef meta, MetaField field) throws Exception {
+
         JournalWithMeta journal = journalService.getJournalById(meta.getId());
-        StringBuilder sourceIdBuilder = new StringBuilder(journal.getSourceId());
-        ObjectData journalQueryData = journal.getQueryData();
+        StringBuilder sourceIdBuilder = new StringBuilder(""/*journal.getSourceId()*/);
+        ObjectData journalQueryData = journal.getJournalDef().getQueryData();
 
         RecordsQuery query = new RecordsQuery();
 
@@ -58,11 +58,11 @@ public class JournalsTotalCountMixin implements AttributesMixin<Unit, RecordRef>
         }
 
         if (journalQueryData == null || journalQueryData.getData().size() == 0) {
-            query.setQuery(journal.getPredicate().getData());
+            query.setQuery(journal.getJournalDef().getPredicate());
             query.setLanguage(PredicateService.LANGUAGE_PREDICATE);
         } else {
             Map<String, DataValue> dataMap = new HashMap<>();
-            dataMap.put("predicate", journal.getPredicate().getData());
+            dataMap.put("predicate", DataValue.create(journal.getJournalDef().getPredicate()));
             dataMap.put("data", journalQueryData.getData());
             query.setQuery(DataValue.create(dataMap));
             query.setLanguage("predicate-with-data");
