@@ -5,7 +5,7 @@ import lombok.Data;
 import ru.citeck.ecos.commons.data.ObjectData;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class MenuItemActionDef {
     private String type;
     private ObjectData config;

@@ -10,7 +10,7 @@ import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
 import java.util.List;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class MenuItemDef {
 
     public static final String TYPE_ITEM = "item";

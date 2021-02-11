@@ -10,7 +10,7 @@ import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
 
 @JsonDeserialize(builder = JournalDef.Builder::class)
-@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 data class JournalDef(
 
     /**

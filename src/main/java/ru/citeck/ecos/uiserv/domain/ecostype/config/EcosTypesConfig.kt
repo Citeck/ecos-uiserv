@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.ecostype.config
 
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationListener
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -12,6 +13,7 @@ import ru.citeck.ecos.model.lib.type.dto.TypeModelDef
 import ru.citeck.ecos.model.lib.type.repo.TypesRepo
 import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
 import ru.citeck.ecos.records2.RecordRef
+import ru.citeck.ecos.records2.source.dao.local.InMemRecordsDao
 import ru.citeck.ecos.records2.source.dao.local.RemoteSyncRecordsDao
 import ru.citeck.ecos.uiserv.domain.ecostype.dto.EcosTypeInfo
 import java.util.concurrent.ConcurrentHashMap
@@ -32,9 +34,16 @@ class EcosTypesConfig(
 
     private var typesSyncStarted = false
 
-    @Bean(name = ["remoteTypesSyncRecordsDao"])
-    fun createRemoteTypesSyncRecordsDao(): RemoteSyncRecordsDao<EcosTypeInfo> {
-        val syncDao = RemoteSyncRecordsDao("emodel/type", EcosTypeInfo::class.java)
+    @Value("\${uiserv.ecos-types-sync.active}")
+    private var typesSyncEnabled: Boolean = false
+
+    @Bean(name = ["typesSyncRecordsDao"])
+    fun createRemoteTypesSyncRecordsDao(): InMemRecordsDao<EcosTypeInfo> {
+        val syncDao: InMemRecordsDao<EcosTypeInfo> = if (typesSyncEnabled) {
+            RemoteSyncRecordsDao("emodel/type", EcosTypeInfo::class.java)
+        } else {
+            InMemRecordsDao("emodel/type")
+        }
         syncDao.addOnChangeListener { onTypeChanged(it) }
         return syncDao
     }
@@ -109,7 +118,7 @@ class EcosTypesConfig(
     }
 
     override fun onApplicationEvent(event: ContextRefreshedEvent) {
-        if (!typesSyncStarted) {
+        if (!typesSyncStarted && typesSyncEnabled) {
             taskExecutor.execute {
                 Thread.sleep(5_000)
                 createRemoteTypesSyncRecordsDao().getRecord("base")

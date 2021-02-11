@@ -211,6 +211,7 @@ uiserv:
     #ribbon:
     #listOfServers: localhost:8089
     #NIWSServerListClassName: com.netflix.loadbalancer.ConfigurationBasedServerList
+  ecos-types-sync.active: true
 
 ecos-app:
   id: ecos-uiserv
@@ -227,3 +228,4 @@ spring.rabbitmq:
 
 # Persisted user configurations limit. If exceeded, the latest configuration is deleted
 max-user-configurations-persisted: 1000
+

@@ -115,6 +115,10 @@ class JournalRecordsDao(
 
     open class JournalRecord(base: JournalWithMeta) : JournalWithMeta(base) {
 
+        fun getModuleId(): String {
+            return getLocalId()
+        }
+
         fun getLocalId(): String {
             return journalDef?.id ?: ""
         }
@@ -130,7 +134,7 @@ class JournalRecordsDao(
         @JsonValue
         @com.fasterxml.jackson.annotation.JsonValue
         open fun toJson(): Any {
-            return journalDef
+            return mapper.toNonDefaultJson(journalDef)
         }
     }
 

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class SubMenuDef {
 
     private ObjectData config = ObjectData.create();

@@ -12,7 +12,7 @@ import java.util.Map;
 @Data
 @ToString(exclude = {"subMenu"})
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class MenuDto {
 
     private String id;

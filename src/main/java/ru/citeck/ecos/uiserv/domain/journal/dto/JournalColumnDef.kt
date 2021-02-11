@@ -9,7 +9,7 @@ import ru.citeck.ecos.model.lib.attributes.dto.AttOptionDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 
 @JsonDeserialize(builder = JournalColumnDef.Builder::class)
-@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 class JournalColumnDef(
 
     /**
