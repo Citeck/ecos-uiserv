@@ -5,15 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.DataValue;
-import ru.citeck.ecos.commons.data.MLText;
-import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnControl;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDto;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDto;
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef;
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -21,12 +16,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JournalByFormGenerator {
 
-    public void fillData(JournalDto journal, EcosFormModel form) {
-        journal.setLabel(form.getTitle());
-        journal.setColumns(readColumns(form.getDefinition().get("components"), new ArrayList<>()));
+    public void fillData(JournalDef journal, EcosFormModel form) {
+        //journal.setLabel(form.getTitle());
+        //journal.setColumns(readColumns(form.getDefinition().get("components"), new ArrayList<>()));
     }
 
-    private List<JournalColumnDto> readColumns(DataValue components, List<JournalColumnDto> result) {
+    private List<JournalColumnDef> readColumns(DataValue components, List<JournalColumnDef> result) {
 
         if (!components.isArray()) {
             return result;
@@ -44,9 +39,9 @@ public class JournalByFormGenerator {
         return result;
     }
 
-    private JournalColumnDto readColumn(DataValue component) {
+    private JournalColumnDef readColumn(DataValue component) {
 
-        JournalColumnDto column = new JournalColumnDto();
+        /*JournalColumnDef column = new JournalColumnDef();
 
         column.setLabel(Json.getMapper().convert(component.get("label").asText(), MLText.class));
         column.setName(component.get("key").asText());
@@ -82,7 +77,8 @@ public class JournalByFormGenerator {
 
         column.setControl(controller);
 
-        return column;
+        return column;*/
+        return null;
     }
 
     private String getAttributeOrNull(DataValue component) {

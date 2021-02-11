@@ -27,7 +27,7 @@
               "hidden": false,
               "type": "JOURNAL",
               "config": {
-                "recordRef": "uiserv/journal_all@active-tasks",
+                "recordRef": "uiserv/journal@active-tasks",
                 "displayCount": true
               }
             },
@@ -40,7 +40,7 @@
               "hidden": false,
               "type": "JOURNAL",
               "config": {
-                "recordRef": "uiserv/journal_all@completed-tasks"
+                "recordRef": "uiserv/journal@completed-tasks"
               }
             },
             {
@@ -52,7 +52,7 @@
               "hidden": false,
               "type": "JOURNAL",
               "config": {
-                "recordRef": "uiserv/journal_all@initiator-tasks"
+                "recordRef": "uiserv/journal@initiator-tasks"
               }
             },
             {
@@ -64,7 +64,7 @@
               "hidden": false,
               "type": "JOURNAL",
               "config": {
-                "recordRef": "uiserv/journal_all@controlled",
+                "recordRef": "uiserv/journal@controlled",
                 "displayCount": true
               }
             },
@@ -77,7 +77,7 @@
               "hidden": false,
               "type": "JOURNAL",
               "config": {
-                "recordRef": "uiserv/journal_all@subordinate-tasks"
+                "recordRef": "uiserv/journal@subordinate-tasks"
               }
             },
             {
@@ -89,7 +89,7 @@
               "hidden": false,
               "type": "JOURNAL",
               "config": {
-                "recordRef": "uiserv/journal_all@task-statistic"
+                "recordRef": "uiserv/journal@task-statistic"
               }
             },
             {
@@ -101,7 +101,7 @@
               "hidden": false,
               "type": "JOURNAL",
               "config": {
-                "recordRef": "uiserv/journal_all@income-package-tasks",
+                "recordRef": "uiserv/journal@income-package-tasks",
                 "displayCount": true
               }
             }
@@ -134,7 +134,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@general-case"
+                    "recordRef": "uiserv/journal@general-case"
                   }
                 },
                 {
@@ -179,7 +179,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@ecos-documents"
+                    "recordRef": "uiserv/journal@ecos-documents"
                   }
                 },
                 {
@@ -258,7 +258,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@meetings"
+                    "recordRef": "uiserv/journal@meetings"
                   }
                 },
                 {
@@ -303,7 +303,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@tax-packages"
+                    "recordRef": "uiserv/journal@tax-packages"
                   }
                 },
                 {
@@ -314,7 +314,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@tax-package-docs"
+                    "recordRef": "uiserv/journal@tax-package-docs"
                   }
                 },
                 {
@@ -325,7 +325,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@tax-unloading-tasks"
+                    "recordRef": "uiserv/journal@tax-unloading-tasks"
                   }
                 },
                 {
@@ -370,7 +370,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@letters-income",
+                    "recordRef": "uiserv/journal@letters-income",
                     "displayCount": true
                   }
                 },
@@ -382,7 +382,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@letters-outcome",
+                    "recordRef": "uiserv/journal@letters-outcome",
                     "displayCount": true
                   }
                 },
@@ -428,7 +428,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@contracts-closing-document"
+                    "recordRef": "uiserv/journal@contracts-closing-document"
                   }
                 },
                 {
@@ -439,7 +439,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@contract-agreements"
+                    "recordRef": "uiserv/journal@contract-agreements"
                   }
                 },
                 {
@@ -450,7 +450,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@contracts-supplementary-agreement"
+                    "recordRef": "uiserv/journal@contracts-supplementary-agreement"
                   }
                 },
                 {
@@ -461,7 +461,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@payments"
+                    "recordRef": "uiserv/journal@payments"
                   }
                 },
                 {
@@ -506,7 +506,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@financial-requests"
+                    "recordRef": "uiserv/journal@financial-requests"
                   }
                 },
                 {
@@ -551,7 +551,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@attorneys-forms"
+                    "recordRef": "uiserv/journal@attorneys-forms"
                   }
                 },
                 {
@@ -596,7 +596,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@order-passes"
+                    "recordRef": "uiserv/journal@order-passes"
                   }
                 },
                 {
@@ -641,7 +641,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@hiring-applications"
+                    "recordRef": "uiserv/journal@hiring-applications"
                   }
                 },
                 {
@@ -652,7 +652,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@hr-management"
+                    "recordRef": "uiserv/journal@hr-management"
                   }
                 },
                 {
@@ -663,7 +663,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@dismissal-applications"
+                    "recordRef": "uiserv/journal@dismissal-applications"
                   }
                 },
                 {
@@ -708,7 +708,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@orders-internal"
+                    "recordRef": "uiserv/journal@orders-internal"
                   }
                 },
                 {
@@ -858,7 +858,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@passports"
+                    "recordRef": "uiserv/journal@passports"
                   }
                 },
                 {
@@ -869,7 +869,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@bank-accounts"
+                    "recordRef": "uiserv/journal@bank-accounts"
                   }
                 },
                 {
@@ -880,7 +880,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@country-iso3166"
+                    "recordRef": "uiserv/journal@country-iso3166"
                   }
                 },
                 {
@@ -891,7 +891,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@groups-of-countries"
+                    "recordRef": "uiserv/journal@groups-of-countries"
                   }
                 },
                 {
@@ -902,7 +902,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@products-and-services"
+                    "recordRef": "uiserv/journal@products-and-services"
                   }
                 },
                 {
@@ -913,7 +913,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@currency"
+                    "recordRef": "uiserv/journal@currency"
                   }
                 },
                 {
@@ -924,7 +924,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@currency-rates"
+                    "recordRef": "uiserv/journal@currency-rates"
                   }
                 },
                 {
@@ -935,7 +935,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@currency-rates-internal"
+                    "recordRef": "uiserv/journal@currency-rates-internal"
                   }
                 },
                 {
@@ -946,7 +946,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@legal-form"
+                    "recordRef": "uiserv/journal@legal-form"
                   }
                 },
                 {
@@ -957,7 +957,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@attorney"
+                    "recordRef": "uiserv/journal@attorney"
                   }
                 },
                 {
@@ -968,7 +968,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@units"
+                    "recordRef": "uiserv/journal@units"
                   }
                 },
                 {
@@ -979,7 +979,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@idocs-contractor"
+                    "recordRef": "uiserv/journal@idocs-contractor"
                   }
                 },
                 {
@@ -990,7 +990,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@legal-entities"
+                    "recordRef": "uiserv/journal@legal-entities"
                   }
                 },
                 {
@@ -1001,7 +1001,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@budget-items"
+                    "recordRef": "uiserv/journal@budget-items"
                   }
                 },
                 {
@@ -1012,7 +1012,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@closing-document-type"
+                    "recordRef": "uiserv/journal@closing-document-type"
                   }
                 },
                 {
@@ -1023,7 +1023,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@payment-periods"
+                    "recordRef": "uiserv/journal@payment-periods"
                   }
                 },
                 {
@@ -1034,7 +1034,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@esign-package"
+                    "recordRef": "uiserv/journal@esign-package"
                   }
                 },
                 {
@@ -1045,7 +1045,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@contract-subjects"
+                    "recordRef": "uiserv/journal@contract-subjects"
                   }
                 },
                 {
@@ -1056,7 +1056,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@files-nomenclature"
+                    "recordRef": "uiserv/journal@files-nomenclature"
                   }
                 },
                 {
@@ -1067,7 +1067,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@work-schedules-1C"
+                    "recordRef": "uiserv/journal@work-schedules-1C"
                   }
                 },
                 {
@@ -1078,7 +1078,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@reasons-absence"
+                    "recordRef": "uiserv/journal@reasons-absence"
                   }
                 },
                 {
@@ -1089,7 +1089,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@original-location"
+                    "recordRef": "uiserv/journal@original-location"
                   }
                 }
               ]
@@ -1112,7 +1112,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@operation-types"
+                    "recordRef": "uiserv/journal@operation-types"
                   }
                 },
                 {
@@ -1123,7 +1123,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@request-types"
+                    "recordRef": "uiserv/journal@request-types"
                   }
                 },
                 {
@@ -1134,7 +1134,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@cost-items"
+                    "recordRef": "uiserv/journal@cost-items"
                   }
                 },
                 {
@@ -1145,7 +1145,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@cost-centers"
+                    "recordRef": "uiserv/journal@cost-centers"
                   }
                 },
                 {
@@ -1156,7 +1156,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@invoice-statuses"
+                    "recordRef": "uiserv/journal@invoice-statuses"
                   }
                 },
                 {
@@ -1167,7 +1167,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@accounting-blocks"
+                    "recordRef": "uiserv/journal@accounting-blocks"
                   }
                 },
                 {
@@ -1178,7 +1178,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@document-types"
+                    "recordRef": "uiserv/journal@document-types"
                   }
                 },
                 {
@@ -1189,7 +1189,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@contractor-to-group"
+                    "recordRef": "uiserv/journal@contractor-to-group"
                   }
                 },
                 {
@@ -1200,7 +1200,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@standard-request-rejections"
+                    "recordRef": "uiserv/journal@standard-request-rejections"
                   }
                 },
                 {
@@ -1211,7 +1211,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@operation-docs"
+                    "recordRef": "uiserv/journal@operation-docs"
                   }
                 },
                 {
@@ -1222,7 +1222,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@fin-attachment-categories"
+                    "recordRef": "uiserv/journal@fin-attachment-categories"
                   }
                 },
                 {
@@ -1233,7 +1233,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@purchase-orders"
+                    "recordRef": "uiserv/journal@purchase-orders"
                   }
                 },
                 {
@@ -1244,7 +1244,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@goods-receipts"
+                    "recordRef": "uiserv/journal@goods-receipts"
                   }
                 },
                 {
@@ -1255,7 +1255,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@scan-cities"
+                    "recordRef": "uiserv/journal@scan-cities"
                   }
                 },
                 {
@@ -1266,7 +1266,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@postal-addresses"
+                    "recordRef": "uiserv/journal@postal-addresses"
                   }
                 }
               ]
@@ -1289,7 +1289,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@privileges"
+                    "recordRef": "uiserv/journal@privileges"
                   }
                 },
                 {
@@ -1300,7 +1300,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@power-of-attorney-templates"
+                    "recordRef": "uiserv/journal@power-of-attorney-templates"
                   }
                 }
               ]
@@ -1323,7 +1323,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@process-steps"
+                    "recordRef": "uiserv/journal@process-steps"
                   }
                 },
                 {
@@ -1334,7 +1334,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@management-kinds"
+                    "recordRef": "uiserv/journal@management-kinds"
                   }
                 },
                 {
@@ -1345,7 +1345,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@employee-categories"
+                    "recordRef": "uiserv/journal@employee-categories"
                   }
                 },
                 {
@@ -1356,7 +1356,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@salary-kinds"
+                    "recordRef": "uiserv/journal@salary-kinds"
                   }
                 },
                 {
@@ -1367,7 +1367,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@hr-processes"
+                    "recordRef": "uiserv/journal@hr-processes"
                   }
                 }
               ]

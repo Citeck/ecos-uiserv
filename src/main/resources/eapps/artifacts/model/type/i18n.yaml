@@ -1,13 +1,13 @@
 
 id: i18n
 
-name:
-  en: i18n
-  ru: i18n
+name: { en: i18n, ru: i18n }
+
+sourceId: uiserv/i18n
 
 system: true
 
-journal: uiserv/journal@i18n
+journalRef: uiserv/journal@i18n
 
 createVariants:
 

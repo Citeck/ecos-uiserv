@@ -1,28 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.journal.service.format;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.stereotype.Component;
-import ru.citeck.ecos.commons.data.DataValue;
-import ru.citeck.ecos.commons.data.MLText;
-import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.records2.QueryContext;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.uiserv.domain.journal.dto.*;
-import ru.citeck.ecos.uiserv.domain.journal.dto.legacy1.*;
-import ru.citeck.ecos.uiserv.domain.journal.service.format.util.EcosTypeUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
-
-@Component
-@RequiredArgsConstructor
-public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
-
+public class JournalV1Format {
+/*
     private final EcosTypeUtils typeUtils;
 
     @Override
@@ -31,9 +10,11 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
         JournalConfigResp resp = new JournalConfigResp();
         resp.setId(dto.getId());
         resp.setParams(Json.getMapper().convert(dto.getAttributes(), StrStrMap.class));
+
         if (resp.getParams() == null) {
             resp.setParams(new HashMap<>());
         }
+
         if (dto.getSortBy() != null && dto.getSortBy().size() > 0) {
             String sortValue = Json.getMapper().toString(dto.getSortBy().stream().map(sort -> {
                 ObjectData targetSort = ObjectData.create();
@@ -43,6 +24,8 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
             }).collect(Collectors.toList()));
             resp.getParams().put("defaultSortBy", sortValue);
         }
+
+
         if (Boolean.FALSE.equals(dto.getEditable())) {
             resp.getParams().put("disableTableEditing", "true");
         }
@@ -91,7 +74,7 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
 
         if (dto.getColumns() != null) {
 
-            for (JournalColumnDto column : dto.getColumns()) {
+            for (JournalColumnDef column : dto.getColumns()) {
 
                 Column respColumn = new Column();
                 respColumn.setMultiple(column.getMultiple());
@@ -150,11 +133,11 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
 
     private List<CreateVariant> getCreateVariants(RecordRef typeRef) {
 
-        List<CreateVariantDto> variants = typeUtils.getCreateVariants(typeRef);
+        List<CreateVariantDef> variants = typeUtils.getCreateVariants(typeRef);
         Locale locale = LocaleContextHolder.getLocale();
 
         List<CreateVariant> result = new ArrayList<>();
-        for (CreateVariantDto variant : variants) {
+        for (CreateVariantDef variant : variants) {
 
             CreateVariant resultVariant = new CreateVariant();
             resultVariant.setAttributes(Json.getMapper().convert(variant.getAttributes(), StrStrMap.class));
@@ -186,5 +169,5 @@ public class JournalV1Format implements JournalModelFormat<JournalConfigResp> {
         return 1;
     }
 
-    public static class StrStrMap extends HashMap<String, String> {}
+    public static class StrStrMap extends HashMap<String, String> {}*/
 }

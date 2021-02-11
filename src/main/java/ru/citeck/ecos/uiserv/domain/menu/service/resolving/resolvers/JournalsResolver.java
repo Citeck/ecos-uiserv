@@ -107,14 +107,14 @@ public class JournalsResolver {
             .flatMap(journalListAtts -> journalListAtts.getJournals().stream())
             .collect(Collectors.toList());
 
-        journalService.getJournalsByJournalList(journalList).forEach(journal -> {
+/*        journalService.getJournalsByJournalList(journalList).forEach(journal -> {
             JournalAtts atts = new JournalAtts();
             atts.setId(journal.getId());
             atts.setJournalType(journal.getId());
             atts.setName(MLText.getClosestValue(journal.getLabel(), LocaleContextHolder.getLocale()));
             atts.setTitle(atts.getName());
             journals.add(atts);
-        });
+        });*/
 
         return journals;
     }

@@ -2,9 +2,6 @@
 id: ecos-theme
 label: { ru: Темы, en: Themes }
 
-typeRef: emodel/type@theme
-sourceId: uiserv/theme
-
 system: true
 
 actions:

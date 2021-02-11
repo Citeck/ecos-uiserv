@@ -1,33 +1,16 @@
 package ru.citeck.ecos.uiserv.domain.journal.service.format;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
-import ru.citeck.ecos.commons.data.DataValue;
-import ru.citeck.ecos.commons.data.MLText;
-import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDto;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
-import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.Attribute;
-import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.CreateVariant;
-import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.JournalConfig;
-import ru.citeck.ecos.uiserv.domain.journal.dto.legacy0.JournalTypeDto;
-import ru.citeck.ecos.uiserv.domain.journal.dto.CreateVariantDto;
 import ru.citeck.ecos.uiserv.domain.journal.service.format.util.EcosTypeUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
-public class JournalV0Format implements JournalModelFormat<JournalConfig> {
+public class JournalV0Format {
 
     private final EcosTypeUtils typeUtils;
 
-    @Override
+    /*@Override
     public JournalConfig convert(JournalWithMeta dto) {
 
         Locale currentLocale = LocaleContextHolder.getLocale();
@@ -42,7 +25,7 @@ public class JournalV0Format implements JournalModelFormat<JournalConfig> {
         journalType.setSettings(Json.getMapper().convert(settings, StrStrMap.class));
 
         List<Attribute> attributes = new ArrayList<>();
-        for (JournalColumnDto column : dto.getColumns()) {
+        for (JournalColumnDef column : dto.getColumns()) {
 
             Attribute att = new Attribute();
             att.setBatchEdit(DataValue.create(Json.getMapper().newArrayNode()));
@@ -76,9 +59,9 @@ public class JournalV0Format implements JournalModelFormat<JournalConfig> {
 
     private List<CreateVariant> getCreateVariants(JournalWithMeta dto) {
 
-        List<CreateVariantDto> typeVariants = typeUtils.getCreateVariants(dto.getTypeRef());
-        List<CreateVariantDto> journalVariants = dto.getCreateVariants();
-        List<CreateVariantDto> variants = Stream.concat(typeVariants.stream(), journalVariants.stream())
+        List<CreateVariantDef> typeVariants = typeUtils.getCreateVariants(dto.getTypeRef());
+        List<CreateVariantDef> journalVariants = dto.getCreateVariants();
+        List<CreateVariantDef> variants = Stream.concat(typeVariants.stream(), journalVariants.stream())
             .collect(Collectors.toList());
 
         Locale locale = LocaleContextHolder.getLocale();
@@ -115,5 +98,6 @@ public class JournalV0Format implements JournalModelFormat<JournalConfig> {
         return 0;
     }
 
-    public static class StrStrMap extends HashMap<String, String> {}
+    public static class StrStrMap extends HashMap<String, String> {}*/
+
 }

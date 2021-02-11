@@ -1,7 +1,7 @@
 
 id: ui-action/record-actions
 
-parent: emodel/type@ui-action
+parentRef: emodel/type@ui-action
 
 name:
   en: Server actions

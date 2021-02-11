@@ -2,9 +2,6 @@
 id: ecos-menus
 label: { ru: Меню, en: Menu }
 
-typeRef: emodel/type@menu
-sourceId: uiserv/menu
-
 system: true
 
 actions:
@@ -32,3 +29,5 @@ columns:
   - name: defaultMenuForJournal
     editable: false
     label: { ru: Меню по умолчанию, en: Default menu }
+
+

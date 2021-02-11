@@ -2,9 +2,6 @@
 id: ecos-journals
 label: { ru: Журналы, en: Journals }
 
-typeRef: emodel/type@journal
-sourceId: uiserv/journal
-
 system: true
 
 actions:
@@ -15,12 +12,9 @@ actions:
 
 columns:
 
-  - name: moduleId
+  - name: localId
     type: text
     label: { ru: Идентификатор, en: Id }
-
-  - name: sourceId
-    label: { ru: Источник данных, en: Data source }
 
   - name: typeRef
     label: { ru: Тип ECOS, en: ECOS Type }

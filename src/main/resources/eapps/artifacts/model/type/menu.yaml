@@ -7,7 +7,9 @@ name:
 
 system: true
 
-journal: uiserv/journal@ecos-menu
+sourceId: uiserv/menu
+
+journalRef: uiserv/journal@ecos-menus
 
 createVariants:
 

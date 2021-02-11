@@ -6,8 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDto;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDto;
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef;
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef;
 import ru.citeck.ecos.uiserv.domain.journal.service.type.JournalByFormGenerator;
 
 import java.io.File;
@@ -32,16 +32,16 @@ public class JournalGeneratorTest {
 
         //  arrange
 
-        JournalDto journalDto = new JournalDto();
-        journalDto.setId("JOURNAL_ECOS_FORM");
-        journalDto.setLabel(new MLText("Form ui"));
+/*        JournalDef journalDef = new JournalDef();
+        journalDef.setId("JOURNAL_ECOS_FORM");
+        journalDef.setLabel(new MLText("Form ui"));
 
-        JournalColumnDto widthColumn = new JournalColumnDto();
+        JournalColumnDef widthColumn = new JournalColumnDef();
         widthColumn.setName("width");
         widthColumn.setLabel(new MLText("Width"));
         widthColumn.setEditable(true);
         widthColumn.setVisible(true);
-        widthColumn.setAttributes(ObjectData.create("{}"));
+        widthColumn.setAttributes(ObjectData.create("{}"));*/
 
         /*ColumnEditorDto widthEditor = new ColumnEditorDto();
         widthEditor.setType("ecosSelect");

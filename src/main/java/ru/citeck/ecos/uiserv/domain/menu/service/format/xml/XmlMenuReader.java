@@ -6,9 +6,9 @@ import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
-import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemActionDto;
-import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDto;
-import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDto;
+import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemActionDef;
+import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDef;
+import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef;
 import ru.citeck.ecos.uiserv.domain.menu.service.format.MenuReader;
 import ru.citeck.ecos.uiserv.domain.menu.service.format.xml.xml.*;
 
@@ -21,8 +21,8 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDto.TYPE_ITEM;
-import static ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDto.TYPE_RESOLVER;
+import static ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDef.TYPE_ITEM;
+import static ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDef.TYPE_RESOLVER;
 
 @Component
 public class XmlMenuReader implements MenuReader {
@@ -61,20 +61,20 @@ public class XmlMenuReader implements MenuReader {
         return dto;
     }
 
-    private Map<String, SubMenuDto> parseSubMenusFromItems(Items items) {
-        SubMenuDto left = new SubMenuDto();
-        List<MenuItemDto> menuItemDtos = items.getItemsChildren().stream()
+    private Map<String, SubMenuDef> parseSubMenusFromItems(Items items) {
+        SubMenuDef left = new SubMenuDef();
+        List<MenuItemDef> menuItemDefs = items.getItemsChildren().stream()
             .map(this::xmlItemToDto)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
-        left.setItems(menuItemDtos);
+        left.setItems(menuItemDefs);
 
-        Map<String, SubMenuDto> subMenus = new HashMap<>();
+        Map<String, SubMenuDef> subMenus = new HashMap<>();
         subMenus.put("left", left);
         return subMenus;
     }
 
-    private MenuItemDto xmlItemToDto(Object item) {
+    private MenuItemDef xmlItemToDto(Object item) {
         if (item instanceof ItemsResolver) {
             return itemsResolverToDto((ItemsResolver) item);
         }
@@ -86,8 +86,8 @@ public class XmlMenuReader implements MenuReader {
         return null;
     }
 
-    private MenuItemDto itemsResolverToDto(ItemsResolver resolver) {
-        MenuItemDto dto = new MenuItemDto();
+    private MenuItemDef itemsResolverToDto(ItemsResolver resolver) {
+        MenuItemDef dto = new MenuItemDef();
 
         dto.setId(resolver.getId());
         dto.setType(TYPE_RESOLVER);
@@ -95,16 +95,16 @@ public class XmlMenuReader implements MenuReader {
             dto.setConfig(parameterListToObjectData(resolver.getParam()));
         }
         if (resolver.getItem() != null) {
-            List<MenuItemDto> singleMenuItemDto = new ArrayList<>();
-            singleMenuItemDto.add(itemToDto(resolver.getItem()));
-            dto.setItems(singleMenuItemDto);
+            List<MenuItemDef> singleMenuItemDef = new ArrayList<>();
+            singleMenuItemDef.add(itemToDto(resolver.getItem()));
+            dto.setItems(singleMenuItemDef);
         }
 
         return dto;
     }
 
-    private MenuItemDto itemToDto(Item item) {
-        MenuItemDto dto = new MenuItemDto();
+    private MenuItemDef itemToDto(Item item) {
+        MenuItemDef dto = new MenuItemDef();
 
         dto.setId(item.getId());
         dto.setType(TYPE_ITEM);
@@ -125,7 +125,7 @@ public class XmlMenuReader implements MenuReader {
             dto.setEvaluator(evaluatorDtoFromEvaluator(item.getEvaluator()));
         }
         if (item.getItems() != null) {
-            List<MenuItemDto> items = item.getItems().getItemsChildren().stream()
+            List<MenuItemDef> items = item.getItems().getItemsChildren().stream()
                 .map(this::xmlItemToDto)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -135,8 +135,8 @@ public class XmlMenuReader implements MenuReader {
         return dto;
     }
 
-    private MenuItemActionDto actionDtoFromAction(Action action) {
-        MenuItemActionDto actionDto = new MenuItemActionDto();
+    private MenuItemActionDef actionDtoFromAction(Action action) {
+        MenuItemActionDef actionDto = new MenuItemActionDef();
 
         actionDto.setType(action.getType());
         if (action.getParam() != null) {
