@@ -1,7 +1,11 @@
 package ru.citeck.ecos.uiserv.domain.ecostype.config
 
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.context.ApplicationListener
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.event.ContextRefreshedEvent
+import org.springframework.core.task.AsyncTaskExecutor
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.model.lib.type.dto.TypeDef
 import ru.citeck.ecos.model.lib.type.dto.TypeModelDef
@@ -14,7 +18,10 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
 @Configuration
-class EcosTypesConfig {
+class EcosTypesConfig(
+    @Qualifier("taskExecutor")
+    private val taskExecutor: AsyncTaskExecutor
+) : ApplicationListener<ContextRefreshedEvent> {
 
     private val parentByType = ConcurrentHashMap<RecordRef, RecordRef>()
     private val childrenByType = ConcurrentHashMap<RecordRef, MutableList<RecordRef>>()
@@ -22,6 +29,8 @@ class EcosTypesConfig {
 
     private val typeByJournal = ConcurrentHashMap<RecordRef, RecordRef>()
     private val journalByType = ConcurrentHashMap<RecordRef, RecordRef>()
+
+    private var typesSyncStarted = false
 
     @Bean(name = ["remoteTypesSyncRecordsDao"])
     fun createRemoteTypesSyncRecordsDao(): RemoteSyncRecordsDao<EcosTypeInfo> {
@@ -96,6 +105,16 @@ class EcosTypesConfig {
                     .withModel(typeInfo.model ?: TypeModelDef.EMPTY)
                     .build()
             }
+        }
+    }
+
+    override fun onApplicationEvent(event: ContextRefreshedEvent) {
+        if (!typesSyncStarted) {
+            taskExecutor.execute {
+                Thread.sleep(5_000)
+                createRemoteTypesSyncRecordsDao().getRecord("base")
+            }
+            typesSyncStarted = true
         }
     }
 }

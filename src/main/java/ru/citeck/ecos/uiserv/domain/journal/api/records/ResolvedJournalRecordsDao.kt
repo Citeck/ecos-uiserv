@@ -4,6 +4,9 @@ import org.apache.commons.lang.StringUtils
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
+import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
+import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.predicate.PredicateUtils
@@ -17,8 +20,10 @@ import ru.citeck.ecos.records3.record.op.query.dto.RecsQueryRes
 import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery
 import ru.citeck.ecos.uiserv.domain.ecostype.dto.EcosTypeInfo
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
-import ru.citeck.ecos.uiserv.domain.journal.dto.ResolvedJournalDef
+import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedColumnDef
+import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedJournalDef
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -49,10 +54,8 @@ class ResolvedJournalRecordsDao(
 
     private fun resolveJournal(journal: JournalRecordsDao.JournalRecord): ResolvedJournalDef {
 
-        val resolvedDto = ResolvedJournalDef(journal)
-
         if (journal.journalDef == null || StringUtils.isBlank(journal.journalDef.id)) {
-            return resolvedDto
+            return ResolvedJournalDef(journal, emptyList())
         }
         val journalBuilder = journal.journalDef.copy()
 
@@ -61,28 +64,29 @@ class ResolvedJournalRecordsDao(
         val typeRef = journalBuilder.typeRef
 
         var typeInfo: EcosTypeInfo? = null
-        if (typeRef != null && RecordRef.isNotEmpty(typeRef)) {
+        if (RecordRef.isNotEmpty(typeRef)) {
             typeInfo = ecosTypeService.getTypeInfo(typeRef)
         }
         resolveTypeJournalProps(journalBuilder, typeInfo)
 
-        resolveEdgeMeta(journalBuilder, typeInfo)
+        val columns = resolveColumns(journalBuilder, typeInfo)
         resolvePredicate(journalBuilder)
 
         val newJournal = JournalRecordsDao.JournalRecord(journal)
         newJournal.journalDef = journalBuilder.build()
 
-        return createResolvedDef(newJournal, typeInfo)
+        return createResolvedDef(newJournal, typeInfo, columns)
     }
 
     private fun createResolvedDef(journal: JournalRecordsDao.JournalRecord,
-                                  typeInfo: EcosTypeInfo?): ResolvedJournalDef {
+                                  typeInfo: EcosTypeInfo?,
+                                  columns: List<ResolvedColumnDef>): ResolvedJournalDef {
 
-        val result = ResolvedJournalDef(journal)
+        val result = ResolvedJournalDef(journal, columns)
 
         if (typeInfo != null) {
             result.sourceId = typeInfo.sourceId ?: ""
-            result.createVariants = typeInfo.createVariants ?: emptyList()
+            result.createVariants = typeInfo.inhCreateVariants ?: emptyList()
         }
 
         return result
@@ -103,79 +107,129 @@ class ResolvedJournalRecordsDao(
     private fun resolveTypeJournalProps(journal: JournalDef.Builder, typeInfo: EcosTypeInfo?) {
 
         if (typeInfo != null && MLText.isEmpty(journal.label)) {
-            journal.label = typeInfo.name
+            journal.label = typeInfo.name ?: MLText(journal.id)
         }
     }
 
-    private fun resolveEdgeMeta(journal: JournalDef.Builder, typeInfo: EcosTypeInfo?) {
+    private fun resolveColumns(journal: JournalDef.Builder, typeInfo: EcosTypeInfo?): List<ResolvedColumnDef> {
+
+        val columns = if (journal.columns.isEmpty()) {
+            typeInfo?.model?.attributes?.map {
+                JournalColumnDef.create().withName(it.id)
+            } ?: emptyList()
+        } else {
+            journal.columns.map { it.copy() }
+        }
+        return resolveEdgeMetaImpl(journal, columns, typeInfo)
+    }
+
+    private fun resolveEdgeMetaImpl(journal: JournalDef.Builder,
+                                    columns: List<JournalColumnDef.Builder>,
+                                    typeInfo: EcosTypeInfo?): List<ResolvedColumnDef> {
+
+        val typeAtts: Map<String, AttributeDef> =
+            typeInfo?.model?.attributes?.map { it.id to it }?.toMap() ?: emptyMap()
+
+        val attributeEdges = HashMap<String, String>()
+        val columnIdxByName = HashMap<String, Int>()
+
+        var columnIdxCounter = 0
+        for (column in columns) {
+
+            columnIdxByName[column.name] = columnIdxCounter++
+
+            val attribute = if (column.attribute.isBlank()) {
+                column.name
+            } else {
+                column.attribute
+            }
+            val isInnerAtt = attribute.contains(".") || attribute.contains("?")
+
+            val typeAtt = typeAtts[column.name]
+
+            val edgeAtts = ArrayList<String>()
+            if (column.type == null) {
+                val typeAttType = typeAtt?.type
+                if (typeAttType != null) {
+                    column.withType(typeAttType)
+                } else if (!isInnerAtt) {
+                    edgeAtts.add("type")
+                }
+            }
+            if (column.editable == null) {
+                edgeAtts.add("protected")
+            }
+            if (MLText.isEmpty(column.label)) {
+                val typeAttName = typeAtt?.name
+                if (!MLText.isEmpty(typeAttName)) {
+                    column.withLabel(typeAttName)
+                } else if (!isInnerAtt) {
+                    edgeAtts.add("title")
+                }
+            }
+            if (column.multiple == null) {
+                val typeAttMultiple = typeAtt?.multiple
+                if (typeAttMultiple != null) {
+                    column.withMultiple(typeAttMultiple)
+                } else if (!isInnerAtt) {
+                    edgeAtts.add("multiple")
+                }
+            }
+            if (column.options.isEmpty()) {
+                val typeAttOptions = typeAtt?.options
+                if (!typeAttOptions.isNullOrEmpty()) {
+                    column.withOptions(typeAttOptions)
+                }
+            }
+
+            if (edgeAtts.isNotEmpty()) {
+                if (edgeAtts.size == 1) {
+                    edgeAtts.add("javaClass") // protection from optimization
+                }
+                attributeEdges[column.name] = "_edge.$attribute{${edgeAtts.joinToString(",")}}"
+            }
+        }
 
         var metaRecord = journal.metaRecord
         if (RecordRef.isEmpty(metaRecord) && typeInfo != null && !typeInfo.sourceId.isNullOrBlank()) {
             metaRecord = RecordRef.valueOf(typeInfo.sourceId + "@")
         }
-        if (RecordRef.isEmpty(metaRecord)) {
-            return
-        }
-        val attributeEdges = HashMap<String, String>()
-        val columnIdxByName = HashMap<String, Int>()
+        if (!RecordRef.isEmpty(metaRecord) && attributeEdges.isNotEmpty()) {
 
-        var columnIdxCounter = 0
-        for (columnDto in journal.columns) {
-
-            columnIdxByName[columnDto.name] = columnIdxCounter++
-
-            val attribute = columnDto.attribute ?: columnDto.name
-
-            if (!attribute.contains(".") && !attribute.contains("?")) {
-                val edgeAtts = ArrayList<String>()
-                if (StringUtils.isBlank(columnDto.type)) {
-                    edgeAtts.add("type")
-                }
-                if (columnDto.editable == null) {
-                    edgeAtts.add("protected")
-                }
-                if (MLText.isEmpty(columnDto.label)) {
-                    edgeAtts.add("title")
-                }
-                if (columnDto.multiple == null) {
-                    edgeAtts.add("multiple")
-                }
-                if (edgeAtts.isNotEmpty()) {
-                    if (edgeAtts.size == 1) {
-                        edgeAtts.add("javaClass") // protection from optimization
+            val attributes = recordsService.getAtts(metaRecord, attributeEdges)
+            attributes.forEach { name: String, value: DataValue ->
+                val columnIdx = columnIdxByName[name]
+                if (columnIdx != null) {
+                    val column = columns[columnIdx]
+                    if (value.has("type")) {
+                        column.withType(value.get("type").asText())
                     }
-                    attributeEdges[columnDto.name] = "_edge.$attribute{${edgeAtts.joinToString(",")}}"
+                    if (value.has("protected")) {
+                        column.withEditable(!value.get("protected").asBoolean())
+                    }
+                    if (value.has("title")) {
+                        column.withLabel(MLText(value.get("title").asText()))
+                    }
+                    if (value.has("multiple")) {
+                        column.withMultiple(value.get("multiple").asBoolean())
+                    }
                 }
             }
         }
-        if (attributeEdges.isEmpty()) {
-            return
-        }
-        val newColumns = ArrayList(journal.columns)
 
-        val attributes = recordsService.getAtts(metaRecord, attributeEdges)
-        attributes.forEach { name: String, value: DataValue ->
-            val columnIdx = columnIdxByName[name]
-            if (columnIdx != null) {
-                val newColumn = newColumns[columnIdx].copy()
-                newColumn.withType(value.get("type").asText())
-                if (StringUtils.isBlank(newColumn.type)) {
-                    newColumn.withType("text")
-                }
-                if (value.has("protected")) {
-                    newColumn.withEditable(!value.get("protected").asBoolean())
-                }
-                if (value.has("title")) {
-                    newColumn.withLabel(MLText(value.get("title").asText()))
-                }
-                if (value.has("multiple")) {
-                    newColumn.withMultiple(value.get("multiple").asBoolean())
-                }
-                newColumns[columnIdx] = newColumn.build()
+        columns.forEach {
+            if (MLText.isEmpty(it.label)) {
+                it.label = MLText(it.name)
+            }
+            if (it.type == null) {
+                it.withType(AttributeType.TEXT)
             }
         }
 
-        journal.withColumns(newColumns)
+        return columns.map { ResolvedColumnDef(
+            it.build(),
+            typeAtts[it.name]?.config ?: ObjectData.create()
+        )}
     }
 
     private fun resolvePredicate(journal: JournalDef.Builder) {
@@ -190,7 +244,7 @@ class ResolvedJournalRecordsDao(
         val typePredicate: Predicate = Predicates.eq("_type", typeRef.toString())
 
         val journalPredicate = journal.predicate
-        fullPredicate = if (journalPredicate != null && journalPredicate != VoidPredicate.INSTANCE) {
+        fullPredicate = if (journalPredicate != VoidPredicate.INSTANCE) {
             val atts = PredicateUtils.getAllPredicateAttributes(journalPredicate)
             if (atts.contains(RecordConstants.ATT_ECOS_TYPE) || atts.contains(RecordConstants.ATT_TYPE)) {
                 journalPredicate

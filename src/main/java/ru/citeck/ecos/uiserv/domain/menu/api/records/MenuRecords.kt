@@ -1,219 +1,160 @@
-package ru.citeck.ecos.uiserv.domain.menu.api.records;
+package ru.citeck.ecos.uiserv.domain.menu.api.records
 
-import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
-import ecos.com.fasterxml.jackson210.annotation.JsonValue;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.stereotype.Component;
-import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.records2.RecordMeta;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName;
-import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
-import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
-import ru.citeck.ecos.records2.graphql.meta.value.field.EmptyMetaField;
-import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
-import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
-import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
-import ru.citeck.ecos.records2.request.query.RecordsQuery;
-import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
-import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
-import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDao;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
-import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService;
-import ru.citeck.ecos.uiserv.domain.menu.service.MenuService;
-import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
-
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import ecos.com.fasterxml.jackson210.annotation.JsonProperty
+import ecos.com.fasterxml.jackson210.annotation.JsonValue
+import lombok.Data
+import lombok.RequiredArgsConstructor
+import org.apache.commons.lang.StringUtils
+import org.springframework.stereotype.Component
+import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.commons.json.Json.mapper
+import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
+import ru.citeck.ecos.records3.record.op.atts.dao.RecordAttsDao
+import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName
+import ru.citeck.ecos.records3.record.op.atts.service.value.AttValue
+import ru.citeck.ecos.records3.record.op.delete.dao.RecordDeleteDao
+import ru.citeck.ecos.records3.record.op.delete.dto.DelStatus
+import ru.citeck.ecos.records3.record.op.mutate.dao.RecordMutateDtoDao
+import ru.citeck.ecos.records3.record.op.query.dao.RecordsQueryDao
+import ru.citeck.ecos.records3.record.op.query.dto.RecsQueryRes
+import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery
+import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService
+import ru.citeck.ecos.uiserv.domain.menu.api.records.MenuRecords.MenuRecord
+import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
+import ru.citeck.ecos.uiserv.domain.menu.service.MenuService
+import java.util.*
+import java.util.stream.Collectors
 
 @Component
 @RequiredArgsConstructor
-public class MenuRecords extends LocalRecordsDao
-    implements LocalRecordsMetaDao<MenuRecords.MenuRecord>,
-               LocalRecordsQueryWithMetaDao<Object>,
-               MutableRecordsLocalDao<MenuRecords.MenuRecord> {
+class MenuRecords(
+    private val menuService: MenuService,
+    private val i18nService: I18nService
+) : AbstractRecordsDao(),
+    RecordAttsDao,
+    RecordsQueryDao,
+    RecordMutateDtoDao<MenuRecord>,
+    RecordDeleteDao {
 
-    private static final String ID = "menu";
-    private static final String AUTHORITIES_QUERY_LANG = "authorities";
-
-    private final MenuService menuService;
-    private final I18nService i18nService;
-
-    {
-        setId(ID);
+    companion object {
+        const val ID = "menu"
+        private const val AUTHORITIES_QUERY_LANG = "authorities"
     }
 
-    @NotNull
-    @Override
-    public List<MenuRecord> getValuesToMutate(@NotNull List<RecordRef> records) {
-        return getLocalRecordsMeta(records, EmptyMetaField.INSTANCE);
+    override fun getId() = ID
+
+    override fun getRecordAtts(record: String): MenuRecord {
+        val menuDto = menuService.getMenu(record).orElseGet { MenuDto("") }
+        return MenuRecord(menuDto)
     }
 
-    @NotNull
-    @Override
-    public RecordsQueryResult<Object> queryLocalRecords(@NotNull RecordsQuery recordsQuery,
-                                                        @NotNull MetaField metaField) {
+    override fun getRecToMutate(recordId: String): MenuRecord {
+        return getRecordAtts(recordId)
+    }
 
-        if (AUTHORITIES_QUERY_LANG.equals(recordsQuery.getLanguage())) {
-            return new RecordsQueryResult<>(new ArrayList<>(menuService.getAllAuthoritiesWithMenu()));
+    override fun queryRecords(recordsQuery: RecordsQuery): RecsQueryRes<Any> {
+
+        if (AUTHORITIES_QUERY_LANG == recordsQuery.language) {
+            return RecsQueryRes(ArrayList<Any>(menuService.allAuthoritiesWithMenu))
         }
+        if ("predicate" != recordsQuery.language && "criteria" != recordsQuery.language) {
 
-        if (!"predicate".equals(recordsQuery.getLanguage())
-            && !"criteria".equals(recordsQuery.getLanguage())) {
+            val menuQuery = recordsQuery.getQueryOrNull(MenuQuery::class.java)
 
-            MenuQuery menuQuery = recordsQuery.getQuery(MenuQuery.class);
             if (menuQuery != null && StringUtils.isNotBlank(menuQuery.user)) {
-                MenuDto menuDto = menuService.getMenuForUser(menuQuery.user, menuQuery.version);
-                return RecordsQueryResult.of(new MenuRecord(menuDto));
+                val menuDto = menuService.getMenuForUser(menuQuery.user, menuQuery.version)
+                return RecsQueryRes.of(MenuRecord(menuDto))
             }
         }
-
-        RecordsQueryResult<Object> result = new RecordsQueryResult<>();
-        result.setRecords(menuService.getAllMenus()
+        val result = RecsQueryRes<Any>()
+        result.setRecords(menuService.allMenus
             .stream()
-            .map(MenuRecord::new)
-            .collect(Collectors.toList()));
-
-        return result;
+            .map { model: MenuDto? -> MenuRecord(model) }
+            .collect(Collectors.toList()))
+        return result
     }
 
-    @NotNull
-    @Override
-    public RecordsMutResult save(@NotNull List<MenuRecord> values) {
+    override fun saveMutatedRec(dto: MenuRecord): String {
 
-        RecordsMutResult result = new RecordsMutResult();
-        values.forEach(dto -> {
-            if (StringUtils.isBlank(dto.getId())) {
-                throw new IllegalArgumentException("Parameter 'id' is mandatory for menu record");
-            }
-
-            if (dto.getId().equals("default-menu") || dto.getId().equals("default-menu-v1")) {
-                dto.setId(UUID.randomUUID().toString());
-            }
-
-            MenuDto saved = menuService.save(dto);
-            result.addRecord(new RecordMeta(saved.getId()));
-        });
-
-        return result;
+        require(!StringUtils.isBlank(dto.id)) { "Parameter 'id' is mandatory for menu record" }
+        if (dto.id == "default-menu" || dto.id == "default-menu-v1") {
+            dto.id = UUID.randomUUID().toString()
+        }
+        val saved = menuService.save(dto)
+        return saved.id
     }
 
-    @Override
-    public RecordsDelResult delete(RecordsDeletion deletion) {
-        RecordsDelResult result = new RecordsDelResult();
-        deletion.getRecords().stream()
-            .map(RecordRef::getId)
-            .forEach(id -> {
-                menuService.deleteByExtId(id);
-                result.addRecord(new RecordMeta(id));
-            });
-        return result;
-    }
-
-    @Override
-    public List<MenuRecord> getLocalRecordsMeta(@NotNull List<RecordRef> records,
-                                                @NotNull MetaField metaField) {
-        return records.stream()
-            .map(RecordRef::getId)
-            .map(id -> menuService.getMenu(id).orElseGet(() -> new MenuDto("")))
-            .map(MenuRecord::new)
-            .collect(Collectors.toList());
+    override fun delete(recordId: String): DelStatus {
+        menuService.deleteByExtId(recordId)
+        return DelStatus.OK
     }
 
     @Data
-    public static class MenuQuery {
-        private String user;
-        private Integer version;
+    class MenuQuery {
+        val user: String? = null
+        val version: Int? = null
     }
 
-    public class MenuRecord extends MenuDto {
+    inner class MenuRecord(model: MenuDto?) : MenuDto(model) {
 
-        public MenuRecord(MenuDto model) {
-            super(model);
+        fun isDefaultMenu(): Boolean {
+            return menuService.isDefaultMenu(id)
         }
 
-        public MenuRecord() {
+        fun getDefaultMenuForJournal(): String {
+            return i18nService.getMessage(if (isDefaultMenu()) "label.yes" else "label.no")
         }
 
-        public boolean isDefaultMenu() {
-            return menuService.isDefaultMenu(getId());
+        fun getPermissions(): MenuPermissions {
+            return MenuPermissions(!isDefaultMenu())
         }
 
-        public String getDefaultMenuForJournal() {
-            return i18nService.getMessage(isDefaultMenu() ? "label.yes" : "label.no");
+        fun getModuleId(): String? {
+            return id
         }
 
-        public MenuPermissions getPermissions() {
-            return new MenuPermissions(!isDefaultMenu());
+        fun setModuleId(moduleId: String) {
+            id = moduleId
         }
 
-        public String getModuleId() {
-            return getId();
-        }
-
-        public void setModuleId(String value) {
-            setId(value);
-        }
-
-        @Override
-        public Integer getVersion() {
-            Integer result = super.getVersion();
-            return result != null ? result : 0;
+        override fun getVersion(): Int {
+            val result = super.getVersion()
+            return result ?: 0
         }
 
         @AttName(".disp")
-        public String getDisplayName() {
-            return getId();
+        fun getDisplayName(): String {
+            return id
         }
 
-        public String getAuthoritiesForJournal() {
-            List<String> authorities = getAuthorities();
-            if (authorities == null) {
-                return "";
-            }
-            return authorities.stream().filter(it -> !"GROUP_EVERYONE".equals(it))
-                .collect(Collectors.joining(", "));
+        fun getAuthoritiesForJournal(): String {
+            val authorities = authorities ?: return ""
+            return authorities.stream().filter { "GROUP_EVERYONE" != it }
+                .collect(Collectors.joining(", "))
         }
 
         @JsonProperty("_content")
-        public void setContent(List<ObjectData> content) {
-
-            String base64Content = content.get(0).get("url", "");
-            base64Content = base64Content.replaceAll("^data:application/json;base64,", "");
-            ObjectData data = Json.getMapper().read(Base64.getDecoder().decode(base64Content), ObjectData.class);
-
-            Json.getMapper().applyData(this, data);
+        fun setContent(content: List<ObjectData>) {
+            var base64Content = content[0].get("url", "")
+            base64Content = base64Content.replace("^data:application/json;base64,".toRegex(), "")
+            val data = mapper.read(Base64.getDecoder().decode(base64Content), ObjectData::class.java)!!
+            mapper.applyData(this, data)
         }
 
         @JsonValue
         @com.fasterxml.jackson.annotation.JsonValue
-        public MenuDto toJson() {
-            return new MenuDto(this);
+        fun toJson(): Any? {
+            return MenuDto(this)
         }
     }
 
-    public static class MenuPermissions implements MetaValue {
-
-        boolean editable;
-
-        MenuPermissions(boolean editable) {
-            this.editable = editable;
-        }
-
-        @Override
-        public boolean has(@NotNull String name) {
-            if ("Write".equals(name)) {
-                return editable;
+    class MenuPermissions internal constructor(var editable: Boolean) : AttValue {
+        override fun has(name: String): Boolean {
+            return if ("Write" == name) {
+                editable
+            } else {
+                true
             }
-            return true;
         }
     }
 }

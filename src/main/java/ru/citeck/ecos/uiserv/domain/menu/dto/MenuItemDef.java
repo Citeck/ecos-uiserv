@@ -12,6 +12,7 @@ import java.util.List;
 @Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MenuItemDef {
+
     public static final String TYPE_ITEM = "item";
     public static final String TYPE_RESOLVER = "resolver";
 
@@ -37,5 +38,77 @@ public class MenuItemDef {
     @JsonIgnore
     public boolean isResolver() {
         return TYPE_RESOLVER.equals(this.type);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public MLText getLabel() {
+        return label;
+    }
+
+    public void setLabel(MLText label) {
+        this.label = label;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public Boolean getHidden() {
+        return hidden;
+    }
+
+    public void setHidden(Boolean hidden) {
+        this.hidden = hidden;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public ObjectData getConfig() {
+        return config;
+    }
+
+    public void setConfig(ObjectData config) {
+        this.config = config;
+    }
+
+    public RecordEvaluatorDto getEvaluator() {
+        return evaluator;
+    }
+
+    public void setEvaluator(RecordEvaluatorDto evaluator) {
+        this.evaluator = evaluator;
+    }
+
+    public MenuItemActionDef getAction() {
+        return action;
+    }
+
+    public void setAction(MenuItemActionDef action) {
+        this.action = action;
+    }
+
+    public List<MenuItemDef> getItems() {
+        return items;
+    }
+
+    public void setItems(List<MenuItemDef> items) {
+        this.items = items;
     }
 }

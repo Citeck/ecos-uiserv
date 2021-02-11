@@ -5,4 +5,9 @@ import ru.citeck.ecos.commons.data.ObjectData
 data class ColumnFormatterDef(
     val type: String,
     val config: ObjectData
-)
+) {
+    companion object {
+        @JvmField
+        val EMPTY = ColumnFormatterDef("", ObjectData.create())
+    }
+}

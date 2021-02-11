@@ -116,7 +116,7 @@ class JournalRecordsDao(
     open class JournalRecord(base: JournalWithMeta) : JournalWithMeta(base) {
 
         fun getLocalId(): String {
-            return journalDef.id
+            return journalDef?.id ?: ""
         }
 
         @AttName("?type")

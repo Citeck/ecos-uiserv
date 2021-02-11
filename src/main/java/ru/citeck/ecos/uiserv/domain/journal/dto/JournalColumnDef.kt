@@ -1,9 +1,12 @@
 package ru.citeck.ecos.uiserv.domain.journal.dto
 
 import ecos.com.fasterxml.jackson210.annotation.JsonInclude
+import ecos.com.fasterxml.jackson210.annotation.JsonSetter
 import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.model.lib.attributes.dto.AttOptionDef
+import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 
 @JsonDeserialize(builder = JournalColumnDef.Builder::class)
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
@@ -20,13 +23,12 @@ class JournalColumnDef(
     /**
      * Label to display in column header.
      */
-    val label: MLText?,
+    val label: MLText,
 
     /**
      * Data type.
-     * ["text", "int", "long", "float", "options", "assoc", etc. ]
      */
-    val type: String?,
+    val type: AttributeType?,
 
     /**
      * Attribute to load data.
@@ -34,11 +36,11 @@ class JournalColumnDef(
      *
      * If not specified field 'name' will be used to load data
      */
-    val attribute: String?,
+    val attribute: String,
 
-    val editor: ColumnEditorDef?,
+    val editor: ColumnEditorDef,
 
-    val formatter: ColumnFormatterDef?,
+    val formatter: ColumnFormatterDef,
 
     // features
 
@@ -81,15 +83,15 @@ class JournalColumnDef(
 
     // /features
 
-    val options: List<ColumnOptionDef>? = null,
+    val options: List<AttOptionDef>,
 
-    val computed: List<JournalComputedDef>? = null,
+    val computed: List<JournalComputedDef>,
 
     /**
      * Custom properties for temporal or very specific
      * parameters which can't be added as field for this DTO
      */
-    val properties: ObjectData? = null
+    val properties: ObjectData = ObjectData.create()
 ) {
     companion object {
 
@@ -117,11 +119,11 @@ class JournalColumnDef(
     class Builder() {
 
         var name: String = ""
-        var label: MLText? = null
-        var type: String? = null
-        var attribute: String? = null
-        var editor: ColumnEditorDef? = null
-        var formatter: ColumnFormatterDef? = null
+        var label: MLText = MLText.EMPTY
+        var type: AttributeType? = null
+        var attribute: String = ""
+        var editor: ColumnEditorDef = ColumnEditorDef.EMPTY
+        var formatter: ColumnFormatterDef = ColumnFormatterDef.EMPTY
         var searchable: Boolean? = null
         var sortable: Boolean? = null
         var groupable: Boolean? = null
@@ -129,9 +131,9 @@ class JournalColumnDef(
         var visible: Boolean? = null
         var hidden: Boolean? = null
         var multiple: Boolean? = null
-        var options: List<ColumnOptionDef>? = null
-        var computed: List<JournalComputedDef>? = null
-        var properties: ObjectData? = null
+        var options: List<AttOptionDef> = emptyList()
+        var computed: List<JournalComputedDef> = emptyList()
+        var properties: ObjectData = ObjectData.create()
 
         constructor(base: JournalColumnDef) : this() {
             name = base.name
@@ -147,9 +149,9 @@ class JournalColumnDef(
             visible = base.visible
             hidden = base.hidden
             multiple = base.multiple
-            options = base.options?.toList()
-            computed = base.computed?.toList()
-            properties = ObjectData.deepCopy(base.properties)
+            options = base.options.toList()
+            computed = base.computed.toList()
+            properties = ObjectData.deepCopyOrNew(base.properties)
         }
 
         fun withName(name: String?): Builder {
@@ -158,47 +160,33 @@ class JournalColumnDef(
         }
 
         fun withLabel(label: MLText?): Builder {
-            this.label = if (MLText.isEmpty(label)) {
-                null
-            } else {
-                label
-            }
+            this.label = label ?: MLText.EMPTY
             return this
         }
 
+        @JsonSetter
         fun withType(type: String?): Builder {
-            this.type = if (type.isNullOrBlank()) {
-                null
-            } else {
-                type
-            }
+            this.type = JournalColumnUtils.getAttType(type)
+            return this
+        }
+
+        fun withType(type: AttributeType?): Builder {
+            this.type = type ?: AttributeType.TEXT
             return this
         }
 
         fun withAttribute(attribute: String?): Builder {
-            this.attribute = if (attribute.isNullOrBlank()) {
-                null
-            } else {
-                attribute
-            }
+            this.attribute = attribute ?: ""
             return this
         }
 
         fun withEditor(editor: ColumnEditorDef?): Builder {
-            this.editor = if (editor?.type.isNullOrBlank()) {
-                null
-            } else {
-                editor
-            }
+            this.editor = editor ?: ColumnEditorDef.EMPTY
             return this
         }
 
         fun withFormatter(formatter: ColumnFormatterDef?): Builder {
-            this.formatter = if (formatter?.type.isNullOrBlank()) {
-                null
-            } else {
-                formatter
-            }
+            this.formatter = formatter ?: ColumnFormatterDef.EMPTY
             return this
         }
 
@@ -237,30 +225,18 @@ class JournalColumnDef(
             return this
         }
 
-        fun withOptions(options: List<ColumnOptionDef>?): Builder {
-            this.options = if (options?.filter { !MLText.isEmpty(it.label) }.isNullOrEmpty()) {
-                null
-            } else {
-                options
-            }
+        fun withOptions(options: List<AttOptionDef>?): Builder {
+            this.options = options ?: emptyList()
             return this
         }
 
         fun withComputed(computed: List<JournalComputedDef>?): Builder {
-            this.computed = if (computed?.filter { it.id.isNotBlank() }.isNullOrEmpty()) {
-                null
-            } else {
-                computed
-            }
+            this.computed = computed?.filter { it.id.isNotBlank() } ?: emptyList()
             return this
         }
 
         fun withProperties(properties: ObjectData?): Builder {
-            this.properties = if ((properties?.size() ?: 0) == 0) {
-                null
-            } else {
-                properties
-            }
+            this.properties = properties ?: ObjectData.create()
             return this
         }
 
