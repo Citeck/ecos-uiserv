@@ -111,6 +111,7 @@ class ResolvedMenuRecords(
                     cvItemDef.config = ObjectData.create()
                     cvItemDef.config.set("recordRef", it.typeRef)
                     cvItemDef.config.set("variantId", it.id)
+                    cvItemDef.config.set("variant", it)
                     cvItemDef.type = "LINK-CREATE-CASE"
                     cvItemDef.label = it.name
                     cvItemDef
