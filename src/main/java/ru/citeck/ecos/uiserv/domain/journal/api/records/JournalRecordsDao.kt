@@ -21,6 +21,7 @@ import ru.citeck.ecos.records3.record.op.query.dao.RecordsQueryDao
 import ru.citeck.ecos.records3.record.op.query.dto.RecsQueryRes
 import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.request.RequestContext
+import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
@@ -31,7 +32,7 @@ import java.util.*
 @RequiredArgsConstructor
 class JournalRecordsDao(
     private val journalService: JournalService,
-    private val typeJournalService: TypeJournalService
+    private val ecosTypeService: EcosTypeService
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordAttsDao,
@@ -51,12 +52,18 @@ class JournalRecordsDao(
         }
 
         val result = RecsQueryRes<JournalWithMeta>()
-        val queryByTypeRef = query.getQueryOrNull(JournalQueryByTypeRef::class.java)
 
-        if (queryByTypeRef != null && RecordRef.isNotEmpty(queryByTypeRef.typeRef)) {
+        if (query.language == "by-type") {
 
-            typeJournalService.getJournalForType(queryByTypeRef.typeRef)
-                .ifPresent { dto -> result.addRecord(JournalRecord(dto)) }
+            val typeRef = query.getQuery(JournalQueryByTypeRef::class.java).typeRef ?: RecordRef.EMPTY
+            val journalRef = ecosTypeService.getJournalRefByTypeRef(typeRef)
+
+            if (RecordRef.isNotEmpty(journalRef)) {
+                val dto = journalService.getJournalById(journalRef.id)
+                if (dto != null) {
+                    result.addRecord(JournalRecord(dto))
+                }
+            }
 
         } else {
 

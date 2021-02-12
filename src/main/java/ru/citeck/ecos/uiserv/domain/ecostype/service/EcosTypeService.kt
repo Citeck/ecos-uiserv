@@ -14,6 +14,24 @@ class EcosTypeService(
         return typesConfig.getTypeRefByJournal(journalRef)
     }
 
+    fun getJournalRefByTypeRef(typeRef: RecordRef): RecordRef {
+
+        var journalRef = typesConfig.getJournalRefByType(typeRef)
+        if (RecordRef.isEmpty(journalRef)) {
+            val parents = typesConfig.getTypeInfo(typeRef)?.parents ?: emptyList()
+            for (parentRef in parents) {
+                if (RecordRef.isNotEmpty(parentRef)) {
+                    journalRef = typesConfig.getJournalRefByType(parentRef)
+                    if (RecordRef.isNotEmpty(journalRef)) {
+                        return journalRef
+                    }
+                }
+            }
+        }
+
+        return RecordRef.EMPTY
+    }
+
     fun getTypeInfo(typeRef: RecordRef): EcosTypeInfo? {
         return typesConfig.getTypeInfo(typeRef)
     }

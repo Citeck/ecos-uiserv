@@ -13,6 +13,7 @@ class EcosTypeInfo(
     val parentRef: RecordRef?,
     val formRef: RecordRef?,
     val journalRef: RecordRef?,
+    val metaRecord: RecordRef?,
     val sourceId: String?,
     val parents: List<RecordRef>,
     val inhDashboardType: String?,

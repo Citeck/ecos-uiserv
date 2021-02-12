@@ -5,6 +5,7 @@ import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 object JournalColumnUtils {
 
     private val TYPES_MAPPING = mapOf(
+        "any" to AttributeType.TEXT,
         "text" to AttributeType.TEXT,
         "mltext" to AttributeType.MLTEXT,
         "date" to AttributeType.DATE,

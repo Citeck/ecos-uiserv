@@ -84,6 +84,10 @@ class EcosTypesConfig(
         createRemoteTypesSyncRecordsDao().addOnChangeListener { listener.invoke(it) }
     }
 
+    fun getJournalRefByType(journalRef: RecordRef): RecordRef {
+        return journalByType[journalRef] ?: RecordRef.EMPTY
+    }
+
     fun getTypeRefByJournal(journalRef: RecordRef): RecordRef {
         return typeByJournal[journalRef] ?: RecordRef.EMPTY
     }

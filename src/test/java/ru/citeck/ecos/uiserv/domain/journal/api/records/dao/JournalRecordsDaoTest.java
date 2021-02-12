@@ -132,7 +132,6 @@ public class JournalRecordsDaoTest {
         journalEntity.setLabel("{\"en\":\"test\"}");
         journalEntity.setTypeRef(TypesDao.testTypeRef.toString());
         journalEntity.setEditable(false);
-        journalEntity.setMetaRecord("someAPP/someDAO@MetaRecord");
         journalEntity.setPredicate("{\"t\":\"eq\",\"att\":\"Type\",\"val\":\"smthg\"}");
         journalEntity.setAttributes("{\"a\":\"value\"}");
 
@@ -196,11 +195,10 @@ public class JournalRecordsDaoTest {
             .andExpect(jsonPath("$.attributes.typeRef?id", is(journalEntity.getTypeRef())))
             .andExpect(jsonPath("$.attributes.predicate", is(journalEntity.getPredicate())))
             .andExpect(jsonPath("$.attributes.editable", is(Boolean.FALSE.toString())))
-            .andExpect(jsonPath("$.attributes.properties", is(journalEntity.getAttributes())))
+            .andExpect(jsonPath("$.attributes.properties", is(journalEntity.getAttributes())));
             //.andExpect(jsonPath("$.attributes.columns", is(journalEntity.getColumns())))
             //.andExpect(jsonPath("$['attributes']['actions[]'][0]", is(actions.get(0).toString())))
             //.andExpect(jsonPath("$['attributes']['actions[]'][1]", is(actions.get(1).toString())))
-            .andExpect(jsonPath("$.attributes.metaRecord?id", is(journalEntity.getMetaRecord())));
     }
 
     @Component

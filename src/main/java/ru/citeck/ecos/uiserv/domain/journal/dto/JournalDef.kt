@@ -33,14 +33,6 @@ data class JournalDef(
     val queryData: ObjectData,
 
     /**
-     * Record to load metadata from edge.
-     *
-     * @see ru.citeck.ecos.records3.record.op.atts.service.value.AttValue.getEdge
-     * @see ru.citeck.ecos.records3.record.op.atts.service.value.AttEdge
-     */
-    val metaRecord: RecordRef,
-
-    /**
      * ECOS type.
      */
     val typeRef: RecordRef,
@@ -116,7 +108,6 @@ data class JournalDef(
         var label: MLText = MLText.EMPTY
         var predicate: Predicate = VoidPredicate.INSTANCE
         var queryData: ObjectData = ObjectData.create()
-        var metaRecord: RecordRef = RecordRef.EMPTY
         var typeRef: RecordRef = RecordRef.EMPTY
         var groupBy: List<String> = emptyList()
         var sortBy: List<JournalSortByDef> = emptyList()
@@ -132,7 +123,6 @@ data class JournalDef(
             label = base.label
             predicate = base.predicate.copy()
             queryData = ObjectData.deepCopyOrNew(base.queryData)
-            metaRecord = base.metaRecord
             typeRef = base.typeRef
             groupBy = base.groupBy.let { DataValue.create(it).asStrList() }
             sortBy = base.sortBy.let { DataValue.create(it).asList(JournalSortByDef::class.java) }
@@ -161,11 +151,6 @@ data class JournalDef(
 
         fun withQueryData(queryData: ObjectData?): Builder {
             this.queryData = queryData ?: ObjectData.create()
-            return this
-        }
-
-        fun withMetaRecord(metaRecord: RecordRef?): Builder {
-            this.metaRecord = metaRecord ?: RecordRef.EMPTY
             return this
         }
 
@@ -221,7 +206,6 @@ data class JournalDef(
                 label,
                 predicate,
                 queryData,
-                metaRecord,
                 typeRef,
                 groupBy,
                 sortBy,

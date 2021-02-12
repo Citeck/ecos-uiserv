@@ -19,7 +19,6 @@ class JournalEntity : AbstractAuditingEntity() {
     var label: String? = null
     var groupBy: String? = null
     var sortBy: String? = null
-    var metaRecord: String? = null
     var typeRef: String? = null
     var predicate: String? = null
     var queryData: String? = null

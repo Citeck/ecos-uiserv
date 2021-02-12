@@ -55,7 +55,7 @@ class ResolvedJournalRecordsDao(
     private fun resolveJournal(journal: JournalRecordsDao.JournalRecord): ResolvedJournalDef {
 
         if (journal.journalDef == null || StringUtils.isBlank(journal.journalDef.id)) {
-            return ResolvedJournalDef(journal, emptyList())
+            return ResolvedJournalDef(journal) { emptyList() }
         }
         val journalBuilder = journal.journalDef.copy()
 
@@ -69,20 +69,20 @@ class ResolvedJournalRecordsDao(
         }
         resolveTypeJournalProps(journalBuilder, typeInfo)
 
-        val columns = resolveColumns(journalBuilder, typeInfo)
         resolvePredicate(journalBuilder)
 
-        val newJournal = JournalRecordsDao.JournalRecord(journal)
-        newJournal.journalDef = journalBuilder.build()
-
-        return createResolvedDef(newJournal, typeInfo, columns)
+        return createResolvedDef(journal, journalBuilder, typeInfo)
     }
 
-    private fun createResolvedDef(journal: JournalRecordsDao.JournalRecord,
-                                  typeInfo: EcosTypeInfo?,
-                                  columns: List<ResolvedColumnDef>): ResolvedJournalDef {
+    private fun createResolvedDef(journalRecord: JournalRecordsDao.JournalRecord,
+                                  journalBuilder: JournalDef.Builder,
+                                  typeInfo: EcosTypeInfo?): ResolvedJournalDef {
 
-        val result = ResolvedJournalDef(journal, columns)
+
+        val newJournal = JournalRecordsDao.JournalRecord(journalRecord)
+        newJournal.journalDef = journalBuilder.build()
+
+        val result = ResolvedJournalDef(newJournal) { resolveColumns(journalBuilder, typeInfo) }
 
         if (typeInfo != null) {
             result.sourceId = typeInfo.sourceId ?: ""
@@ -120,11 +120,10 @@ class ResolvedJournalRecordsDao(
         } else {
             journal.columns.map { it.copy() }
         }
-        return resolveEdgeMetaImpl(journal, columns, typeInfo)
+        return resolveEdgeMetaImpl(columns, typeInfo)
     }
 
-    private fun resolveEdgeMetaImpl(journal: JournalDef.Builder,
-                                    columns: List<JournalColumnDef.Builder>,
+    private fun resolveEdgeMetaImpl(columns: List<JournalColumnDef.Builder>,
                                     typeInfo: EcosTypeInfo?): List<ResolvedColumnDef> {
 
         val typeAtts: Map<String, AttributeDef> =
@@ -156,7 +155,7 @@ class ResolvedJournalRecordsDao(
                     edgeAtts.add("type")
                 }
             }
-            if (column.editable == null) {
+            if (column.editable == null && !isInnerAtt) {
                 edgeAtts.add("protected")
             }
             if (MLText.isEmpty(column.label)) {
@@ -190,7 +189,7 @@ class ResolvedJournalRecordsDao(
             }
         }
 
-        var metaRecord = journal.metaRecord
+        var metaRecord = typeInfo?.metaRecord
         if (RecordRef.isEmpty(metaRecord) && typeInfo != null && !typeInfo.sourceId.isNullOrBlank()) {
             metaRecord = RecordRef.valueOf(typeInfo.sourceId + "@")
         }
