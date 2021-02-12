@@ -85,7 +85,7 @@ class ResolvedJournalRecordsDao(
         val result = ResolvedJournalDef(newJournal) { resolveColumns(journalBuilder, typeInfo) }
 
         if (typeInfo != null) {
-            result.sourceId = typeInfo.sourceId ?: ""
+            result.sourceId = typeInfo.inhSourceId ?: ""
             result.createVariants = typeInfo.inhCreateVariants ?: emptyList()
         }
 
@@ -190,8 +190,8 @@ class ResolvedJournalRecordsDao(
         }
 
         var metaRecord = typeInfo?.metaRecord
-        if (RecordRef.isEmpty(metaRecord) && typeInfo != null && !typeInfo.sourceId.isNullOrBlank()) {
-            metaRecord = RecordRef.valueOf(typeInfo.sourceId + "@")
+        if (RecordRef.isEmpty(metaRecord) && typeInfo != null && !typeInfo.inhSourceId.isNullOrBlank()) {
+            metaRecord = RecordRef.valueOf(typeInfo.inhSourceId + "@")
         }
         if (!RecordRef.isEmpty(metaRecord) && attributeEdges.isNotEmpty()) {
 

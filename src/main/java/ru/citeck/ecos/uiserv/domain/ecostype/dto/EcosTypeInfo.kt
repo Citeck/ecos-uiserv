@@ -14,7 +14,7 @@ class EcosTypeInfo(
     val formRef: RecordRef?,
     val journalRef: RecordRef?,
     val metaRecord: RecordRef?,
-    val sourceId: String?,
+    val inhSourceId: String?,
     val parents: List<RecordRef>,
     val inhDashboardType: String?,
     val inhCreateVariants: List<CreateVariantDef>?,
