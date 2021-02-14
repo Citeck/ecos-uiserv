@@ -7,7 +7,7 @@ sourceId: uiserv/i18n
 
 system: true
 
-journalRef: uiserv/journal@i18n
+journalRef: uiserv/journal@ecos-i18n
 
 createVariants:
 

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.commons.json.YamlUtils;
 import ru.citeck.ecos.records2.QueryContext;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.PredicateService;
@@ -31,6 +32,7 @@ import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -224,9 +226,8 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
         @JsonProperty("_content")
         public void setContent(List<ObjectData> content) {
 
-            String base64Content = content.get(0).get("url", "");
-            base64Content = base64Content.replaceAll("^data:application/json;base64,", "");
-            ObjectData data = Json.getMapper().read(Base64.getDecoder().decode(base64Content), ObjectData.class);
+            String dataUriContent = content.get(0).get("url", "");
+            ObjectData data = Json.getMapper().read(dataUriContent, ObjectData.class);
 
             Json.getMapper().applyData(this, data);
         }
@@ -235,6 +236,10 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
         @com.fasterxml.jackson.annotation.JsonValue
         public EcosFormModel toJson() {
             return new EcosFormModel(this);
+        }
+
+        public byte[] getData() {
+            return YamlUtils.toNonDefaultString(toJson()).getBytes(StandardCharsets.UTF_8);
         }
     }
 }

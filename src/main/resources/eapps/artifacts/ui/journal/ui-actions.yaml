@@ -6,7 +6,7 @@ label: { ru: Действия, en: Actions }
 system: true
 
 actions:
-  - uiserv/action@ecos-module-download
+  - uiserv/action@download-base64-data-yml
   - uiserv/action@delete
   - uiserv/action@edit
   - uiserv/action@module-copy

@@ -1,16 +1,16 @@
 package ru.citeck.ecos.uiserv.domain.journal.dto
 
 import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
-import ecos.com.fasterxml.jackson210.annotation.JsonInclude
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
 
+@IncludeNonDefault
 @JsonDeserialize(builder = JournalDef.Builder::class)
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 data class JournalDef(
 
     /**

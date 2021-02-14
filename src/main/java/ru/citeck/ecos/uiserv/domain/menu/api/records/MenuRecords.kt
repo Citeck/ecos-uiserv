@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json.mapper
+import ru.citeck.ecos.commons.json.YamlUtils.toNonDefaultString
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.op.atts.dao.RecordAttsDao
 import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName
@@ -22,6 +23,7 @@ import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService
 import ru.citeck.ecos.uiserv.domain.menu.api.records.MenuRecords.MenuRecord
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService
+import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.stream.Collectors
 
@@ -135,9 +137,8 @@ class MenuRecords(
 
         @JsonProperty("_content")
         fun setContent(content: List<ObjectData>) {
-            var base64Content = content[0].get("url", "")
-            base64Content = base64Content.replace("^data:application/json;base64,".toRegex(), "")
-            val data = mapper.read(Base64.getDecoder().decode(base64Content), ObjectData::class.java)!!
+            val dataUriContent = content[0].get("url", "")
+            val data = mapper.read(dataUriContent, ObjectData::class.java)!!
             mapper.applyData(this, data)
         }
 
@@ -145,6 +146,11 @@ class MenuRecords(
         @com.fasterxml.jackson.annotation.JsonValue
         fun toJson(): Any? {
             return MenuDto(this)
+        }
+
+        fun getData(): ByteArray? {
+            val json = toJson() ?: return null
+            return toNonDefaultString(json).toByteArray(StandardCharsets.UTF_8)
         }
     }
 

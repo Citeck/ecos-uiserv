@@ -1,16 +1,16 @@
 package ru.citeck.ecos.uiserv.domain.menu.dto;
 
 import ecos.com.fasterxml.jackson210.annotation.JsonIgnore;
-import ecos.com.fasterxml.jackson210.annotation.JsonInclude;
 import lombok.Data;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
 
 import java.util.List;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@IncludeNonDefault
 public class MenuItemDef {
 
     public static final String TYPE_ITEM = "item";

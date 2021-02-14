@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json.mapper
+import ru.citeck.ecos.commons.json.YamlUtils
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.model.Predicate
@@ -25,7 +26,7 @@ import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
-import ru.citeck.ecos.uiserv.domain.journal.service.type.TypeJournalService
+import java.nio.charset.StandardCharsets
 import java.util.*
 
 @Component
@@ -111,7 +112,10 @@ class JournalRecordsDao(
     }
 
     override fun saveMutatedRec(record: JournalMutateRec): String {
-        record.localId?.let { record.withId(it) }
+        val localId = record.localId
+        if (!localId.isNullOrBlank()) {
+            record.withId(localId)
+        }
         return journalService.save(record.build()).journalDef.id
     }
 
@@ -143,6 +147,10 @@ class JournalRecordsDao(
         open fun toJson(): Any {
             return mapper.toNonDefaultJson(journalDef)
         }
+
+        open fun getData(): ByteArray {
+            return YamlUtils.toNonDefaultString(toJson()).toByteArray(StandardCharsets.UTF_8)
+        }
     }
 
     class JournalMutateRec(base: JournalDef) : JournalDef.Builder(base) {
@@ -155,9 +163,8 @@ class JournalRecordsDao(
 
         @JsonProperty("_content")
         fun setContent(content: List<ObjectData>) {
-            var base64Content = content[0].get("url", "")
-            base64Content = base64Content.replace("^data:application/json;base64,".toRegex(), "")
-            val data = mapper.read(Base64.getDecoder().decode(base64Content), ObjectData::class.java)!!
+            val dataUriContent = content[0].get("url", "")
+            val data = mapper.read(dataUriContent, ObjectData::class.java)!!
             mapper.applyData(this, data)
         }
     }

@@ -7,6 +7,17 @@
   ],
   "version": 1,
   "subMenu": {
+    "create": {
+      "items": [
+        {
+          "id": "create-123",
+          "type": "CREATE_IN_SECTION",
+          "config": {
+            "sectionId": "912d7e77-c96d-4df6-af3e-bacf279fa1a4"
+          }
+        }
+      ]
+    },
     "left": {
       "items": [
         {

@@ -1,14 +1,14 @@
 package ru.citeck.ecos.uiserv.domain.menu.dto;
 
-import ecos.com.fasterxml.jackson210.annotation.JsonInclude;
 import lombok.Data;
 import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@IncludeNonDefault
 public class SubMenuDef {
 
     private ObjectData config = ObjectData.create();

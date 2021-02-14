@@ -52,7 +52,7 @@ class JournalMapper(
             entity.extId = journal.id
         }
 
-        entity.columns = mapper.toString(journal.columns)!!
+        entity.columns = mapper.toString(journal.columns.map { mapper.toNonDefaultJson(it) })!!
         entity.editable = journal.editable
         entity.label = mapper.toString(journal.label)
         entity.typeRef = RecordRef.toString(journal.typeRef)

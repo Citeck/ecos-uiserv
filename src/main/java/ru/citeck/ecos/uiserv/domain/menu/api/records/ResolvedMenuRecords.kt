@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.menu.api.records
 
+import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
@@ -26,6 +27,8 @@ class ResolvedMenuRecords(
 
     companion object {
         const val ID = "rmenu"
+
+        private val log = KotlinLogging.logger {}
     }
 
     override fun getId() = ID
@@ -62,36 +65,82 @@ class ResolvedMenuRecords(
             val subMenus = HashMap(menu.subMenu)
 
             val currentCreateMenu = subMenus["create"]
-            if (currentCreateMenu == null
-                || currentCreateMenu.config.get("auto-variants").asBoolean(true)) {
+
+            if (currentCreateMenu == null) {
 
                 val createMenu = SubMenuDef()
-                createMenu.config = ObjectData.create("""{"auto-variants":true}""")
-                createMenu.items = evalCreateVariants(menu.subMenu["left"])
+                createMenu.items = emptyList()
+                subMenus["create"] = createMenu
+
+            } else {
+
+                val resultItems = ArrayList<MenuItemDef>()
+
+                currentCreateMenu.items.forEach { createMenuItem ->
+
+                    if (createMenuItem.type == "CREATE_IN_SECTION") {
+
+                        val sectionId = createMenuItem.config.get("sectionId").asText()
+                        if (sectionId.isNotBlank()) {
+
+                            val section = findMenuItemById(subMenus["left"]?.items, sectionId)
+                            if (section == null) {
+                                log.warn("Section is not found by id: $sectionId")
+                            }
+                            evalCreateVariants(section).forEach {
+                                resultItems.add(it)
+                            }
+                        } else {
+                            log.warn("CREATE_IN_SECTION item without sectionId: $createMenuItem")
+                        }
+                    } else {
+                        resultItems.add(createMenuItem)
+                    }
+                }
+
+                val createMenu = SubMenuDef()
+                createMenu.items = resultItems
                 subMenus["create"] = createMenu
             }
 
             return subMenus
         }
 
-        private fun evalCreateVariants(leftMenu: SubMenuDef?): List<MenuItemDef> {
+        private fun findMenuItemById(items: List<MenuItemDef>?, id: String): MenuItemDef? {
+            items?.forEach { item ->
+                if (item.id == id) {
+                    return item
+                }
+                val result = findMenuItemById(item.items, id)
+                if (result != null) {
+                    return result
+                }
+            }
+            return null
+        }
 
-            leftMenu ?: return emptyList()
+        private fun evalCreateVariants(section: MenuItemDef?): List<MenuItemDef> {
+
+            section ?: return emptyList()
 
             val visitedTypes = HashSet<RecordRef>()
 
             val variants = mutableMapOf<String, MutableList<CreateVariantDef>>()
             val sectionNameById = mutableMapOf<String, MLText>()
-            sectionNameById["_ROOT"] = MLText("Root")
+            sectionNameById[section.id] = section.label
 
-            leftMenu.items?.forEach {
-                if (it.type == "SECTION") {
-                    sectionNameById[it.id] = it.label
-                    val variantsRes = variants.computeIfAbsent(it.id) { ArrayList() }
-                    extractCreateVariantsFromItem(it, variantsRes, visitedTypes)
-                } else if (it.type == "JOURNAL") {
+            section.items?.forEach { item0 ->
+
+                if (item0.type == "SECTION") {
+
+                    sectionNameById[item0.id] = item0.label
+                    val variantsRes = variants.computeIfAbsent(item0.id) { ArrayList() }
+                    extractCreateVariantsFromItem(item0, variantsRes, visitedTypes)
+
+                } else if (item0.type == "JOURNAL") {
+
                     val variantsRes = variants.computeIfAbsent("_ROOT") { ArrayList() }
-                    extractCreateVariantsFromItem(it, variantsRes, visitedTypes)
+                    extractCreateVariantsFromItem(item0, variantsRes, visitedTypes)
                 }
             }
 

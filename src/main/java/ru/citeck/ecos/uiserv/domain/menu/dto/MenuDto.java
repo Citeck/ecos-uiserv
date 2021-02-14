@@ -1,10 +1,10 @@
 package ru.citeck.ecos.uiserv.domain.menu.dto;
 
-import ecos.com.fasterxml.jackson210.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import ru.citeck.ecos.commons.data.DataValue;
+import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault;
 
 import java.util.List;
 import java.util.Map;
@@ -12,7 +12,7 @@ import java.util.Map;
 @Data
 @ToString(exclude = {"subMenu"})
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@IncludeNonDefault
 public class MenuDto {
 
     private String id;

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.commons.json.YamlUtils;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
 import ru.citeck.ecos.records3.record.op.atts.dao.RecordAttsDao;
@@ -25,6 +26,7 @@ import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -157,9 +159,8 @@ public class DashboardRecords extends AbstractRecordsDao
         @JsonProperty("_content")
         public void setContent(List<ObjectData> content) {
 
-            String base64Content = content.get(0).get("url", "");
-            base64Content = base64Content.replaceAll("^data:application/json;base64,", "");
-            ObjectData data = Json.getMapper().read(Base64.getDecoder().decode(base64Content), ObjectData.class);
+            String dataUriContent = content.get(0).get("url", "");
+            ObjectData data = Json.getMapper().read(dataUriContent, ObjectData.class);
 
             Json.getMapper().applyData(this, data);
         }
@@ -168,6 +169,10 @@ public class DashboardRecords extends AbstractRecordsDao
         @com.fasterxml.jackson.annotation.JsonValue
         public DashboardDto toJson() {
             return new DashboardDto(this);
+        }
+
+        public byte[] getData() {
+            return YamlUtils.toNonDefaultString(toJson()).getBytes(StandardCharsets.UTF_8);
         }
     }
 

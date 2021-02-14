@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.commons.json.YamlUtils;
 import ru.citeck.ecos.records2.QueryContext;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
@@ -32,6 +33,7 @@ import ru.citeck.ecos.records3.record.request.RequestContext;
 import ru.citeck.ecos.uiserv.domain.action.service.ActionService;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -428,9 +430,8 @@ public class ActionRecords extends LocalRecordsDao
         @JsonProperty("_content")
         public void setContent(List<ObjectData> content) {
 
-            String base64Content = content.get(0).get("url", "");
-            base64Content = base64Content.replaceAll("^data:application/json;base64,", "");
-            ObjectData data = Json.getMapper().read(Base64.getDecoder().decode(base64Content), ObjectData.class);
+            String dataUriContent = content.get(0).get("url", "");
+            ObjectData data = Json.getMapper().read(dataUriContent, ObjectData.class);
 
             Json.getMapper().applyData(this, data);
         }
@@ -439,6 +440,10 @@ public class ActionRecords extends LocalRecordsDao
         @com.fasterxml.jackson.annotation.JsonValue
         public ActionDto toJson() {
             return new ActionDto(this);
+        }
+
+        public byte[] getData() {
+            return YamlUtils.toNonDefaultString(toJson()).getBytes(StandardCharsets.UTF_8);
         }
     }
 }

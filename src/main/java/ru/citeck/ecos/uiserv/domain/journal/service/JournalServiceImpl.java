@@ -106,6 +106,10 @@ public class JournalServiceImpl implements JournalService {
     @Override
     public JournalWithMeta save(JournalDef dto) {
 
+        if (dto.getId().isEmpty()) {
+            throw new IllegalArgumentException("Journal without id: " + dto);
+        }
+
         JournalEntity journalEntity = journalMapper.dtoToEntity(dto);
         JournalEntity storedJournalEntity = journalRepository.save(journalEntity);
 
