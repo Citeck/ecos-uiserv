@@ -230,7 +230,7 @@ class ResolvedJournalRecordsDao(
                 it.searchableByText = it.searchable
             }
             if (it.sortable == null) {
-                it.sortable = it.searchable && it.type != AttributeType.ASSOC
+                it.sortable = it.searchable != false && it.type != AttributeType.ASSOC
             }
         }
 
