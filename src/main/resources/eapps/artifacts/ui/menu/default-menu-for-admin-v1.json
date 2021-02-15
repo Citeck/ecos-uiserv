@@ -92,18 +92,6 @@
               }
             },
             {
-              "id": "0e4e5e24-f19f-43ca-88c6-4ba04789c6f0",
-              "label": {
-                "en": "Статистика по задачам"
-              },
-              "icon": "ui/icon@i-leftmenu-task-statistic",
-              "hidden": false,
-              "type": "JOURNAL",
-              "config": {
-                "recordRef": "uiserv/journal@task-statistic"
-              }
-            },
-            {
               "id": "1c992c3e-b20b-408c-8f33-26a1ddccfcdb",
               "label": {
                 "en": "Задачи разбора входящих"
