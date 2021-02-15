@@ -160,7 +160,7 @@
                     <label>menu.item.bpmn-modeler</label>
                     <icon>bpmn-modeler</icon>
                     <action type="PAGE_LINK">
-                        <param name="pageId">bpmn-designer</param>
+                        <param name="pageId">../../flowable-modeler</param>
                     </action>
                 </item>
                 <item id="HEADER_GROUPS">
