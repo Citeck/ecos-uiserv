@@ -223,6 +223,12 @@ class ResolvedJournalRecordsDao(
             if (it.type == null) {
                 it.withType(AttributeType.TEXT)
             }
+            if (it.searchable == null) {
+                it.searchable = true
+            }
+            if (it.searchableByText == null) {
+                it.searchableByText = it.searchable
+            }
         }
 
         return columns.map { ResolvedColumnDef(
