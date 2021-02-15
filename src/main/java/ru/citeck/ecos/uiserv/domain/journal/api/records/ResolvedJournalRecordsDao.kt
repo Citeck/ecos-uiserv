@@ -229,6 +229,9 @@ class ResolvedJournalRecordsDao(
             if (it.searchableByText == null) {
                 it.searchableByText = it.searchable
             }
+            if (it.sortable == null) {
+                it.sortable = it.searchable && it.type != AttributeType.ASSOC
+            }
         }
 
         return columns.map { ResolvedColumnDef(
