@@ -100,6 +100,10 @@ public class ThemeService {
 
     public List<ThemeDto> getAll(int max, int skipCount) {
 
+        if (max == 0) {
+            return Collections.emptyList();
+        }
+
         PageRequest page = PageRequest.of(
             skipCount / max,
             max,
@@ -117,6 +121,10 @@ public class ThemeService {
     }
 
     public List<ThemeDto> getAll(int max, int skipCount, Predicate predicate) {
+
+        if (max == 0) {
+            return Collections.emptyList();
+        }
 
         PageRequest page = PageRequest.of(
             skipCount / max,

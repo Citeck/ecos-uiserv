@@ -21,7 +21,6 @@ import ru.citeck.ecos.uiserv.domain.action.dto.*;
 import ru.citeck.ecos.uiserv.domain.action.repo.ActionEntity;
 import ru.citeck.ecos.uiserv.domain.evaluator.repo.EvaluatorEntity;
 import ru.citeck.ecos.uiserv.domain.action.repo.ActionRepository;
-import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -48,6 +47,10 @@ public class ActionService {
     }
 
     public List<ActionDto> getActions(int max, int skip) {
+
+        if (max == 0) {
+            return Collections.emptyList();
+        }
 
         PageRequest page = PageRequest.of(skip / max, max, Sort.by(Sort.Direction.DESC, "id"));
 

@@ -45,6 +45,10 @@ public class JournalServiceImpl implements JournalService {
     @Override
     public List<JournalWithMeta> getAll(int max, int skipCount, Predicate predicate) {
 
+        if (max == 0) {
+            return Collections.emptyList();
+        }
+
         PageRequest page = PageRequest.of(
             skipCount / max,
             max,
@@ -68,6 +72,10 @@ public class JournalServiceImpl implements JournalService {
 
     @Override
     public Set<JournalWithMeta> getAll(int maxItems, int skipCount) {
+
+        if (maxItems == 0) {
+            return Collections.emptySet();
+        }
 
         PageRequest page = PageRequest.of(
             skipCount / maxItems,

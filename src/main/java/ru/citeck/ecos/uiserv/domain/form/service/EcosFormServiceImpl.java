@@ -67,6 +67,10 @@ public class EcosFormServiceImpl implements EcosFormService {
     @Override
     public List<EcosFormModel> getAllForms(Predicate predicate, int max, int skip) {
 
+        if (max == 0) {
+            return Collections.emptyList();
+        }
+
         PageRequest page = PageRequest.of(skip / max, max, Sort.by(Sort.Direction.DESC, "id"));
 
         FilterPredicate dto = PredicateUtils.convertToDto(predicate, FilterPredicate.class);
@@ -116,6 +120,10 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     @Override
     public List<EcosFormModel> getAllForms(int max, int skip) {
+
+        if (max == 0) {
+            return Collections.emptyList();
+        }
 
         PageRequest page = PageRequest.of(skip / max, max, Sort.by(Sort.Direction.DESC, "id"));
 

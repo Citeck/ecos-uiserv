@@ -59,7 +59,7 @@ class JournalsTotalCountMixin(
         }
 
         qBuilder.withConsistency(Consistency.EVENTUAL)
-        qBuilder.withPage(QueryPage.create { withMaxItems(1) })
+        qBuilder.withPage(QueryPage.create { withMaxItems(0) })
 
         return recordsService.query(qBuilder.build()).getTotalCount()
     }
