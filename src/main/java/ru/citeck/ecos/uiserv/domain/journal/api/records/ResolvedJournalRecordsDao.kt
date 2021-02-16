@@ -247,6 +247,15 @@ class ResolvedJournalRecordsDao(
             if (column.sortable == null) {
                 column.sortable = column.searchable != false && column.type != AttributeType.ASSOC
             }
+            if (column.groupable == null) {
+                column.groupable = column.type == AttributeType.ASSOC
+            }
+            if (column.hidden == null) {
+                column.hidden = false
+            }
+            if (column.visible == null) {
+                column.visible = true
+            }
 
             val attType = typeAtts[column.name]
             columnEditorResolver.resolve(column, attType)
