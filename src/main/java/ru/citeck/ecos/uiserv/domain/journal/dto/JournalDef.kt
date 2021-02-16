@@ -23,6 +23,10 @@ data class JournalDef(
      */
     val label: MLText,
 
+    val sourceId: String,
+
+    val metaRecord: RecordRef,
+
     /**
      * Predicate for base entities filtering in a table.
      * This predicate can't be changed by user
@@ -106,6 +110,8 @@ data class JournalDef(
 
         var id: String = ""
         var label: MLText = MLText.EMPTY
+        var sourceId: String = ""
+        var metaRecord: RecordRef = RecordRef.EMPTY
         var predicate: Predicate = VoidPredicate.INSTANCE
         var queryData: ObjectData = ObjectData.create()
         var typeRef: RecordRef = RecordRef.EMPTY
@@ -121,6 +127,8 @@ data class JournalDef(
         constructor(base: JournalDef) : this() {
             id = base.id
             label = base.label
+            sourceId = base.sourceId
+            metaRecord = base.metaRecord
             predicate = base.predicate.copy()
             queryData = ObjectData.deepCopyOrNew(base.queryData)
             typeRef = base.typeRef
@@ -141,6 +149,16 @@ data class JournalDef(
 
         fun withLabel(label: MLText?): Builder {
             this.label = label ?: MLText.EMPTY
+            return this
+        }
+
+        fun withSourceId(sourceId: String?): Builder {
+            this.sourceId = sourceId ?: ""
+            return this
+        }
+
+        fun withMetaRecord(metaRecord: RecordRef?): Builder {
+            this.metaRecord = RecordRef.valueOf(metaRecord)
             return this
         }
 
@@ -204,6 +222,8 @@ data class JournalDef(
             return JournalDef(
                 id,
                 label,
+                sourceId,
+                metaRecord,
                 predicate,
                 queryData,
                 typeRef,

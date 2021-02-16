@@ -16,6 +16,8 @@ class JournalEntity : AbstractAuditingEntity() {
     lateinit var extId: String
     lateinit var columns: String
 
+    var sourceId: String? = null
+    var metaRecord: String? = null
     var label: String? = null
     var groupBy: String? = null
     var sortBy: String? = null

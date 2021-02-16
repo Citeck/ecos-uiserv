@@ -11,10 +11,17 @@ class EcosTypeService(
 ) {
 
     fun getTypeRefByJournal(journalRef: RecordRef): RecordRef {
+        if (RecordRef.isEmpty(journalRef)) {
+            return RecordRef.EMPTY
+        }
         return typesConfig.getTypeRefByJournal(journalRef)
     }
 
     fun getJournalRefByTypeRef(typeRef: RecordRef): RecordRef {
+
+        if (RecordRef.isEmpty(typeRef)) {
+            return RecordRef.EMPTY
+        }
 
         var journalRef = typesConfig.getJournalRefByType(typeRef)
         if (RecordRef.isEmpty(journalRef)) {

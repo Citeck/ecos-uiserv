@@ -5,7 +5,6 @@ import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
-import ru.citeck.ecos.model.lib.attributes.dto.AttOptionDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 
 @IncludeNonDefault
@@ -85,8 +84,6 @@ class JournalColumnDef(
 
     // /features
 
-    val options: List<AttOptionDef>,
-
     val computed: List<JournalComputedDef>,
 
     /**
@@ -134,7 +131,6 @@ class JournalColumnDef(
         var visible: Boolean? = null
         var hidden: Boolean? = null
         var multiple: Boolean? = null
-        var options: List<AttOptionDef> = emptyList()
         var computed: List<JournalComputedDef> = emptyList()
         var properties: ObjectData = ObjectData.create()
 
@@ -153,7 +149,6 @@ class JournalColumnDef(
             visible = base.visible
             hidden = base.hidden
             multiple = base.multiple
-            options = base.options.toList()
             computed = base.computed.toList()
             properties = ObjectData.deepCopyOrNew(base.properties)
         }
@@ -234,11 +229,6 @@ class JournalColumnDef(
             return this
         }
 
-        fun withOptions(options: List<AttOptionDef>?): Builder {
-            this.options = options ?: emptyList()
-            return this
-        }
-
         fun withComputed(computed: List<JournalComputedDef>?): Builder {
             this.computed = computed?.filter { it.id.isNotBlank() } ?: emptyList()
             return this
@@ -266,7 +256,6 @@ class JournalColumnDef(
                 visible,
                 hidden,
                 multiple,
-                options,
                 computed,
                 properties
             )

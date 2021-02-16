@@ -30,7 +30,8 @@ import kotlin.collections.ArrayList
 @Component
 class ResolvedJournalRecordsDao(
     private val journalRecordsDao: JournalRecordsDao,
-    private val ecosTypeService: EcosTypeService
+    private val ecosTypeService: EcosTypeService,
+    private val columnEditorResolver: ColumnEditorResolver
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordAttsDao {
@@ -85,10 +86,6 @@ class ResolvedJournalRecordsDao(
         val result = ResolvedJournalDef(newJournal) { resolveColumns(journalBuilder, typeInfo) }
 
         if (typeInfo != null) {
-            result.sourceId = typeInfo.inhSourceId ?: ""
-            if (result.sourceId.isBlank()) {
-                result.sourceId = "alfresco/"
-            }
             result.createVariants = typeInfo.inhCreateVariants ?: emptyList()
         }
 
@@ -109,8 +106,31 @@ class ResolvedJournalRecordsDao(
 
     private fun resolveTypeJournalProps(journal: JournalDef.Builder, typeInfo: EcosTypeInfo?) {
 
-        if (typeInfo != null && MLText.isEmpty(journal.label)) {
-            journal.label = typeInfo.name ?: MLText(journal.id)
+        if (MLText.isEmpty(journal.label)) {
+            if (typeInfo != null) {
+                journal.withLabel(typeInfo.name)
+            }
+            if (MLText.isEmpty(journal.label)) {
+                journal.withLabel(MLText(journal.id))
+            }
+        }
+
+        if (journal.sourceId.isBlank()) {
+            if (typeInfo != null) {
+                journal.withSourceId(typeInfo.inhSourceId)
+            }
+            if (journal.sourceId.isBlank()) {
+                journal.withSourceId("alfresco/")
+            }
+        }
+
+        if (RecordRef.isEmpty(journal.metaRecord)) {
+            if (typeInfo != null) {
+                journal.withMetaRecord(typeInfo.metaRecord)
+            }
+            if (RecordRef.isEmpty(journal.metaRecord)) {
+                journal.withMetaRecord(RecordRef.valueOf(journal.sourceId + "@"))
+            }
         }
     }
 
@@ -123,10 +143,11 @@ class ResolvedJournalRecordsDao(
         } else {
             journal.columns.map { it.copy() }
         }
-        return resolveEdgeMetaImpl(columns, typeInfo)
+        return resolveEdgeMetaImpl(journal.metaRecord, columns, typeInfo)
     }
 
-    private fun resolveEdgeMetaImpl(columns: List<JournalColumnDef.Builder>,
+    private fun resolveEdgeMetaImpl(metaRecord: RecordRef,
+                                    columns: List<JournalColumnDef.Builder>,
                                     typeInfo: EcosTypeInfo?): List<ResolvedColumnDef> {
 
         val typeAtts: Map<String, AttributeDef> =
@@ -177,12 +198,6 @@ class ResolvedJournalRecordsDao(
                     edgeAtts.add("multiple")
                 }
             }
-            if (column.options.isEmpty()) {
-                val typeAttOptions = typeAtt?.options
-                if (!typeAttOptions.isNullOrEmpty()) {
-                    column.withOptions(typeAttOptions)
-                }
-            }
 
             if (edgeAtts.isNotEmpty()) {
                 if (edgeAtts.size == 1) {
@@ -192,10 +207,6 @@ class ResolvedJournalRecordsDao(
             }
         }
 
-        var metaRecord = typeInfo?.metaRecord
-        if (RecordRef.isEmpty(metaRecord) && typeInfo != null && !typeInfo.inhSourceId.isNullOrBlank()) {
-            metaRecord = RecordRef.valueOf(typeInfo.inhSourceId + "@")
-        }
         if (!RecordRef.isEmpty(metaRecord) && attributeEdges.isNotEmpty()) {
 
             val attributes = recordsService.getAtts(metaRecord, attributeEdges)
@@ -219,28 +230,28 @@ class ResolvedJournalRecordsDao(
             }
         }
 
-        columns.forEach {
-            if (MLText.isEmpty(it.label)) {
-                it.label = MLText(it.name)
+        columns.forEach { column ->
+
+            if (MLText.isEmpty(column.label)) {
+                column.label = MLText(column.name)
             }
-            if (it.type == null) {
-                it.withType(AttributeType.TEXT)
+            if (column.type == null) {
+                column.withType(AttributeType.TEXT);
             }
-            if (it.searchable == null) {
-                it.searchable = true
+            if (column.searchable == null) {
+                column.searchable = true
             }
-            if (it.searchableByText == null) {
-                it.searchableByText = it.searchable
+            if (column.searchableByText == null) {
+                column.searchableByText = column.searchable
             }
-            if (it.sortable == null) {
-                it.sortable = it.searchable != false && it.type != AttributeType.ASSOC
+            if (column.sortable == null) {
+                column.sortable = column.searchable != false && column.type != AttributeType.ASSOC
             }
+
+            columnEditorResolver.resolveColumnEditor(column, typeAtts[column.name])
         }
 
-        return columns.map { ResolvedColumnDef(
-            it.build(),
-            typeAtts[it.name]?.config ?: ObjectData.create()
-        )}
+        return columns.map { ResolvedColumnDef(it.build()) }
     }
 
     private fun resolvePredicate(journal: JournalDef.Builder) {

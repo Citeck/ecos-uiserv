@@ -9,7 +9,6 @@ class ResolvedJournalDef(
     val columnsEval: () -> List<ResolvedColumnDef>
 ) : JournalRecordsDao.JournalRecord(other) {
 
-    var sourceId: String = ""
     var createVariants: List<CreateVariantDef> = emptyList()
 
     fun getColumns(): List<ResolvedColumnDef> {
@@ -18,7 +17,6 @@ class ResolvedJournalDef(
 
     override fun toJson(): Any {
         val data = ObjectData.create(journalDef)
-        data.set("sourceId", sourceId)
         data.set("createVariants", createVariants)
         data.set("columns", getColumns())
         return data

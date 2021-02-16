@@ -7,14 +7,11 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
 
 class ResolvedColumnDef(
     @AttName("...")
-    val column: JournalColumnDef,
-    val attConfig: ObjectData
+    val column: JournalColumnDef
 ) {
 
     @JsonValue
     fun toJson(): ObjectData {
-        val result = ObjectData.create(column)
-        result.set("attConfig", attConfig)
-        return result
+        return ObjectData.create(column)
     }
 }
