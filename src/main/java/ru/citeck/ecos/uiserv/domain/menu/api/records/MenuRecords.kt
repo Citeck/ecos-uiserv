@@ -22,10 +22,12 @@ import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery
 import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService
 import ru.citeck.ecos.uiserv.domain.menu.api.records.MenuRecords.MenuRecord
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
+import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService
 import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.stream.Collectors
+import kotlin.collections.HashMap
 
 @Component
 @RequiredArgsConstructor
@@ -98,6 +100,16 @@ class MenuRecords(
     }
 
     inner class MenuRecord(model: MenuDto?) : MenuDto(model) {
+
+        override fun setSubMenu(subMenu: MutableMap<String, SubMenuDef>?) {
+            val newSubMenu = HashMap(this.subMenu)
+            subMenu?.forEach { (k, v) ->
+                if (v.items.isNotEmpty()) {
+                    newSubMenu[k] = v
+                }
+            }
+            super.setSubMenu(newSubMenu)
+        }
 
         fun isDefaultMenu(): Boolean {
             return menuService.isDefaultMenu(id)

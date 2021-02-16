@@ -10,7 +10,7 @@
     "create": {
       "items": [
         {
-          "id": "create-123",
+          "id": "create-1234",
           "type": "CREATE_IN_SECTION",
           "config": {
             "sectionId": "912d7e77-c96d-4df6-af3e-bacf279fa1a4"

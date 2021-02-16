@@ -86,6 +86,9 @@ class ResolvedJournalRecordsDao(
 
         if (typeInfo != null) {
             result.sourceId = typeInfo.inhSourceId ?: ""
+            if (result.sourceId.isBlank()) {
+                result.sourceId = "alfresco/"
+            }
             result.createVariants = typeInfo.inhCreateVariants ?: emptyList()
         }
 
