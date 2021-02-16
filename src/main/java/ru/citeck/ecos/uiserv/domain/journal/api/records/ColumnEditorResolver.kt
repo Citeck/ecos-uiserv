@@ -16,7 +16,7 @@ class ColumnEditorResolver(
     val ecosTypeService: EcosTypeService
 ) {
 
-    fun resolveColumnEditor(column: JournalColumnDef.Builder, typeAtt: AttributeDef?) {
+    fun resolve(column: JournalColumnDef.Builder, typeAtt: AttributeDef?) {
 
         if (column.editor.type.isNotBlank()) {
             return

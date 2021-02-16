@@ -4,7 +4,6 @@ import org.apache.commons.lang.StringUtils
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
-import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 import ru.citeck.ecos.records2.RecordConstants
@@ -31,7 +30,8 @@ import kotlin.collections.ArrayList
 class ResolvedJournalRecordsDao(
     private val journalRecordsDao: JournalRecordsDao,
     private val ecosTypeService: EcosTypeService,
-    private val columnEditorResolver: ColumnEditorResolver
+    private val columnEditorResolver: ColumnEditorResolver,
+    private val columnFormatterResolver: ColumnFormatterResolver
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordAttsDao {
@@ -248,7 +248,9 @@ class ResolvedJournalRecordsDao(
                 column.sortable = column.searchable != false && column.type != AttributeType.ASSOC
             }
 
-            columnEditorResolver.resolveColumnEditor(column, typeAtts[column.name])
+            val attType = typeAtts[column.name]
+            columnEditorResolver.resolve(column, attType)
+            columnFormatterResolver.resolve(column, attType)
         }
 
         return columns.map { ResolvedColumnDef(it.build()) }
