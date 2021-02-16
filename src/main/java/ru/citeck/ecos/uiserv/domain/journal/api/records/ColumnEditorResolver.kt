@@ -80,7 +80,7 @@ class ColumnEditorResolver(
     }
 
     private fun resolveEditorForMLText() : ColumnEditorDef {
-        return ColumnEditorDef("mltext", ObjectData.create())
+        return ColumnEditorDef("text", ObjectData.create())
     }
 
     private fun resolveEditorForDateTime(attType: AttributeType) : ColumnEditorDef {

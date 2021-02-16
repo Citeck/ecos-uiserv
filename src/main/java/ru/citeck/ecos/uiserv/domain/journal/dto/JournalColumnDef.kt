@@ -13,7 +13,7 @@ class JournalColumnDef(
 
     /**
      * Internal column name. Used in data query when attribute is not set.
-     * Allowed characters: [a-zA-Z\-_:]+.
+     * Allowed characters: ^[a-zA-Z][$\da-zA-Z:_-]*$
      *
      * Mandatory
      */
@@ -32,6 +32,7 @@ class JournalColumnDef(
     /**
      * Attribute to load data.
      * Can be nested, e.g. ecos:counterparty.ecos:inn
+     * Allowed characters: ^[a-zA-Z][$.\da-zA-Z:_-]*$
      *
      * If not specified field 'name' will be used to load data
      */

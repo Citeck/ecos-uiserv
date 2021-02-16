@@ -256,6 +256,9 @@ class ResolvedJournalRecordsDao(
             if (column.visible == null) {
                 column.visible = true
             }
+            if (column.attribute.isBlank()) {
+                column.attribute = column.name
+            }
 
             val attType = typeAtts[column.name]
             columnEditorResolver.resolve(column, attType)

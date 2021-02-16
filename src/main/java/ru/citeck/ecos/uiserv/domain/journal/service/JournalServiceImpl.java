@@ -18,12 +18,17 @@ import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class JournalServiceImpl implements JournalService {
+
+    private final Pattern VALID_COLUMN_NAME_PATTERN = Pattern.compile("^[a-zA-Z][$\\da-zA-Z:_-]*$");
+    private final Pattern VALID_COLUMN_ATT_PATTERN = Pattern.compile("^[a-zA-Z][$.\\da-zA-Z:_-]*$");
 
     private final JournalRepository journalRepository;
     private final JournalMapper journalMapper;
@@ -117,6 +122,21 @@ public class JournalServiceImpl implements JournalService {
         if (dto.getId().isEmpty()) {
             throw new IllegalArgumentException("Journal without id: " + dto);
         }
+
+        dto.getColumns().forEach(column -> {
+            Matcher validNameMatcher = VALID_COLUMN_NAME_PATTERN.matcher(column.getName());
+            if (!validNameMatcher.matches()) {
+                throw new IllegalArgumentException(
+                    "Journal column name is invalid: '" + column.getName() + "'. Column: " + column);
+            }
+            if (StringUtils.isNotBlank(column.getAttribute())) {
+                Matcher validAttMatcher = VALID_COLUMN_ATT_PATTERN.matcher(column.getAttribute());
+                if (!validAttMatcher.matches()) {
+                    throw new IllegalArgumentException(
+                        "Journal column attribute is invalid: '" + column.getAttribute() + "'. Column: " + column);
+                }
+            }
+        });
 
         JournalEntity journalEntity = journalMapper.dtoToEntity(dto);
         JournalEntity storedJournalEntity = journalRepository.save(journalEntity);
