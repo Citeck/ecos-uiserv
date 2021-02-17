@@ -1514,7 +1514,7 @@
               "hidden": false,
               "type": "ARBITRARY",
               "config": {
-                "url": "/v2/bpmn-designer"
+                "url": "/flowable-modeler"
               }
             },
             {
