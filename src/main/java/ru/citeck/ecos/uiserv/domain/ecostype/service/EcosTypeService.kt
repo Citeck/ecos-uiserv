@@ -24,14 +24,15 @@ class EcosTypeService(
         }
 
         var journalRef = typesConfig.getJournalRefByType(typeRef)
-        if (RecordRef.isEmpty(journalRef)) {
-            val parents = typesConfig.getTypeInfo(typeRef)?.parents ?: emptyList()
-            for (parentRef in parents) {
-                if (RecordRef.isNotEmpty(parentRef)) {
-                    journalRef = typesConfig.getJournalRefByType(parentRef)
-                    if (RecordRef.isNotEmpty(journalRef)) {
-                        return journalRef
-                    }
+        if (RecordRef.isNotEmpty(journalRef)) {
+            return journalRef
+        }
+        val parents = typesConfig.getTypeInfo(typeRef)?.parents ?: emptyList()
+        for (parentRef in parents) {
+            if (RecordRef.isNotEmpty(parentRef)) {
+                journalRef = typesConfig.getJournalRefByType(parentRef)
+                if (RecordRef.isNotEmpty(journalRef)) {
+                    return journalRef
                 }
             }
         }
