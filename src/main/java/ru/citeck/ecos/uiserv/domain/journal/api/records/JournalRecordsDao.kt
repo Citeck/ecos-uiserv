@@ -23,6 +23,7 @@ import ru.citeck.ecos.records3.record.op.query.dto.RecsQueryRes
 import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.request.RequestContext
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
@@ -144,12 +145,25 @@ class JournalRecordsDao(
 
         @JsonValue
         @com.fasterxml.jackson.annotation.JsonValue
-        open fun toJson(): Any {
+        open fun toNonDefaultJson(): Any {
             return mapper.toNonDefaultJson(journalDef)
         }
 
+        open fun getColumns(): List<Any> {
+            return journalDef.columns.map { ColumnAttValue(it) }
+        }
+
         open fun getData(): ByteArray {
-            return YamlUtils.toNonDefaultString(toJson()).toByteArray(StandardCharsets.UTF_8)
+            return YamlUtils.toNonDefaultString(toNonDefaultJson()).toByteArray(StandardCharsets.UTF_8)
+        }
+    }
+
+    class ColumnAttValue(
+        @AttName("...")
+        val column: JournalColumnDef
+    ) {
+        fun getJsonValue(): ObjectData {
+            return ObjectData.create(column)
         }
     }
 

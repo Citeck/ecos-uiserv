@@ -11,11 +11,11 @@ class ResolvedJournalDef(
 
     var createVariants: List<CreateVariantDef> = emptyList()
 
-    fun getColumns(): List<ResolvedColumnDef> {
-        return columnsEval.invoke();
+    override fun getColumns(): List<Any> {
+        return columnsEval.invoke()
     }
 
-    override fun toJson(): Any {
+    override fun toNonDefaultJson(): Any {
         val data = ObjectData.create(journalDef)
         data.set("createVariants", createVariants)
         data.set("columns", getColumns())
