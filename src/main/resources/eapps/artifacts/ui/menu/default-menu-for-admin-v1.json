@@ -733,16 +733,6 @@
                   }
                 }
               ]
-            },
-            {
-              "id": "2b73864b-e853-4153-bf36-d54ba2f63e7f",
-              "label": {
-                "ru": "Создать сайт"
-              },
-              "icon": "ui/icon@icon-empty",
-              "hidden": false,
-              "type": "SECTION",
-              "config": {}
             }
           ]
         },
