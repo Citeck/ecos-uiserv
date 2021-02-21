@@ -1,19 +1,16 @@
-
+---
 id: ui-action/download
-
-parentRef: emodel/type@ui-action
-
 name:
   en: Download
   ru: Скачать
 
+parentRef: emodel/type@ui-action
+formRef: uiserv/form@download_action_form
+
 system: true
 
 createVariants:
-
   - id: create-new-action-download
     name: { ru: Создать "Скачать", en: Create "Download" }
-    recordRef: uiserv/action@
-    formRef: uiserv/eform@download_action_form
     attributes:
       type: download

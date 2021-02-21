@@ -1,15 +1,17 @@
-
+---
 id: journal-columns
-label: { ru: Выбор колонок, en: Select columns }
+name:
+  ru: Выбор колонок
+  en: Select columns
 
 system: true
 
 columns:
 
-  - name: label
+  - id: label
+    name: { ru: Наименование, en: Label }
     type: text
-    label: { en: Label , ru: Наименование }
 
-  - name: name
+  - id: name
+    name: { ru: Системное имя, en: System name }
     type: text
-    label: { en: System name, ru: Системное имя }

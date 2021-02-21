@@ -32,7 +32,7 @@
                 "props": {
                   "id": "50d79720-f007-43f7-a91f-f7094f928b07",
                   "config": {
-                    "formId": "uiserv/eform@person_general",
+                    "formId": "uiserv/form@person_general",
                     "titleAsFormName": true
                   }
                 },
@@ -46,7 +46,7 @@
                 "props": {
                   "id": "54b3425a-3798-4c26-a770-275d93039cf3",
                   "config": {
-                    "formId": "uiserv/eform@person_contacts",
+                    "formId": "uiserv/form@person_contacts",
                     "titleAsFormName": true
                   }
                 },
@@ -60,7 +60,7 @@
                 "props": {
                   "id": "ca2bb8ff-3e0b-414f-9e85-428df7d1458d",
                   "config": {
-                    "formId": "uiserv/eform@person_other",
+                    "formId": "uiserv/form@person_other",
                     "titleAsFormName": true
                   }
                 },
@@ -74,7 +74,7 @@
                 "props": {
                   "id": "f3796002-5214-47b8-9014-ce87cffe74c5",
                   "config": {
-                    "formId": "uiserv/eform@cm_person_user_groups",
+                    "formId": "uiserv/form@cm_person_user_groups",
                     "titleAsFormName": true
                   }
                 },
@@ -154,7 +154,7 @@
                 "props": {
                   "id": "50d79720-f007-43f7-a91f-f7094f928b07",
                   "config": {
-                    "formId": "uiserv/eform@person_general",
+                    "formId": "uiserv/form@person_general",
                     "titleAsFormName": true
                   }
                 },
@@ -168,7 +168,7 @@
                 "props": {
                   "id": "54b3425a-3798-4c26-a770-275d93039cf3",
                   "config": {
-                    "formId": "uiserv/eform@person_contacts",
+                    "formId": "uiserv/form@person_contacts",
                     "titleAsFormName": true
                   }
                 },
@@ -182,7 +182,7 @@
                 "props": {
                   "id": "ca2bb8ff-3e0b-414f-9e85-428df7d1458d",
                   "config": {
-                    "formId": "uiserv/eform@person_other",
+                    "formId": "uiserv/form@person_other",
                     "titleAsFormName": true
                   }
                 },
@@ -196,7 +196,7 @@
                 "props": {
                   "id": "f3796002-5214-47b8-9014-ce87cffe74c5",
                   "config": {
-                    "formId": "uiserv/eform@cm_person_user_groups",
+                    "formId": "uiserv/form@cm_person_user_groups",
                     "titleAsFormName": true
                   }
                 },
@@ -275,7 +275,7 @@
                   "props": {
                     "id": "50d79720-f007-43f7-a91f-f7094f928b07",
                     "config": {
-                      "formId": "uiserv/eform@person_general",
+                      "formId": "uiserv/form@person_general",
                       "titleAsFormName": true
                     }
                   },
@@ -289,7 +289,7 @@
                   "props": {
                     "id": "54b3425a-3798-4c26-a770-275d93039cf3",
                     "config": {
-                      "formId": "uiserv/eform@person_contacts",
+                      "formId": "uiserv/form@person_contacts",
                       "titleAsFormName": true
                     }
                   },
@@ -303,7 +303,7 @@
                   "props": {
                     "id": "ca2bb8ff-3e0b-414f-9e85-428df7d1458d",
                     "config": {
-                      "formId": "uiserv/eform@person_other",
+                      "formId": "uiserv/form@person_other",
                       "titleAsFormName": true
                     }
                   },
@@ -317,7 +317,7 @@
                   "props": {
                     "id": "f3796002-5214-47b8-9014-ce87cffe74c5",
                     "config": {
-                      "formId": "uiserv/eform@cm_person_user_groups",
+                      "formId": "uiserv/form@cm_person_user_groups",
                       "titleAsFormName": true
                     }
                   },
@@ -421,7 +421,7 @@
           "props": {
             "id": "50d79720-f007-43f7-a91f-f7094f928b07",
             "config": {
-              "formId": "uiserv/eform@person_general",
+              "formId": "uiserv/form@person_general",
               "titleAsFormName": true
             }
           },
@@ -435,7 +435,7 @@
           "props": {
             "id": "54b3425a-3798-4c26-a770-275d93039cf3",
             "config": {
-              "formId": "uiserv/eform@person_contacts",
+              "formId": "uiserv/form@person_contacts",
               "titleAsFormName": true
             }
           },
@@ -449,7 +449,7 @@
           "props": {
             "id": "ca2bb8ff-3e0b-414f-9e85-428df7d1458d",
             "config": {
-              "formId": "uiserv/eform@person_other",
+              "formId": "uiserv/form@person_other",
               "titleAsFormName": true
             }
           },
@@ -463,7 +463,7 @@
           "props": {
             "id": "f3796002-5214-47b8-9014-ce87cffe74c5",
             "config": {
-              "formId": "uiserv/eform@cm_person_user_groups",
+              "formId": "uiserv/form@cm_person_user_groups",
               "titleAsFormName": true
             }
           },

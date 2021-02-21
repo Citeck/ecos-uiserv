@@ -1,11 +1,10 @@
-
+---
 id: form
-
 name:
   en: Form
   ru: Форма
 
-sourceId: uiserv/eform
+sourceId: uiserv/form
 
 system: true
 
@@ -15,9 +14,7 @@ createVariants:
 
   - id: create-new-form
     name: { ru: Создать форму, en: Create form }
-    recordRef: uiserv/eform@
 
   - id: upload-form
     name: { ru: Загрузить форму, en: Upload form }
-    recordRef: uiserv/eform@
-    formRef: uiserv/eform@ecos-module-upload
+    formRef: uiserv/form@ecos-module-upload

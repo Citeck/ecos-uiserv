@@ -16,4 +16,4 @@ createVariants:
   - id: upload-menu
     name: { ru: Загрузить меню, en: Upload menu }
     recordRef: uiserv/menu@
-    formRef: uiserv/eform@ecos-module-upload
+    formRef: uiserv/form@ecos-module-upload

@@ -1,0 +1,52 @@
+--
+id: search
+name:
+  ru: Поиск
+  en: Search
+
+system: true
+
+properties:
+  full-search-predicate: '{ "t": "contains", "att": "ALL", "val": "$INPUT" }'
+
+actions:
+  - uiserv/action@delete
+  - uiserv/action@edit
+  - uiserv/action@view-dashboard
+  - uiserv/action@view-dashboard-in-background
+
+columns:
+
+  - id: cm:name
+    name: { ru: Название, en: Name }
+    type: text
+
+  - id: cm:title
+    name: { ru: Заголовок, en: Title }
+    type: text
+
+  - id: type
+    name: { ru: Тип , en: Type }
+    type: text
+    visible: false
+
+  - id: etype
+    name: { ru: Тип кейса, en: Case type }
+    attribute: _type
+    type: text
+
+  - id: cm:modifier
+    name: { ru: Кем изменен, en: Changed by }
+    type: text
+
+  - id: cm:modified
+    name: { ru: Когда изменен, en: Changed time }
+    type: datetime
+
+  - id: cm:creator
+    name: { ru: Создан, en: Created by }
+    type: text
+
+  - id: cm:created
+    name: { ru: Дата создания, en: Created time }
+    type: datetime

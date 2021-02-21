@@ -1,0 +1,21 @@
+---
+id: ecos-theme
+name:
+  ru: Темы
+  en: Themes
+
+system: true
+
+actions:
+  - uiserv/action@download-base64-data-zip
+  - uiserv/action@delete
+
+columns:
+
+  - id: moduleId
+    name: { ru: Идентификатор, en: Id }
+    type: text
+
+  - id: name
+    name: { ru: Имя, en: Name }
+    type: text

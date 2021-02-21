@@ -124,10 +124,10 @@ public class JournalServiceImpl implements JournalService {
         }
 
         dto.getColumns().forEach(column -> {
-            Matcher validNameMatcher = VALID_COLUMN_NAME_PATTERN.matcher(column.getName());
+            Matcher validNameMatcher = VALID_COLUMN_NAME_PATTERN.matcher(column.getId());
             if (!validNameMatcher.matches()) {
                 throw new IllegalArgumentException(
-                    "Journal column name is invalid: '" + column.getName() + "'. Column: " + column);
+                    "Journal column name is invalid: '" + column.getId() + "'. Column: " + column);
             }
             if (StringUtils.isNotBlank(column.getAttribute())) {
                 Matcher validAttMatcher = VALID_COLUMN_ATT_PATTERN.matcher(column.getAttribute());

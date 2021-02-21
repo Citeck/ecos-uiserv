@@ -44,7 +44,7 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
                RecordDeleteDao,
                RecordAttsDao {
 
-    public static final String ID = "eform";
+    public static final String ID = "form";
 
     private static final String FORMS_FOR_TYPE_LANG = "forms-for-type";
 
@@ -53,7 +53,7 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
 
     private static final Set<String> SYSTEM_FORMS = new HashSet<>(Arrays.asList(DEFAULT_FORM_ID, ECOS_FORM_ID));
 
-    private final EcosFormService eformFormService;
+    private final EcosFormService ecosFormService;
 
     @NotNull
     @Override
@@ -65,7 +65,7 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
     public EcosFormModelDownstream getRecToMutate(@NotNull String formId) {
         return toDownstream(Optional.of(formId)
             .filter(str -> !str.isEmpty())
-            .map(x -> eformFormService.getFormById(x)
+            .map(x -> ecosFormService.getFormById(x)
                 .orElseThrow(() -> new IllegalArgumentException("Form with id " + formId + " not found!")))
             .map(EcosFormModel::new) //defensive copy, even though getFormById probably creates new instance
             .orElseGet(EcosFormModel::new));
@@ -78,7 +78,7 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
     @NotNull
     @Override
     public String saveMutatedRec(EcosFormModelDownstream ecosFormModelDownstream) {
-        return eformFormService.save(ecosFormModelDownstream);
+        return ecosFormService.save(ecosFormModelDownstream);
     }
 
     @NotNull
@@ -88,7 +88,7 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
         if (SYSTEM_FORMS.contains(formId)) {
             return DelStatus.PROTECTED;
         }
-        eformFormService.delete(formId);
+        ecosFormService.delete(formId);
         return DelStatus.OK;
     }
 
@@ -97,7 +97,7 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
     public Object getRecordAtts(@NotNull String formId) {
         return toDownstream(Optional.of(formId)
             .filter(str -> !str.isEmpty())
-            .map(x -> eformFormService.getFormById(x)
+            .map(x -> ecosFormService.getFormById(x)
                 .orElseThrow(() -> new IllegalArgumentException("Form with id " + formId + " not found!")))
             .orElseGet(() -> {
                 final EcosFormModel form = new EcosFormModelDownstream(new EcosFormModel());
@@ -124,7 +124,7 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
                 return result;
             }
 
-            result.addRecords(eformFormService.getAllFormsForType(formsForTypeQuery.getTypeRef()).stream()
+            result.addRecords(ecosFormService.getAllFormsForType(formsForTypeQuery.getTypeRef()).stream()
                 .map(this::toDownstream)
                 .collect(Collectors.toList())
             );
@@ -142,20 +142,20 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
                 predicate = recordsQuery.getQuery(Predicate.class);
             }
 
-            List<EcosFormModelDownstream> forms = eformFormService.getAllForms(predicate, max, skipCount)
+            List<EcosFormModelDownstream> forms = ecosFormService.getAllForms(predicate, max, skipCount)
                 .stream()
                 .map(this::toDownstream)
                 .collect(Collectors.toList());
 
             result.setRecords(forms);
-            result.setTotalCount(eformFormService.getCount());
+            result.setTotalCount(ecosFormService.getCount());
             return result;
         }
 
         Optional<EcosFormModel> form = Optional.empty();
 
         if (CollectionUtils.isNotEmpty(query.formKeys)) {
-            List<EcosFormModelDownstream> formsByKeys = eformFormService.getFormsByKeys(query.formKeys)
+            List<EcosFormModelDownstream> formsByKeys = ecosFormService.getFormsByKeys(query.formKeys)
                 .stream()
                 .map(this::toDownstream)
                 .collect(Collectors.toList());
@@ -165,7 +165,7 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
             return result;
         } else if (StringUtils.isNotBlank(query.formKey)) {
 
-            form = eformFormService.getFormByKey(Arrays.stream(query.formKey.split(","))
+            form = ecosFormService.getFormByKey(Arrays.stream(query.formKey.split(","))
                 .filter(StringUtils::isNotBlank)
                 .collect(Collectors.toList()));
 

@@ -1,7 +1,8 @@
-
+---
 id: i18n
-
-name: { en: i18n, ru: i18n }
+name:
+  en: i18n
+  ru: i18n
 
 sourceId: uiserv/i18n
 
@@ -13,5 +14,4 @@ createVariants:
 
   - id: upload-i18n
     name: { ru: Загрузить локализацию, en: Upload localization }
-    recordRef: uiserv/i18n@
-    formRef: uiserv/eform@ecos-module-upload
+    formRef: uiserv/form@ecos-module-upload

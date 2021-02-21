@@ -21,7 +21,7 @@ data class JournalDef(
     /**
      * Journal label. Field for information.
      */
-    val label: MLText,
+    val name: MLText,
 
     val sourceId: String,
 
@@ -109,7 +109,7 @@ data class JournalDef(
     open class Builder() {
 
         var id: String = ""
-        var label: MLText = MLText.EMPTY
+        var name: MLText = MLText.EMPTY
         var sourceId: String = ""
         var metaRecord: RecordRef = RecordRef.EMPTY
         var predicate: Predicate = VoidPredicate.INSTANCE
@@ -126,7 +126,7 @@ data class JournalDef(
 
         constructor(base: JournalDef) : this() {
             id = base.id
-            label = base.label
+            name = base.name
             sourceId = base.sourceId
             metaRecord = base.metaRecord
             predicate = base.predicate.copy()
@@ -147,8 +147,8 @@ data class JournalDef(
             return this
         }
 
-        fun withLabel(label: MLText?): Builder {
-            this.label = label ?: MLText.EMPTY
+        fun withName(name: MLText?): Builder {
+            this.name = name ?: MLText.EMPTY
             return this
         }
 
@@ -198,7 +198,7 @@ data class JournalDef(
         }
 
         fun withColumns(columns: List<JournalColumnDef>): Builder {
-            this.columns = columns.filter { it.name.isNotBlank() }
+            this.columns = columns.filter { it.id.isNotBlank() }
             return this
         }
 
@@ -221,7 +221,7 @@ data class JournalDef(
 
             return JournalDef(
                 id,
-                label,
+                name,
                 sourceId,
                 metaRecord,
                 predicate,

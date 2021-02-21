@@ -1,6 +1,5 @@
-
+---
 id: ui-action
-
 name:
   en: UI Action
   ru: UI Действие
@@ -14,5 +13,4 @@ createVariants:
 
   - id: upload-action
     name: { ru: Загрузить действие, en: Upload action }
-    recordRef: uiserv/action@
-    formRef: uiserv/eform@ecos-module-upload
+    formRef: uiserv/form@ecos-module-upload

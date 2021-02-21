@@ -17,12 +17,12 @@ class JournalColumnDef(
      *
      * Mandatory
      */
-    val name: String,
+    val id: String,
 
     /**
      * Label to display in column header.
      */
-    val label: MLText,
+    val name: MLText,
 
     /**
      * Data type.
@@ -118,8 +118,8 @@ class JournalColumnDef(
 
     class Builder() {
 
-        var name: String = ""
-        var label: MLText = MLText.EMPTY
+        var id: String = ""
+        var name: MLText = MLText.EMPTY
         var type: AttributeType? = null
         var attribute: String = ""
         var editor: ColumnEditorDef = ColumnEditorDef.EMPTY
@@ -136,8 +136,8 @@ class JournalColumnDef(
         var properties: ObjectData = ObjectData.create()
 
         constructor(base: JournalColumnDef) : this() {
+            id = base.id
             name = base.name
-            label = base.label
             type = base.type
             attribute = base.attribute
             editor = base.editor
@@ -154,13 +154,13 @@ class JournalColumnDef(
             properties = ObjectData.deepCopyOrNew(base.properties)
         }
 
-        fun withName(name: String?): Builder {
-            this.name = name ?: ""
+        fun withId(id: String?): Builder {
+            this.id = id ?: ""
             return this
         }
 
-        fun withLabel(label: MLText?): Builder {
-            this.label = label ?: MLText.EMPTY
+        fun withName(name: MLText?): Builder {
+            this.name = name ?: MLText.EMPTY
             return this
         }
 
@@ -243,8 +243,8 @@ class JournalColumnDef(
         fun build(): JournalColumnDef {
 
             return JournalColumnDef(
+                id,
                 name,
-                label,
                 type,
                 attribute,
                 editor,

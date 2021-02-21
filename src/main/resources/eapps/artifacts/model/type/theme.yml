@@ -15,4 +15,4 @@ createVariants:
   - id: upload-theme
     name: { ru: Загрузить тему, en: Upload theme }
     recordRef: uiserv/theme@
-    formRef: uiserv/eform@ecos-module-upload
+    formRef: uiserv/form@ecos-module-upload
