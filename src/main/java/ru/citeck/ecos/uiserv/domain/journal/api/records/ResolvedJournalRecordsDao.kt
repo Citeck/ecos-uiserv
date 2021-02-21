@@ -161,12 +161,7 @@ class ResolvedJournalRecordsDao(
 
             columnIdxByName[column.name] = columnIdxCounter++
 
-            val attribute = if (column.attribute.isBlank()) {
-                column.name
-            } else {
-                column.attribute
-            }
-            val isInnerAtt = attribute.contains(".") || attribute.contains("?")
+            val attribute = column.name
 
             val typeAtt = typeAtts[column.name]
 
@@ -175,18 +170,18 @@ class ResolvedJournalRecordsDao(
                 val typeAttType = typeAtt?.type
                 if (typeAttType != null) {
                     column.withType(typeAttType)
-                } else if (!isInnerAtt) {
+                } else {
                     edgeAtts.add("type")
                 }
             }
-            if (column.editable == null && !isInnerAtt) {
+            if (column.editable == null) {
                 edgeAtts.add("protected")
             }
             if (MLText.isEmpty(column.label)) {
                 val typeAttName = typeAtt?.name
                 if (!MLText.isEmpty(typeAttName)) {
                     column.withLabel(typeAttName)
-                } else if (!isInnerAtt) {
+                } else {
                     edgeAtts.add("title")
                 }
             }
@@ -194,7 +189,7 @@ class ResolvedJournalRecordsDao(
                 val typeAttMultiple = typeAtt?.multiple
                 if (typeAttMultiple != null) {
                     column.withMultiple(typeAttMultiple)
-                } else if (!isInnerAtt) {
+                } else {
                     edgeAtts.add("multiple")
                 }
             }
