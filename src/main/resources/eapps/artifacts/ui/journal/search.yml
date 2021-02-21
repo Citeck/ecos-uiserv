@@ -19,25 +19,25 @@ columns:
 
   - id: cm:name
     name: { ru: Название, en: Name }
-    type: text
+    type: TEXT
 
   - id: cm:title
     name: { ru: Заголовок, en: Title }
-    type: text
+    type: TEXT
 
   - id: type
     name: { ru: Тип , en: Type }
-    type: text
+    type: TEXT
     visible: false
 
   - id: etype
     name: { ru: Тип кейса, en: Case type }
     attribute: _type
-    type: text
+    type: TEXT
 
   - id: cm:modifier
     name: { ru: Кем изменен, en: Changed by }
-    type: text
+    type: TEXT
 
   - id: cm:modified
     name: { ru: Когда изменен, en: Changed time }
@@ -45,7 +45,7 @@ columns:
 
   - id: cm:creator
     name: { ru: Создан, en: Created by }
-    type: text
+    type: TEXT
 
   - id: cm:created
     name: { ru: Дата создания, en: Created time }

@@ -16,11 +16,11 @@ columns:
 
   - id: moduleId
     name: { ru: Идентификатор, en: Id }
-    type: text
+    type: TEXT
 
   - id: name
     name: { ru: Имя, en: Name }
-    type: text
+    type: TEXT
 
   - id: type
     name: { ru: Тип, en: Type }

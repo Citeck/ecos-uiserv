@@ -10,8 +10,8 @@ columns:
 
   - id: label
     name: { ru: Наименование, en: Label }
-    type: text
+    type: TEXT
 
   - id: name
     name: { ru: Системное имя, en: System name }
-    type: text
+    type: TEXT

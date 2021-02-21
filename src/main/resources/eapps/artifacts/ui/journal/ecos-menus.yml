@@ -19,7 +19,7 @@ columns:
 
   - id: moduleId
     name: { ru: Идентификатор, en: Id }
-    type: text
+    type: TEXT
 
   - id: version
     name: { ru: Версия модели, en: Model Version }

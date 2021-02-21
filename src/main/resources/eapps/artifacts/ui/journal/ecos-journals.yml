@@ -16,11 +16,11 @@ columns:
 
   - id: localId
     name: { ru: Идентификатор, en: Id }
-    type: text
+    type: TEXT
 
   - id: typeRef
     name: { ru: Тип ECOS, en: ECOS Type }
 
   - id: label
     name: { ru: Название, en: Name }
-    type: text
+    type: TEXT

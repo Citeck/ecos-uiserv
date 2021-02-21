@@ -294,7 +294,7 @@ public class ActionRecords extends LocalRecordsDao
 
     @Data
     public static class RecordTypeMeta {
-        @AttName("_etype?id")
+        @AttName("_type?id")
         private String type;
     }
 

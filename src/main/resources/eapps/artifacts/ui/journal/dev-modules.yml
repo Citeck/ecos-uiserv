@@ -13,9 +13,9 @@ columns:
 
   - id: label
     name: { ru: Заголовок, en: Label }
-    type: text
+    type: TEXT
 
   - id: description
     name: { ru: Описание, en: Description }
-    type: text
+    type: TEXT
 

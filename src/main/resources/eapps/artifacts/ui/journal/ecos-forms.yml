@@ -16,15 +16,15 @@ columns:
 
   - id: moduleId
     name: { ru: Идентификатор, en: Id }
-    type: text
+    type: TEXT
 
   - id: formKey
     name: { ru: Ключ формы, en: Form key }
-    type: text
+    type: TEXT
 
   - id: title
     name: { ru: Название, en: Name }
-    type: text
+    type: TEXT
 
   - id: description
     name: { ru: Описание, en: Description }

@@ -6,6 +6,7 @@ import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
+import java.util.*
 
 @IncludeNonDefault
 @JsonDeserialize(builder = JournalColumnDef.Builder::class)
@@ -161,6 +162,16 @@ class JournalColumnDef(
 
         fun withName(name: MLText?): Builder {
             this.name = name ?: MLText.EMPTY
+            if (this.id.isEmpty()) {
+                // legacy config support
+                this.id = this.name.get(Locale.ENGLISH)
+            }
+            return this
+        }
+
+        @Deprecated(message = "deprecated field", replaceWith = ReplaceWith("withName"))
+        fun withLabel(label: MLText?): Builder {
+            this.name = label ?: MLText.EMPTY
             return this
         }
 

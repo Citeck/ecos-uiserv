@@ -111,7 +111,7 @@ public class DashboardRecords extends AbstractRecordsDao
 
         if (query.getTypeRef() == null) {
             if (query.getRecordRef() != null) {
-                DataValue ecosType = recordsService.getAtt(query.getRecordRef(), "_etype?id");
+                DataValue ecosType = recordsService.getAtt(query.getRecordRef(), "_type?id");
                 if (ecosType.isTextual()) {
                     query.setTypeRef(RecordRef.valueOf(ecosType.asText()));
                 }

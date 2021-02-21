@@ -16,7 +16,7 @@ columns:
 
   - id: moduleId
     name: { ru: Идентификатор, en: Id }
-    type: text
+    type: TEXT
 
   - id: typeRef
     name: { ru: Тип ECOS, en: ECOS Type }
