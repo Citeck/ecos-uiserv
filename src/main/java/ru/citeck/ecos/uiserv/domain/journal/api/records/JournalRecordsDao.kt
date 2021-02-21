@@ -139,8 +139,8 @@ class JournalRecordsDao(
         fun getType(): RecordRef = RecordRef.valueOf("emodel/type@journal")
 
         @AttName("?disp")
-        fun getDisplayName(): String {
-            return MLText.getClosestValue(journalDef.label, RequestContext.getLocale(), journalDef.id)
+        fun getDisplayName(): MLText {
+            return journalDef.name
         }
 
         @JsonValue

@@ -134,7 +134,7 @@
                               "ru": "Название журнала",
                               "en": "Journal name"
                             },
-                            "key": "label",
+                            "key": "name",
                             "type": "mlText",
                             "input": true
                           },
@@ -222,7 +222,7 @@
                           "ru": "Системное имя"
                         },
                         "defaultValue": "",
-                        "key": "name",
+                        "key": "id",
                         "type": "textfield",
                         "input": true,
                         "row": "0-0"
@@ -232,7 +232,7 @@
                           "ru": "Название колонки",
                           "en": "Column name"
                         },
-                        "key": "label",
+                        "key": "name",
                         "type": "mlText",
                         "input": true,
                         "row": "0-1"

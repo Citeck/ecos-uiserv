@@ -18,7 +18,8 @@ class JournalEntity : AbstractAuditingEntity() {
 
     var sourceId: String? = null
     var metaRecord: String? = null
-    var label: String? = null
+    @Column(name = "label")
+    var name: String? = null
     var groupBy: String? = null
     var sortBy: String? = null
     var typeRef: String? = null

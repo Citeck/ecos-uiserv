@@ -106,12 +106,12 @@ class ResolvedJournalRecordsDao(
 
     private fun resolveTypeJournalProps(journal: JournalDef.Builder, typeInfo: EcosTypeInfo?) {
 
-        if (MLText.isEmpty(journal.label)) {
+        if (MLText.isEmpty(journal.name)) {
             if (typeInfo != null) {
-                journal.withLabel(typeInfo.name)
+                journal.withName(typeInfo.name)
             }
-            if (MLText.isEmpty(journal.label)) {
-                journal.withLabel(MLText(journal.id))
+            if (MLText.isEmpty(journal.name)) {
+                journal.withName(MLText(journal.id))
             }
         }
 
@@ -138,7 +138,7 @@ class ResolvedJournalRecordsDao(
 
         val columns = if (journal.columns.isEmpty()) {
             typeInfo?.model?.attributes?.map {
-                JournalColumnDef.create().withName(it.id)
+                JournalColumnDef.create().withId(it.id)
             } ?: emptyList()
         } else {
             journal.columns.map { it.copy() }
@@ -159,11 +159,11 @@ class ResolvedJournalRecordsDao(
         var columnIdxCounter = 0
         for (column in columns) {
 
-            columnIdxByName[column.name] = columnIdxCounter++
+            columnIdxByName[column.id] = columnIdxCounter++
 
-            val attribute = column.name
+            val attribute = column.id
 
-            val typeAtt = typeAtts[column.name]
+            val typeAtt = typeAtts[column.id]
 
             val edgeAtts = ArrayList<String>()
             if (column.type == null) {
@@ -177,10 +177,10 @@ class ResolvedJournalRecordsDao(
             if (column.editable == null) {
                 edgeAtts.add("protected")
             }
-            if (MLText.isEmpty(column.label)) {
+            if (MLText.isEmpty(column.name)) {
                 val typeAttName = typeAtt?.name
                 if (!MLText.isEmpty(typeAttName)) {
-                    column.withLabel(typeAttName)
+                    column.withName(typeAttName)
                 } else {
                     edgeAtts.add("title")
                 }
@@ -198,7 +198,7 @@ class ResolvedJournalRecordsDao(
                 if (edgeAtts.size == 1) {
                     edgeAtts.add("javaClass") // protection from optimization
                 }
-                attributeEdges[column.name] = "_edge.$attribute{${edgeAtts.joinToString(",")}}"
+                attributeEdges[column.id] = "_edge.$attribute{${edgeAtts.joinToString(",")}}"
             }
         }
 
@@ -216,7 +216,7 @@ class ResolvedJournalRecordsDao(
                         column.withEditable(!value.get("protected").asBoolean())
                     }
                     if (value.has("title")) {
-                        column.withLabel(MLText(value.get("title").asText()))
+                        column.withName(MLText(value.get("title").asText()))
                     }
                     if (value.has("multiple")) {
                         column.withMultiple(value.get("multiple").asBoolean())
@@ -227,8 +227,8 @@ class ResolvedJournalRecordsDao(
 
         columns.forEach { column ->
 
-            if (MLText.isEmpty(column.label)) {
-                column.label = MLText(column.name)
+            if (MLText.isEmpty(column.name)) {
+                column.name = MLText(column.id)
             }
             if (column.type == null) {
                 column.withType(AttributeType.TEXT);
@@ -252,10 +252,10 @@ class ResolvedJournalRecordsDao(
                 column.visible = true
             }
             if (column.attribute.isBlank()) {
-                column.attribute = column.name
+                column.attribute = column.id
             }
 
-            val attType = typeAtts[column.name]
+            val attType = typeAtts[column.id]
             columnEditorResolver.resolve(column, attType)
             columnFormatterResolver.resolve(column, attType)
         }
@@ -277,7 +277,7 @@ class ResolvedJournalRecordsDao(
         val journalPredicate = journal.predicate
         fullPredicate = if (journalPredicate != VoidPredicate.INSTANCE) {
             val atts = PredicateUtils.getAllPredicateAttributes(journalPredicate)
-            if (atts.contains(RecordConstants.ATT_ECOS_TYPE) || atts.contains(RecordConstants.ATT_TYPE)) {
+            if (atts.contains(RecordConstants.ATT_TYPE)) {
                 journalPredicate
             } else {
                 Predicates.and(journalPredicate, typePredicate)
