@@ -21,6 +21,6 @@ columns:
   - id: typeRef
     name: { ru: Тип ECOS, en: ECOS Type }
 
-  - id: label
+  - id: name
     name: { ru: Название, en: Name }
     type: TEXT
