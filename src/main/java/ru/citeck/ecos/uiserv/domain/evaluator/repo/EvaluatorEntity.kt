@@ -1,47 +1,41 @@
-package ru.citeck.ecos.uiserv.domain.evaluator.repo;
+package ru.citeck.ecos.uiserv.domain.evaluator.repo
 
-import lombok.Data;
+import java.util.*
+import javax.persistence.*
 
-import javax.persistence.*;
-import java.util.Objects;
-
-@Data
 @Entity
 @Table(name = "evaluators")
-public class EvaluatorEntity {
-
+class EvaluatorEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "evaluators_seq_gen")
     @SequenceGenerator(name = "evaluators_seq_gen")
-    protected Long id;
+    val id: Long? = null
 
     @Column(name = "evaluator_id")
-    private String evaluatorId;
+    var evaluatorId: String? = null
 
     @Column(name = "type")
-    private String type;
+    var type: String? = null
 
     @Lob
     @Column(name = "config_json")
-    private String configJson;
+    var configJson: String? = null
 
     @Column(name = "inverse")
-    private boolean inverse;
+    var inverse = false
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
+            return true
         }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
+        if (other == null || javaClass != other.javaClass) {
+            return false
         }
-        EvaluatorEntity that = (EvaluatorEntity) o;
-        return Objects.equals(id, that.id);
+        val that = other as EvaluatorEntity
+        return id == that.id
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+    override fun hashCode(): Int {
+        return Objects.hash(id)
     }
 }

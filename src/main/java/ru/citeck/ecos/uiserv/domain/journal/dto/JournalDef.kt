@@ -58,6 +58,12 @@ data class JournalDef(
     val actions: List<RecordRef>,
 
     /**
+     * Action definitions for every entity in a table.
+     * Can be filtered for specific entities by evaluator.
+     */
+    val actionsDef: List<JournalActionDef>,
+
+    /**
      * Can attributes of entities in a table be edited or not.
      * Global config for all columns.
      * If manual setup for columns is required see JournalColumnDto::editable.
@@ -118,6 +124,7 @@ data class JournalDef(
         var groupBy: List<String> = emptyList()
         var sortBy: List<JournalSortByDef> = emptyList()
         var actions: List<RecordRef> = emptyList()
+        var actionsDef: List<JournalActionDef> = emptyList()
         var editable: Boolean = true
         var columns: List<JournalColumnDef> = emptyList()
         var computed: List<JournalComputedDef> = emptyList()
@@ -135,6 +142,7 @@ data class JournalDef(
             groupBy = base.groupBy.let { DataValue.create(it).asStrList() }
             sortBy = base.sortBy.let { DataValue.create(it).asList(JournalSortByDef::class.java) }
             actions = base.actions.let { DataValue.create(it).asList(RecordRef::class.java) }
+            actionsDef = base.actionsDef.let { DataValue.create(it).asList(JournalActionDef::class.java) }
             editable = base.editable
             columns = base.columns.toList()
             computed = base.computed.let { DataValue.create(it).asList(JournalComputedDef::class.java) }
@@ -192,6 +200,11 @@ data class JournalDef(
             return this
         }
 
+        fun withActionsDef(actionsDef: List<JournalActionDef>?): Builder {
+            this.actionsDef = actionsDef?.filter { it.type.isNotBlank() } ?: emptyList()
+            return this
+        }
+
         fun withEditable(editable: Boolean?): Builder {
             this.editable = editable ?: true
             return this
@@ -230,6 +243,7 @@ data class JournalDef(
                 groupBy,
                 sortBy,
                 actions,
+                actionsDef,
                 editable,
                 columns,
                 computed,

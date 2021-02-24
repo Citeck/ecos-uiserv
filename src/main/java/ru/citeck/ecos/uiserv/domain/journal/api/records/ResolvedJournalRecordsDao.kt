@@ -2,8 +2,10 @@ package ru.citeck.ecos.uiserv.domain.journal.api.records
 
 import org.apache.commons.lang.StringUtils
 import org.springframework.stereotype.Component
+import org.springframework.util.DigestUtils
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
+import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 import ru.citeck.ecos.records2.RecordConstants
@@ -71,8 +73,33 @@ class ResolvedJournalRecordsDao(
         resolveTypeJournalProps(journalBuilder, typeInfo)
 
         resolvePredicate(journalBuilder)
+        resolveActionsDef(journalBuilder)
 
         return createResolvedDef(journal, journalBuilder, typeInfo)
+    }
+
+    private fun resolveActionsDef(journalBuilder: JournalDef.Builder) {
+
+        val actionsDef = journalBuilder.actionsDef
+        if (actionsDef.isEmpty()) {
+            return
+        }
+
+        val actions = ArrayList(journalBuilder.actions)
+        journalBuilder.withActionsDef(actionsDef.map {
+            val localId = if (it.id.isBlank()) {
+                val actionBytes = Json.mapper.toBytes(it) ?: ByteArray(0)
+                DigestUtils.md5DigestAsHex(actionBytes)
+            } else {
+                it.id
+            }
+            val action = it.copy()
+            action.withId("journal$${journalBuilder.id}$$localId")
+            actions.add(RecordRef.create("uiserv", "action", action.id))
+            action.build()
+        })
+
+        journalBuilder.withActions(actions)
     }
 
     private fun createResolvedDef(journalRecord: JournalRecordsDao.JournalRecord,

@@ -1,55 +1,52 @@
-package ru.citeck.ecos.uiserv.domain.action.repo;
+package ru.citeck.ecos.uiserv.domain.action.repo
 
-import lombok.Data;
-import ru.citeck.ecos.uiserv.app.common.repo.AbstractAuditingEntity;
-import ru.citeck.ecos.uiserv.domain.evaluator.repo.EvaluatorEntity;
+import lombok.Data
+import ru.citeck.ecos.uiserv.app.common.repo.AbstractAuditingEntity
+import ru.citeck.ecos.uiserv.domain.evaluator.repo.EvaluatorEntity
+import java.util.*
+import javax.persistence.*
 
-import javax.persistence.*;
-import java.util.Objects;
-
-@Data
 @Entity
 @Table(name = "actions")
-public class ActionEntity extends AbstractAuditingEntity {
+class ActionEntity : AbstractAuditingEntity() {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "actions_seq_gen")
     @SequenceGenerator(name = "actions_seq_gen")
-    private Long id;
+    val id: Long? = null
 
-    @Column(name = "ext_id")
-    private String extId;
-    private String name;
-    private String type;
-    private String icon;
+    @Column(unique = true)
+    lateinit var extId: String
+
+    var name: String? = null
+    var type: String? = null
+    var icon: String? = null
 
     @Lob
     @Column(name = "config_json")
-    private String configJson;
+    var configJson: String? = null
 
-    @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToOne(cascade = [CascadeType.ALL], fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "evaluator")
-    private EvaluatorEntity evaluator;
+    var evaluator: EvaluatorEntity? = null
+    var confirm: String? = null
+    var result: String? = null
+    var features: String? = null
+    var pluralName: String? = null
+    var predicate: String? = null
 
-    private String confirm;
-    private String result;
-    private String features;
-    private String pluralName;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
+            return true
         }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
+        if (other == null || javaClass != other.javaClass) {
+            return false
         }
-        ActionEntity that = (ActionEntity) o;
-        return Objects.equals(id, that.id);
+        val that = other as ActionEntity
+        return id == that.id
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+    override fun hashCode(): Int {
+        return Objects.hash(id)
     }
 }
