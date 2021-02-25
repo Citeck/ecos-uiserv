@@ -4,18 +4,18 @@ import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
-import ru.citeck.ecos.records3.record.op.query.dao.RecordsQueryDao
-import ru.citeck.ecos.records3.record.op.query.dto.RecsQueryRes
-import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery
+import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
+import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 
 @Component
 class AdminPageSections : AbstractRecordsDao(), RecordsQueryDao {
 
     override fun getId() = "admin-page-section"
 
-    override fun queryRecords(query: RecordsQuery): RecsQueryRes<*>? {
+    override fun queryRecords(recsQuery: RecordsQuery): RecsQueryRes<*>? {
 
-        if (query.language != "groups") {
+        if (recsQuery.language != "groups") {
             return null
         }
 

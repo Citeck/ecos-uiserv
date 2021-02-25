@@ -10,15 +10,15 @@ import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.commons.json.YamlUtils.toNonDefaultString
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
-import ru.citeck.ecos.records3.record.op.atts.dao.RecordAttsDao
-import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName
-import ru.citeck.ecos.records3.record.op.atts.service.value.AttValue
-import ru.citeck.ecos.records3.record.op.delete.dao.RecordDeleteDao
-import ru.citeck.ecos.records3.record.op.delete.dto.DelStatus
-import ru.citeck.ecos.records3.record.op.mutate.dao.RecordMutateDtoDao
-import ru.citeck.ecos.records3.record.op.query.dao.RecordsQueryDao
-import ru.citeck.ecos.records3.record.op.query.dto.RecsQueryRes
-import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery
+import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
+import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
+import ru.citeck.ecos.records3.record.atts.value.AttValue
+import ru.citeck.ecos.records3.record.dao.delete.RecordDeleteDao
+import ru.citeck.ecos.records3.record.dao.delete.DelStatus
+import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao
+import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
+import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService
 import ru.citeck.ecos.uiserv.domain.menu.api.records.MenuRecords.MenuRecord
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
@@ -66,7 +66,7 @@ class MenuRecords(
             val menuQuery = recordsQuery.getQueryOrNull(MenuQuery::class.java)
 
             if (menuQuery != null && StringUtils.isNotBlank(menuQuery.user)) {
-                val menuDto = menuService.getMenuForUser(menuQuery.user, menuQuery.version)
+                val menuDto = menuService.getMenuForCurrentUser(/*menuQuery.user, */menuQuery.version)
                 return RecsQueryRes.of(MenuRecord(menuDto))
             }
         }

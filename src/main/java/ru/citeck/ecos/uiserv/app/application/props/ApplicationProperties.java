@@ -22,9 +22,9 @@ import static java.util.stream.Collectors.toList;
 @Getter
 @Setter
 public class ApplicationProperties {
+
     private List<String> menuConfigAuthorityOrder;
     private String defaultThemeId;
-    private String tryHeaderForUsername;
 
     public void setMenuConfigAuthorityOrder(String orderString) {
         this.menuConfigAuthorityOrder = Arrays.stream(orderString.split(","))

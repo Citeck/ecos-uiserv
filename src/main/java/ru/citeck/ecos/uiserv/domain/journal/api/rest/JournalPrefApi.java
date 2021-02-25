@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
@@ -114,11 +115,10 @@ public class JournalPrefApi {
 
     @GetMapping("/list")
     public List<JournalPrefService.JournalPreferences> getJournalPrefs(@RequestParam String journalId,
-                                                                       @ModelAttribute("username") @NonNull
-                                                                           String username,
                                                                        @RequestParam(defaultValue = "true")
                                                                            Boolean includeUserLocal) {
-        username = validateUsername(username);
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
         List<JournalSettingsDto> settings = journalSettingsService.getSettings(username, journalId);
         List<JournalPrefService.JournalPreferences> preferences =

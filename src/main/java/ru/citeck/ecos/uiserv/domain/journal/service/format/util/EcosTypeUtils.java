@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.model.lib.type.dto.CreateVariantDef;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName;
+import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 
 import javax.annotation.PostConstruct;
 import java.util.Collections;

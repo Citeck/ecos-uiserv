@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.domain.journal.api.records
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.model.lib.attributes.dto.AttOptionDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 import ru.citeck.ecos.records2.RecordRef
@@ -22,7 +23,7 @@ class ColumnEditorResolver(
             return
         }
 
-        val attOptions = typeAtt?.options ?: emptyList()
+        val attOptions = emptyList<AttOptionDef>() //typeAtt?.options ?: emptyList()
         if (attOptions.isNotEmpty()) {
             val config = ObjectData.create()
             config.set("options", attOptions.map {

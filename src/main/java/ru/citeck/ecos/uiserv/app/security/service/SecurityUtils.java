@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.app.security.service;
 
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -58,11 +59,8 @@ public final class SecurityUtils {
         if (StringUtils.isNotBlank(userName)) {
             return userName;
         }
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        if (requestAttributes != null) {
-            return (String) requestAttributes.getAttribute(REQUEST_USERNAME_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
-        }
-        return null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null ? authentication.getName() : null;
     }
 
     /**

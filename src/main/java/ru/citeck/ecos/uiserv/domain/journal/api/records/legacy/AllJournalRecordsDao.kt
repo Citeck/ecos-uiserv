@@ -3,9 +3,9 @@ package ru.citeck.ecos.uiserv.domain.journal.api.records.legacy
 import lombok.extern.slf4j.Slf4j
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
-import ru.citeck.ecos.records3.record.op.atts.dao.RecordAttsDao
-import ru.citeck.ecos.records3.record.op.query.dao.RecordsQueryDao
-import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery
+import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
+import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.uiserv.domain.journal.api.records.ResolvedJournalRecordsDao
 
 @Slf4j
@@ -18,11 +18,11 @@ class AllJournalRecordsDao(
 
     override fun getId() = "journal_all"
 
-    override fun queryRecords(query: RecordsQuery): Any? {
-        return resolvedJournalRecordsDao.queryRecords(query)
+    override fun queryRecords(recsQuery: RecordsQuery): Any? {
+        return resolvedJournalRecordsDao.queryRecords(recsQuery)
     }
 
-    override fun getRecordAtts(record: String): Any? {
-        return resolvedJournalRecordsDao.getRecordAtts(record)
+    override fun getRecordAtts(recordId: String): Any? {
+        return resolvedJournalRecordsDao.getRecordAtts(recordId)
     }
 }

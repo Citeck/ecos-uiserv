@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.domain.menu.service;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.commons.data.DataValue;
@@ -118,19 +119,16 @@ public class MenuService {
         return dto;
     }
 
-    public MenuDto getMenuForUser(String username, Integer version) {
-        return getMenuForUser(username, null, version);
-    }
+    public MenuDto getMenuForCurrentUser(Integer version) {
 
-    public MenuDto getMenuForUser(String username, Set<String> authorities, Integer version) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        MenuDto menu = findFirstByAuthorities(Collections.singletonList(username), version)
+        MenuDto menu = findFirstByAuthorities(Collections.singletonList(userName), version)
             .orElseGet(() -> {
 
-                Set<String> authToRequest =  new HashSet<>(authorities != null ?
-                    authorities : authoritiesSupport.queryUserAuthorities(username));
+                Set<String> authToRequest = new HashSet<>(authoritiesSupport.getCurrentUserAuthorities());
 
-                authToRequest.remove(username);
+                authToRequest.remove(userName);
                 List<String> orderedAuthorities = getOrderedAuthorities(authToRequest);
                 return findFirstByAuthorities(orderedAuthorities, version).orElse(null);
             });
@@ -140,9 +138,9 @@ public class MenuService {
         return menu;
     }
 
-    public ResolvedMenuDto getResolvedMenuForUser(String username) {
-        Set<String> authorities = new HashSet<>(authoritiesSupport.queryUserAuthorities(username));
-        MenuDto dto = getMenuForUser(username, authorities, null);
+    public ResolvedMenuDto getResolvedMenuForCurrentUser() {
+        Set<String> authorities = new HashSet<>(authoritiesSupport.getCurrentUserAuthorities());
+        MenuDto dto = getMenuForCurrentUser(null);
         return resolveMenu(dto, authorities);
     }
 

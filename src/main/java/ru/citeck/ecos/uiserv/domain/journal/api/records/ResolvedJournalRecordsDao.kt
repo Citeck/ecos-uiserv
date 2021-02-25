@@ -15,10 +15,10 @@ import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.Predicates
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
-import ru.citeck.ecos.records3.record.op.atts.dao.RecordAttsDao
-import ru.citeck.ecos.records3.record.op.query.dao.RecordsQueryDao
-import ru.citeck.ecos.records3.record.op.query.dto.RecsQueryRes
-import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery
+import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
+import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
+import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.domain.ecostype.dto.EcosTypeInfo
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
@@ -40,9 +40,9 @@ class ResolvedJournalRecordsDao(
 
     override fun getId() = "rjournal"
 
-    override fun queryRecords(query: RecordsQuery): Any? {
+    override fun queryRecords(recsQuery: RecordsQuery): Any? {
 
-        val records = journalRecordsDao.queryRecords(query)
+        val records = journalRecordsDao.queryRecords(recsQuery)
 
         val result = RecsQueryRes<Any>()
         result.setHasMore(records.getHasMore())
@@ -51,8 +51,8 @@ class ResolvedJournalRecordsDao(
         return result
     }
 
-    override fun getRecordAtts(record: String): Any? {
-        return resolveJournal(journalRecordsDao.getRecordAtts(record))
+    override fun getRecordAtts(recordId: String): Any? {
+        return resolveJournal(journalRecordsDao.getRecordAtts(recordId))
     }
 
     private fun resolveJournal(journal: JournalRecordsDao.JournalRecord): ResolvedJournalDef {

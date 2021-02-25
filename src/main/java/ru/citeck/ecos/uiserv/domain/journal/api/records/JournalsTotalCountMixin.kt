@@ -6,11 +6,11 @@ import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
 import ru.citeck.ecos.records3.RecordsService
-import ru.citeck.ecos.records3.record.op.atts.service.mixin.AttMixin
-import ru.citeck.ecos.records3.record.op.atts.service.value.AttValueCtx
-import ru.citeck.ecos.records3.record.op.query.dto.query.Consistency
-import ru.citeck.ecos.records3.record.op.query.dto.query.QueryPage
-import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery
+import ru.citeck.ecos.records3.record.atts.value.AttValueCtx
+import ru.citeck.ecos.records3.record.dao.query.dto.query.Consistency
+import ru.citeck.ecos.records3.record.dao.query.dto.query.QueryPage
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
+import ru.citeck.ecos.records3.record.mixin.AttMixin
 import javax.annotation.PostConstruct
 
 @Component

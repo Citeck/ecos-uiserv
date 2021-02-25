@@ -2,7 +2,7 @@ package ru.citeck.ecos.uiserv.domain.journal.dto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName;
+import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 
 import java.time.Instant;
 

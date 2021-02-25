@@ -182,10 +182,6 @@ application:
   default-theme-id: citeckTheme
   #Раньше располагался в конфиге ecos под тем же названием
   menu-config-authority-order:
-  #A header to look for username if not found in a cookie;
-  #  can turn this attempt off by setting this to empty,
-  #  in particular with "-Dapplication.try-header-for-username="
-  try-header-for-username: X-ECOS-User,X-Alfresco-Remote-User
 
 uiserv:
   alfresco-service-url: 'http://alfresco/alfresco/s/'

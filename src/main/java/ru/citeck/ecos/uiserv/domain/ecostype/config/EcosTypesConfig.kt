@@ -7,8 +7,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.core.task.AsyncTaskExecutor
-import ru.citeck.ecos.commons.data.MLText
-import ru.citeck.ecos.model.lib.type.dto.TypeDef
 import ru.citeck.ecos.model.lib.type.dto.TypeModelDef
 import ru.citeck.ecos.model.lib.type.repo.TypesRepo
 import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
@@ -103,20 +101,16 @@ class EcosTypesConfig(
 
         return object : TypesRepo {
 
-            override fun getChildren(typeRef: RecordRef): List<RecordRef> {
-                return childrenByType[typeRef] ?: emptyList()
+            override fun getModel(typeRef: RecordRef): TypeModelDef {
+                return typesDao.getRecord(typeRef.id).orElse(null)?.model ?: return TypeModelDef.EMPTY
             }
 
-            override fun getTypeDef(typeRef: RecordRef): TypeDef? {
+            override fun getParent(typeRef: RecordRef): RecordRef {
+                return typesDao.getRecord(typeRef.id).orElse(null)?.parentRef ?: RecordRef.EMPTY
+            }
 
-                val typeInfo = typesDao.getRecord(typeRef.id).orElse(null) ?: return null
-
-                return TypeDef.create()
-                    .withId(typeInfo.id)
-                    .withName(typeInfo.name ?: MLText())
-                    .withParentRef(typeInfo.parentRef)
-                    .withModel(typeInfo.model ?: TypeModelDef.EMPTY)
-                    .build()
+            override fun getChildren(typeRef: RecordRef): List<RecordRef> {
+                return childrenByType[typeRef] ?: emptyList()
             }
         }
     }

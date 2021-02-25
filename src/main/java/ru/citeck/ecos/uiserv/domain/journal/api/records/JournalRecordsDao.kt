@@ -13,15 +13,14 @@ import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
-import ru.citeck.ecos.records3.record.op.atts.dao.RecordAttsDao
-import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName
-import ru.citeck.ecos.records3.record.op.delete.dao.RecordDeleteDao
-import ru.citeck.ecos.records3.record.op.delete.dto.DelStatus
-import ru.citeck.ecos.records3.record.op.mutate.dao.RecordMutateDtoDao
-import ru.citeck.ecos.records3.record.op.query.dao.RecordsQueryDao
-import ru.citeck.ecos.records3.record.op.query.dto.RecsQueryRes
-import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery
-import ru.citeck.ecos.records3.record.request.RequestContext
+import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
+import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
+import ru.citeck.ecos.records3.record.dao.delete.DelStatus
+import ru.citeck.ecos.records3.record.dao.delete.RecordDeleteDao
+import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao
+import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
+import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
@@ -47,17 +46,17 @@ class JournalRecordsDao(
 
     override fun getId() = ID
 
-    override fun queryRecords(query: RecordsQuery): RecsQueryRes<JournalRecord> {
+    override fun queryRecords(recsQuery: RecordsQuery): RecsQueryRes<JournalRecord> {
 
-        if (query.language == "site-journals") {
+        if (recsQuery.language == "site-journals") {
             return RecsQueryRes()
         }
 
         val result = RecsQueryRes<JournalWithMeta>()
 
-        if (query.language == "by-type") {
+        if (recsQuery.language == "by-type") {
 
-            val typeRef = query.getQuery(JournalQueryByTypeRef::class.java).typeRef ?: RecordRef.EMPTY
+            val typeRef = recsQuery.getQuery(JournalQueryByTypeRef::class.java).typeRef ?: RecordRef.EMPTY
             val journalRef = ecosTypeService.getJournalRefByTypeRef(typeRef)
 
             if (RecordRef.isNotEmpty(journalRef)) {
@@ -69,18 +68,18 @@ class JournalRecordsDao(
 
         } else {
 
-            if (query.language == PredicateService.LANGUAGE_PREDICATE) {
-                val predicate = query.getQuery(Predicate::class.java)
-                var max: Int = query.page.maxItems
+            if (recsQuery.language == PredicateService.LANGUAGE_PREDICATE) {
+                val predicate = recsQuery.getQuery(Predicate::class.java)
+                var max: Int = recsQuery.page.maxItems
                 if (max <= 0) {
                     max = 10000
                 }
-                val journals = journalService.getAll(max, query.page.skipCount, predicate)
+                val journals = journalService.getAll(max, recsQuery.page.skipCount, predicate)
                 result.setRecords(ArrayList(journals))
                 result.setTotalCount(journalService.getCount(predicate))
             } else {
                 result.setRecords(ArrayList(
-                    journalService.getAll(query.page.maxItems, query.page.skipCount))
+                    journalService.getAll(recsQuery.page.maxItems, recsQuery.page.skipCount))
                 )
                 result.setTotalCount(journalService.count)
             }
