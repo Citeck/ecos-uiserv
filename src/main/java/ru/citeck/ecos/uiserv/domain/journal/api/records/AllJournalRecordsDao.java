@@ -55,7 +55,11 @@ public class AllJournalRecordsDao extends LocalRecordsDao
             JournalWithMeta result = new JournalWithMeta();
             JournalConfigResp metaV1 = metaV1List.get(0);
 
-            result.setLabel(new MLText(metaV1.getDisplayName()));
+            String dispName = metaV1.getDisplayName();
+            if (StringUtils.isBlank(dispName)) {
+                dispName = "Journal";
+            }
+            result.setLabel(new MLText(dispName));
             result.setId(recordRef.getId());
             return result;
         }
