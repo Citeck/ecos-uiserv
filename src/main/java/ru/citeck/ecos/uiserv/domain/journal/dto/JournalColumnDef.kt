@@ -196,7 +196,7 @@ class JournalColumnDef(
         }
 
         fun withAttSchema(attSchema: String?): Builder {
-            this.attSchema = attSchema
+            this.attSchema = attSchema ?: ""
             return this
         }
 
