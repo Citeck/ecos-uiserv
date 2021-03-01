@@ -33,6 +33,12 @@ class ColumnFormatterResolver(
                     }
                 }
             }
+            AttributeType.DATE -> {
+                column.withFormatter(ColumnFormatterDef.create { withType("date") })
+            }
+            AttributeType.DATETIME -> {
+                column.withFormatter(ColumnFormatterDef.create { withType("datetime") })
+            }
             else -> {
                 //do nothing
             }
