@@ -39,6 +39,8 @@ class JournalColumnDef(
      */
     val attribute: String,
 
+    val attSchema: String,
+
     val editor: ColumnEditorDef,
 
     val formatter: ColumnFormatterDef,
@@ -123,6 +125,7 @@ class JournalColumnDef(
         var name: MLText = MLText.EMPTY
         var type: AttributeType? = null
         var attribute: String = ""
+        var attSchema: String = ""
         var editor: ColumnEditorDef = ColumnEditorDef.EMPTY
         var formatter: ColumnFormatterDef = ColumnFormatterDef.EMPTY
         var searchable: Boolean? = null
@@ -141,6 +144,7 @@ class JournalColumnDef(
             name = base.name
             type = base.type
             attribute = base.attribute
+            attSchema = base.attSchema
             editor = base.editor
             formatter = base.formatter
             searchable = base.searchable
@@ -188,6 +192,11 @@ class JournalColumnDef(
 
         fun withAttribute(attribute: String?): Builder {
             this.attribute = attribute ?: ""
+            return this
+        }
+
+        fun withAttSchema(attSchema: String?): Builder {
+            this.attSchema = attSchema
             return this
         }
 
@@ -258,6 +267,7 @@ class JournalColumnDef(
                 name,
                 type,
                 attribute,
+                attSchema,
                 editor,
                 formatter,
                 searchable,
