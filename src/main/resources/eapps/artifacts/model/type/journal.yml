@@ -8,8 +8,10 @@ system: true
 
 sourceId: uiserv/journal
 
-form: uiserv/form@journal-form
+formRef: uiserv/form@journal-form
 journalRef: uiserv/journal@ecos-journals
+
+defaultCreateVariant: false
 
 createVariants:
 
