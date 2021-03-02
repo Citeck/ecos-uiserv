@@ -19,7 +19,7 @@ class JournalMapper(
 
     fun entityToDto(entity: JournalEntity): JournalWithMeta {
 
-        val dto = JournalWithMeta()
+        val dto = JournalWithMeta(true)
 
         dto.journalDef = JournalDef.create()
             .withId(entity.extId)

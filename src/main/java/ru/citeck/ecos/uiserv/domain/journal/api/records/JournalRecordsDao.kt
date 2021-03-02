@@ -92,11 +92,11 @@ class JournalRecordsDao(
         return res
     }
 
-    override fun getRecordAtts(record: String): JournalRecord {
-        val dto = if (record.isEmpty()) {
-            JournalWithMeta()
+    override fun getRecordAtts(recordId: String): JournalRecord {
+        val dto = if (recordId.isEmpty()) {
+            JournalWithMeta(false)
         } else {
-            journalService.getById(record) ?: JournalWithMeta()
+            journalService.getById(recordId) ?: JournalWithMeta(false)
         }
         return JournalRecord(dto)
     }

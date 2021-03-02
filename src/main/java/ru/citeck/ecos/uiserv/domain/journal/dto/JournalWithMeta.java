@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.domain.journal.dto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import ru.citeck.ecos.records2.RecordConstants;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 
 import java.time.Instant;
@@ -23,7 +24,11 @@ public class JournalWithMeta {
     @AttName("_creator")
     private String creator;
 
-    public JournalWithMeta() {
+    @AttName(RecordConstants.ATT_NOT_EXISTS)
+    private boolean notExists;
+
+    public JournalWithMeta(boolean exists) {
+        this.notExists = !exists;
     }
 
     public JournalWithMeta(JournalWithMeta other) {
@@ -32,6 +37,7 @@ public class JournalWithMeta {
         this.modifier = other.modifier;
         this.created = other.created;
         this.creator = other.creator;
+        this.notExists = other.notExists;
     }
 
     public JournalDef getJournalDef() {
