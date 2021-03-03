@@ -176,6 +176,13 @@ class AdminPageSections : AbstractRecordsDao(), RecordsQueryDao {
                         }""".trimIndent())
                     ),
                     PageSection(
+                        MLText("Источники данных"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "ecos-data-sources"
+                        }""".trimIndent())
+                    ),
+                    PageSection(
                         MLText("Конфигурация ящиков ЭДО"),
                         SectionType.JOURNAL,
                         ObjectData.create("""{
