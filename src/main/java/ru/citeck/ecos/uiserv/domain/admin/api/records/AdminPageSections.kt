@@ -164,6 +164,53 @@ class AdminPageSections : AbstractRecordsDao(), RecordsQueryDao {
                         }""".trimIndent())
                     )
                 )
+            ),
+            PageSectionGroup(
+                MLText("Интеграции"),
+                listOf(
+                    PageSection(
+                        MLText("Синхронизации"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "ecos-sync"
+                        }""".trimIndent())
+                    ),
+                    PageSection(
+                        MLText("Конфигурация ящиков ЭДО"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "edi-box"
+                        }""".trimIndent())
+                    ),
+                    PageSection(
+                        MLText("OSGI Пакеты"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "ecos-osgi-bundles"
+                        }""".trimIndent())
+                    ),
+                    PageSection(
+                        MLText("Конфигурация импорта файлов"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "file-import-config"
+                        }""".trimIndent())
+                    ),
+                    PageSection(
+                        MLText("Файлы для импорта"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "file-import-task"
+                        }""".trimIndent())
+                    ),
+                    PageSection(
+                        MLText("Элементы файлового импорта"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "file-import-task-item"
+                        }""".trimIndent())
+                    )
+                )
             )
         )
 
