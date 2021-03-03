@@ -8,7 +8,7 @@ system: true
 
 actions:
   - uiserv/action@view-menu
-  - uiserv/action@download-base64-data-yml
+  - uiserv/action@ecos-module-download
   - uiserv/action@delete
   - uiserv/action@edit-menu
   - uiserv/action@copy-menu
