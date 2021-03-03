@@ -166,7 +166,7 @@ class AdminPageSections : AbstractRecordsDao(), RecordsQueryDao {
                 )
             ),
             PageSectionGroup(
-                MLText("Интеграции"),
+                MLText("Интеграция"),
                 listOf(
                     PageSection(
                         MLText("Синхронизации"),
