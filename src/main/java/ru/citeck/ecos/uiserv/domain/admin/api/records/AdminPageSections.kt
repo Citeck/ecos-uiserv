@@ -183,6 +183,13 @@ class AdminPageSections : AbstractRecordsDao(), RecordsQueryDao {
                         }""".trimIndent())
                     ),
                     PageSection(
+                        MLText("Credentials"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "ecos-credentials"
+                        }""".trimIndent())
+                    ),
+                    PageSection(
                         MLText("Конфигурация ящиков ЭДО"),
                         SectionType.JOURNAL,
                         ObjectData.create("""{
