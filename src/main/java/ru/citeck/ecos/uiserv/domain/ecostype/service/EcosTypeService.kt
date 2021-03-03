@@ -14,7 +14,8 @@ class EcosTypeService(
         if (RecordRef.isEmpty(journalRef)) {
             return RecordRef.EMPTY
         }
-        return typesConfig.getTypeRefByJournal(journalRef)
+        val ref = RecordRef.create("uiserv", "journal", journalRef.id);
+        return typesConfig.getTypeRefByJournal(ref)
     }
 
     fun getJournalRefByTypeRef(typeRef: RecordRef): RecordRef {

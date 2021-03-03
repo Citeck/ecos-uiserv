@@ -139,7 +139,7 @@ class ResolvedMenuRecords(
 
                 } else if (item0.type == "JOURNAL") {
 
-                    val variantsRes = variants.computeIfAbsent("_ROOT") { ArrayList() }
+                    val variantsRes = variants.computeIfAbsent(section.id) { ArrayList() }
                     extractCreateVariantsFromItem(item0, variantsRes, visitedTypes)
                 }
             }
