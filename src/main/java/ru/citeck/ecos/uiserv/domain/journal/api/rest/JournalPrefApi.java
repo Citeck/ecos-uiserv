@@ -2,13 +2,14 @@ package ru.citeck.ecos.uiserv.domain.journal.api.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.uiserv.app.common.service.AuthoritiesSupport;
+import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils;
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType;
 import ru.citeck.ecos.uiserv.domain.file.service.FileService;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSettingsDto;
@@ -27,6 +28,7 @@ public class JournalPrefApi {
     private final JournalPrefService journalPrefService;
     private final FileService fileService;
     private final ObjectMapper objectMapper;
+    private final AuthoritiesSupport authoritiesSupport;
 
     private final JournalSettingsService journalSettingsService;
 
@@ -35,9 +37,9 @@ public class JournalPrefApi {
      */
     @Deprecated
     @GetMapping
-    public JsonNode getJournalPrefs(@RequestParam String id,
-                                    @ModelAttribute("username") @NonNull String username) {
+    public JsonNode getJournalPrefs(@RequestParam String id) {
 
+        String username = SecurityUtils.getCurrentUserLoginFromRequestContext();
         JournalSettingsDto settings = journalSettingsService.getById(id);
         if (settings != null) {
             if (!username.equals(settings.getAuthority())) {
@@ -55,8 +57,7 @@ public class JournalPrefApi {
     @Deprecated
     @PutMapping
     public void putJournalPrefs(@RequestParam String id,
-                                @RequestBody byte[] bytes,
-                                @ModelAttribute("username") @NonNull String username) {
+                                @RequestBody byte[] bytes) {
         validateBody(bytes);
 
         JournalSettingsDto dto = journalSettingsService.getById(id);
@@ -64,7 +65,10 @@ public class JournalPrefApi {
             fileService.deployFileOverride(FileType.JOURNALPREFS, id, null, bytes);
             return;
         }
-        if (!username.equals(dto.getAuthority())) {
+
+        String username = SecurityUtils.getCurrentUserLoginFromRequestContext();
+
+        if (!Objects.equals(username, dto.getAuthority())) {
             throw new RuntimeException("Access denied");
         }
         dto.setSettings(Json.getMapper().read(bytes, ObjectData.class));
@@ -76,12 +80,13 @@ public class JournalPrefApi {
     }
 
     @DeleteMapping("/id/{journalViewPrefsId}")
-    public void deleteJournalPrefs(@PathVariable String journalViewPrefsId,
-                                   @ModelAttribute("username") @NonNull String username) {
+    public void deleteJournalPrefs(@PathVariable String journalViewPrefsId) {
+
+        String username = SecurityUtils.getCurrentUserLoginFromRequestContext();
 
         JournalSettingsDto settings = journalSettingsService.getById(journalViewPrefsId);
         if (settings != null) {
-            if (!username.equals(settings.getAuthority())) {
+            if (!Objects.equals(username, settings.getAuthority())) {
                 throw new RuntimeException("Access denied");
             } else {
                 journalSettingsService.delete(journalViewPrefsId);
@@ -94,8 +99,9 @@ public class JournalPrefApi {
 
     @PostMapping
     public String postJournalPrefs(@RequestParam String journalId,
-                                   @ModelAttribute("username") @NonNull String username,
                                    @RequestBody byte[] bytes) {
+
+        String username = SecurityUtils.getCurrentUserLoginFromRequestContext();
 
         username = validateUsername(username);
         validateBody(bytes);
