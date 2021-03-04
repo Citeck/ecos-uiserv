@@ -27,7 +27,6 @@
       "Groupable": "Доступна ли группировка?",
       "Editable": "Доступно ли редактирование в таблице?",
       "Hidden": "Атрибут спрятан от пользователя?",
-      "Add columns": "Добавить колонки",
       "Main tab": "Основное",
       "Columns tab": "Колонки",
       "Group Actions": "Групповые действия",
@@ -147,6 +146,20 @@
                             "key": "editable",
                             "type": "checkbox",
                             "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "Добавить колонки",
+                              "en": "Add columns"
+                            },
+                            "action": "custom",
+                            "state": "",
+                            "showValidations": false,
+                            "custom": "\nlet formInstance = instance.root;\nformInstance.showErrors([]);\n\nconst formData = submission.data;\nif (!formData || !formData.sourceId) {\n    formInstance.showErrors(\"Вы должны указать sourceId\");\n}\n\nlet sourceDaoId = \"source\";\nlet journalSourceId = formData.sourceId;\nconst sourceIdSlashIdx = journalSourceId.indexOf('/');\nif (sourceIdSlashIdx > 0) {\n    sourceDaoId = journalSourceId.substring(0, sourceIdSlashIdx) + \"/\" + sourceDaoId;\n    journalSourceId = journalSourceId.substring(sourceIdSlashIdx + 1);\n}\nlet sourceInfoId = Citeck.Records.get(sourceDaoId + '@' + journalSourceId);\nCiteck.Records.get(sourceInfoId).load('columnsSourceId').then(columnsSourceId => {\n\n    if (!columnsSourceId) {\n        formInstance.showErrors(\"Для данного источника данных не настроен источник с колонками.\")\n        return;\n    }\n\n    const currentColumnsSet = {};\n    const currentColumns = _.get(submission, 'data.columns', [])\n    for (let column of currentColumns) {\n        currentColumnsSet[column.name || ''] = true;\n    }\n\n    const applyAutoColumns = (columns) => {\n\n        columns = columns.filter(c => !c.name || !currentColumnsSet[c.name]);\n\n        if (columns.length) {\n            submission = {\n                ...submission,\n                data: {\n                    ...submission.data,\n                    columns: [\n                        ...submission.data.columns,\n                        ...columns\n                    ]\n                }\n            }\n            formInstance.submission = submission;\n        }\n    }\n\n    Citeck.Dialogs.showFormDialog({\n        title: 'Выбор колонок',\n        showDefaultButtons: true,\n        formDefinition: {\n            components: [\n                {\n                    label: 'Колонки',\n                    key: 'selected-columns',\n                    type: \"selectJournal\",\n                    queryData: submission,\n                    customSourceId: columnsSourceId,\n                    journalId: 'journal-columns',\n                    multiple: true\n                }\n            ]\n        },\n        onSubmit: submission => {\n            let columns = submission.data['selected-columns'] || [];\n            console.log('selected columns', columns);\n            Citeck.Records.get(columns)\n                .load({label: 'label{ru,en}', name: 'name'})\n                .then(applyAutoColumns)\n                .catch(e => formInstance.showErrors(e));\n        }\n    });\n\n}).catch(() => formInstance.showErrors(\"Ошибка при загрузке информации по источнику данных\"));\n\n\n",
+                            "block": true,
+                            "key": "submit23",
+                            "type": "button",
+                            "input": true
                           }
                         ],
                         "type": "column",
@@ -170,6 +183,15 @@
                             "type": "selectJournal",
                             "input": true,
                             "reorder": false
+                          },
+                          {
+                            "label": {
+                              "ru": "Тип данных"
+                            },
+                            "journalId": "ecos-types",
+                            "key": "typeRef",
+                            "type": "selectJournal",
+                            "input": true
                           }
                         ]
                       }
@@ -239,7 +261,8 @@
                       },
                       {
                         "label": {
-                          "ru": "Panel"
+                          "ru": "Тип данных",
+                          "en": "Data type"
                         },
                         "key": "panel",
                         "type": "panel",
@@ -311,7 +334,8 @@
                       },
                       {
                         "label": {
-                          "ru": "Panel"
+                          "ru": "Дополнительно",
+                          "en": "Additional"
                         },
                         "key": "panel2",
                         "type": "panel",
@@ -363,18 +387,6 @@
                 "columns": [
                   {
                     "components": [
-                      {
-                        "label": {
-                          "ru": "Тип данных"
-                        },
-                        "description": {
-                          "ru": "По умолчанию загружается из связи type -> journal и здесь настройка не требуется"
-                        },
-                        "journalId": "ecos-types",
-                        "key": "typeRef",
-                        "type": "selectJournal",
-                        "input": true
-                      },
                       {
                         "label": {
                           "en": "Source ID",
