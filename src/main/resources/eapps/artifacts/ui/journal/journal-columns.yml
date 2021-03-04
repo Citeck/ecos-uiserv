@@ -8,10 +8,10 @@ system: true
 
 columns:
 
-  - id: label
+  - id: name
     name: { ru: Наименование, en: Label }
     type: TEXT
 
-  - id: name
+  - id: columnId
     name: { ru: Системное имя, en: System name }
     type: TEXT
