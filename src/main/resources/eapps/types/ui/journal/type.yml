@@ -9,8 +9,3 @@ name:
 
 controller:
   type: json
-  config:
-    metaFields:
-      name: 'label'
-
-
