@@ -174,6 +174,10 @@ class JournalRecordsDao(
             localId = base.id
         }
 
+        fun setModuleId(moduleId: String) {
+            this.localId = moduleId
+        }
+
         @JsonProperty("_content")
         fun setContent(content: List<ObjectData>) {
             val dataUriContent = content[0].get("url", "")
