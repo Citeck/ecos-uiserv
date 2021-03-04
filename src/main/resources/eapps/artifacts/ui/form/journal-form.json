@@ -213,10 +213,13 @@
                     "layoutFixed": false,
                     "enableRowGroups": false,
                     "multiple": true,
-                    "reorder": false,
+                    "reorder": true,
                     "defaultValue": [
                       {
-                        "name": "",
+                        "name": {
+                          "ru": "",
+                          "en": ""
+                        },
                         "label2": {
                           "ru": "",
                           "en": ""
@@ -228,7 +231,8 @@
                           "en": ""
                         },
                         "select": "",
-                        "type": ""
+                        "type": "",
+                        "id": ""
                       }
                     ],
                     "validate": {
@@ -377,6 +381,127 @@
             ]
           },
           {
+            "label": "Actions",
+            "key": "actions",
+            "components": [
+              {
+                "label": {
+                  "ru": "Panel"
+                },
+                "key": "panel4",
+                "type": "panel",
+                "input": false,
+                "components": [
+                  {
+                    "label": {
+                      "ru": "Actions Configuration"
+                    },
+                    "disableAddingRemovingRows": false,
+                    "addAnother": "",
+                    "addAnotherPosition": "bottom",
+                    "removePlacement": "col",
+                    "defaultOpen": false,
+                    "layoutFixed": false,
+                    "enableRowGroups": false,
+                    "reorder": false,
+                    "defaultValue": [
+                      {
+                        "textField": "",
+                        "id2": "",
+                        "mlText": {
+                          "ru": "",
+                          "en": ""
+                        },
+                        "name2": {
+                          "ru": "",
+                          "en": ""
+                        },
+                        "type2": "",
+                        "value": "Value",
+                        "config": {},
+                        "type": "",
+                        "id": "",
+                        "name": {
+                          "ru": "",
+                          "en": ""
+                        },
+                        "configMap": {}
+                      }
+                    ],
+                    "validate": {
+                      "minLength": "",
+                      "maxLength": ""
+                    },
+                    "key": "actionsDef",
+                    "type": "datagrid",
+                    "input": true,
+                    "components": [
+                      {
+                        "label": {
+                          "ru": "Panel"
+                        },
+                        "key": "panel5",
+                        "type": "panel",
+                        "input": false,
+                        "components": [
+                          {
+                            "label": {
+                              "ru": "Id"
+                            },
+                            "defaultValue": "",
+                            "key": "id",
+                            "type": "textfield",
+                            "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "Имя",
+                              "en": "Name"
+                            },
+                            "key": "name",
+                            "type": "mlText",
+                            "input": true
+                          }
+                        ],
+                        "row": "0-0"
+                      },
+                      {
+                        "label": {
+                          "ru": "Panel"
+                        },
+                        "key": "panel6",
+                        "type": "panel",
+                        "input": false,
+                        "components": [
+                          {
+                            "label": {
+                              "ru": "Тип",
+                              "en": "Type"
+                            },
+                            "defaultValue": "",
+                            "key": "type",
+                            "type": "textfield",
+                            "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "Config"
+                            },
+                            "keyLabel": "",
+                            "key": "configMap",
+                            "type": "datamap",
+                            "input": true
+                          }
+                        ],
+                        "row": "0-1"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
             "label": "Advanced",
             "key": "advanced",
             "components": [
@@ -502,7 +627,8 @@
                 ],
                 "key": "columns3",
                 "type": "columns",
-                "input": false
+                "input": false,
+                "tab": 2
               }
             ]
           }

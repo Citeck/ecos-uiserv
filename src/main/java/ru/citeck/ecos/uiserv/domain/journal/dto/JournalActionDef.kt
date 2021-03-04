@@ -78,6 +78,12 @@ data class JournalActionDef(
             this.predicate = Json.mapper.copy(base.predicate) ?: VoidPredicate.INSTANCE
         }
 
+        fun withConfigMap(map: Map<String, String>) {
+            val obj = ObjectData.create();
+            map.forEach { (k, v) -> obj.set(k, v)}
+            withConfig(obj);
+        }
+
         fun withId(id: String): Builder {
             this.id = id
             return this

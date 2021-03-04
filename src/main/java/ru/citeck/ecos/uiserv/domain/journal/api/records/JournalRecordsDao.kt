@@ -22,6 +22,7 @@ import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalActionDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
@@ -124,6 +125,24 @@ class JournalRecordsDao(
         val typeRef: RecordRef? = null
     )
 
+    class ActionDefRecord(
+        @AttName("...")
+        val actionDef: JournalActionDef
+    ) {
+        fun getConfigMap(): Map<String, String> {
+
+            val map = HashMap<String, String>()
+            actionDef.config.forEach { k, v ->
+                map[k] = if (v.isObject()) {
+                    v.toString()
+                } else {
+                    v.asText()
+                }
+            }
+            return map
+        }
+    }
+
     open class JournalRecord(base: JournalWithMeta) : JournalWithMeta(base) {
 
         fun getModuleId(): String {
@@ -136,6 +155,10 @@ class JournalRecordsDao(
 
         @AttName("?type")
         fun getType(): RecordRef = RecordRef.valueOf("emodel/type@journal")
+
+        fun getActionsDef(): List<ActionDefRecord> {
+            return journalDef.actionsDef.map { ActionDefRecord(it) }
+        }
 
         @AttName("?disp")
         fun getDisplayName(): MLText {
