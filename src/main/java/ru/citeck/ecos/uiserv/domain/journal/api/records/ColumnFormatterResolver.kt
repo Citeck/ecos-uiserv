@@ -43,5 +43,11 @@ class ColumnFormatterResolver(
                 //do nothing
             }
         }
+
+        if (column.formatter.type.isBlank()) {
+            if (column.id == "cm:title" || column.id == "_disp") {
+                column.withFormatter(ColumnFormatterDef.create { withType("link") })
+            }
+        }
     }
 }
