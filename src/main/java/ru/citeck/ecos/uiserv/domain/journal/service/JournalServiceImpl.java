@@ -157,9 +157,9 @@ public class JournalServiceImpl implements JournalService {
         PredicateDto predicateDto = PredicateUtils.convertToDto(predicate, PredicateDto.class);
         Specification<JournalEntity> spec = null;
 
-        if (StringUtils.isNotBlank(predicateDto.label)) {
+        if (StringUtils.isNotBlank(predicateDto.name)) {
             spec = (root, query, builder) ->
-                builder.like(builder.lower(root.get("label")), "%" + predicateDto.label.toLowerCase() + "%");
+                builder.like(builder.lower(root.get("name")), "%" + predicateDto.name.toLowerCase() + "%");
         }
         if (StringUtils.isNotBlank(predicateDto.localId)) {
             Specification<JournalEntity> idSpec = (root, query, builder) ->
@@ -172,7 +172,7 @@ public class JournalServiceImpl implements JournalService {
 
     @Data
     public static class PredicateDto {
-        private String label;
+        private String name;
         private String localId;
     }
 }
