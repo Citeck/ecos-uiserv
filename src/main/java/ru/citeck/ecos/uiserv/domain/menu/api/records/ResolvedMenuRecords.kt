@@ -177,9 +177,15 @@ class ResolvedMenuRecords(
                     cvItemDef.withId("${it.typeRef}-${it.id}")
 
                     val config = ObjectData.create()
-                    config.set("recordRef", it.typeRef)
+
+                    config.set("typeRef", it.typeRef.toString())
                     config.set("variantId", it.id)
+
+                    // todo: remove it
+                    config.set("recordRef", it.typeRef)
                     config.set("variant", it)
+                    // end of todo
+
                     cvItemDef.withConfig(config)
 
                     cvItemDef.withType("LINK-CREATE-CASE")
