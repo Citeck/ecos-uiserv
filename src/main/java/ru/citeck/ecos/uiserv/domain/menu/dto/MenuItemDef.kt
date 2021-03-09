@@ -38,6 +38,10 @@ class MenuItemDef(
         }
     }
 
+    fun copy(): Builder {
+        return Builder(this)
+    }
+
     class Builder() {
 
         var id: String = ""

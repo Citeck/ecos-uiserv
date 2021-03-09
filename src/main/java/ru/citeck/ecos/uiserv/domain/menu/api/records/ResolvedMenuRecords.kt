@@ -180,11 +180,9 @@ class ResolvedMenuRecords(
 
                     config.set("typeRef", it.typeRef.toString())
                     config.set("variantId", it.id)
-
-                    // todo: remove it
                     config.set("recordRef", it.typeRef)
+
                     config.set("variant", it)
-                    // end of todo
 
                     cvItemDef.withConfig(config)
 
@@ -245,13 +243,33 @@ class ResolvedMenuRecords(
         }
 
         private fun processMenuItem(item: MenuItemDef, authorities: Set<String>): MenuItemDef? {
+
             if (item.hidden) {
                 return null
             }
             if (item.allowedFor.isNotEmpty() && !item.allowedFor.any { authorities.contains(it) }) {
                 return null
             }
-            return item
+
+            val newItem = item.copy()
+
+            if (item.type == "LINK-CREATE-CASE") {
+                val typeRef = RecordRef.valueOf(item.config.get("typeRef").asText())
+                val variantId = item.config.get("variantId").asText();
+                if (RecordRef.isNotEmpty(typeRef)) {
+                    val typeInfo = ecosTypeService.getTypeInfo(typeRef)
+                    val variant = typeInfo?.inhCreateVariants?.find { it.id == variantId }
+                    if (variant != null) {
+                        val newConfig = ObjectData.deepCopyOrNew(item.config)
+                        newConfig.set("variant", variant)
+                        newItem.withConfig(newConfig)
+                    }
+                }
+            }
+
+            newItem.withItems(processMenuItems(newItem.items, authorities))
+
+            return newItem.build()
         }
     }
 }
