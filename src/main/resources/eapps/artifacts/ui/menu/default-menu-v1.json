@@ -328,7 +328,7 @@
                   }
                 },
                 {
-                  "id": "eb529867-4234-4946-9364-add0112ad816",
+                  "id": "dc6da88e-af9c-44dc-953c-6f7f6fff26ca",
                   "label": {
                     "ru": "Каталог"
                   },
@@ -339,7 +339,7 @@
                   }
                 },
                 {
-                  "id": "ef9be5fb-1913-4203-857c-ed72b472ce3b",
+                  "id": "48542876-a5a8-40a5-8a0b-6c8a39973254",
                   "label": {
                     "ru": "Календарь"
                   },
@@ -1370,6 +1370,102 @@
                   }
                 }
               ]
+            }
+          ]
+        },
+        {
+          "id": "6c4a1fee-22e5-448f-aa06-201d9bb012b1",
+          "label": {
+            "ru": "Инструменты администратора"
+          },
+          "allowedFor": ["GROUP_ALFRESCO_ADMINISTRATORS"],
+          "hidden": false,
+          "type": "SECTION",
+          "config": {},
+          "items": [
+            {
+              "id": "b9d460c8-e77e-4b17-bfb1-a2c416c5344f",
+              "label": {
+                "ru": "Репозиторий"
+              },
+              "icon": "ui/icon@i-leftmenu-repository",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/share/page/repository"
+              }
+            },
+            {
+              "id": "3753daa7-77d2-4722-85a8-6f3c790e7e32",
+              "label": {
+                "ru": "Приложение"
+              },
+              "icon": "ui/icon@i-leftmenu-app",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/share/page/console/admin-console/application"
+              }
+            },
+            {
+              "id": "979bfe85-5361-4cf2-a0a3-dd43dabc95b6",
+              "label": {
+                "ru": "Редактор бизнес-процессов"
+              },
+              "icon": "ui/icon@i-leftmenu-bpmn-editor",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/v2/bpmn-designer"
+              }
+            },
+            {
+              "id": "c3f0a948-bebf-4bae-9646-41acece5f3f9",
+              "label": {
+                "ru": "Группы"
+              },
+              "icon": "ui/icon@i-leftmenu-groups",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/share/page/console/admin-console/groups"
+              }
+            },
+            {
+              "id": "c161291d-09c5-488c-b375-4bb8138afc32",
+              "label": {
+                "ru": "Пользователи"
+              },
+              "icon": "ui/icon@i-leftmenu-users",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/share/page/console/admin-console/users"
+              }
+            },
+            {
+              "id": "5635b794-4158-4c97-9961-7e38852a14a4",
+              "label": {
+                "ru": "Инструменты"
+              },
+              "icon": "ui/icon@i-leftmenu-tools",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/v2/dev-tools"
+              }
+            },
+            {
+              "id": "90342505-91c7-446a-909a-c18b1aa930f2",
+              "label": {
+                "ru": "Еще..."
+              },
+              "icon": "ui/icon@i-leftmenu-more",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/share/page/console/admin-console/javascript-console"
+              }
             }
           ]
         }

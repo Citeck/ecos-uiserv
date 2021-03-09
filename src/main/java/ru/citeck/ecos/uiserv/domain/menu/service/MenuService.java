@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.menu.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -22,12 +23,14 @@ import ru.citeck.ecos.uiserv.domain.menu.service.resolving.MenuFactory;
 import ru.citeck.ecos.uiserv.domain.menu.service.resolving.ResolvedMenuDto;
 import ru.citeck.ecos.uiserv.domain.menu.service.resolving.resolvers.MenuItemsResolver;
 
+import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -37,10 +40,15 @@ public class MenuService {
     private static final String DEFAULT_MENU_ID = "default-menu";
     private static final String DEFAULT_MENU_V1_ID = "default-menu-v1";
 
+    private final List<String> CONFIGS_TO_REMOVE = Collections.singletonList(
+        "default-menu-for-admin-v1"
+    );
+
     public static final List<String> DEFAULT_MENUS = Arrays.asList(
         DEFAULT_MENU_ID,
         DEFAULT_MENU_V1_ID
     );
+
     private final MenuRepository menuRepository;
     private final MenuReaderService readerService;
     private final I18nService i18nService;
@@ -50,6 +58,18 @@ public class MenuService {
     private final RecordsService recordsService;
 
     private final List<Consumer<MenuDto>> onChangeListeners = new CopyOnWriteArrayList<>();
+
+    @PostConstruct
+    public void init() {
+        CONFIGS_TO_REMOVE.forEach(cfg -> {
+            MenuEntity menu = menuRepository.findByExtId(cfg).orElse(null);
+            if (menu != null) {
+                MenuDto dtoToRemove = mapToDto(menu);
+                log.info("Remove menu config: " + Json.getMapper().toString(dtoToRemove));
+                menuRepository.delete(menu);
+            }
+        });
+    }
 
     public long getLastModifiedTimeMs() {
         return menuRepository.getLastModifiedTime()
