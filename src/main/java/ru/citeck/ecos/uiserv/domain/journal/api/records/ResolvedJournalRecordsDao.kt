@@ -23,6 +23,7 @@ import ru.citeck.ecos.uiserv.domain.ecostype.dto.EcosTypeInfo
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSortByDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedJournalDef
 import java.util.*
@@ -72,6 +73,7 @@ class ResolvedJournalRecordsDao(
         }
         resolveTypeJournalProps(journalBuilder, typeInfo)
 
+        resolveSorting(journalBuilder)
         resolvePredicate(journalBuilder)
         resolveActionsDef(journalBuilder)
 
@@ -129,6 +131,12 @@ class ResolvedJournalRecordsDao(
         val typeRef = ecosTypeService.getTypeRefByJournal(journalRef)
 
         journal.withTypeRef(typeRef)
+    }
+
+    private fun resolveSorting(journal: JournalDef.Builder) {
+        if (journal.sortBy.isEmpty()) {
+            journal.withSortBy(listOf(JournalSortByDef(RecordConstants.ATT_CREATED, false)))
+        }
     }
 
     private fun resolveTypeJournalProps(journal: JournalDef.Builder, typeInfo: EcosTypeInfo?) {
