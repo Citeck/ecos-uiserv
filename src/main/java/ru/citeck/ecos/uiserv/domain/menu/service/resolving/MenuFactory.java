@@ -2,10 +2,9 @@ package ru.citeck.ecos.uiserv.domain.menu.service.resolving;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.i18n.LocaleContextHolder;
-import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
+import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemActionDef;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDef;
@@ -19,18 +18,13 @@ import java.util.stream.Collectors;
 
 public class MenuFactory {
 
-    private final static String userInGroupEvaluatorId = "user-in-group";
-
-    private final Set<String> authorities;
     private final Function<String, String> i18n;
     private final Map<String, MenuItemsResolver> resolvers;
 
-    public MenuFactory(Set<String> userAuthorities,
-                       Function<String, String> i18n,
+    public MenuFactory(Function<String, String> i18n,
                        List<MenuItemsResolver> resolvers) {
 
         this.i18n = i18n;
-        this.authorities = userAuthorities;
         this.resolvers = resolvers.stream().collect(Collectors.toMap(MenuItemsResolver::getId, Function.identity()));
     }
 
@@ -60,17 +54,13 @@ public class MenuFactory {
         List<ResolvedMenuItemDto> result = new ArrayList<>();
 
         items.forEach(itemDto -> {
-            if (itemDto.isItem() && evaluate(itemDto)) {
-                ResolvedMenuItemDto newElement = new ResolvedMenuItemDto();
-                if (context == null) {
-                    Map<String, String> params = new HashMap<>();
-                    params.put("rootElement", "true");
-                    newElement.setParams(params);
-                }
-                result.add(updateItem(newElement, itemDto));
-            } else if (itemDto.isResolver()) {
-                result.addAll(resolve(itemDto, context));
+            ResolvedMenuItemDto newElement = new ResolvedMenuItemDto();
+            if (context == null) {
+                Map<String, String> params = new HashMap<>();
+                params.put("rootElement", "true");
+                newElement.setParams(params);
             }
+            result.add(updateItem(newElement, itemDto));
         });
         return filterElements(result, context);
     }
@@ -101,7 +91,8 @@ public class MenuFactory {
     //(some of them can be slow because they ask something of ecos),
     // we'd better change XML schema accordingly, to avoid having ugly code like this:
     private boolean evaluate(MenuItemDef item) {
-        RecordEvaluatorDto evaluator = item.getEvaluator();
+        return true;
+        /*RecordEvaluatorDto evaluator = item.getEvaluator();
         if (evaluator == null) {
             return true;
         }
@@ -123,7 +114,7 @@ public class MenuFactory {
             }
         }
 
-        return false;
+        return false; */
     }
 
     private List<ResolvedMenuItemDto> resolve(MenuItemDef child, ResolvedMenuItemDto context) {
@@ -181,9 +172,9 @@ public class MenuFactory {
             targetElement.setLabel(label);
         }
 
-        String icon = newData.getIcon();
-        if (!StringUtils.isEmpty(icon)) {
-            targetElement.setIcon(icon);
+        RecordRef icon = newData.getIcon();
+        if (!RecordRef.isEmpty(icon)) {
+            targetElement.setIcon(icon.toString());
         }
 
         ObjectData config = newData.getConfig();

@@ -210,7 +210,6 @@ public class MenuService {
             return null;
         }
         return new MenuFactory(
-            allUserAuthorities,
             i18nService::getMessage,
             resolvers
         ).getResolvedMenu(menuDto);

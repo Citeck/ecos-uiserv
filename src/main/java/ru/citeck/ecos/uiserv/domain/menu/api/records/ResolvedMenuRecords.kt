@@ -12,6 +12,8 @@ import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
+import ru.citeck.ecos.uiserv.app.common.service.AuthoritiesSupport
+import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDef
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
@@ -22,7 +24,8 @@ import kotlin.collections.HashSet
 @Component
 class ResolvedMenuRecords(
     private val menuRecords: MenuRecords,
-    private val ecosTypeService: EcosTypeService
+    private val ecosTypeService: EcosTypeService,
+    private val authoritiesSupport: AuthoritiesSupport
 ) : AbstractRecordsDao(), RecordAttsDao, RecordsQueryDao {
 
     companion object {
@@ -60,9 +63,26 @@ class ResolvedMenuRecords(
         val menu: MenuRecords.MenuRecord
     ) {
 
-        fun getSubMenu(): Map<String, SubMenuDef> {
+        fun getSubMenu(): SubMenus {
+            return SubMenus(menu.subMenu)
+        }
+    }
 
-            val subMenus = HashMap(menu.subMenu)
+    inner class SubMenus(originalDef: Map<String, SubMenuDef>) {
+
+        private val subMenus: Map<String, SubMenuDef>
+
+        init {
+            val authorities = HashSet(ArrayList(authoritiesSupport.currentUserAuthorities))
+            SecurityUtils.getCurrentUserLogin().ifPresent { authorities.add(it) }
+            subMenus = processMenuItems(originalDef, authorities)
+        }
+
+        fun getLeft(): SubMenuDef {
+            return subMenus["left"] ?: SubMenuDef()
+        }
+
+        fun getCreate(): SubMenuDef {
 
             val currentCreateMenu = subMenus["create"]
 
@@ -70,7 +90,7 @@ class ResolvedMenuRecords(
 
                 val createMenu = SubMenuDef()
                 createMenu.items = emptyList()
-                subMenus["create"] = createMenu
+                return createMenu
 
             } else {
 
@@ -100,10 +120,8 @@ class ResolvedMenuRecords(
 
                 val createMenu = SubMenuDef()
                 createMenu.items = resultItems
-                subMenus["create"] = createMenu
+                return createMenu
             }
-
-            return subMenus
         }
 
         private fun findMenuItemById(items: List<MenuItemDef>?, id: String): MenuItemDef? {
@@ -129,7 +147,7 @@ class ResolvedMenuRecords(
             val sectionNameById = mutableMapOf<String, MLText>()
             sectionNameById[section.id] = section.label
 
-            section.items?.forEach { item0 ->
+            section.items.forEach { item0 ->
 
                 if (item0.type == "SECTION") {
 
@@ -148,26 +166,29 @@ class ResolvedMenuRecords(
 
             variants.forEach { (id, variants) ->
 
-                val sectionItemDef = MenuItemDef()
-                sectionItemDef.id = "$id-create"
-                sectionItemDef.label = sectionNameById[id] ?: MLText(sectionItemDef.id)
-                sectionItemDef.hidden = false
-                sectionItemDef.type = "SECTION"
+                val sectionItemDef = MenuItemDef.create()
+                sectionItemDef.withId("$id-create")
+                sectionItemDef.withLabel(sectionNameById[id] ?: MLText(sectionItemDef.id))
+                sectionItemDef.withType("SECTION")
 
-                sectionItemDef.items = variants.map {
-                    val cvItemDef = MenuItemDef()
-                    cvItemDef.id = "${it.typeRef}-${it.id}"
-                    cvItemDef.config = ObjectData.create()
-                    cvItemDef.config.set("recordRef", it.typeRef)
-                    cvItemDef.config.set("variantId", it.id)
-                    cvItemDef.config.set("variant", it)
-                    cvItemDef.type = "LINK-CREATE-CASE"
-                    cvItemDef.label = it.name
-                    cvItemDef
-                }
+                sectionItemDef.withItems(variants.map {
 
-                if (sectionItemDef.items?.size ?: 0 > 0) {
-                    result.add(sectionItemDef)
+                    val cvItemDef = MenuItemDef.create()
+                    cvItemDef.withId("${it.typeRef}-${it.id}")
+
+                    val config = ObjectData.create()
+                    config.set("recordRef", it.typeRef)
+                    config.set("variantId", it.id)
+                    config.set("variant", it)
+                    cvItemDef.withConfig(config)
+
+                    cvItemDef.withType("LINK-CREATE-CASE")
+                    cvItemDef.withLabel(it.name)
+                    cvItemDef.build()
+                })
+
+                if (sectionItemDef.items.isNotEmpty()) {
+                    result.add(sectionItemDef.build())
                 }
             }
 
@@ -179,14 +200,14 @@ class ResolvedMenuRecords(
                                                   visitedTypes: MutableSet<RecordRef>) {
 
             if (item.type == "SECTION") {
-                item.items?.forEach {
+                item.items.forEach {
                     extractCreateVariantsFromItem(it, result, visitedTypes)
                 }
             } else if (item.type == "JOURNAL") {
 
-                val journalRef = item.config?.get("recordRef")?.asText()
+                val journalRef = item.config.get("recordRef").asText()
 
-                if (!journalRef.isNullOrBlank()) {
+                if (journalRef.isNotBlank()) {
                     val typeRef = ecosTypeService.getTypeRefByJournal(RecordRef.valueOf(journalRef))
                     if (RecordRef.isNotEmpty(typeRef) && visitedTypes.add(typeRef)) {
                         val typeInfo = ecosTypeService.getTypeInfo(typeRef)
@@ -194,6 +215,37 @@ class ResolvedMenuRecords(
                     }
                 }
             }
+        }
+
+        private fun processMenuItems(subMenu: Map<String, SubMenuDef>,
+                                     authorities: Set<String>):  Map<String, SubMenuDef> {
+
+            val result = HashMap<String, SubMenuDef>()
+            subMenu.forEach { (menuType, menu) ->
+                result[menuType] = processMenuItems(menu, authorities)
+            }
+            return result
+        }
+
+        private fun processMenuItems(menu: SubMenuDef, authorities: Set<String>): SubMenuDef {
+            val result = SubMenuDef()
+            result.config = menu.config
+            result.items = processMenuItems(menu.items, authorities)
+            return result
+        }
+
+        private fun processMenuItems(items: List<MenuItemDef>, authorities: Set<String>): List<MenuItemDef> {
+            return items.mapNotNull { processMenuItem(it, authorities) }
+        }
+
+        private fun processMenuItem(item: MenuItemDef, authorities: Set<String>): MenuItemDef? {
+            if (item.hidden) {
+                return null
+            }
+            if (item.allowedFor.isNotEmpty() && !item.allowedFor.any { authorities.contains(it) }) {
+                return null
+            }
+            return item
         }
     }
 }

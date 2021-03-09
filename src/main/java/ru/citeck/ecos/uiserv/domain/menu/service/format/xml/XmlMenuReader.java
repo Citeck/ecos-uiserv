@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
+import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemActionDef;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDef;
@@ -20,9 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDef.TYPE_ITEM;
-import static ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDef.TYPE_RESOLVER;
 
 @Component
 public class XmlMenuReader implements MenuReader {
@@ -87,10 +84,10 @@ public class XmlMenuReader implements MenuReader {
     }
 
     private MenuItemDef itemsResolverToDto(ItemsResolver resolver) {
-        MenuItemDef dto = new MenuItemDef();
+        MenuItemDef.Builder dto = MenuItemDef.create();
 
-        dto.setId(resolver.getId());
-        dto.setType(TYPE_RESOLVER);
+        dto.withId(resolver.getId());
+        //dto.withType(TYPE_RESOLVER);
         if (resolver.getParam() != null) {
             dto.setConfig(parameterListToObjectData(resolver.getParam()));
         }
@@ -100,61 +97,44 @@ public class XmlMenuReader implements MenuReader {
             dto.setItems(singleMenuItemDef);
         }
 
-        return dto;
+        return dto.build();
     }
 
     private MenuItemDef itemToDto(Item item) {
-        MenuItemDef dto = new MenuItemDef();
+        MenuItemDef.Builder dto = MenuItemDef.create();
 
-        dto.setId(item.getId());
-        dto.setType(TYPE_ITEM);
+        dto.withId(item.getId());
+        dto.withType("item");
         if (item.getLabel() != null) {
-            dto.setLabel(new MLText(item.getLabel()));
+            dto.withLabel(new MLText(item.getLabel()));
         }
-        dto.setIcon(item.getIcon());
+        dto.withIcon(RecordRef.valueOf(item.getIcon()));
 
         if (item.getAction() != null) {
-            dto.setAction(actionDtoFromAction(item.getAction()));
+            dto.withAction(actionDtoFromAction(item.getAction()));
         }
 
         if (item.getParam() != null) {
-            dto.setConfig(parameterListToObjectData(item.getParam()));
+            dto.withConfig(parameterListToObjectData(item.getParam()));
         }
 
-        if (item.getEvaluator() != null) {
-            dto.setEvaluator(evaluatorDtoFromEvaluator(item.getEvaluator()));
-        }
         if (item.getItems() != null) {
             List<MenuItemDef> items = item.getItems().getItemsChildren().stream()
                 .map(this::xmlItemToDto)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-            dto.setItems(items);
+            dto.withItems(items);
         }
 
-        return dto;
+        return dto.build();
     }
 
     private MenuItemActionDef actionDtoFromAction(Action action) {
-        MenuItemActionDef actionDto = new MenuItemActionDef();
-
-        actionDto.setType(action.getType());
-        if (action.getParam() != null) {
-            actionDto.setConfig(parameterListToObjectData(action.getParam()));
-        }
-
+        MenuItemActionDef actionDto = new MenuItemActionDef(
+            action.getType(),
+            parameterListToObjectData(action.getParam())
+        );
         return actionDto;
-    }
-
-    private RecordEvaluatorDto evaluatorDtoFromEvaluator(Evaluator evaluator) {
-        RecordEvaluatorDto recordEvaluatorDto = new RecordEvaluatorDto();
-
-        recordEvaluatorDto.setId(evaluator.getId());
-        if (evaluator.getParam() != null) {
-            recordEvaluatorDto.setConfig(parameterListToObjectData(evaluator.getParam()));
-        }
-
-        return recordEvaluatorDto;
     }
 
     private ObjectData parameterListToObjectData(List<Parameter> parameters) {
