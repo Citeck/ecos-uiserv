@@ -34,7 +34,8 @@ class ResolvedJournalRecordsDao(
     private val journalRecordsDao: JournalRecordsDao,
     private val ecosTypeService: EcosTypeService,
     private val columnEditorResolver: ColumnEditorResolver,
-    private val columnFormatterResolver: ColumnFormatterResolver
+    private val columnFormatterResolver: ColumnFormatterResolver,
+    private val columnAttSchemaResolver: ColumnAttSchemaResolver
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordAttsDao {
@@ -293,6 +294,7 @@ class ResolvedJournalRecordsDao(
             val attType = typeAtts[column.id]
             columnEditorResolver.resolve(column, attType)
             columnFormatterResolver.resolve(column, attType)
+            columnAttSchemaResolver.resolve(column, attType)
         }
 
         return columns.map { ResolvedColumnDef(it.build()) }
