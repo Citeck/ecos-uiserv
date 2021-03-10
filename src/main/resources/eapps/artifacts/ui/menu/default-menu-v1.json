@@ -815,18 +815,6 @@
               "config": {
                 "url": "/share/page/context/mine/myfiles"
               }
-            },
-            {
-              "id": "888adf1e-d1a3-4044-b360-e8faf9189d46",
-              "label": {
-                "ru": "Мои разделы"
-              },
-              "icon": "ui/icon@icon-empty",
-              "hidden": false,
-              "type": "ARBITRARY",
-              "config": {
-                "url": "/share/page/user/user-sites"
-              }
             }
           ]
         },
