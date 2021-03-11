@@ -30,6 +30,7 @@ class JournalMapper(
             .withTypeRef(RecordRef.valueOf(entity.typeRef))
             .withPredicate(mapper.read(entity.predicate, Predicate::class.java))
             .withQueryData(mapper.read(entity.queryData, ObjectData::class.java))
+            .withActionsFromType(entity.actionsFromType)
             .withActions(mapper.readList(entity.actions, RecordRef::class.java))
             .withActionsDef(mapper.readList(entity.actionsDef, JournalActionDef::class.java))
             .withProperties(mapper.read(entity.attributes, ObjectData::class.java))
@@ -63,6 +64,7 @@ class JournalMapper(
         entity.typeRef = RecordRef.toString(journal.typeRef)
         entity.predicate = mapper.toString(journal.predicate)
         entity.queryData = mapper.toString(journal.queryData)
+        entity.actionsFromType = journal.actionsFromType
         entity.actions = mapper.toString(journal.actions)
         entity.actionsDef = mapper.toString(journal.actionsDef)
         entity.attributes = mapper.toString(journal.properties)
