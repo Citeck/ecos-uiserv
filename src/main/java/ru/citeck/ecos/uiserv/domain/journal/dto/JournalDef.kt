@@ -52,6 +52,11 @@ data class JournalDef(
     val sortBy: List<JournalSortByDef>,
 
     /**
+     * Include action from typeDef
+     */
+    val actionsFromType: Boolean?,
+
+    /**
      * Actions for every entity in a table.
      * Can be filtered for specific entities by evaluator.
      */
@@ -123,6 +128,7 @@ data class JournalDef(
         var typeRef: RecordRef = RecordRef.EMPTY
         var groupBy: List<String> = emptyList()
         var sortBy: List<JournalSortByDef> = emptyList()
+        var actionsFromType: Boolean? = null
         var actions: List<RecordRef> = emptyList()
         var actionsDef: List<JournalActionDef> = emptyList()
         var editable: Boolean = true
@@ -141,6 +147,7 @@ data class JournalDef(
             typeRef = base.typeRef
             groupBy = base.groupBy.let { DataValue.create(it).asStrList() }
             sortBy = base.sortBy.let { DataValue.create(it).asList(JournalSortByDef::class.java) }
+            actionsFromType = base.actionsFromType
             actions = base.actions.let { DataValue.create(it).asList(RecordRef::class.java) }
             actionsDef = base.actionsDef.let { DataValue.create(it).asList(JournalActionDef::class.java) }
             editable = base.editable
@@ -195,6 +202,11 @@ data class JournalDef(
             return this
         }
 
+        fun withActionsFromType(actionsFromType: Boolean?): Builder {
+            this.actionsFromType = actionsFromType
+            return this
+        }
+
         fun withActions(actions: List<RecordRef>?): Builder {
             this.actions = actions?.filter { RecordRef.isNotEmpty(it) } ?: emptyList()
             return this
@@ -242,6 +254,7 @@ data class JournalDef(
                 typeRef,
                 groupBy,
                 sortBy,
+                actionsFromType,
                 actions,
                 actionsDef,
                 editable,

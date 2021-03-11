@@ -77,8 +77,24 @@ class ResolvedJournalRecordsDao(
         resolveSorting(journalBuilder)
         resolvePredicate(journalBuilder)
         resolveActionsDef(journalBuilder)
+        resolveActionsFromType(journalBuilder, typeInfo)
 
         return createResolvedDef(journal, journalBuilder, typeInfo)
+    }
+
+    private fun resolveActionsFromType(journalBuilder: JournalDef.Builder, typeInfo: EcosTypeInfo?) {
+        val actions = ArrayList(journalBuilder.actions)
+        val isInherit = journalBuilder.actionsFromType
+        if (isInherit == false || isInherit == null && actions.size > 0) {
+            return
+        }
+
+        typeInfo?.inhActions?.map {
+            if (it.id != "record-actions") {
+                actions.add(it)
+            }
+        }
+        journalBuilder.withActions(actions.distinct())
     }
 
     private fun resolveActionsDef(journalBuilder: JournalDef.Builder) {

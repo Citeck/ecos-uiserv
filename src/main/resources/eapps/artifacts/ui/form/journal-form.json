@@ -38,6 +38,7 @@
       "Case Type": "Тип кейса",
       "Source ID": "Идентификатор источника данных",
       "Actions": "Действия",
+      "ActionFromType": "Добавить действия из типа",
       "Attribute": "Атрибут",
       "Ascending": "По возрастанию",
       "Key": "Ключ",
@@ -47,7 +48,8 @@
       "Save": "Сохранить",
       "Control": "Контрол",
       "Config": "Конфигурация",
-      "columnFormatter": "Форматтер"
+      "columnFormatter": "Форматтер",
+      "tooltip.actionFromType": "null - если actions и actionsDef пустые, то добавляем действия из типа\ntrue - всегда добавляем действия из типа\nfalse - никогда не добавляем из типа"
     },
     "en": {
       "Load columns": "Load columns",
@@ -79,6 +81,7 @@
       "Case Type": "Case Type",
       "Source ID": "Data source ID",
       "Actions": "Actions",
+      "ActionFromType": "Add actions form type",
       "Attribute": "Attribute",
       "Ascending": "Ascending",
       "Key": "Key",
@@ -88,7 +91,8 @@
       "Save": "Save",
       "Control": "Control",
       "Config": "Config",
-      "columnFormatter": "Formatter"
+      "columnFormatter": "Formatter",
+      "tooltip.actionFromType": "null - if `actions` and `actionsDef` is empty, then add actions from type\ntrue - always add actions from type\nfalse - never add actions from type"
     }
   },
   "definition": {
@@ -173,6 +177,15 @@
                         "input": false,
                         "key": "column",
                         "components": [
+                          {
+                            "label": "ActionFromType",
+                            "labelPosition": "left-left",
+                            "tooltip": "tooltip.actionFromType",
+                            "hasThreeStates": true,
+                            "key": "actionFromType",
+                            "type": "checkbox",
+                            "input": true
+                          },
                           {
                             "label": {
                               "ru": "Actions"
