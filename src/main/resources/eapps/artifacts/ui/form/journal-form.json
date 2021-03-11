@@ -49,7 +49,7 @@
       "Control": "Контрол",
       "Config": "Конфигурация",
       "columnFormatter": "Форматтер",
-      "tooltip.actionFromType": "null - если actions и actionsDef пустые, то добавляем действия из типа\ntrue - всегда добавляем действия из типа\nfalse - никогда не добавляем из типа"
+      "tooltip.actionFromType": "empty (null) - если actions и actionsDef пустые, то добавляем действия из типа\ntrue - всегда добавляем действия из типа\nfalse - никогда не добавляем из типа"
     },
     "en": {
       "Load columns": "Load columns",
@@ -92,7 +92,7 @@
       "Control": "Control",
       "Config": "Config",
       "columnFormatter": "Formatter",
-      "tooltip.actionFromType": "null - if `actions` and `actionsDef` is empty, then add actions from type\ntrue - always add actions from type\nfalse - never add actions from type"
+      "tooltip.actionFromType": "empty (null) - if `actions` and `actionsDef` is empty, then add actions from type\ntrue - always add actions from type\nfalse - never add actions from type"
     }
   },
   "definition": {

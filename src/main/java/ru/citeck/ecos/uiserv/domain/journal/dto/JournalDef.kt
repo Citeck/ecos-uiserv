@@ -52,7 +52,7 @@ data class JournalDef(
     val sortBy: List<JournalSortByDef>,
 
     /**
-     * Include action from typeDef
+     * Include actions from typeDef
      */
     val actionsFromType: Boolean?,
 
