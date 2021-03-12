@@ -7,10 +7,6 @@ name:
 
 source-id: ""
 
-name:
-  ru: Иконка
-  en: Icon
-
 controller:
   type: bin
 

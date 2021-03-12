@@ -7,9 +7,5 @@ name:
 
 source-id: "journal"
 
-name:
-  ru: Журнал
-  en: Journal
-
 controller:
   type: json

@@ -7,10 +7,6 @@ name:
 
 source-id: "dashboard"
 
-name:
-  ru: Дэшборд
-  en: Dashboard
-
 controller:
   type: json
 
