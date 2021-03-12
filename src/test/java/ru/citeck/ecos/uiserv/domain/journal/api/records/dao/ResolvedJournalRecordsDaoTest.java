@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -239,26 +240,15 @@ public class ResolvedJournalRecordsDaoTest {
         List<ResolvedColumnDef> invoke = recordAtts.getColumnsEval().invoke();
         JournalColumnDef testCol = invoke.get(2).getColumn();
 
-        List<Object> checkVals = Arrays.asList(
-            testCol.getId(),
-            testCol.getAttribute(),
-            testCol.getName(),
-            testCol.getType(),
-            testCol.getEditor().getType(),
-            testCol.getEditor().getConfig().get("journalId").asText()
-        );
-
-        List<Object> expectedVals = Arrays.asList(
-            "test-column",
-            "test-column",
-            new MLText()
+        assertAll(
+            () -> assertThat(testCol.getId()).isEqualTo("test-column1"),
+            () -> assertThat(testCol.getAttribute()).isEqualTo("test-column1"),
+            () -> assertThat(testCol.getName()).isEqualTo(new MLText()
                 .withValue(LocaleUtils.toLocale("ru"), "Тестовый столбец молодец")
-                .withValue(LocaleUtils.toLocale("en"), "Testovii stolbec molodec"),
-            AttributeType.ASSOC,
-            "journal",
-            "simple-journal"
+                .withValue(LocaleUtils.toLocale("en"), "Testovii stolbec molodec")),
+            () -> assertThat(testCol.getType()).isEqualTo(AttributeType.ASSOC),
+            () -> assertThat(testCol.getEditor().getType()).isEqualTo("journal"),
+            () -> assertThat(testCol.getEditor().getConfig().get("journalId").asText()).isEqualTo("simple-journal")
         );
-
-        assertThat(checkVals).isEqualTo(expectedVals);
     }
 }
