@@ -242,7 +242,7 @@ public class ResolvedJournalRecordsDaoTest {
 
         assertAll(
             () -> assertThat(testCol.getId()).isEqualTo("test-column1"),
-            () -> assertThat(testCol.getAttribute()).isEqualTo("test-column1"),
+            () -> assertThat(testCol.getAttribute()).isEqualTo("test-column"),
             () -> assertThat(testCol.getName()).isEqualTo(new MLText()
                 .withValue(LocaleUtils.toLocale("ru"), "Тестовый столбец молодец")
                 .withValue(LocaleUtils.toLocale("en"), "Testovii stolbec molodec")),
