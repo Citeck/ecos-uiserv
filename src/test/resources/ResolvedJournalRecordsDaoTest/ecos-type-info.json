@@ -35,7 +35,30 @@
   "model": {
     "roles": [],
     "statuses": [],
-    "attributes": []
+    "attributes": [
+      {
+        "id": "test-column",
+        "name": {
+          "ru": "Тестовый столбец молодец",
+          "en": "Testovii stolbec molodec"
+        },
+        "type": "ASSOC",
+        "config": {
+          "typeRef": "emodel/type@simple-journal"
+        },
+        "multiple": false,
+        "mandatory": false,
+        "computed": {
+          "type": "NONE",
+          "config": {},
+          "storingType": "NONE"
+        },
+        "constraint": {
+          "type": "",
+          "config": {}
+        }
+      }
+    ]
   },
   "inhActions": [
     "uiserv/action@edit",

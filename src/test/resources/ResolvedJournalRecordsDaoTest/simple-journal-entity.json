@@ -8,7 +8,7 @@
   "editable": true,
   "attributes": "{}",
   "actions": "[]",
-  "columns": "[{\"id\":\"cm:name\",\"name\":{\"ru\":\"Имя\",\"en\":\"Name\"}},{\"id\":\"cm:title\",\"name\":{\"ru\":\"Заголовок\",\"en\":\"Title\"}}]",
+  "columns": "[{\"id\":\"cm:name\",\"name\":{\"ru\":\"Имя\",\"en\":\"Name\"}},{\"id\":\"cm:title\",\"name\":{\"ru\":\"Заголовок\",\"en\":\"Title\"}},{\"id\":\"test-column\"}]",
   "sourceId": "",
   "groupBy": "[]",
   "sortBy": "[]",

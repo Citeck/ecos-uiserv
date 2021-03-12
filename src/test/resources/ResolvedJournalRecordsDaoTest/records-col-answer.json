@@ -1,0 +1,16 @@
+{
+  "cm:title": {
+    "type": "mltext",
+    "protected": "false",
+    "multiple": "false"
+  },
+  "cm:name": {
+    "type": "text",
+    "protected": "false",
+    "multiple": "false"
+  },
+  "test-column": {
+    "javaClass": null,
+    "protected": false
+  }
+}
