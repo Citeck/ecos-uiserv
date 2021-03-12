@@ -1,0 +1,5 @@
+[
+  "uiserv/action@ecos-module-download",
+  "uiserv/action@edit",
+  "uiserv/action@module-copy"
+]
