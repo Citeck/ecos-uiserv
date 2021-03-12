@@ -1,6 +1,10 @@
 
 modelVersion: "1.0"
 
+name:
+  ru: Конфигурация
+  en: Config
+
 source-id: "config"
 
 internal: true
