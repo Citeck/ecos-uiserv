@@ -1,33 +1,27 @@
-package ru.citeck.ecos.uiserv.domain.menu.repo;
+package ru.citeck.ecos.uiserv.domain.menu.repo
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.stereotype.Repository
+import java.time.Instant
 
 @Repository
-public interface MenuRepository extends JpaRepository<MenuEntity, Long> {
-    Optional<MenuEntity> findByExtId(String extId);
+interface MenuRepository : JpaRepository<MenuEntity, Long> {
+
+    fun findByExtId(extId: String): MenuEntity?
 
     @Query("SELECT menu " +
         "FROM MenuEntity menu " +
         "JOIN menu.authorities authority " +
         "WHERE authority = ?1 " +
         "ORDER BY menu.priority DESC")
-    List<MenuEntity> findAllByAuthoritiesContains(String authority);
+    fun findAllByAuthoritiesContains(authority: String): List<MenuEntity>
 
-    void deleteByExtId(String extId);
+    fun deleteByExtId(extId: String)
 
     @Query("SELECT max(m.lastModifiedDate) FROM MenuEntity m")
-    Optional<Instant> getLastModifiedTime();
+    fun getLastModifiedTime(): Instant?
 
-    @Query(
-        value = "SELECT DISTINCT authority FROM ecos_menu_authority",
-        nativeQuery = true
-    )
-    Set<String> getAllAuthoritiesWithMenu();
+    @Query(value = "SELECT DISTINCT authority FROM ecos_menu_authority", nativeQuery = true)
+    fun getAllAuthoritiesWithMenu(): Set<String>
 }

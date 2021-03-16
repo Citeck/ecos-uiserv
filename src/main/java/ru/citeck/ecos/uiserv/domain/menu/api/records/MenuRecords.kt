@@ -20,6 +20,7 @@ import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService
+import ru.citeck.ecos.uiserv.domain.i18n.service.MessageResolver
 import ru.citeck.ecos.uiserv.domain.menu.api.records.MenuRecords.MenuRecord
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
@@ -33,7 +34,7 @@ import kotlin.collections.HashMap
 @RequiredArgsConstructor
 class MenuRecords(
     private val menuService: MenuService,
-    private val i18nService: I18nService
+    private val messageResolver: MessageResolver
 ) : AbstractRecordsDao(),
     RecordAttsDao,
     RecordsQueryDao,
@@ -116,7 +117,7 @@ class MenuRecords(
         }
 
         fun getDefaultMenuForJournal(): String {
-            return i18nService.getMessage(if (isDefaultMenu()) "label.yes" else "label.no")
+            return messageResolver.getMessage(if (isDefaultMenu()) "label.yes" else "label.no")
         }
 
         fun getPermissions(): MenuPermissions {

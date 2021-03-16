@@ -16,7 +16,7 @@ class EcosTypeInfo(
     val journalRef: RecordRef?,
     val metaRecord: RecordRef?,
     val inhSourceId: String?,
-    val parents: List<RecordRef>,
+    val parents: List<RecordRef>?,
     val inhDashboardType: String?,
     val inhCreateVariants: List<CreateVariantDef>?,
     @AttName("resolvedModel?json")

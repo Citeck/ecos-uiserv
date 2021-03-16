@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class I18nService {
+public class I18nService implements MessageResolver {
 
     private final I18nRepository repo;
 

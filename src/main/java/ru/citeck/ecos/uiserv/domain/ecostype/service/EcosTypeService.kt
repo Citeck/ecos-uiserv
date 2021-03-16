@@ -41,7 +41,10 @@ class EcosTypeService(
         return RecordRef.EMPTY
     }
 
-    fun getTypeInfo(typeRef: RecordRef): EcosTypeInfo? {
+    fun getTypeInfo(typeRef: RecordRef?): EcosTypeInfo? {
+        if (typeRef == null) {
+            return null
+        }
         return typesConfig.getTypeInfo(typeRef)
     }
 }
