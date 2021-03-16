@@ -270,6 +270,7 @@ class ResolvedMenuRecords(
                         val newConfig = ObjectData.deepCopyOrNew(item.config)
                         newConfig.set("variant", variant)
                         newItem.withConfig(newConfig)
+                        newItem.withLabel(variant.name)
                     }
                 }
             }
