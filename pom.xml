@@ -639,6 +639,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire-plugin.version}</version>
                     <configuration>
+                        <forkMode>never</forkMode>
                         <!-- Force alphabetical order to have a reproducible build -->
                         <runOrder>alphabetical</runOrder>
                         <!-- Fixes a bug which will be solved in next version after 2.22.1 then this can be removed -->
