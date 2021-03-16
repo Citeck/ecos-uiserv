@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.app.logging;
 
+import org.springframework.test.annotation.DirtiesContext;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.app.logging.api.rest.LogsResource;
 import ru.citeck.ecos.uiserv.app.logging.api.rest.LoggerVM;
@@ -29,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class LogsResourceIntTest {
 
     private MockMvc restLogsMockMvc;

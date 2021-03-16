@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.app.web.errors;
 
+import org.springframework.test.annotation.DirtiesContext;
 import ru.citeck.ecos.uiserv.Application;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class ExceptionTranslatorIntTest {
 
     @Autowired

@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.app.timezone;
 
+import org.springframework.test.annotation.DirtiesContext;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.app.timezone.repo.DateTimeWrapper;
 import ru.citeck.ecos.uiserv.app.timezone.repo.DateTimeWrapperRepository;
@@ -24,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class HibernateTimeZoneTest {
 
     @Autowired
