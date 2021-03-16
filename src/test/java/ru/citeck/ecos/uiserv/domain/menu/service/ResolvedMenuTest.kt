@@ -72,6 +72,11 @@ class ResolvedMenuTest : MenuTestBase() {
                     variantTypeRef = RecordRef.valueOf("emodel/type@unknown-type"),
                     variantId = "DEFAULT"
                 )))
+                .build(),
+            MenuItemDef.create()
+                .withId("4")
+                .withType("LINK-CREATE-CASE")
+                .withHidden(true)
                 .build()
         )
 
@@ -95,7 +100,6 @@ class ResolvedMenuTest : MenuTestBase() {
         assertThat(
             resolvedSubMenu.items[1].config.get("variant").getAs(CreateVariantDef::class.java)
         ).isEqualTo(testType2.inhCreateVariants[0])
-
     }
 
     class CreateCaseConfig(
