@@ -250,8 +250,8 @@ class JournalColumnDef(
             return this
         }
 
-        fun withComputed(computed: List<JournalComputedDef>?): Builder {
-            this.computed = computed?.filter { it.id.isNotBlank() } ?: emptyList()
+        fun withComputed(computed: List<JournalComputedDef?>?): Builder {
+            this.computed = computed?.filterNotNull()?.filter { it.id.isNotBlank() } ?: emptyList()
             return this
         }
 
