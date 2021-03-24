@@ -105,9 +105,7 @@ class MenuRecords(
         override fun setSubMenu(subMenu: MutableMap<String, SubMenuDef>?) {
             val newSubMenu = HashMap(this.subMenu)
             subMenu?.forEach { (k, v) ->
-                if (v.items.isNotEmpty()) {
-                    newSubMenu[k] = v
-                }
+                newSubMenu[k] = v
             }
             super.setSubMenu(newSubMenu)
         }
