@@ -23,6 +23,9 @@ public class ActionEntity extends AbstractAuditingEntity {
     private String type;
     private String icon;
 
+    @Column(name = "pre_action_module")
+    private String preActionModule;
+
     @Lob
     @Column(name = "config_json")
     private String configJson;
