@@ -2,8 +2,6 @@ package ru.citeck.ecos.uiserv.domain.action.service
 
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.records2.RecordRef
@@ -12,10 +10,13 @@ import ru.citeck.ecos.records2.evaluator.RecordEvaluatorService
 import ru.citeck.ecos.records2.evaluator.evaluators.AlwaysFalseEvaluator
 import ru.citeck.ecos.records2.evaluator.evaluators.AlwaysTrueEvaluator
 import ru.citeck.ecos.records2.evaluator.evaluators.PredicateEvaluator
+import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
+import ru.citeck.ecos.uiserv.domain.action.dao.ActionDao
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto
 import ru.citeck.ecos.uiserv.domain.action.dto.RecordsActionsDto
-import ru.citeck.ecos.uiserv.domain.action.repo.ActionRepository
+import ru.citeck.ecos.uiserv.domain.action.repo.ActionEntity
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Consumer
@@ -23,8 +24,8 @@ import java.util.function.Consumer
 @Service
 class ActionService(
     private val evaluatorsService: RecordEvaluatorService,
-    private val actionRepository: ActionRepository,
-    private val actionEntityMapper: ActionEntityMapper
+    private val actionEntityMapper: ActionEntityMapper,
+    private val actionDao: ActionDao
 ) {
     companion object {
         val log = KotlinLogging.logger {}
@@ -58,21 +59,30 @@ class ActionService(
     }
 
     fun getCount(): Long {
-        return actionRepository.count()
+        return actionDao.getCount()
+    }
+
+    fun getCount(predicate: Predicate): Long {
+        return actionDao.getCount(predicate)
+    }
+
+    fun getActions(max: Int, skip: Int, predicate: Predicate): List<ActionDto> {
+        if (max == 0) {
+            return emptyList()
+        }
+        return getActionEntities(max, skip, predicate).mapNotNull { actionEntityMapper.toDto(it) }
     }
 
     fun getActions(max: Int, skip: Int): List<ActionDto> {
         if (max == 0) {
             return emptyList()
         }
-        val page = PageRequest.of(skip / max, max, Sort.by(Sort.Direction.DESC, "id"))
-
-        return actionRepository.findAll(page).mapNotNull { actionEntityMapper.toDto(it) }
+        return getActionEntities(max, skip).mapNotNull { actionEntityMapper.toDto(it) }
     }
 
     fun updateAction(action: ActionDto) {
         var actionEntity = actionEntityMapper.toEntity(action)
-        actionEntity = actionRepository.save(actionEntity)
+        actionEntity = actionDao.save(actionEntity)
         changeListener?.accept(actionEntityMapper.toDto(actionEntity)!!)
     }
 
@@ -81,9 +91,10 @@ class ActionService(
     }
 
     fun deleteAction(id: String?) {
-        val action = actionRepository.findByExtId(id)
+        id ?: return
+        val action = actionDao.getAction(id)
         if (action != null) {
-            actionRepository.delete(action)
+            actionDao.delete(action)
         }
     }
 
@@ -166,6 +177,18 @@ class ActionService(
         recordsActions.actions = actionArtifacts
 
         return recordsActions
+    }
+
+    private fun getActionEntities(max: Int, skip: Int, predicate: Predicate): List<ActionEntity> {
+        return actionDao.getActions(max, skip, predicate, SortBy("id", false))
+    }
+
+    private fun getActionEntities(max: Int, skip: Int): List<ActionEntity> {
+        return actionDao.getActions(max, skip, VoidPredicate.INSTANCE, SortBy("id", false))
+    }
+
+    fun addActionProvider(provider: ActionsProvider) {
+        this.actionProviders[provider.getType()] = provider
     }
 
     @Autowired(required = false)
