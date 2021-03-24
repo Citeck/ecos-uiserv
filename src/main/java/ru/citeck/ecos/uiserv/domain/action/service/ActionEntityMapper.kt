@@ -8,16 +8,16 @@ import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto
 import ru.citeck.ecos.records2.predicate.model.Predicate
+import ru.citeck.ecos.uiserv.domain.action.dao.ActionDao
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionConfirmDef
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionResultDto
 import ru.citeck.ecos.uiserv.domain.action.repo.ActionEntity
-import ru.citeck.ecos.uiserv.domain.action.repo.ActionRepository
 import ru.citeck.ecos.uiserv.domain.evaluator.repo.EvaluatorEntity
 
 @Component
 class ActionEntityMapper(
-    private val actionRepository: ActionRepository
+    private val actionDao: ActionDao
 ) {
 
     fun toDto(actionEntity: ActionEntity?): ActionDto? {
@@ -67,7 +67,7 @@ class ActionEntityMapper(
 
     fun toEntity(action: ActionDto): ActionEntity {
 
-        var actionEntity = actionRepository.findByExtId(action.id)
+        var actionEntity = actionDao.getAction(action.id)
         if (actionEntity == null) {
             actionEntity = ActionEntity()
             actionEntity.extId = action.id

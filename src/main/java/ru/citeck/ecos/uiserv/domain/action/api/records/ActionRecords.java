@@ -15,6 +15,8 @@ import ru.citeck.ecos.records2.QueryContext;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
+import ru.citeck.ecos.records2.predicate.PredicateService;
+import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.commons.data.ObjectData;
@@ -113,13 +115,23 @@ public class ActionRecords extends LocalRecordsDao
             int max = recordsQuery.getMaxItems();
             int skip = recordsQuery.getSkipCount();
 
-            List<Object> actions = actionService.getActions(max, skip)
-                .stream()
-                .map(ActionRecord::new)
-                .collect(Collectors.toList());
+            List<ActionDto> actions;
 
-            result.setRecords(actions);
-            result.setTotalCount(actionService.getCount());
+            if (PredicateService.LANGUAGE_PREDICATE.equals(recordsQuery.getLanguage())) {
+
+                Predicate predicate = recordsQuery.getQuery(Predicate.class);
+                actions = actionService.getActions(max, skip, predicate);
+                result.setTotalCount(actionService.getCount(predicate));
+
+            } else {
+
+                actions = actionService.getActions(max, skip);
+                result.setTotalCount(actionService.getCount());
+            }
+
+            result.setRecords(actions.stream()
+                .map(ActionRecord::new)
+                .collect(Collectors.toList()));
 
             return result;
         }
