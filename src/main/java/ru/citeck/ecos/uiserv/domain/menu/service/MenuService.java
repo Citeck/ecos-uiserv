@@ -11,7 +11,6 @@ import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.uiserv.domain.config.api.records.ConfigRecords;
-import ru.citeck.ecos.uiserv.domain.i18n.service.MessageResolver;
 import ru.citeck.ecos.uiserv.domain.menu.dao.MenuDao;
 import ru.citeck.ecos.uiserv.domain.menu.repo.MenuEntity;
 import ru.citeck.ecos.uiserv.app.common.service.AuthoritiesSupport;
@@ -143,13 +142,14 @@ public class MenuService {
     public MenuDto getMenuForCurrentUser(Integer version) {
 
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<String> userNameVariants = Arrays.asList(userName, userName.toLowerCase());
 
-        MenuDto menu = findFirstByAuthorities(Collections.singletonList(userName), version)
+        MenuDto menu = findFirstByAuthorities(userNameVariants, version)
             .orElseGet(() -> {
 
                 Set<String> authToRequest = new HashSet<>(authoritiesSupport.getCurrentUserAuthorities());
 
-                authToRequest.remove(userName);
+                authToRequest.removeAll(userNameVariants);
                 List<String> orderedAuthorities = getOrderedAuthorities(authToRequest);
                 return findFirstByAuthorities(orderedAuthorities, version).orElse(null);
             });
