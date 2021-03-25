@@ -17,24 +17,29 @@ class UserWithLowerCaseTest : MenuTestBase() {
             .addRecord("menu-group-priority", MenuGroupPriorityConfig(listOf("user-group")))
             .build())
 
-        testImpl("User", "user")
-        testImpl("User", "uSer")
-        testImpl("user", "USer")
-        testImpl("user", "user")
-        testImpl("USER", "USER")
-        testImpl("USER", "user")
-        testImpl("user", "USER")
+        testImpl(listOf("User"), "user", emptyList())
+        testImpl(listOf("User"), "uSer", emptyList())
+        testImpl(listOf("user"), "USer", emptyList())
+        testImpl(listOf("user"), "user", emptyList())
+        testImpl(listOf("USER"), "USER", emptyList())
+        testImpl(listOf("USER"), "user", emptyList())
+        testImpl(listOf("user"), "USER", emptyList())
+
+        testImpl(listOf("Group0", "Group1"), "user", listOf("group0"))
+        testImpl(listOf("Group0", "Group1"), "user", listOf("group1"))
+        testImpl(listOf("Group0", "Group1"), "user", listOf("Group0"))
+        testImpl(listOf("Group0", "Group1"), "user", listOf("Group1"))
     }
 
-    fun testImpl(menuUser: String, searchUser: String) {
+    fun testImpl(menuAuthorities: List<String>, searchUser: String, searchUserGroups: List<String>) {
 
         val userMenu = MenuDto("test-user-menu")
-        userMenu.authorities = listOf(menuUser)
+        userMenu.authorities = menuAuthorities
         userMenu.version = 1
 
         menuService.save(userMenu)
 
-        val userMenuFromService = TestUtils.runAsUser(searchUser, listOf("user-group")) {
+        val userMenuFromService = TestUtils.runAsUser(searchUser, searchUserGroups) {
             menuService.getMenuForCurrentUser(1)
         }
 

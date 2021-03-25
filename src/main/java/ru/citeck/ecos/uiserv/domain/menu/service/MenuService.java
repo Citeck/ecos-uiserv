@@ -142,7 +142,7 @@ public class MenuService {
     public MenuDto getMenuForCurrentUser(Integer version) {
 
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<String> userNameVariants = Arrays.asList(userName, userName.toLowerCase());
+        List<String> userNameVariants = Collections.singletonList(userName.toLowerCase());
 
         MenuDto menu = findFirstByAuthorities(userNameVariants, version)
             .orElseGet(() -> {
@@ -150,7 +150,10 @@ public class MenuService {
                 Set<String> authToRequest = new HashSet<>(authoritiesSupport.getCurrentUserAuthorities());
 
                 authToRequest.removeAll(userNameVariants);
-                List<String> orderedAuthorities = getOrderedAuthorities(authToRequest);
+                List<String> orderedAuthorities = getOrderedAuthorities(authToRequest).stream()
+                    .map(String::toLowerCase)
+                    .collect(Collectors.toList());
+
                 return findFirstByAuthorities(orderedAuthorities, version).orElse(null);
             });
         if (menu == null) {
