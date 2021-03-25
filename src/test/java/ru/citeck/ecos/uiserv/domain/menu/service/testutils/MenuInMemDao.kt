@@ -15,7 +15,9 @@ class MenuInMemDao : MenuDao {
     }
 
     override fun findAllByAuthoritiesContains(authority: String): List<MenuEntity> {
-        return data.values.filter { it.authorities?.contains(authority) ?: false }
+        return data.values.filter { menu ->
+            menu.authorities?.map { it.toLowerCase() } ?.contains(authority) ?: false
+        }
     }
 
     override fun deleteByExtId(extId: String) {

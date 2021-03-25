@@ -8,7 +8,7 @@ import ru.citeck.ecos.uiserv.domain.config.api.records.ConfigRecords
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
 import ru.citeck.ecos.uiserv.domain.menu.service.testutils.MenuTestBase
 
-class UserWIthLowerCaseTest : MenuTestBase() {
+class UserWithLowerCaseTest : MenuTestBase() {
 
     @Test
     fun test() {
@@ -17,13 +17,24 @@ class UserWIthLowerCaseTest : MenuTestBase() {
             .addRecord("menu-group-priority", MenuGroupPriorityConfig(listOf("user-group")))
             .build())
 
+        testImpl("User", "user")
+        testImpl("User", "uSer")
+        testImpl("user", "USer")
+        testImpl("user", "user")
+        testImpl("USER", "USER")
+        testImpl("USER", "user")
+        testImpl("user", "USER")
+    }
+
+    fun testImpl(menuUser: String, searchUser: String) {
+
         val userMenu = MenuDto("test-user-menu")
-        userMenu.authorities = listOf("user")
+        userMenu.authorities = listOf(menuUser)
         userMenu.version = 1
 
         menuService.save(userMenu)
 
-        val userMenuFromService = TestUtils.runAsUser("User", listOf("user-group")) {
+        val userMenuFromService = TestUtils.runAsUser(searchUser, listOf("user-group")) {
             menuService.getMenuForCurrentUser(1)
         }
 

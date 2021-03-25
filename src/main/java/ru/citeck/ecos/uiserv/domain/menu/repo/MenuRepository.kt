@@ -13,7 +13,7 @@ interface MenuRepository : JpaRepository<MenuEntity, Long> {
     @Query("SELECT menu " +
         "FROM MenuEntity menu " +
         "JOIN menu.authorities authority " +
-        "WHERE authority = ?1 " +
+        "WHERE lower(authority) = ?1 " +
         "ORDER BY menu.priority DESC")
     fun findAllByAuthoritiesContains(authority: String): List<MenuEntity>
 
