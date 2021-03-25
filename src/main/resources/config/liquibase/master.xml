@@ -47,6 +47,6 @@
     <include file="changelog/20201001000000_add_theme_parent.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20201005000000_journal_settings_table.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20201204000000_exact_ref_for_dashboards.xml" relativeToChangelogFile="true"/>
-    <include file="changelog/20210324000000_add_actions_pre_action_Module.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20210324000000_add_actions_pre_action_module.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
