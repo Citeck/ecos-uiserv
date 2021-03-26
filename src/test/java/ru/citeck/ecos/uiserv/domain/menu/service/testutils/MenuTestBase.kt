@@ -2,7 +2,12 @@ package ru.citeck.ecos.uiserv.domain.menu.service.testutils
 
 import org.junit.jupiter.api.BeforeEach
 import org.mockito.Mockito
+import org.springframework.util.ResourceUtils
+import ru.citeck.ecos.commons.data.DataValue
+import ru.citeck.ecos.commons.io.file.EcosFile
+import ru.citeck.ecos.commons.io.file.std.EcosStdFile
 import ru.citeck.ecos.commons.json.Json
+import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records3.RecordsProperties
 import ru.citeck.ecos.records3.RecordsService
@@ -14,6 +19,8 @@ import ru.citeck.ecos.uiserv.domain.i18n.service.MessageResolver
 import ru.citeck.ecos.uiserv.domain.menu.api.records.MenuRecords
 import ru.citeck.ecos.uiserv.domain.menu.api.records.ResolvedMenuRecords
 import ru.citeck.ecos.uiserv.domain.menu.dao.MenuDao
+import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
+import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService
 import ru.citeck.ecos.uiserv.domain.menu.service.format.MenuReaderService
 import java.util.concurrent.ConcurrentHashMap
@@ -58,6 +65,11 @@ open class MenuTestBase {
             val typeRef: RecordRef = it.getArgument(0)
             typesInfo[typeRef.id]
         }
+        Mockito.`when`(ecosTypeService.getTypeRefByJournal(Mockito.any())).thenAnswer { invocation ->
+            typesInfo.values.firstOrNull {
+                it.journalRef == invocation.getArgument(0)
+            }?.id?.let { TypeUtils.getTypeRef(it) }
+        }
 
         resolvedMenuRecords = ResolvedMenuRecords(menuRecords, ecosTypeService, AuthoritiesSupport())
         records.register(resolvedMenuRecords)
@@ -74,6 +86,44 @@ open class MenuTestBase {
         }
 
         typesInfo[id] = type
+    }
+
+    fun loadType(path: String): EcosTypeInfo {
+        val file = ResourceUtils.getFile("classpath:test/menu/" + this::class.simpleName + "/type/" + path)
+        return Json.mapper.read(file, EcosTypeInfo::class.java)!!
+    }
+
+    fun loadMenu(path: String): MenuDto {
+        val file = ResourceUtils.getFile("classpath:test/menu/" + this::class.simpleName + "/menu/" + path)
+        return Json.mapper.read(file, MenuDto::class.java)!!
+    }
+
+    fun loadSubMenu(path: String): SubMenuDef {
+        val file = ResourceUtils.getFile("classpath:test/menu/" + this::class.simpleName + "/subMenu/" + path)
+        return Json.mapper.read(file, SubMenuDef::class.java)!!
+    }
+
+    fun loadJson(path: String): DataValue {
+        val file = ResourceUtils.getFile("classpath:test/menu/" + this::class.simpleName + "/" + path)
+        return Json.mapper.read(file, DataValue::class.java)!!
+    }
+
+    fun loadAndRegisterAllTypes(path: String) {
+
+        val file = ResourceUtils.getFile("classpath:test/menu/" + this::class.simpleName + "/" + path)
+        val ecosFile = EcosStdFile(file)
+
+        ecosFile.findFiles("**.{json,yml,yaml}").forEach {
+            registerType(Json.mapper.read(it, DataValue::class.java)!!)
+        }
+    }
+
+    fun findFiles(pattern: String) : List<EcosFile> {
+
+        val file = ResourceUtils.getFile("classpath:test/menu/" + this::class.simpleName)
+        val ecosFile = EcosStdFile(file)
+
+        return ecosFile.findFiles(pattern)
     }
 }
 

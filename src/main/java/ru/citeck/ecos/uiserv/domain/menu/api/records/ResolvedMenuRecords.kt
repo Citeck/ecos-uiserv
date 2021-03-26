@@ -86,42 +86,52 @@ class ResolvedMenuRecords(
 
             val currentCreateMenu = subMenus["create"]
 
-            if (currentCreateMenu == null) {
+            return if (currentCreateMenu == null) {
 
                 val createMenu = SubMenuDef()
                 createMenu.items = emptyList()
-                return createMenu
+                createMenu
 
             } else {
 
-                val resultItems = ArrayList<MenuItemDef>()
+                val createMenu = SubMenuDef()
+                createMenu.items = preProcessSubMenuItems(currentCreateMenu.items)
+                createMenu
+            }
+        }
 
-                currentCreateMenu.items.forEach { createMenuItem ->
+        private fun preProcessSubMenuItems(items: List<MenuItemDef>) : List<MenuItemDef> {
 
-                    if (createMenuItem.type == "CREATE_IN_SECTION") {
+            val resultItems = ArrayList<MenuItemDef>()
 
-                        val sectionId = createMenuItem.config.get("sectionId").asText()
-                        if (sectionId.isNotBlank()) {
+            items.forEach { createMenuItem ->
 
-                            val section = findMenuItemById(subMenus["left"]?.items, sectionId)
-                            if (section == null) {
-                                log.warn("Section is not found by id: $sectionId")
-                            }
-                            evalCreateVariants(section).forEach {
-                                resultItems.add(it)
-                            }
-                        } else {
-                            log.warn("CREATE_IN_SECTION item without sectionId: $createMenuItem")
+                if (createMenuItem.type == "CREATE_IN_SECTION") {
+
+                    val sectionId = createMenuItem.config.get("sectionId").asText()
+                    if (sectionId.isNotBlank()) {
+
+                        val section = findMenuItemById(subMenus["left"]?.items, sectionId)
+                        if (section == null) {
+                            log.warn("Section is not found by id: $sectionId")
+                        }
+                        evalCreateVariants(section).forEach {
+                            resultItems.add(it)
                         }
                     } else {
-                        resultItems.add(createMenuItem)
+                        log.warn("CREATE_IN_SECTION item without sectionId: $createMenuItem")
                     }
-                }
+                } else if (createMenuItem.type == "SECTION") {
 
-                val createMenu = SubMenuDef()
-                createMenu.items = resultItems
-                return createMenu
+                    resultItems.add(createMenuItem.copy()
+                        .withItems(preProcessSubMenuItems(createMenuItem.items))
+                        .build())
+
+                } else {
+                    resultItems.add(createMenuItem)
+                }
             }
+            return resultItems
         }
 
         private fun findMenuItemById(items: List<MenuItemDef>?, id: String): MenuItemDef? {

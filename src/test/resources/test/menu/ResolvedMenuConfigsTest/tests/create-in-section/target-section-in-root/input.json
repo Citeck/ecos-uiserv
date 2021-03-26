@@ -1,0 +1,42 @@
+{
+  "create": {
+    "items": [
+      {
+        "id": "test-create-item",
+        "type": "CREATE_IN_SECTION",
+        "config": {
+          "sectionId": "root-section-with-journal"
+        }
+      },
+      {
+        "id": "section-test-with-inner-create-in-section",
+        "type": "SECTION",
+        "items": [
+          {
+            "id": "test-inner-create-item",
+            "type": "CREATE_IN_SECTION",
+            "config": {
+              "sectionId": "root-section-with-journal"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "left": {
+    "items": [
+      {
+        "id": "root-section-with-journal",
+        "type": "SECTION",
+        "items": [
+          {
+            "type": "JOURNAL",
+            "config": {
+              "recordRef": "uiserv/journal@test-journal"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

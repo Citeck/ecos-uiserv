@@ -1,0 +1,15 @@
+{
+  "id": "test-type",
+  "journalRef": "uiserv/journal@test-journal",
+  "inhCreateVariants": [
+    {
+      "id": "DEFAULT",
+      "formRef": "uiserv/form@test-form",
+      "name": {
+        "ru": "Создать ...",
+        "en": "Create ..."
+      },
+      "typeRef": "emodel/type@test-type"
+    }
+  ]
+}

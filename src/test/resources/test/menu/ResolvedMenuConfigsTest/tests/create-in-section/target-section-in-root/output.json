@@ -1,0 +1,52 @@
+{
+  "create": {
+    "items": [
+      {
+        "type": "SECTION",
+        "items": [
+          {
+            "type": "LINK-CREATE-CASE",
+            "label": {
+              "ru": "Создать ...",
+              "en": "Create ..."
+            },
+            "config": {
+              "typeRef": "emodel/type@test-type",
+              "variant": {
+                "id": "DEFAULT",
+                "formRef": "uiserv/form@test-form",
+                "typeRef": "emodel/type@test-type"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "section-test-with-inner-create-in-section",
+        "type": "SECTION",
+        "items": [
+          {
+            "type": "SECTION",
+            "items": [
+              {
+                "type": "LINK-CREATE-CASE",
+                "label": {
+                  "ru": "Создать ...",
+                  "en": "Create ..."
+                },
+                "config": {
+                  "typeRef": "emodel/type@test-type",
+                  "variant": {
+                    "id": "DEFAULT",
+                    "formRef": "uiserv/form@test-form",
+                    "typeRef": "emodel/type@test-type"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
