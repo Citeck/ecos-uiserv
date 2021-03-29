@@ -248,6 +248,7 @@
               "hidden": false,
               "type": "SECTION",
               "config": {},
+              "allowedFor": ["GROUP_site_meetings"],
               "items": [
                 {
                   "id": "bd6c8ee5-4518-4805-9fbf-0ee71382aa1f",
@@ -293,6 +294,7 @@
               "hidden": false,
               "type": "SECTION",
               "config": {},
+              "allowedFor": ["GROUP_site_ecos-tr"],
               "items": [
                 {
                   "id": "27072f12-2650-465e-8da7-231fda552e92",
@@ -360,6 +362,7 @@
               "hidden": false,
               "type": "SECTION",
               "config": {},
+              "allowedFor": ["GROUP_site_letters"],
               "items": [
                 {
                   "id": "1523e0f7-e914-4cc0-908f-98c178806989",
@@ -418,6 +421,7 @@
               "hidden": false,
               "type": "SECTION",
               "config": {},
+              "allowedFor": ["GROUP_site_contracts"],
               "items": [
                 {
                   "id": "52ae8e62-8981-4e75-ac88-5b497e45e627",
@@ -496,6 +500,7 @@
               "hidden": false,
               "type": "SECTION",
               "config": {},
+              "allowedFor": ["GROUP_site_ecos-finance"],
               "items": [
                 {
                   "id": "08645929-9ce3-4609-9b68-3707d9ae3645",
@@ -541,6 +546,7 @@
               "hidden": false,
               "type": "SECTION",
               "config": {},
+              "allowedFor": ["GROUP_site_attorneys"],
               "items": [
                 {
                   "id": "8e087a98-65b5-4442-9209-f2d5ed94fe0d",
@@ -586,6 +592,7 @@
               "hidden": false,
               "type": "SECTION",
               "config": {},
+              "allowedFor": ["GROUP_site_order-pass"],
               "items": [
                 {
                   "id": "272aa970-c181-447e-b565-1a8a9294d2be",
@@ -631,6 +638,7 @@
               "hidden": false,
               "type": "SECTION",
               "config": {},
+              "allowedFor": ["GROUP_site_hr_core"],
               "items": [
                 {
                   "id": "46285b1d-375b-4f48-833b-c7a922d5021d",
@@ -698,6 +706,7 @@
               "hidden": false,
               "type": "SECTION",
               "config": {},
+              "allowedFor": ["GROUP_site_orders"],
               "items": [
                 {
                   "id": "8ba947b7-210a-407f-b741-e83535220d46",
