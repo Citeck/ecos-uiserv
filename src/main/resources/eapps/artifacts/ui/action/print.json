@@ -6,7 +6,7 @@
   },
   "type": "open-url",
   "config": {
-    "url": "/gateway/alfresco/alfresco/citeck/print/printpdf?nodeRef=${recordRef}&print=true"
+    "url": "/gateway/alfresco/alfresco/s/citeck/print/printpdf?nodeRef=${?localId}&print=true"
   },
   "evaluator": {
     "type": "has-attribute",
