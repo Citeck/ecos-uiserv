@@ -154,4 +154,12 @@ public class ActionDto {
     public void setFeatures(Map<String, Boolean> features) {
         this.features = features;
     }
+
+    public String getPreActionModule() {
+        return preActionModule;
+    }
+
+    public void setPreActionModule(String preActionModule) {
+        this.preActionModule = preActionModule;
+    }
 }

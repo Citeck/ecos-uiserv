@@ -33,7 +33,7 @@ class ActionEntityMapper(
         action.type = actionEntity.type
         action.confirm = mapper.read(actionEntity.confirm, ActionConfirmDef::class.java)
         action.result = mapper.read(actionEntity.result, ActionResultDto::class.java)
-        action.preActionModule = actionEntity.preActionModule ?: ""
+        action.preActionModule = actionEntity.preActionModule
 
         val features = mapper.read(actionEntity.features, DataValue::class.java)
         if (features != null && features.isNotNull()) {
