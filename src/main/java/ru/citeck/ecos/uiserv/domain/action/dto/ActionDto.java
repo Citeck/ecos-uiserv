@@ -25,6 +25,8 @@ public class ActionDto {
     private String icon;
     private RecordRef typeRef;
 
+    private String preActionModule;
+
     private ActionConfirmDef confirm;
     private ActionResultDto result;
 
@@ -51,6 +53,7 @@ public class ActionDto {
         this.result = Json.getMapper().copy(other.result);
         this.evaluator = other.evaluator;
         this.typeRef = other.typeRef;
+        this.preActionModule = other.preActionModule;
 
         this.config = ObjectData.deepCopy(other.config);
         this.features = DataValue.create(features).asMap(String.class, Boolean.class);
