@@ -75,7 +75,7 @@ class ResolvedMenuRecords(
         init {
             val authorities = HashSet(ArrayList(authoritiesSupport.currentUserAuthorities))
             SecurityUtils.getCurrentUserLogin().ifPresent { authorities.add(it) }
-            subMenus = processMenuItems(originalDef, authorities)
+            subMenus = processMenuItems(originalDef, authorities.map { it.toLowerCase() }.toSet())
         }
 
         fun getLeft(): SubMenuDef {
@@ -258,7 +258,7 @@ class ResolvedMenuRecords(
             if (item.hidden) {
                 return null
             }
-            if (item.allowedFor.isNotEmpty() && !item.allowedFor.any { authorities.contains(it) }) {
+            if (item.allowedFor.isNotEmpty() && !item.allowedFor.any { authorities.contains(it.toLowerCase()) }) {
                 return null
             }
 
