@@ -13,8 +13,8 @@ import ru.citeck.ecos.commons.utils.func.UncheckedSupplier
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.source.dao.local.RecordsDaoBuilder
 import ru.citeck.ecos.records3.RecordsService
-import ru.citeck.ecos.records3.record.op.atts.dto.RecordAtts
-import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery
+import ru.citeck.ecos.records3.record.atts.dto.RecordAtts
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.uiserv.Application
 import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils
 import ru.citeck.ecos.uiserv.domain.dashdoard.api.records.DashboardRecords

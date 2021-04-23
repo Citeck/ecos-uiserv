@@ -1,0 +1,17 @@
+---
+id: menu
+name:
+  en: Menu
+  ru: Меню
+
+system: true
+
+sourceId: uiserv/menu
+journalRef: uiserv/journal@ecos-menus
+
+createVariants:
+
+  - id: upload-menu
+    name: { ru: Загрузить меню, en: Upload menu }
+    recordRef: uiserv/menu@
+    formRef: uiserv/form@ecos-module-upload

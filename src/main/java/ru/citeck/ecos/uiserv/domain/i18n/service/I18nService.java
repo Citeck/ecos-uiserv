@@ -50,6 +50,10 @@ public class I18nService {
 
     public List<I18nDto> getAll(int max, int skipCount) {
 
+        if (max == 0) {
+            return Collections.emptyList();
+        }
+
         PageRequest page = PageRequest.of(
             skipCount / max,
             max,
@@ -67,6 +71,10 @@ public class I18nService {
     }
 
     public List<I18nDto> getAll(int max, int skipCount, Predicate predicate) {
+
+        if (max == 0) {
+            return Collections.emptyList();
+        }
 
         PageRequest page = PageRequest.of(
             skipCount / max,

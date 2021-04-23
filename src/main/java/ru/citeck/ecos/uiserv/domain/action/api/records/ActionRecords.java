@@ -10,11 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.commons.json.YamlUtils;
 import ru.citeck.ecos.records2.QueryContext;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName;
+import ru.citeck.ecos.records2.predicate.PredicateService;
+import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
@@ -28,9 +31,11 @@ import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.commons.utils.StringUtils;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
+import ru.citeck.ecos.records3.record.request.RequestContext;
 import ru.citeck.ecos.uiserv.domain.action.service.ActionService;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -110,13 +115,23 @@ public class ActionRecords extends LocalRecordsDao
             int max = recordsQuery.getMaxItems();
             int skip = recordsQuery.getSkipCount();
 
-            List<Object> actions = actionService.getActions(max, skip)
-                .stream()
-                .map(ActionRecord::new)
-                .collect(Collectors.toList());
+            List<ActionDto> actions;
 
-            result.setRecords(actions);
-            result.setTotalCount(actionService.getCount());
+            if (PredicateService.LANGUAGE_PREDICATE.equals(recordsQuery.getLanguage())) {
+
+                Predicate predicate = recordsQuery.getQuery(Predicate.class);
+                actions = actionService.getActions(max, skip, predicate);
+                result.setTotalCount(actionService.getCount(predicate));
+
+            } else {
+
+                actions = actionService.getActions(max, skip);
+                result.setTotalCount(actionService.getCount());
+            }
+
+            result.setRecords(actions.stream()
+                .map(ActionRecord::new)
+                .collect(Collectors.toList()));
 
             return result;
         }
@@ -291,7 +306,7 @@ public class ActionRecords extends LocalRecordsDao
 
     @Data
     public static class RecordTypeMeta {
-        @AttName("_etype?id")
+        @AttName("_type?id")
         private String type;
     }
 
@@ -392,14 +407,7 @@ public class ActionRecords extends LocalRecordsDao
             if (text == null) {
                 text = "null";
             }
-            MLText ml = new MLText();
-            QueryContext currentCtx = QueryContext.getCurrent();
-            if (currentCtx != null) {
-                ml.set(currentCtx.getLocale(), text);
-            } else {
-                ml.set(text);
-            }
-            return ml;
+            return MLText.EMPTY.withValue(RequestContext.getLocale(), text);
         }
     }
 
@@ -434,9 +442,8 @@ public class ActionRecords extends LocalRecordsDao
         @JsonProperty("_content")
         public void setContent(List<ObjectData> content) {
 
-            String base64Content = content.get(0).get("url", "");
-            base64Content = base64Content.replaceAll("^data:application/json;base64,", "");
-            ObjectData data = Json.getMapper().read(Base64.getDecoder().decode(base64Content), ObjectData.class);
+            String dataUriContent = content.get(0).get("url", "");
+            ObjectData data = Json.getMapper().read(dataUriContent, ObjectData.class);
 
             Json.getMapper().applyData(this, data);
         }
@@ -445,6 +452,10 @@ public class ActionRecords extends LocalRecordsDao
         @com.fasterxml.jackson.annotation.JsonValue
         public ActionDto toJson() {
             return new ActionDto(this);
+        }
+
+        public byte[] getData() {
+            return YamlUtils.toNonDefaultString(toJson()).getBytes(StandardCharsets.UTF_8);
         }
     }
 }

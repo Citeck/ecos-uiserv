@@ -1,0 +1,26 @@
+---
+id: ecos-journals
+name:
+  ru: Журналы
+  en: Journals
+
+system: true
+
+actions:
+  - uiserv/action@download-base64-data-yml
+  - uiserv/action@delete
+  - uiserv/action@edit
+  - uiserv/action@module-copy
+
+columns:
+
+  - id: localId
+    name: { ru: Идентификатор, en: Id }
+    type: TEXT
+
+  - id: typeRef
+    name: { ru: Тип ECOS, en: ECOS Type }
+
+  - id: name
+    name: { ru: Название, en: Name }
+    type: TEXT

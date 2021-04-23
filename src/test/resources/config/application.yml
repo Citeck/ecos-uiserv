@@ -101,3 +101,5 @@ jhipster:
 
 # Persisted user configurations limit. If exceeded, the latest configuration is deleted
 max-user-configurations-persisted: 10
+
+uiserv.ecos-types-sync.active: false

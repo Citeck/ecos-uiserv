@@ -24,7 +24,6 @@ import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
-import ru.citeck.ecos.uiserv.domain.journal.service.mapper.JournalMapper;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
 import ru.citeck.ecos.uiserv.domain.action.repo.ActionRepository;
 
@@ -73,11 +72,11 @@ public class JournalRecordsDaoTest {
 
         JournalEntity journalEntity = new JournalEntity();
         journalEntity.setExtId("myTestJournal");
-        journalEntity.setLabel("{\"en\":\"test\"}");
+        journalEntity.setName("{\"en\":\"test\"}");
 
         JournalEntity otherJournalEntity = new JournalEntity();
         otherJournalEntity.setExtId("otherTestJournal");
-        otherJournalEntity.setLabel("{\"en\":\"test\"}");
+        otherJournalEntity.setName("{\"en\":\"test\"}");
         otherJournalEntity.setTypeRef(TypesDao.baseTypeRef.toString());
 
         journalRepository.save(journalEntity);
@@ -129,17 +128,16 @@ public class JournalRecordsDaoTest {
 
         JournalEntity journalEntity = new JournalEntity();
         journalEntity.setExtId("myTestJournal");
-        journalEntity.setLabel("{\"en\":\"test\"}");
+        journalEntity.setName("{\"en\":\"test\"}");
         journalEntity.setTypeRef(TypesDao.testTypeRef.toString());
         journalEntity.setEditable(false);
-        journalEntity.setMetaRecord("someAPP/someDAO@MetaRecord");
-        journalEntity.setPredicate("{\"att\":\"Type\",\"val\":\"smthg\",\"t\":\"eq\"}");
+        journalEntity.setPredicate("{\"t\":\"eq\",\"att\":\"Type\",\"val\":\"smthg\"}");
         journalEntity.setAttributes("{\"a\":\"value\"}");
 
         journalEntity.setColumns("[\n" +
             "        {\n" +
             "            \"attribute\": \"icase:case\",\n" +
-            "            \"name\": \"columnName\",\n" +
+            "            \"id\": \"columnName\",\n" +
             "            \"type\": \"text\",\n" +
             "            \"searchable\": true,\n" +
             "            \"sortable\": true,\n" +
@@ -168,7 +166,7 @@ public class JournalRecordsDaoTest {
 
 
         journalEntity.setActions("[\"uiserv/action@testAction\",\"uiserv/action@testAction2\"]");
-        List<RecordRef> actions = Json.getMapper().read(journalEntity.getActions(), JournalMapper.RecordRefsList.class);
+        List<RecordRef> actions = Json.getMapper().readList(journalEntity.getActions(), RecordRef.class);
         String actionsString = Json.getMapper().toString(actions);
 
         journalRepository.save(journalEntity);
@@ -179,11 +177,11 @@ public class JournalRecordsDaoTest {
             .content("{\n" +
                 "    \"record\": \"journal@myTestJournal\",\n" +
                 "    \"attributes\": [\n" +
-                "        \"label\",\n" +
+                "        \"name\",\n" +
                 "        \"typeRef?id\",\n" +
                 "        \"predicate\",\n" +
                 "        \"editable\",\n" +
-                "        \"attributes\",\n" +
+                "        \"properties\",\n" +
                 "        \"columns[]?json\",\n" +
                 "        \"actions[]\",\n" +
                 "        \"metaRecord?id\"\n" +
@@ -192,15 +190,14 @@ public class JournalRecordsDaoTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id",
                 is(JOURNAL_DAO_ID + "@" + journalEntity.getExtId())))
-            .andExpect(jsonPath("$.attributes.label", is("test")))
+            .andExpect(jsonPath("$.attributes.name", is("test")))
             .andExpect(jsonPath("$.attributes.typeRef?id", is(journalEntity.getTypeRef())))
             .andExpect(jsonPath("$.attributes.predicate", is(journalEntity.getPredicate())))
             .andExpect(jsonPath("$.attributes.editable", is(Boolean.FALSE.toString())))
-            .andExpect(jsonPath("$.attributes.attributes", is(journalEntity.getAttributes())))
+            .andExpect(jsonPath("$.attributes.properties", is(journalEntity.getAttributes())));
             //.andExpect(jsonPath("$.attributes.columns", is(journalEntity.getColumns())))
             //.andExpect(jsonPath("$['attributes']['actions[]'][0]", is(actions.get(0).toString())))
             //.andExpect(jsonPath("$['attributes']['actions[]'][1]", is(actions.get(1).toString())))
-            .andExpect(jsonPath("$.attributes.metaRecord?id", is(journalEntity.getMetaRecord())));
     }
 
     @Component

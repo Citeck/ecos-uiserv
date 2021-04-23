@@ -1,7 +1,9 @@
 package ru.citeck.ecos.uiserv.domain.menu.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.commons.data.DataValue;
@@ -13,18 +15,22 @@ import ru.citeck.ecos.uiserv.domain.menu.repo.MenuEntity;
 import ru.citeck.ecos.uiserv.domain.menu.repo.MenuRepository;
 import ru.citeck.ecos.uiserv.app.common.service.AuthoritiesSupport;
 import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService;
-import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDeployModule;
+import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDeployArtifact;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
-import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDto;
+import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef;
 import ru.citeck.ecos.uiserv.domain.menu.service.format.MenuReaderService;
 import ru.citeck.ecos.uiserv.domain.menu.service.resolving.MenuFactory;
 import ru.citeck.ecos.uiserv.domain.menu.service.resolving.ResolvedMenuDto;
 import ru.citeck.ecos.uiserv.domain.menu.service.resolving.resolvers.MenuItemsResolver;
 
+import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -34,10 +40,15 @@ public class MenuService {
     private static final String DEFAULT_MENU_ID = "default-menu";
     private static final String DEFAULT_MENU_V1_ID = "default-menu-v1";
 
+    private final List<String> CONFIGS_TO_REMOVE = Collections.singletonList(
+        "default-menu-for-admin-v1"
+    );
+
     public static final List<String> DEFAULT_MENUS = Arrays.asList(
         DEFAULT_MENU_ID,
         DEFAULT_MENU_V1_ID
     );
+
     private final MenuRepository menuRepository;
     private final MenuReaderService readerService;
     private final I18nService i18nService;
@@ -46,16 +57,34 @@ public class MenuService {
 
     private final RecordsService recordsService;
 
+    private final List<Consumer<MenuDto>> onChangeListeners = new CopyOnWriteArrayList<>();
+
+    @PostConstruct
+    public void init() {
+        CONFIGS_TO_REMOVE.forEach(cfg -> {
+            MenuEntity menu = menuRepository.findByExtId(cfg).orElse(null);
+            if (menu != null) {
+                MenuDto dtoToRemove = mapToDto(menu);
+                log.info("Remove menu config: " + Json.getMapper().toString(dtoToRemove));
+                menuRepository.delete(menu);
+            }
+        });
+    }
+
     public long getLastModifiedTimeMs() {
         return menuRepository.getLastModifiedTime()
             .map(Instant::toEpochMilli)
             .orElse(0L);
     }
 
-    public MenuDto upload(MenuDeployModule module) {
+    public MenuDto upload(MenuDeployArtifact module) {
+
         MenuDto menuDto = readerService.readMenu(module.getData(), module.getFilename());
         MenuEntity entity = mapToEntity(menuDto);
-        return mapToDto(menuRepository.save(entity));
+
+        MenuDto result = mapToDto(menuRepository.save(entity));
+        onChangeListeners.forEach(it -> it.accept(result));
+        return result;
     }
 
     public Set<String> getAllAuthoritiesWithMenu() {
@@ -110,19 +139,16 @@ public class MenuService {
         return dto;
     }
 
-    public MenuDto getMenuForUser(String username, Integer version) {
-        return getMenuForUser(username, null, version);
-    }
+    public MenuDto getMenuForCurrentUser(Integer version) {
 
-    public MenuDto getMenuForUser(String username, Set<String> authorities, Integer version) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        MenuDto menu = findFirstByAuthorities(Collections.singletonList(username), version)
+        MenuDto menu = findFirstByAuthorities(Collections.singletonList(userName), version)
             .orElseGet(() -> {
 
-                Set<String> authToRequest =  new HashSet<>(authorities != null ?
-                    authorities : authoritiesSupport.queryUserAuthorities(username));
+                Set<String> authToRequest = new HashSet<>(authoritiesSupport.getCurrentUserAuthorities());
 
-                authToRequest.remove(username);
+                authToRequest.remove(userName);
                 List<String> orderedAuthorities = getOrderedAuthorities(authToRequest);
                 return findFirstByAuthorities(orderedAuthorities, version).orElse(null);
             });
@@ -132,9 +158,9 @@ public class MenuService {
         return menu;
     }
 
-    public ResolvedMenuDto getResolvedMenuForUser(String username) {
-        Set<String> authorities = new HashSet<>(authoritiesSupport.queryUserAuthorities(username));
-        MenuDto dto = getMenuForUser(username, authorities, null);
+    public ResolvedMenuDto getResolvedMenuForCurrentUser() {
+        Set<String> authorities = new HashSet<>(authoritiesSupport.getCurrentUserAuthorities());
+        MenuDto dto = getMenuForCurrentUser(null);
         return resolveMenu(dto, authorities);
     }
 
@@ -204,13 +230,13 @@ public class MenuService {
             return null;
         }
         return new MenuFactory(
-            allUserAuthorities,
             i18nService::getMessage,
             resolvers
         ).getResolvedMenu(menuDto);
     }
 
     public MenuDto save(MenuDto dto) {
+
         if (dto == null) {
             throw new IllegalArgumentException("Dto cannot be null");
         }
@@ -219,7 +245,9 @@ public class MenuService {
             dto.setId(UUID.randomUUID().toString());
         }
 
-        return mapToDto(menuRepository.save(mapToEntity(dto)));
+        MenuDto result = mapToDto(menuRepository.save(mapToEntity(dto)));
+        onChangeListeners.forEach(it -> it.accept(result));
+        return result;
     }
 
     public void deleteByExtId(String menuId) {
@@ -229,6 +257,10 @@ public class MenuService {
         menuRepository.deleteByExtId(menuId);
     }
 
-    public static class SubMenus extends HashMap<String, SubMenuDto> {
+    public void addOnChangeListener(Consumer<MenuDto> listener) {
+        onChangeListeners.add(listener);
+    }
+
+    public static class SubMenus extends HashMap<String, SubMenuDef> {
     }
 }

@@ -1,7 +1,7 @@
 
 modelVersion: "1.0"
 
-source-id: "eform"
+source-id: form
 
 name:
   ru: Форма

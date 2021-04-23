@@ -7,6 +7,17 @@
   ],
   "version": 1,
   "subMenu": {
+    "create": {
+      "items": [
+        {
+          "id": "create-123",
+          "type": "CREATE_IN_SECTION",
+          "config": {
+            "sectionId": "912d7e77-c96d-4df6-af3e-bacf279fa1a4"
+          }
+        }
+      ]
+    },
     "left": {
       "items": [
         {
@@ -27,7 +38,7 @@
               "hidden": false,
               "type": "JOURNAL",
               "config": {
-                "recordRef": "uiserv/journal_all@active-tasks",
+                "recordRef": "uiserv/journal@active-tasks",
                 "displayCount": true
               }
             },
@@ -40,7 +51,7 @@
               "hidden": false,
               "type": "JOURNAL",
               "config": {
-                "recordRef": "uiserv/journal_all@completed-tasks"
+                "recordRef": "uiserv/journal@completed-tasks"
               }
             },
             {
@@ -52,7 +63,7 @@
               "hidden": false,
               "type": "JOURNAL",
               "config": {
-                "recordRef": "uiserv/journal_all@initiator-tasks"
+                "recordRef": "uiserv/journal@initiator-tasks"
               }
             },
             {
@@ -64,7 +75,7 @@
               "hidden": false,
               "type": "JOURNAL",
               "config": {
-                "recordRef": "uiserv/journal_all@controlled",
+                "recordRef": "uiserv/journal@controlled",
                 "displayCount": true
               }
             },
@@ -77,19 +88,7 @@
               "hidden": false,
               "type": "JOURNAL",
               "config": {
-                "recordRef": "uiserv/journal_all@subordinate-tasks"
-              }
-            },
-            {
-              "id": "0e4e5e24-f19f-43ca-88c6-4ba04789c6f0",
-              "label": {
-                "en": "Статистика по задачам"
-              },
-              "icon": "ui/icon@i-leftmenu-task-statistic",
-              "hidden": false,
-              "type": "JOURNAL",
-              "config": {
-                "recordRef": "uiserv/journal_all@task-statistic"
+                "recordRef": "uiserv/journal@subordinate-tasks"
               }
             },
             {
@@ -101,7 +100,7 @@
               "hidden": false,
               "type": "JOURNAL",
               "config": {
-                "recordRef": "uiserv/journal_all@income-package-tasks",
+                "recordRef": "uiserv/journal@income-package-tasks",
                 "displayCount": true
               }
             }
@@ -134,7 +133,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@general-case"
+                    "recordRef": "uiserv/journal@general-case"
                   }
                 },
                 {
@@ -179,7 +178,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@ecos-documents"
+                    "recordRef": "uiserv/journal@ecos-documents"
                   }
                 },
                 {
@@ -258,7 +257,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@meetings"
+                    "recordRef": "uiserv/journal@meetings"
                   }
                 },
                 {
@@ -303,7 +302,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@tax-packages"
+                    "recordRef": "uiserv/journal@tax-packages"
                   }
                 },
                 {
@@ -314,7 +313,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@tax-package-docs"
+                    "recordRef": "uiserv/journal@tax-package-docs"
                   }
                 },
                 {
@@ -325,11 +324,11 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@tax-unloading-tasks"
+                    "recordRef": "uiserv/journal@tax-unloading-tasks"
                   }
                 },
                 {
-                  "id": "eb529867-4234-4946-9364-add0112ad816",
+                  "id": "dc6da88e-af9c-44dc-953c-6f7f6fff26ca",
                   "label": {
                     "ru": "Каталог"
                   },
@@ -340,7 +339,7 @@
                   }
                 },
                 {
-                  "id": "ef9be5fb-1913-4203-857c-ed72b472ce3b",
+                  "id": "48542876-a5a8-40a5-8a0b-6c8a39973254",
                   "label": {
                     "ru": "Календарь"
                   },
@@ -370,7 +369,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@letters-income",
+                    "recordRef": "uiserv/journal@letters-income",
                     "displayCount": true
                   }
                 },
@@ -382,7 +381,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@letters-outcome",
+                    "recordRef": "uiserv/journal@letters-outcome",
                     "displayCount": true
                   }
                 },
@@ -428,7 +427,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@contracts-closing-document"
+                    "recordRef": "uiserv/journal@contracts-closing-document"
                   }
                 },
                 {
@@ -439,7 +438,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@contract-agreements"
+                    "recordRef": "uiserv/journal@contract-agreements"
                   }
                 },
                 {
@@ -450,7 +449,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@contracts-supplementary-agreement"
+                    "recordRef": "uiserv/journal@contracts-supplementary-agreement"
                   }
                 },
                 {
@@ -461,7 +460,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@payments"
+                    "recordRef": "uiserv/journal@payments"
                   }
                 },
                 {
@@ -506,7 +505,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@financial-requests"
+                    "recordRef": "uiserv/journal@financial-requests"
                   }
                 },
                 {
@@ -551,7 +550,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@attorneys-forms"
+                    "recordRef": "uiserv/journal@attorneys-forms"
                   }
                 },
                 {
@@ -596,7 +595,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@order-passes"
+                    "recordRef": "uiserv/journal@order-passes"
                   }
                 },
                 {
@@ -641,7 +640,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@hiring-applications"
+                    "recordRef": "uiserv/journal@hiring-applications"
                   }
                 },
                 {
@@ -652,7 +651,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@hr-management"
+                    "recordRef": "uiserv/journal@hr-management"
                   }
                 },
                 {
@@ -663,7 +662,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@dismissal-applications"
+                    "recordRef": "uiserv/journal@dismissal-applications"
                   }
                 },
                 {
@@ -708,7 +707,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@orders-internal"
+                    "recordRef": "uiserv/journal@orders-internal"
                   }
                 },
                 {
@@ -816,18 +815,6 @@
               "config": {
                 "url": "/share/page/context/mine/myfiles"
               }
-            },
-            {
-              "id": "888adf1e-d1a3-4044-b360-e8faf9189d46",
-              "label": {
-                "ru": "Мои разделы"
-              },
-              "icon": "ui/icon@icon-empty",
-              "hidden": false,
-              "type": "ARBITRARY",
-              "config": {
-                "url": "/share/page/user/user-sites"
-              }
             }
           ]
         },
@@ -858,7 +845,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@passports"
+                    "recordRef": "uiserv/journal@passports"
                   }
                 },
                 {
@@ -869,7 +856,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@bank-accounts"
+                    "recordRef": "uiserv/journal@bank-accounts"
                   }
                 },
                 {
@@ -880,7 +867,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@country-iso3166"
+                    "recordRef": "uiserv/journal@country-iso3166"
                   }
                 },
                 {
@@ -891,7 +878,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@groups-of-countries"
+                    "recordRef": "uiserv/journal@groups-of-countries"
                   }
                 },
                 {
@@ -902,7 +889,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@products-and-services"
+                    "recordRef": "uiserv/journal@products-and-services"
                   }
                 },
                 {
@@ -913,7 +900,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@currency"
+                    "recordRef": "uiserv/journal@currency"
                   }
                 },
                 {
@@ -924,7 +911,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@currency-rates"
+                    "recordRef": "uiserv/journal@currency-rates"
                   }
                 },
                 {
@@ -935,7 +922,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@currency-rates-internal"
+                    "recordRef": "uiserv/journal@currency-rates-internal"
                   }
                 },
                 {
@@ -946,7 +933,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@legal-form"
+                    "recordRef": "uiserv/journal@legal-form"
                   }
                 },
                 {
@@ -957,7 +944,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@attorney"
+                    "recordRef": "uiserv/journal@attorney"
                   }
                 },
                 {
@@ -968,7 +955,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@units"
+                    "recordRef": "uiserv/journal@units"
                   }
                 },
                 {
@@ -979,7 +966,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@idocs-contractor"
+                    "recordRef": "uiserv/journal@idocs-contractor"
                   }
                 },
                 {
@@ -990,7 +977,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@legal-entities"
+                    "recordRef": "uiserv/journal@legal-entities"
                   }
                 },
                 {
@@ -1001,7 +988,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@budget-items"
+                    "recordRef": "uiserv/journal@budget-items"
                   }
                 },
                 {
@@ -1012,7 +999,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@closing-document-type"
+                    "recordRef": "uiserv/journal@closing-document-type"
                   }
                 },
                 {
@@ -1023,7 +1010,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@payment-periods"
+                    "recordRef": "uiserv/journal@payment-periods"
                   }
                 },
                 {
@@ -1034,7 +1021,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@esign-package"
+                    "recordRef": "uiserv/journal@esign-package"
                   }
                 },
                 {
@@ -1045,7 +1032,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@contract-subjects"
+                    "recordRef": "uiserv/journal@contract-subjects"
                   }
                 },
                 {
@@ -1056,7 +1043,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@files-nomenclature"
+                    "recordRef": "uiserv/journal@files-nomenclature"
                   }
                 },
                 {
@@ -1067,7 +1054,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@work-schedules-1C"
+                    "recordRef": "uiserv/journal@work-schedules-1C"
                   }
                 },
                 {
@@ -1078,7 +1065,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@reasons-absence"
+                    "recordRef": "uiserv/journal@reasons-absence"
                   }
                 },
                 {
@@ -1089,7 +1076,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@original-location"
+                    "recordRef": "uiserv/journal@original-location"
                   }
                 }
               ]
@@ -1112,7 +1099,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@operation-types"
+                    "recordRef": "uiserv/journal@operation-types"
                   }
                 },
                 {
@@ -1123,7 +1110,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@request-types"
+                    "recordRef": "uiserv/journal@request-types"
                   }
                 },
                 {
@@ -1134,7 +1121,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@cost-items"
+                    "recordRef": "uiserv/journal@cost-items"
                   }
                 },
                 {
@@ -1145,7 +1132,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@cost-centers"
+                    "recordRef": "uiserv/journal@cost-centers"
                   }
                 },
                 {
@@ -1156,7 +1143,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@invoice-statuses"
+                    "recordRef": "uiserv/journal@invoice-statuses"
                   }
                 },
                 {
@@ -1167,7 +1154,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@accounting-blocks"
+                    "recordRef": "uiserv/journal@accounting-blocks"
                   }
                 },
                 {
@@ -1178,7 +1165,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@document-types"
+                    "recordRef": "uiserv/journal@document-types"
                   }
                 },
                 {
@@ -1189,7 +1176,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@contractor-to-group"
+                    "recordRef": "uiserv/journal@contractor-to-group"
                   }
                 },
                 {
@@ -1200,7 +1187,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@standard-request-rejections"
+                    "recordRef": "uiserv/journal@standard-request-rejections"
                   }
                 },
                 {
@@ -1211,7 +1198,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@operation-docs"
+                    "recordRef": "uiserv/journal@operation-docs"
                   }
                 },
                 {
@@ -1222,7 +1209,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@fin-attachment-categories"
+                    "recordRef": "uiserv/journal@fin-attachment-categories"
                   }
                 },
                 {
@@ -1233,7 +1220,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@purchase-orders"
+                    "recordRef": "uiserv/journal@purchase-orders"
                   }
                 },
                 {
@@ -1244,7 +1231,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@goods-receipts"
+                    "recordRef": "uiserv/journal@goods-receipts"
                   }
                 },
                 {
@@ -1255,7 +1242,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@scan-cities"
+                    "recordRef": "uiserv/journal@scan-cities"
                   }
                 },
                 {
@@ -1266,7 +1253,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@postal-addresses"
+                    "recordRef": "uiserv/journal@postal-addresses"
                   }
                 }
               ]
@@ -1289,7 +1276,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@privileges"
+                    "recordRef": "uiserv/journal@privileges"
                   }
                 },
                 {
@@ -1300,7 +1287,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@power-of-attorney-templates"
+                    "recordRef": "uiserv/journal@power-of-attorney-templates"
                   }
                 }
               ]
@@ -1323,7 +1310,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@process-steps"
+                    "recordRef": "uiserv/journal@process-steps"
                   }
                 },
                 {
@@ -1334,7 +1321,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@management-kinds"
+                    "recordRef": "uiserv/journal@management-kinds"
                   }
                 },
                 {
@@ -1345,7 +1332,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@employee-categories"
+                    "recordRef": "uiserv/journal@employee-categories"
                   }
                 },
                 {
@@ -1356,7 +1343,7 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@salary-kinds"
+                    "recordRef": "uiserv/journal@salary-kinds"
                   }
                 },
                 {
@@ -1367,10 +1354,106 @@
                   "hidden": false,
                   "type": "JOURNAL",
                   "config": {
-                    "recordRef": "uiserv/journal_all@hr-processes"
+                    "recordRef": "uiserv/journal@hr-processes"
                   }
                 }
               ]
+            }
+          ]
+        },
+        {
+          "id": "6c4a1fee-22e5-448f-aa06-201d9bb012b1",
+          "label": {
+            "ru": "Инструменты администратора"
+          },
+          "allowedFor": ["GROUP_ALFRESCO_ADMINISTRATORS"],
+          "hidden": false,
+          "type": "SECTION",
+          "config": {},
+          "items": [
+            {
+              "id": "b9d460c8-e77e-4b17-bfb1-a2c416c5344f",
+              "label": {
+                "ru": "Репозиторий"
+              },
+              "icon": "ui/icon@i-leftmenu-repository",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/share/page/repository"
+              }
+            },
+            {
+              "id": "3753daa7-77d2-4722-85a8-6f3c790e7e32",
+              "label": {
+                "ru": "Приложение"
+              },
+              "icon": "ui/icon@i-leftmenu-app",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/share/page/console/admin-console/application"
+              }
+            },
+            {
+              "id": "979bfe85-5361-4cf2-a0a3-dd43dabc95b6",
+              "label": {
+                "ru": "Редактор бизнес-процессов"
+              },
+              "icon": "ui/icon@i-leftmenu-bpmn-editor",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/v2/bpmn-designer"
+              }
+            },
+            {
+              "id": "c3f0a948-bebf-4bae-9646-41acece5f3f9",
+              "label": {
+                "ru": "Группы"
+              },
+              "icon": "ui/icon@i-leftmenu-groups",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/share/page/console/admin-console/groups"
+              }
+            },
+            {
+              "id": "c161291d-09c5-488c-b375-4bb8138afc32",
+              "label": {
+                "ru": "Пользователи"
+              },
+              "icon": "ui/icon@i-leftmenu-users",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/share/page/console/admin-console/users"
+              }
+            },
+            {
+              "id": "5635b794-4158-4c97-9961-7e38852a14a4",
+              "label": {
+                "ru": "Инструменты"
+              },
+              "icon": "ui/icon@i-leftmenu-tools",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/v2/dev-tools"
+              }
+            },
+            {
+              "id": "90342505-91c7-446a-909a-c18b1aa930f2",
+              "label": {
+                "ru": "Еще..."
+              },
+              "icon": "ui/icon@i-leftmenu-more",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/share/page/console/admin-console/javascript-console"
+              }
             }
           ]
         }

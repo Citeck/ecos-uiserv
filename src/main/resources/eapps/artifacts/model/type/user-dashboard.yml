@@ -1,0 +1,10 @@
+---
+id: user-dashboard
+
+name:
+  en: User dashboard
+  ru: Пользовательский дашборд
+
+system: true
+
+dashboardType: user-dashboard

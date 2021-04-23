@@ -7,17 +7,17 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.userconfig.service.UserConfigurationsService;
 import ru.citeck.ecos.uiserv.domain.userconfig.dto.UserConfigurationDto;
 import ru.citeck.ecos.uiserv.domain.userconfig.repo.UserConfigurationEntity;
 import ru.citeck.ecos.uiserv.domain.userconfig.repo.UserConfigurationsRepository;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class UserConfigurationsServiceTest {
-    private static final String REQUEST_USERNAME_ATTRIBUTE = "requestUsername";
+
     private static final String USER_NAME = "username";
 
     @Value("${max-user-configurations-persisted}")
@@ -41,14 +41,9 @@ public class UserConfigurationsServiceTest {
     @Before
     public void prepare() {
         userConfigurationsRepository.deleteAll();
-        setUserInContext();
-    }
-
-    private void setUserInContext() {
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        if (requestAttributes != null) {
-            requestAttributes.setAttribute(REQUEST_USERNAME_ATTRIBUTE, USER_NAME, RequestAttributes.SCOPE_REQUEST);
-        }
+        SecurityContextHolder.getContext().setAuthentication(
+            new UsernamePasswordAuthenticationToken(USER_NAME, null, Collections.emptyList())
+        );
     }
 
     @Test

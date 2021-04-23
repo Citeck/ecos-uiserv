@@ -9,28 +9,31 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.commons.json.YamlUtils;
 import ru.citeck.ecos.records2.QueryContext;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
-import ru.citeck.ecos.records3.record.op.atts.dao.RecordAttsDao;
-import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName;
-import ru.citeck.ecos.records3.record.op.delete.dao.RecordDeleteDao;
-import ru.citeck.ecos.records3.record.op.delete.dto.DelStatus;
-import ru.citeck.ecos.records3.record.op.mutate.dao.RecordMutateDtoDao;
-import ru.citeck.ecos.records3.record.op.query.dao.RecordsQueryDao;
-import ru.citeck.ecos.records3.record.op.query.dto.RecsQueryRes;
-import ru.citeck.ecos.records3.record.op.query.dto.query.QueryPage;
-import ru.citeck.ecos.records3.record.op.query.dto.query.RecordsQuery;
+import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
+import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
+import ru.citeck.ecos.records3.record.dao.delete.RecordDeleteDao;
+import ru.citeck.ecos.records3.record.dao.delete.DelStatus;
+import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao;
+import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
+import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.QueryPage;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,7 +45,7 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
                RecordDeleteDao,
                RecordAttsDao {
 
-    public static final String ID = "eform";
+    public static final String ID = "form";
 
     private static final String FORMS_FOR_TYPE_LANG = "forms-for-type";
 
@@ -51,7 +54,7 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
 
     private static final Set<String> SYSTEM_FORMS = new HashSet<>(Arrays.asList(DEFAULT_FORM_ID, ECOS_FORM_ID));
 
-    private final EcosFormService eformFormService;
+    private final EcosFormService ecosFormService;
 
     @NotNull
     @Override
@@ -59,11 +62,12 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
         return ID;
     }
 
+    @Secured({"ROLE_ADMIN"})
     @Override
     public EcosFormModelDownstream getRecToMutate(@NotNull String formId) {
         return toDownstream(Optional.of(formId)
             .filter(str -> !str.isEmpty())
-            .map(x -> eformFormService.getFormById(x)
+            .map(x -> ecosFormService.getFormById(x)
                 .orElseThrow(() -> new IllegalArgumentException("Form with id " + formId + " not found!")))
             .map(EcosFormModel::new) //defensive copy, even though getFormById probably creates new instance
             .orElseGet(EcosFormModel::new));
@@ -76,7 +80,7 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
     @NotNull
     @Override
     public String saveMutatedRec(EcosFormModelDownstream ecosFormModelDownstream) {
-        return eformFormService.save(ecosFormModelDownstream);
+        return ecosFormService.save(ecosFormModelDownstream);
     }
 
     @NotNull
@@ -86,7 +90,7 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
         if (SYSTEM_FORMS.contains(formId)) {
             return DelStatus.PROTECTED;
         }
-        eformFormService.delete(formId);
+        ecosFormService.delete(formId);
         return DelStatus.OK;
     }
 
@@ -95,7 +99,7 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
     public Object getRecordAtts(@NotNull String formId) {
         return toDownstream(Optional.of(formId)
             .filter(str -> !str.isEmpty())
-            .map(x -> eformFormService.getFormById(x)
+            .map(x -> ecosFormService.getFormById(x)
                 .orElseThrow(() -> new IllegalArgumentException("Form with id " + formId + " not found!")))
             .orElseGet(() -> {
                 final EcosFormModel form = new EcosFormModelDownstream(new EcosFormModel());
@@ -122,7 +126,7 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
                 return result;
             }
 
-            result.addRecords(eformFormService.getAllFormsForType(formsForTypeQuery.getTypeRef()).stream()
+            result.addRecords(ecosFormService.getAllFormsForType(formsForTypeQuery.getTypeRef()).stream()
                 .map(this::toDownstream)
                 .collect(Collectors.toList())
             );
@@ -140,20 +144,20 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
                 predicate = recordsQuery.getQuery(Predicate.class);
             }
 
-            List<EcosFormModelDownstream> forms = eformFormService.getAllForms(predicate, max, skipCount)
+            List<EcosFormModelDownstream> forms = ecosFormService.getAllForms(predicate, max, skipCount)
                 .stream()
                 .map(this::toDownstream)
                 .collect(Collectors.toList());
 
             result.setRecords(forms);
-            result.setTotalCount(eformFormService.getCount());
+            result.setTotalCount(ecosFormService.getCount());
             return result;
         }
 
         Optional<EcosFormModel> form = Optional.empty();
 
         if (CollectionUtils.isNotEmpty(query.formKeys)) {
-            List<EcosFormModelDownstream> formsByKeys = eformFormService.getFormsByKeys(query.formKeys)
+            List<EcosFormModelDownstream> formsByKeys = ecosFormService.getFormsByKeys(query.formKeys)
                 .stream()
                 .map(this::toDownstream)
                 .collect(Collectors.toList());
@@ -163,7 +167,7 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
             return result;
         } else if (StringUtils.isNotBlank(query.formKey)) {
 
-            form = eformFormService.getFormByKey(Arrays.stream(query.formKey.split(","))
+            form = ecosFormService.getFormByKey(Arrays.stream(query.formKey.split(","))
                 .filter(StringUtils::isNotBlank)
                 .collect(Collectors.toList()));
 
@@ -224,9 +228,8 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
         @JsonProperty("_content")
         public void setContent(List<ObjectData> content) {
 
-            String base64Content = content.get(0).get("url", "");
-            base64Content = base64Content.replaceAll("^data:application/json;base64,", "");
-            ObjectData data = Json.getMapper().read(Base64.getDecoder().decode(base64Content), ObjectData.class);
+            String dataUriContent = content.get(0).get("url", "");
+            ObjectData data = Json.getMapper().read(dataUriContent, ObjectData.class);
 
             Json.getMapper().applyData(this, data);
         }
@@ -235,6 +238,10 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
         @com.fasterxml.jackson.annotation.JsonValue
         public EcosFormModel toJson() {
             return new EcosFormModel(this);
+        }
+
+        public byte[] getData() {
+            return YamlUtils.toNonDefaultString(toJson()).getBytes(StandardCharsets.UTF_8);
         }
     }
 }

@@ -1,0 +1,28 @@
+---
+id: ecos-dashboards
+name:
+  ru: Дашборды
+  en: Dashboards
+
+system: true
+
+actions:
+  - uiserv/action@ecos-module-download
+  - uiserv/action@delete
+  - uiserv/action@edit
+  - uiserv/action@module-copy
+
+columns:
+
+  - id: moduleId
+    name: { ru: Идентификатор, en: Id }
+    type: TEXT
+
+  - id: typeRef
+    name: { ru: Тип ECOS, en: ECOS Type }
+
+  - id: appliedToRef
+    name: { ru: Запись, en: Record }
+
+  - id: authority
+    name: { ru: Человек или группа, en: User or group }

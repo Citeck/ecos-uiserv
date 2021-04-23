@@ -1,0 +1,16 @@
+---
+id: ui-action
+name:
+  en: UI Action
+  ru: UI Действие
+
+system: true
+
+sourceId: uiserv/action
+journalRef: uiserv/journal@ui-actions
+
+createVariants:
+
+  - id: upload-action
+    name: { ru: Загрузить действие, en: Upload action }
+    formRef: uiserv/form@ecos-module-upload

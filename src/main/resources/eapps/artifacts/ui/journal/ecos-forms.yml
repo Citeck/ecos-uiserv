@@ -1,0 +1,31 @@
+---
+id: ecos-forms
+name:
+  ru: Формы
+  en: Forms
+
+system: true
+
+actions:
+  - uiserv/action@ecos-module-download
+  - uiserv/action@delete
+  - uiserv/action@edit
+  - uiserv/action@module-copy
+
+columns:
+
+  - id: moduleId
+    name: { ru: Идентификатор, en: Id }
+    type: TEXT
+
+  - id: formKey
+    name: { ru: Ключ формы, en: Form key }
+    type: TEXT
+
+  - id: title
+    name: { ru: Название, en: Name }
+    type: TEXT
+
+  - id: description
+    name: { ru: Описание, en: Description }
+

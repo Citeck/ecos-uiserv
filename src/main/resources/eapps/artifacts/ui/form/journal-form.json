@@ -1,13 +1,10 @@
 {
   "id": "journal-form",
   "formKey": "journal-form",
-  "system": true,
   "title": {
     "en": "Journal form"
   },
-  "description": {
-    "en": ""
-  },
+  "description": {},
   "customModule": null,
   "typeRef": "emodel/type@journal",
   "width": "default",
@@ -30,7 +27,6 @@
       "Groupable": "Доступна ли группировка?",
       "Editable": "Доступно ли редактирование в таблице?",
       "Hidden": "Атрибут спрятан от пользователя?",
-      "Add columns": "Добавить колонки",
       "Main tab": "Основное",
       "Columns tab": "Колонки",
       "Group Actions": "Групповые действия",
@@ -42,6 +38,7 @@
       "Case Type": "Тип кейса",
       "Source ID": "Идентификатор источника данных",
       "Actions": "Действия",
+      "ActionFromType": "Добавить действия из типа",
       "Attribute": "Атрибут",
       "Ascending": "По возрастанию",
       "Key": "Ключ",
@@ -51,7 +48,8 @@
       "Save": "Сохранить",
       "Control": "Контрол",
       "Config": "Конфигурация",
-      "columnFormatter": "Форматтер"
+      "columnFormatter": "Форматтер",
+      "tooltip.actionFromType": "empty (null) - если actions и actionsDef пустые, то добавляем действия из типа\ntrue - всегда добавляем действия из типа\nfalse - никогда не добавляем из типа"
     },
     "en": {
       "Load columns": "Load columns",
@@ -83,6 +81,7 @@
       "Case Type": "Case Type",
       "Source ID": "Data source ID",
       "Actions": "Actions",
+      "ActionFromType": "Add actions form type",
       "Attribute": "Attribute",
       "Ascending": "Ascending",
       "Key": "Key",
@@ -92,142 +91,105 @@
       "Save": "Save",
       "Control": "Control",
       "Config": "Config",
-      "columnFormatter": "Formatter"
+      "columnFormatter": "Formatter",
+      "tooltip.actionFromType": "empty (null) - if `actions` and `actionsDef` is empty, then add actions from type\ntrue - always add actions from type\nfalse - never add actions from type"
     }
   },
   "definition": {
     "components": [
       {
-        "scrollableContent": true,
-        "key": "panel4",
-        "type": "panel",
-        "input": false,
+        "label": {
+          "ru": "Tabs"
+        },
         "components": [
           {
+            "label": "Main",
+            "key": "tab2",
             "components": [
               {
-                "label": "Main tab",
-                "key": "main",
+                "label": {
+                  "ru": "Panel"
+                },
+                "scrollableContent": true,
+                "key": "panel3",
+                "type": "panel",
+                "input": false,
                 "components": [
                   {
+                    "label": {
+                      "ru": "Columns"
+                    },
                     "columns": [
                       {
                         "components": [
                           {
-                            "label": "Module ID",
+                            "label": {
+                              "ru": "Идентификатор журнала",
+                              "en": "Journal ID"
+                            },
                             "defaultValue": "",
-                            "key": "moduleId",
+                            "key": "localId",
                             "type": "textfield",
                             "input": true
                           },
                           {
-                            "label": "Source ID",
-                            "defaultValue": "",
-                            "key": "sourceId",
-                            "type": "textfield",
+                            "label": {
+                              "ru": "Название журнала",
+                              "en": "Journal name"
+                            },
+                            "key": "name",
+                            "type": "mlText",
                             "input": true
                           },
                           {
-                            "label": "Predicate",
-                            "defaultValue": "",
-                            "key": "predicate",
-                            "type": "textarea",
-                            "ecos": {
-                              "dataType": "json"
+                            "label": {
+                              "ru": "Разрешить редактирование значений в ячейках",
+                              "en": "Allow to edit values in cells"
                             },
-                            "input": true,
-                            "editor": "ace"
+                            "labelPosition": "left-left",
+                            "key": "editable",
+                            "type": "checkbox",
+                            "input": true
                           },
                           {
-                            "label": "Sort by",
-                            "disableAddingRemovingRows": false,
-                            "addAnother": "",
-                            "addAnotherPosition": "bottom",
-                            "removePlacement": "col",
-                            "defaultOpen": false,
-                            "layoutFixed": false,
-                            "enableRowGroups": false,
-                            "multiple": true,
-                            "reorder": false,
-                            "defaultValue": [
-                              {
-                                "attribute2": "",
-                                "ascending": false,
-                                "attribute": ""
-                              }
-                            ],
-                            "validate": {
-                              "minLength": "",
-                              "maxLength": ""
+                            "label": {
+                              "ru": "Добавить колонки",
+                              "en": "Add columns"
                             },
-                            "key": "sortBy",
-                            "type": "datagrid",
-                            "input": true,
-                            "components": [
-                              {
-                                "label": "Attribute",
-                                "defaultValue": "",
-                                "key": "attribute",
-                                "type": "textfield",
-                                "input": true,
-                                "row": "0-0"
-                              },
-                              {
-                                "label": "Ascending",
-                                "key": "ascending",
-                                "type": "checkbox",
-                                "input": true,
-                                "row": "0-1"
-                              }
-                            ]
+                            "action": "custom",
+                            "state": "",
+                            "showValidations": false,
+                            "custom": "\nlet formInstance = instance.root;\nformInstance.showErrors([]);\n\nconst formData = submission.data || {};\nvar sourceId = formData.sourceId;\nif (!!sourceId) {\n    sourceId = Promise.resolve(sourceId);\n} else {\n    var type = formData.typeRef;\n    if (!type) {\n        formInstance.showErrors(\"Вы должны указать тип или sourceId\");       \n        return;\n    }\n    var resolvedType = type.replace(\"emodel/type@\", \"emodel/rtype@\");\n    sourceId = Citeck.Records.get(resolvedType).load('sourceId?str', true);\n}\n\nsourceId.then(function(srcId) { \n\n    if (!srcId) {\n        formInstance.showErrors(\"В типе не найден sourceId\");\n        return;\n    }\n\n    let sourceDaoId = \"source\";\n    let journalSourceId = srcId;\n\n    const sourceIdSlashIdx = journalSourceId.indexOf('/');\n    if (sourceIdSlashIdx > 0) {\n        sourceDaoId = journalSourceId.substring(0, sourceIdSlashIdx) + \"/\" + sourceDaoId;\n        journalSourceId = journalSourceId.substring(sourceIdSlashIdx + 1);\n    }\n\n    let sourceInfoId = Citeck.Records.get(sourceDaoId + '@' + journalSourceId);\n    Citeck.Records.get(sourceInfoId).load('columnsSourceId').then(columnsSourceId => {\n\n        if (!columnsSourceId) {\n            formInstance.showErrors(\"Для данного источника данных не настроен источник с колонками.\")\n            return;\n        }\n\n        const currentColumnsSet = {};\n        const currentColumns = _.get(submission, 'data.columns', [])\n        for (let column of currentColumns) {\n            currentColumnsSet[column.id || ''] = true;\n        }\n\n        const applyAutoColumns = (columns) => {\n\n            columns = columns.filter(c => !c.id || !currentColumnsSet[c.id]);\n\n            if (columns.length) {\n                submission = {\n                    ...submission,\n                    data: {\n                        ...submission.data,\n                        columns: [\n                            ...submission.data.columns,\n                            ...columns\n                        ]\n                    }\n                }\n                formInstance.submission = submission;\n            }\n        }\n\n        Citeck.Dialogs.showFormDialog({\n            title: 'Выбор колонок',\n            showDefaultButtons: true,\n            formDefinition: {\n                components: [\n                    {\n                        label: 'Колонки',\n                        key: 'selected-columns',\n                        type: \"selectJournal\",\n                        queryData: submission,\n                        customSourceId: columnsSourceId,\n                        journalId: 'journal-columns',\n                        multiple: true\n                    }\n                ]\n            },\n            onSubmit: submission => {\n                let columns = submission.data['selected-columns'] || [];\n                console.log('selected columns', columns);\n                Citeck.Records.get(columns)\n                    .load({name: 'name{ru,en}', id: 'columnId?str'})\n                    .then(applyAutoColumns)\n                    .catch(e => formInstance.showErrors(e));\n            }\n        });\n\n    }).catch(() => formInstance.showErrors(\"Ошибка при загрузке информации по источнику данных\"));\n});\n",
+                            "block": true,
+                            "key": "submit23",
+                            "type": "button",
+                            "input": true
                           }
                         ],
                         "type": "column",
                         "input": false,
                         "key": "column",
-                        "label": "Column",
-                        "index": 0,
-                        "clearOnHide": true,
-                        "conditional": {
-                          "show": null,
-                          "when": null
-                        }
+                        "index": 0
                       },
                       {
                         "index": 1,
                         "type": "column",
                         "input": false,
                         "key": "column",
-                        "label": "Column",
                         "components": [
                           {
-                            "label": "Journal Label",
-                            "defaultValue": {
-                              "ru": "",
-                              "en": ""
+                            "label": "ActionFromType",
+                            "labelPosition": "left-left",
+                            "tooltip": "tooltip.actionFromType",
+                            "hasThreeStates": true,
+                            "key": "actionFromType",
+                            "type": "checkbox",
+                            "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "Actions"
                             },
-                            "key": "label",
-                            "type": "mlText",
-                            "input": true
-                          },
-                          {
-                            "label": "Meta record",
-                            "defaultValue": "",
-                            "key": "metaRecord",
-                            "type": "textfield",
-                            "input": true
-                          },
-                          {
-                            "label": "Case Type",
-                            "journalId": "ecos-types",
-                            "key": "typeRef",
-                            "type": "selectJournal",
-                            "input": true,
-                            "customPredicateJs": null,
-                            "presetFilterPredicatesJs": null
-                          },
-                          {
-                            "label": "Actions",
                             "multiple": true,
                             "journalId": "ui-actions",
                             "key": "actions",
@@ -236,100 +198,26 @@
                             "reorder": false
                           },
                           {
-                            "label": "Editable",
-                            "key": "editable",
-                            "type": "checkbox",
-                            "input": true
-                          }
-                        ],
-                        "clearOnHide": true,
-                        "conditional": {
-                          "show": null,
-                          "when": null
-                        }
-                      }
-                    ],
-                    "key": "columns7",
-                    "type": "columns",
-                    "input": false,
-                    "tab": 0
-                  },
-                  {
-                    "label": "Attributes",
-                    "keyLabel": "",
-                    "key": "attributes",
-                    "type": "datamap",
-                    "input": true,
-                    "valueComponent": {
-                      "type": "textfield",
-                      "key": "value",
-                      "label": "Value",
-                      "defaultValue": "Value",
-                      "input": true,
-                      "conditional": {
-                        "show": null,
-                        "when": null,
-                        "eq": "",
-                        "json": ""
-                      }
-                    },
-                    "tab": 0
-                  }
-                ]
-              },
-              {
-                "label": "Columns",
-                "key": "columns5",
-                "components": [
-                  {
-                    "columns": [
-                      {
-                        "components": [],
-                        "md": 4,
-                        "type": "column",
-                        "input": false,
-                        "key": "column",
-                        "label": "Column",
-                        "index": 0
-                      },
-                      {
-                        "md": 4,
-                        "type": "column",
-                        "input": false,
-                        "key": "column",
-                        "label": "Column",
-                        "index": 1,
-                        "components": []
-                      },
-                      {
-                        "md": 4,
-                        "type": "column",
-                        "input": false,
-                        "key": "column",
-                        "label": "Column",
-                        "index": 2,
-                        "components": [
-                          {
-                            "label": "Add columns",
-                            "action": "custom",
-                            "state": "",
-                            "showValidations": false,
-                            "custom": "\nlet formInstance = instance.root;\nformInstance.showErrors([]);\n\nconst formData = submission.data;\nif (!formData || !formData.sourceId) {\n    formInstance.showErrors(\"Вы должны указать sourceId\");\n}\n\nlet sourceDaoId = \"source\";\nlet journalSourceId = formData.sourceId;\nconst sourceIdSlashIdx = journalSourceId.indexOf('/');\nif (sourceIdSlashIdx > 0) {\n    sourceDaoId = journalSourceId.substring(0, sourceIdSlashIdx) + \"/\" + sourceDaoId;\n    journalSourceId = journalSourceId.substring(sourceIdSlashIdx + 1);\n}\nlet sourceInfoId = Citeck.Records.get(sourceDaoId + '@' + journalSourceId);\nCiteck.Records.get(sourceInfoId).load('columnsSourceId').then(columnsSourceId => {\n\n    if (!columnsSourceId) {\n        formInstance.showErrors(\"Для данного источника данных не настроен источник с колонками.\")\n        return;\n    }\n\n    const currentColumnsSet = {};\n    const currentColumns = _.get(submission, 'data.columns', [])\n    for (let column of currentColumns) {\n        currentColumnsSet[column.name || ''] = true;\n    }\n\n    const applyAutoColumns = (columns) => {\n\n        columns = columns.filter(c => !c.name || !currentColumnsSet[c.name]);\n\n        if (columns.length) {\n            submission = {\n                ...submission,\n                data: {\n                    ...submission.data,\n                    columns: [\n                        ...submission.data.columns,\n                        ...columns\n                    ]\n                }\n            }\n            formInstance.submission = submission;\n        }\n    }\n\n    Citeck.Dialogs.showFormDialog({\n        title: 'Выбор колонок',\n        showDefaultButtons: true,\n        formDefinition: {\n            components: [\n                {\n                    label: 'Колонки',\n                    key: 'selected-columns',\n                    type: \"selectJournal\",\n                    queryData: submission,\n                    customSourceId: columnsSourceId,\n                    journalId: 'journal-columns',\n                    multiple: true\n                }\n            ]\n        },\n        onSubmit: submission => {\n            let columns = submission.data['selected-columns'] || [];\n            console.log('selected columns', columns);\n            Citeck.Records.get(columns)\n                .load({label: 'label{ru,en}', name: 'name'})\n                .then(applyAutoColumns)\n                .catch(e => formInstance.showErrors(e));\n        }\n    });\n\n}).catch(() => formInstance.showErrors(\"Ошибка при загрузке информации по источнику данных\"));\n\n\n",
-                            "block": true,
-                            "key": "submit2",
-                            "type": "button",
+                            "label": {
+                              "ru": "Тип данных"
+                            },
+                            "journalId": "ecos-types",
+                            "key": "typeRef",
+                            "type": "selectJournal",
                             "input": true
                           }
                         ]
                       }
                     ],
-                    "key": "columns9",
+                    "key": "columns4",
                     "type": "columns",
                     "input": false
                   },
                   {
-                    "label": "Columns",
-                    "hideLabel": true,
+                    "label": {
+                      "ru": "Колонки",
+                      "en": "Columns"
+                    },
                     "disableAddingRemovingRows": false,
                     "addAnother": "",
                     "addAnotherPosition": "bottom",
@@ -341,55 +229,16 @@
                     "reorder": true,
                     "defaultValue": [
                       {
-                        "textField": "",
-                        "label": {
+                        "name": {
                           "ru": "",
                           "en": ""
                         },
-                        "ecosSelect": "",
-                        "types": "",
-                        "name": "",
-                        "attribute": "",
-                        "types2": "",
-                        "checkbox": false,
-                        "visible": true,
                         "type": "",
-                        "visible2": false,
-                        "visible3": false,
-                        "batchEdit": false,
-                        "searchable": true,
-                        "searchable2": false,
-                        "sortable": true,
-                        "groupable": true,
-                        "editable": true,
-                        "sortable2": false,
-                        "hidden": false,
-                        "editable2": false,
-                        "hidden_flag": false,
-                        "value": "Value",
-                        "attributes": {},
-                        "batchEdit2": false,
-                        "groupable2": false,
-                        "hidden_flag2": false,
-                        "attributes2": {},
-                        "container": {},
-                        "label2": {
-                          "label": "",
-                          "en": "",
-                          "textField": "",
-                          "ru": "",
-                          "name": "",
-                          "value": "",
-                          "attributes": ""
-                        },
-                        "label3": {
-                          "en": "",
-                          "ru": ""
-                        },
-                        "control": {
-                          "type": "",
-                          "config": {}
-                        }
+                        "id": "",
+                        "submit4": false,
+                        "computed": [
+                          null
+                        ]
                       }
                     ],
                     "validate": {
@@ -401,323 +250,289 @@
                     "input": true,
                     "components": [
                       {
-                        "label": "",
+                        "label": {
+                          "ru": "Системное имя"
+                        },
+                        "defaultValue": "",
+                        "key": "id",
+                        "type": "textfield",
+                        "input": true,
+                        "row": "0-0"
+                      },
+                      {
+                        "label": {
+                          "ru": "Название колонки",
+                          "en": "Column name"
+                        },
+                        "key": "name",
+                        "type": "mlText",
+                        "input": true,
+                        "row": "0-1"
+                      },
+                      {
+                        "label": {
+                          "ru": "Тип данных",
+                          "en": "Data type"
+                        },
                         "key": "panel",
                         "type": "panel",
                         "input": false,
                         "components": [
                           {
-                            "columns": [
-                              {
-                                "components": [
-                                  {
-                                    "label": "Label",
-                                    "defaultValue": {
-                                      "ru": "",
-                                      "en": ""
-                                    },
-                                    "key": "label",
-                                    "type": "mlText",
-                                    "input": true
-                                  }
-                                ],
-                                "type": "column",
-                                "input": false,
-                                "key": "column",
-                                "label": "Column",
-                                "index": 0
-                              },
-                              {
-                                "index": 1,
-                                "type": "column",
-                                "input": false,
-                                "key": "column",
-                                "label": "Column",
-                                "components": [
-                                  {
-                                    "label": "System name",
-                                    "defaultValue": "",
-                                    "key": "name",
-                                    "type": "textfield",
-                                    "input": true
-                                  }
-                                ]
-                              }
-                            ],
-                            "key": "columns2",
-                            "type": "columns",
-                            "input": false
-                          },
-                          {
-                            "title": "Settings",
-                            "collapsible": true,
-                            "collapsed": true,
-                            "key": "panel3",
-                            "type": "panel",
-                            "input": false,
-                            "components": [
-                              {
-                                "columns": [
-                                  {
-                                    "components": [
-                                      {
-                                        "label": "Column attribute",
-                                        "defaultValue": "",
-                                        "key": "attribute",
-                                        "type": "textfield",
-                                        "input": true
-                                      },
-                                      {
-                                        "label": "Flags",
-                                        "title": "Flags",
-                                        "collapsible": true,
-                                        "key": "panel7",
-                                        "type": "panel",
-                                        "input": false,
-                                        "components": [
-                                          {
-                                            "label": "Visible",
-                                            "defaultValue": true,
-                                            "key": "visible",
-                                            "type": "checkbox",
-                                            "hasThreeStates": true,
-                                            "input": true
-                                          },
-                                          {
-                                            "label": "Searchable",
-                                            "defaultValue": true,
-                                            "key": "searchable",
-                                            "type": "checkbox",
-                                            "hasThreeStates": true,
-                                            "input": true
-                                          },
-                                          {
-                                            "label": "Sortable",
-                                            "defaultValue": true,
-                                            "key": "sortable",
-                                            "type": "checkbox",
-                                            "hasThreeStates": true,
-                                            "input": true
-                                          },
-                                          {
-                                            "label": "Groupable",
-                                            "defaultValue": true,
-                                            "key": "groupable",
-                                            "type": "checkbox",
-                                            "hasThreeStates": true,
-                                            "input": true
-                                          },
-                                          {
-                                            "label": "Editable",
-                                            "defaultValue": true,
-                                            "key": "editable",
-                                            "type": "checkbox",
-                                            "hasThreeStates": true,
-                                            "input": true
-                                          },
-                                          {
-                                            "label": "Hidden",
-                                            "key": "hidden",
-                                            "hasThreeStates": true,
-                                            "properties": {
-                                              "attribute": "hidden"
-                                            },
-                                            "type": "checkbox",
-                                            "input": true
-                                          }
-                                        ],
-                                        "collapsed": true,
-                                        "row": "0-3"
-                                      },
-                                      {
-                                        "title": "Control",
-                                        "collapsible": true,
-                                        "key": "panel2",
-                                        "type": "panel",
-                                        "input": false,
-                                        "components": [
-                                          {
-                                            "label": "columnControl",
-                                            "hideLabel": true,
-                                            "key": "control",
-                                            "type": "container",
-                                            "input": true,
-                                            "components": [
-                                              {
-                                                "label": "Type",
-                                                "defaultValue": "",
-                                                "key": "type",
-                                                "type": "textfield",
-                                                "input": true
-                                              },
-                                              {
-                                                "label": "Config",
-                                                "keyLabel": "",
-                                                "key": "config",
-                                                "type": "datamap",
-                                                "input": true,
-                                                "valueComponent": {
-                                                  "type": "textfield",
-                                                  "key": "value",
-                                                  "label": "Value",
-                                                  "defaultValue": "Value",
-                                                  "input": true,
-                                                  "conditional": {
-                                                    "show": null,
-                                                    "when": null,
-                                                    "eq": "",
-                                                    "json": ""
-                                                  }
-                                                }
-                                              }
-                                            ]
-                                          }
-                                        ],
-                                        "collapsed": true,
-                                        "lazyLoad": false
-                                      },
-                                      {
-                                        "title": "Formatter",
-                                        "collapsible": true,
-                                        "key": "panel5",
-                                        "type": "panel",
-                                        "input": false,
-                                        "components": [
-                                          {
-                                            "label": "columnFormatter",
-                                            "hideLabel": true,
-                                            "key": "formatter",
-                                            "type": "container",
-                                            "input": true,
-                                            "components": [
-                                              {
-                                                "label": "Type",
-                                                "defaultValue": "",
-                                                "key": "type",
-                                                "type": "textfield",
-                                                "input": true
-                                              },
-                                              {
-                                                "label": "Config",
-                                                "keyLabel": "",
-                                                "key": "config",
-                                                "type": "datamap",
-                                                "input": true,
-                                                "valueComponent": {
-                                                  "type": "textfield",
-                                                  "key": "value",
-                                                  "label": "Value",
-                                                  "defaultValue": "Value",
-                                                  "input": true,
-                                                  "conditional": {
-                                                    "show": null,
-                                                    "when": null,
-                                                    "eq": "",
-                                                    "json": ""
-                                                  }
-                                                }
-                                              }
-                                            ]
-                                          }
-                                        ],
-                                        "collapsed": true,
-                                        "lazyLoad": false
-                                      }
-                                    ],
-                                    "type": "column",
-                                    "input": false,
-                                    "key": "column",
-                                    "label": "Column",
-                                    "index": 0
-                                  },
-                                  {
-                                    "index": 1,
-                                    "type": "column",
-                                    "input": false,
-                                    "key": "column",
-                                    "label": "Column",
-                                    "components": [
-                                      {
-                                        "label": "Data type",
-                                        "dataSrc": "values",
-                                        "data": {
-                                          "values": [
-                                            {
-                                              "label": "text",
-                                              "value": "text"
-                                            },
-                                            {
-                                              "label": "number",
-                                              "value": "double"
-                                            },
-                                            {
-                                              "label": "date",
-                                              "value": "date"
-                                            },
-                                            {
-                                              "label": "datetime",
-                                              "value": "datetime"
-                                            },
-                                            {
-                                              "label": "boolean",
-                                              "value": "boolean"
-                                            },
-                                            {
-                                              "label": "assoc",
-                                              "value": "assoc"
-                                            },
-                                            {
-                                              "label": "options",
-                                              "value": "options"
-                                            },
-                                            {
-                                              "label": "person",
-                                              "value": "person"
-                                            },
-                                            {
-                                              "label": "authorityGroup",
-                                              "value": "authorityGroup"
-                                            },
-                                            {
-                                              "label": "authority",
-                                              "value": "authority"
-                                            }
-                                          ]
-                                        },
-                                        "defaultValue": "",
-                                        "key": "type",
-                                        "type": "ecosSelect",
-                                        "input": true
-                                      },
-                                      {
-                                        "label": "Attributes",
-                                        "keyLabel": "",
-                                        "key": "attributes",
-                                        "type": "datamap",
-                                        "input": true
-                                      }
-                                    ]
-                                  }
-                                ],
-                                "key": "columns4",
-                                "type": "columns",
-                                "input": false
-                              }
-                            ]
+                            "label": {
+                              "ru": "Тип данных",
+                              "en": "Data type"
+                            },
+                            "hideLabel": true,
+                            "data": {
+                              "values": [
+                                {
+                                  "label": "Ассоциация",
+                                  "value": "ASSOC"
+                                },
+                                {
+                                  "label": "Человек",
+                                  "value": "PERSON"
+                                },
+                                {
+                                  "label": "Группа",
+                                  "value": "AUTHORITY_GROUP"
+                                },
+                                {
+                                  "label": "Группа или человек",
+                                  "value": "AUTHORITY"
+                                },
+                                {
+                                  "label": "Текст",
+                                  "value": "TEXT"
+                                },
+                                {
+                                  "label": "Мультиязычный текст",
+                                  "value": "MLTEXT"
+                                },
+                                {
+                                  "label": "Число",
+                                  "value": "NUMBER"
+                                },
+                                {
+                                  "label": "Булево",
+                                  "value": "BOOLEAN"
+                                },
+                                {
+                                  "label": "Дата",
+                                  "value": "DATE"
+                                },
+                                {
+                                  "label": "Дата и время",
+                                  "value": "DATETIME"
+                                },
+                                {
+                                  "label": "Контент",
+                                  "value": "CONTENT"
+                                }
+                              ]
+                            },
+                            "valueProperty": "value",
+                            "refreshOn": [],
+                            "key": "type",
+                            "defaultValue": "",
+                            "type": "select",
+                            "input": true
                           }
                         ],
-                        "row": "0-0"
+                        "row": "0-2"
+                      },
+                      {
+                        "label": {
+                          "ru": "Дополнительно",
+                          "en": "Additional"
+                        },
+                        "key": "panel2",
+                        "type": "panel",
+                        "input": false,
+                        "components": [
+                          {
+                            "label": {
+                              "ru": "Дополнительно",
+                              "en": "Additional"
+                            },
+                            "action": "custom",
+                            "state": "",
+                            "showValidations": false,
+                            "custom": "\nvar currentRow = row;\n\nCiteck.EcosFormUtils.getFormById('uiserv/form@journal-column-data-form', {\n    definition: 'definition?json'\n}).then(function(formConfig) {\n\n    var inputs = [\n        'attribute',\n        'editor',\n        'formatter',\n        'searchable',\n        'searchableByText',\n        'sortable',\n        'groupable',\n        'editable',\n        'visible',\n        'hidden',\n        'multiple',\n        'computed',\n        'properties'\n    ];\n\n    var formData = {};\n\n    for (var i = 0; i < inputs.length; i++) {\n        var att = inputs[i];\n        var value = currentRow[att];\n        if (value === undefined) {\n            value = null;\n        } else if (Array.isArray(value)) {\n            value = value.filter(function(it) { return !!it; });\n        }\n        formData[att] = value;\n    }\n\n    Citeck.Dialogs.showFormDialog({\n        title: 'Column additional config',\n        showDefaultButtons: true,\n        formDefinition: formConfig.definition,\n        formData: formData,\n        onSubmit: submission => {\n            var data = submission.data || {};\n            for (var i = 0; i < inputs.length; i++) {\n                var att = inputs[i];\n                currentRow[att] = data[att];\n            }\n        }\n    })\n});\n",
+                            "block": true,
+                            "key": "submit4",
+                            "type": "button",
+                            "input": true,
+                            "row": "0-2"
+                          },
+                          {
+                            "label": {
+                              "ru": "attribute"
+                            },
+                            "key": "attribute",
+                            "type": "hidden",
+                            "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "editor"
+                            },
+                            "key": "editor",
+                            "properties": {
+                              "dataType": "json"
+                            },
+                            "type": "hidden",
+                            "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "formatter"
+                            },
+                            "key": "formatter",
+                            "properties": {
+                              "dataType": "json"
+                            },
+                            "type": "hidden",
+                            "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "searchable"
+                            },
+                            "key": "searchable",
+                            "properties": {
+                              "dataType": "bool"
+                            },
+                            "type": "hidden",
+                            "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "searchableByText"
+                            },
+                            "key": "searchableByText",
+                            "properties": {
+                              "dataType": "bool"
+                            },
+                            "type": "hidden",
+                            "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "sortable"
+                            },
+                            "key": "sortable",
+                            "properties": {
+                              "dataType": "bool"
+                            },
+                            "type": "hidden",
+                            "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "groupable"
+                            },
+                            "key": "groupable",
+                            "properties": {
+                              "dataType": "bool"
+                            },
+                            "type": "hidden",
+                            "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "editable"
+                            },
+                            "key": "editable",
+                            "properties": {
+                              "dataType": "bool"
+                            },
+                            "type": "hidden",
+                            "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "visible"
+                            },
+                            "key": "visible",
+                            "properties": {
+                              "dataType": "bool"
+                            },
+                            "type": "hidden",
+                            "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "hidden"
+                            },
+                            "key": "hidden",
+                            "properties": {
+                              "dataType": "bool"
+                            },
+                            "type": "hidden",
+                            "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "multiple"
+                            },
+                            "key": "multiple",
+                            "properties": {
+                              "dataType": "bool"
+                            },
+                            "type": "hidden",
+                            "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "computed"
+                            },
+                            "multiple": true,
+                            "key": "computed",
+                            "properties": {
+                              "dataType": "json"
+                            },
+                            "type": "hidden",
+                            "input": true,
+                            "reorder": false
+                          },
+                          {
+                            "label": {
+                              "ru": "properties"
+                            },
+                            "key": "properties",
+                            "properties": {
+                              "dataType": "json"
+                            },
+                            "type": "hidden",
+                            "input": true
+                          }
+                        ],
+                        "row": "0-3"
                       }
                     ]
                   }
                 ]
-              },
+              }
+            ]
+          },
+          {
+            "label": "Actions",
+            "key": "actions",
+            "components": [
               {
-                "label": "Create Variants",
-                "key": "createVariants",
+                "label": {
+                  "ru": "Panel"
+                },
+                "key": "panel4",
+                "type": "panel",
+                "input": false,
                 "components": [
                   {
-                    "label": "Create Variants",
+                    "label": {
+                      "ru": "Actions Configuration"
+                    },
                     "disableAddingRemovingRows": false,
                     "addAnother": "",
                     "addAnotherPosition": "bottom",
@@ -725,125 +540,296 @@
                     "defaultOpen": false,
                     "layoutFixed": false,
                     "enableRowGroups": false,
-                    "multiple": true,
                     "reorder": false,
                     "defaultValue": [
                       {
-                        "id": "",
-                        "container": {},
-                        "title": "",
-                        "type": "",
-                        "formKey": "",
-                        "params": {},
-                        "value": "Value",
-                        "ru": "",
                         "textField": "",
-                        "en": "",
-                        "recordRef": "",
+                        "id2": "",
                         "mlText": {
                           "ru": "",
                           "en": ""
                         },
-                        "selectJournal": "",
-                        "formRef": "",
-                        "attributes2": {}
+                        "name2": {
+                          "ru": "",
+                          "en": ""
+                        },
+                        "type2": "",
+                        "value": "Value",
+                        "config": {},
+                        "type": "",
+                        "id": "",
+                        "name": {
+                          "ru": "",
+                          "en": ""
+                        },
+                        "configMap": {}
                       }
                     ],
                     "validate": {
                       "minLength": "",
                       "maxLength": ""
                     },
-                    "key": "createVariants",
+                    "key": "actionsDef",
                     "type": "datagrid",
                     "input": true,
                     "components": [
                       {
-                        "key": "panel11",
+                        "label": {
+                          "ru": "Panel"
+                        },
+                        "key": "panel5",
                         "type": "panel",
                         "input": false,
                         "components": [
                           {
-                            "label": "Id",
+                            "label": {
+                              "ru": "Id"
+                            },
                             "defaultValue": "",
                             "key": "id",
                             "type": "textfield",
                             "input": true
                           },
                           {
-                            "label": "Record Ref",
-                            "defaultValue": "",
-                            "key": "recordRef",
-                            "type": "textfield",
+                            "label": {
+                              "ru": "Имя",
+                              "en": "Name"
+                            },
+                            "key": "name",
+                            "type": "mlText",
                             "input": true
                           }
                         ],
                         "row": "0-0"
                       },
                       {
-                        "key": "panel12",
+                        "label": {
+                          "ru": "Panel"
+                        },
+                        "key": "panel6",
                         "type": "panel",
                         "input": false,
                         "components": [
                           {
-                            "label": "Name",
-                            "key": "name",
-                            "type": "mlText",
+                            "label": {
+                              "ru": "Тип",
+                              "en": "Type"
+                            },
+                            "defaultValue": "",
+                            "key": "type",
+                            "type": "textfield",
                             "input": true
                           },
                           {
-                            "label": "Form",
-                            "journalId": "ecos-forms",
-                            "key": "formRef",
-                            "type": "selectJournal",
+                            "label": {
+                              "ru": "Config"
+                            },
+                            "keyLabel": "",
+                            "key": "configMap",
+                            "type": "datamap",
                             "input": true
                           }
                         ],
                         "row": "0-1"
-                      },
-                      {
-                        "label": "Attributes",
-                        "keyLabel": "",
-                        "key": "attributes",
-                        "type": "datamap",
-                        "input": true,
-                        "row": "0-2"
                       }
-                    ],
-                    "tab": 3
+                    ]
                   }
                 ]
               }
-            ],
-            "key": "tabs2",
-            "type": "tabs",
-            "input": false
+            ]
+          },
+          {
+            "label": "Advanced",
+            "key": "advanced",
+            "components": [
+              {
+                "label": {
+                  "ru": "Columns"
+                },
+                "columns": [
+                  {
+                    "components": [
+                      {
+                        "label": {
+                          "en": "Source ID",
+                          "ru": "Идентификатор источника данных"
+                        },
+                        "description": {
+                          "ru": "По умолчанию загружается из связанного типа"
+                        },
+                        "defaultValue": "",
+                        "key": "sourceId",
+                        "type": "textfield",
+                        "input": true
+                      },
+                      {
+                        "label": {
+                          "ru": "Предикат"
+                        },
+                        "description": {
+                          "ru": "Дополнительные условия поиска записей в журнале"
+                        },
+                        "editor": "ace",
+                        "defaultValue": "",
+                        "key": "predicate",
+                        "as": "",
+                        "type": "textarea",
+                        "input": true
+                      },
+                      {
+                        "label": {
+                          "ru": "Дополнительные свойства"
+                        },
+                        "keyLabel": "",
+                        "key": "properties",
+                        "type": "datamap",
+                        "input": true
+                      }
+                    ],
+                    "type": "column",
+                    "input": false,
+                    "key": "column",
+                    "index": 0
+                  },
+                  {
+                    "index": 1,
+                    "type": "column",
+                    "input": false,
+                    "key": "column",
+                    "components": [
+                      {
+                        "label": {
+                          "ru": "Группировать по"
+                        },
+                        "multiple": true,
+                        "reorder": true,
+                        "defaultValue": [
+                          ""
+                        ],
+                        "key": "groupBy",
+                        "type": "textfield",
+                        "input": true
+                      },
+                      {
+                        "label": {
+                          "ru": "Сортировать по"
+                        },
+                        "disableAddingRemovingRows": false,
+                        "addAnother": "",
+                        "addAnotherPosition": "bottom",
+                        "removePlacement": "col",
+                        "defaultOpen": false,
+                        "layoutFixed": false,
+                        "enableRowGroups": false,
+                        "multiple": true,
+                        "reorder": false,
+                        "defaultValue": [
+                          {
+                            "attribute": "",
+                            "ascending": false
+                          }
+                        ],
+                        "validate": {
+                          "minLength": "",
+                          "maxLength": ""
+                        },
+                        "key": "sortBy",
+                        "type": "datagrid",
+                        "input": true,
+                        "components": [
+                          {
+                            "label": {
+                              "ru": "Атрибут"
+                            },
+                            "defaultValue": "",
+                            "key": "attribute",
+                            "type": "textfield",
+                            "input": true,
+                            "row": "0-0"
+                          },
+                          {
+                            "label": {
+                              "ru": "По возрастанию"
+                            },
+                            "labelPosition": "",
+                            "key": "ascending",
+                            "type": "checkbox",
+                            "input": true,
+                            "row": "0-1"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "key": "columns3",
+                "type": "columns",
+                "input": false,
+                "tab": 2
+              }
+            ]
           }
-        ]
+        ],
+        "key": "tabs2",
+        "type": "tabs",
+        "input": false
       },
       {
+        "label": {
+          "ru": "Actions"
+        },
         "columns": [
           {
             "components": [],
+            "md": 3,
             "type": "column",
             "input": false,
             "key": "column",
-            "label": "Column",
-            "index": 0,
-            "clearOnHide": true,
-            "conditional": {
-              "show": null,
-              "when": null
-            }
+            "index": 0
           },
           {
-            "index": 1,
+            "md": 3,
             "type": "column",
             "input": false,
             "key": "column",
-            "label": "Column",
+            "index": 1,
+            "components": []
+          },
+          {
+            "md": 3,
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 2,
             "components": [
               {
-                "label": "Save",
+                "label": {
+                  "ru": "Отменить",
+                  "en": "Cancel"
+                },
+                "action": "event",
+                "state": "",
+                "showValidations": false,
+                "event": "cancel",
+                "block": true,
+                "key": "submit3",
+                "type": "button",
+                "input": true
+              }
+            ]
+          },
+          {
+            "md": 3,
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 3,
+            "components": [
+              {
+                "label": {
+                  "ru": "Сохранить",
+                  "en": "Save"
+                },
                 "state": "",
                 "theme": "primary",
                 "block": true,
@@ -852,15 +838,10 @@
                 "type": "button",
                 "input": true
               }
-            ],
-            "clearOnHide": true,
-            "conditional": {
-              "show": null,
-              "when": null
-            }
+            ]
           }
         ],
-        "key": "columns6",
+        "key": "columns2",
         "type": "columns",
         "input": false
       }

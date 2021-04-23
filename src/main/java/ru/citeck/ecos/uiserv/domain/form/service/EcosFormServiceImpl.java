@@ -16,7 +16,7 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName;
+import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.domain.form.repo.EcosFormEntity;
@@ -67,6 +67,10 @@ public class EcosFormServiceImpl implements EcosFormService {
     @Override
     public List<EcosFormModel> getAllForms(Predicate predicate, int max, int skip) {
 
+        if (max == 0) {
+            return Collections.emptyList();
+        }
+
         PageRequest page = PageRequest.of(skip / max, max, Sort.by(Sort.Direction.DESC, "id"));
 
         FilterPredicate dto = PredicateUtils.convertToDto(predicate, FilterPredicate.class);
@@ -116,6 +120,10 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     @Override
     public List<EcosFormModel> getAllForms(int max, int skip) {
+
+        if (max == 0) {
+            return Collections.emptyList();
+        }
 
         PageRequest page = PageRequest.of(skip / max, max, Sort.by(Sort.Direction.DESC, "id"));
 

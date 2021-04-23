@@ -2,14 +2,13 @@ package ru.citeck.ecos.uiserv.domain.menu.service.resolving;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.i18n.LocaleContextHolder;
-import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
+import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
-import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemActionDto;
-import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDto;
-import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDto;
+import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemActionDef;
+import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDef;
+import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef;
 import ru.citeck.ecos.uiserv.domain.menu.service.resolving.resolvers.MenuItemsResolver;
 
 import java.util.*;
@@ -19,18 +18,13 @@ import java.util.stream.Collectors;
 
 public class MenuFactory {
 
-    private final static String userInGroupEvaluatorId = "user-in-group";
-
-    private final Set<String> authorities;
     private final Function<String, String> i18n;
     private final Map<String, MenuItemsResolver> resolvers;
 
-    public MenuFactory(Set<String> userAuthorities,
-                       Function<String, String> i18n,
+    public MenuFactory(Function<String, String> i18n,
                        List<MenuItemsResolver> resolvers) {
 
         this.i18n = i18n;
-        this.authorities = userAuthorities;
         this.resolvers = resolvers.stream().collect(Collectors.toMap(MenuItemsResolver::getId, Function.identity()));
     }
 
@@ -44,8 +38,8 @@ public class MenuFactory {
         return menu;
     }
 
-    private List<ResolvedMenuItemDto> subMenusToItemDtos(Map<String, SubMenuDto> subMenuDtoMap) {
-        SubMenuDto left = subMenuDtoMap.get("left");
+    private List<ResolvedMenuItemDto> subMenusToItemDtos(Map<String, SubMenuDef> subMenuDtoMap) {
+        SubMenuDef left = subMenuDtoMap.get("left");
         if (left == null) {
             return Collections.emptyList();
         }
@@ -53,24 +47,20 @@ public class MenuFactory {
         return constructItems(left.getItems(), null);
     }
 
-    private List<ResolvedMenuItemDto> constructItems(List<MenuItemDto> items, ResolvedMenuItemDto context) {
+    private List<ResolvedMenuItemDto> constructItems(List<MenuItemDef> items, ResolvedMenuItemDto context) {
         if (items == null) {
             return Collections.emptyList();
         }
         List<ResolvedMenuItemDto> result = new ArrayList<>();
 
         items.forEach(itemDto -> {
-            if (itemDto.isItem() && evaluate(itemDto)) {
-                ResolvedMenuItemDto newElement = new ResolvedMenuItemDto();
-                if (context == null) {
-                    Map<String, String> params = new HashMap<>();
-                    params.put("rootElement", "true");
-                    newElement.setParams(params);
-                }
-                result.add(updateItem(newElement, itemDto));
-            } else if (itemDto.isResolver()) {
-                result.addAll(resolve(itemDto, context));
+            ResolvedMenuItemDto newElement = new ResolvedMenuItemDto();
+            if (context == null) {
+                Map<String, String> params = new HashMap<>();
+                params.put("rootElement", "true");
+                newElement.setParams(params);
             }
+            result.add(updateItem(newElement, itemDto));
         });
         return filterElements(result, context);
     }
@@ -100,8 +90,9 @@ public class MenuFactory {
     //todo Since we decided to only allow privileges check as opposed to other "evaluators"
     //(some of them can be slow because they ask something of ecos),
     // we'd better change XML schema accordingly, to avoid having ugly code like this:
-    private boolean evaluate(MenuItemDto item) {
-        RecordEvaluatorDto evaluator = item.getEvaluator();
+    private boolean evaluate(MenuItemDef item) {
+        return true;
+        /*RecordEvaluatorDto evaluator = item.getEvaluator();
         if (evaluator == null) {
             return true;
         }
@@ -123,10 +114,10 @@ public class MenuFactory {
             }
         }
 
-        return false;
+        return false; */
     }
 
-    private List<ResolvedMenuItemDto> resolve(MenuItemDto child, ResolvedMenuItemDto context) {
+    private List<ResolvedMenuItemDto> resolve(MenuItemDef child, ResolvedMenuItemDto context) {
         String resolverId = child.getId();
         if (StringUtils.isEmpty(resolverId)) {
             return Collections.emptyList();
@@ -140,7 +131,7 @@ public class MenuFactory {
             params.put(k, v.textValue());
         });
 
-        MenuItemDto childItem = child.getItems() != null && !child.getItems().isEmpty()
+        MenuItemDef childItem = child.getItems() != null && !child.getItems().isEmpty()
             ? child.getItems().get(0)
             : null;
 
@@ -149,7 +140,7 @@ public class MenuFactory {
             .collect(Collectors.toList());
     }
 
-    private ResolvedMenuItemDto updateItem(ResolvedMenuItemDto targetElement, MenuItemDto newData) {
+    private ResolvedMenuItemDto updateItem(ResolvedMenuItemDto targetElement, MenuItemDef newData) {
         if (targetElement == null) {
             return null;
         }
@@ -157,7 +148,7 @@ public class MenuFactory {
             return targetElement;
         }
 
-        MenuItemActionDto actionDto = newData.getAction();
+        MenuItemActionDef actionDto = newData.getAction();
         if (actionDto != null) {
             Map<String, String> params = new HashMap<>();
             actionDto.getConfig().forEachJ((k, v) -> {
@@ -181,9 +172,9 @@ public class MenuFactory {
             targetElement.setLabel(label);
         }
 
-        String icon = newData.getIcon();
-        if (!StringUtils.isEmpty(icon)) {
-            targetElement.setIcon(icon);
+        RecordRef icon = newData.getIcon();
+        if (!RecordRef.isEmpty(icon)) {
+            targetElement.setIcon(icon.toString());
         }
 
         ObjectData config = newData.getConfig();

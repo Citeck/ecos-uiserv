@@ -1,0 +1,24 @@
+---
+id: ecos-i18n
+name:
+  ru: Локализация
+  en: Localization
+
+system: true
+
+actions:
+  - uiserv/action@ecos-module-download
+  - uiserv/action@delete
+  - uiserv/action@module-copy
+
+columns:
+
+  - id: moduleId
+    name: { ru: Идентификатор, en: Id }
+    type: TEXT
+
+  - id: order
+    name: { ru: Порядок, en: Order }
+    type: TEXT
+
+

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService;
@@ -18,12 +17,9 @@ public class MenuApi {
     private final MenuService menuService;
 
     @GetMapping
-    public ResponseEntity<ResolvedMenuDto> getUserMenu(@ModelAttribute("username") String username) {
-        if (username == null) {
-            throw new IllegalArgumentException("Expecting username");
-        }
+    public ResponseEntity<ResolvedMenuDto> getUserMenu() {
 
-        ResolvedMenuDto menu = menuService.getResolvedMenuForUser(username);
+        ResolvedMenuDto menu = menuService.getResolvedMenuForCurrentUser();
         if (menu == null) {
             menu = new ResolvedMenuDto();
         }

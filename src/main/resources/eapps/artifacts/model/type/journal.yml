@@ -1,0 +1,23 @@
+---
+id: journal
+name:
+  en: Journal
+  ru: Журнал
+
+system: true
+
+sourceId: uiserv/journal
+
+formRef: uiserv/form@journal-form
+journalRef: uiserv/journal@ecos-journals
+
+defaultCreateVariant: false
+
+createVariants:
+
+  - id: create-new-journal
+    name: { ru: Создать журнал, en: Create journal }
+
+  - id: upload-journal
+    name: { ru: Загрузить журнал, en: Upload journal }
+    formRef: uiserv/form@ecos-module-upload

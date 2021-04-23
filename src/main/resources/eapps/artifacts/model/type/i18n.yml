@@ -1,0 +1,17 @@
+---
+id: i18n
+name:
+  en: i18n
+  ru: i18n
+
+sourceId: uiserv/i18n
+
+system: true
+
+journalRef: uiserv/journal@ecos-i18n
+
+createVariants:
+
+  - id: upload-i18n
+    name: { ru: Загрузить локализацию, en: Upload localization }
+    formRef: uiserv/form@ecos-module-upload

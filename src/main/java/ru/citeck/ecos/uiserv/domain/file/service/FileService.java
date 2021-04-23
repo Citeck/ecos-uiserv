@@ -195,6 +195,11 @@ public class FileService {
     }
 
     public List<File> findByType(FileType type, int max, int skip) {
+
+        if (max == 0) {
+            return Collections.emptyList();
+        }
+
         return fileRepository.findByType(type, PageRequest.of(
             skip / max, max,
             Sort.by(Sort.Direction.DESC, "id"))

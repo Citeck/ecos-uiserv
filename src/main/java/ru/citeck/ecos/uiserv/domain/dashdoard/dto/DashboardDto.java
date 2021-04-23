@@ -1,13 +1,13 @@
 package ru.citeck.ecos.uiserv.domain.dashdoard.dto;
 
-import ecos.com.fasterxml.jackson210.annotation.JsonInclude;
 import lombok.Data;
 import lombok.ToString;
+import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.commons.data.ObjectData;
 
 @Data
-@JsonInclude(value = JsonInclude.Include.NON_DEFAULT)
+@IncludeNonDefault
 @ToString(exclude = { "config" })
 public class DashboardDto {
 

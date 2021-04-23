@@ -7,14 +7,13 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records3.record.op.atts.service.schema.annotation.AttName;
+import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.records2.predicate.model.Predicates;
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService;
-import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
 
 import javax.annotation.PostConstruct;
@@ -132,10 +131,11 @@ public class TypeJournalService {
             return journalByFormIdCache.getUnchecked(formRef.getId())
                 .map(dto -> {
                     JournalWithMeta result = new JournalWithMeta(dto);
-                    result.setTypeRef(typeRef);
-                    result.setSourceId(sourceId);
-                    result.setPredicate(ObjectData.create(Predicates.eq("_etype", typeRef.toString())));
-                    result.setId(JOURNAL_ID_PREFIX + typeRef.getId());
+                    result.setJournalDef(JournalDef.create()
+                        .withTypeRef(typeRef)
+                        .withPredicate(Predicates.eq("_type", typeRef.toString()))
+                        .withId(JOURNAL_ID_PREFIX + typeRef.getId())
+                        .build());
                     return result;
                 });
         }
@@ -144,7 +144,8 @@ public class TypeJournalService {
 
     private Optional<JournalWithMeta> getJournalByFormIdImpl(String formId) {
 
-        EcosFormModel form = formService.getFormById(formId).orElse(null);
+        return Optional.empty();
+        /*EcosFormModel form = formService.getFormById(formId).orElse(null);
         if (form == null) {
             return Optional.empty();
         }
@@ -152,10 +153,10 @@ public class TypeJournalService {
         JournalWithMeta journal = new JournalWithMeta();
         byFormGenerator.fillData(journal, form);
 
-        if (journal.getColumns().isEmpty()) {
+        if (journal.getJournalDef().getColumns().isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(journal);
+        return Optional.of(journal);*/
     }
 
     @Data

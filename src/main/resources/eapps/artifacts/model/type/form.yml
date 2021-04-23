@@ -1,0 +1,20 @@
+---
+id: form
+name:
+  en: Form
+  ru: Форма
+
+sourceId: uiserv/form
+
+system: true
+
+journalRef: uiserv/journal@ecos-forms
+
+createVariants:
+
+  - id: create-new-form
+    name: { ru: Создать форму, en: Create form }
+
+  - id: upload-form
+    name: { ru: Загрузить форму, en: Upload form }
+    formRef: uiserv/form@ecos-module-upload
