@@ -23,6 +23,7 @@ import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
+import ru.citeck.ecos.uiserv.app.application.props.UiServProperties;
 import ru.citeck.ecos.uiserv.domain.journal.dto.ResolvedJournalDto;
 import ru.citeck.ecos.uiserv.domain.journal.service.format.JournalV0Format;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
@@ -43,14 +44,14 @@ public class JournalV0RecordsDao extends LocalRecordsDao
     implements LocalRecordsQueryWithMetaDao<JournalConfig>,
     LocalRecordsMetaDao<JournalConfig> {
 
-    private static final String PROXY_URI = "http://alfresco/share/proxy/alfresco/";
-    private static final String CONFIG_URI = PROXY_URI + "api/journals/journals-config?nodeRef=";
-    private static final String TYPE_URI = PROXY_URI + "api/journals/types/";
+    private static final String CONFIG_URI = "api/journals/journals-config?nodeRef=";
+    private static final String TYPE_URI = "api/journals/types/";
     private static final String NODE_REF_PREFIX = "workspace://";
 
     private final ResolvedJournalRecordsDao journalRecordsDao;
     private final JournalV0Format converter;
     private final RecordsService recordsService;
+    private final UiServProperties properties;
 
     private LoadingCache<ConfigKey, Optional<JournalConfigResp>> configByJournalType;
     private LoadingCache<ConfigKey, Optional<JournalConfigResp>> configByNodeRef;
@@ -171,7 +172,8 @@ public class JournalV0RecordsDao extends LocalRecordsDao
             return Optional.empty();
         }
         try {
-            JournalTypeDto typeDto = recordsRestTemplate.getForObject(TYPE_URI + journalType, JournalTypeDto.class);
+            String url = properties.getAlfrescoServiceUrl() + TYPE_URI + journalType;
+            JournalTypeDto typeDto = recordsRestTemplate.getForObject(url, JournalTypeDto.class);
             if (typeDto != null && StringUtils.isNotBlank(typeDto.getId())) {
                 return Optional.of(typeDto);
             }
@@ -211,7 +213,7 @@ public class JournalV0RecordsDao extends LocalRecordsDao
         if (StringUtils.isBlank(nodeRef) || !nodeRef.startsWith(NODE_REF_PREFIX)) {
             return Optional.empty();
         }
-        String uri = CONFIG_URI + nodeRef;
+        String uri = properties.getAlfrescoServiceUrl() + CONFIG_URI + nodeRef;
         try {
             JournalConfigResp config = recordsRestTemplate.getForObject(uri, JournalConfigResp.class);
             if (config != null && StringUtils.isNotBlank(config.getNodeRef())) {

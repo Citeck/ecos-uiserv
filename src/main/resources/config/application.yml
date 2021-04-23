@@ -15,36 +15,36 @@
 # ===================================================================
 
 eureka:
-    client:
-        enabled: true
-        healthcheck:
-            enabled: true
-        fetch-registry: true
-        register-with-eureka: true
-        instance-info-replication-interval-seconds: 10
-        registry-fetch-interval-seconds: 10
-    instance:
-        appname: uiserv
-        instanceId: uiserv:${spring.application.instance-id:${random.value}}
-        lease-renewal-interval-in-seconds: 5
-        lease-expiration-duration-in-seconds: 10
-        status-page-url-path: ${management.endpoints.web.base-path}/info
-        health-check-url-path: ${management.endpoints.web.base-path}/health
-        metadata-map:
-            zone: primary # This is needed for the load balancer
-            profile: ${spring.profiles.active}
-            version: ${info.project.version:}
-            git-version: ${git.commit.id.describe:}
-            git-commit: ${git.commit.id.abbrev:}
-            git-branch: ${git.branch:}
-       # ip-address: host.docker.internal
-       # hostname: host.docker.internal
+  client:
+    enabled: true
+    healthcheck:
+      enabled: true
+    fetch-registry: true
+    register-with-eureka: true
+    instance-info-replication-interval-seconds: 10
+    registry-fetch-interval-seconds: 10
+  instance:
+    appname: uiserv
+    instanceId: uiserv:${spring.application.instance-id:${random.value}}
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+    status-page-url-path: ${management.endpoints.web.base-path}/info
+    health-check-url-path: ${management.endpoints.web.base-path}/health
+    metadata-map:
+      zone: primary # This is needed for the load balancer
+      profile: ${spring.profiles.active}
+      version: ${info.project.version:}
+      git-version: ${git.commit.id.describe:}
+      git-commit: ${git.commit.id.abbrev:}
+      git-branch: ${git.branch:}
+    # ip-address: host.docker.internal
+    # hostname: host.docker.internal
 ribbon:
-    eureka:
-        enabled: true
+  eureka:
+    enabled: true
 feign:
-    hystrix:
-        enabled: true
+  hystrix:
+    enabled: true
 #    client:
 #        config:
 #            default:
@@ -53,91 +53,91 @@ feign:
 
 # See https://github.com/Netflix/Hystrix/wiki/Configuration
 hystrix:
-    command:
-        default:
-            execution:
-                isolation:
-                    strategy: SEMAPHORE
-# See https://github.com/spring-cloud/spring-cloud-netflix/issues/1330
-#                    thread:
-#                        timeoutInMilliseconds: 10000
-    shareSecurityContext: true
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+  # See https://github.com/spring-cloud/spring-cloud-netflix/issues/1330
+  #                    thread:
+  #                        timeoutInMilliseconds: 10000
+  shareSecurityContext: true
 
 management:
-    endpoints:
-        web:
-            base-path: /management
-            exposure:
-                include: ["configprops", "env", "health", "info", "threaddump", "logfile", "jhi-metrics", "prometheus" ]
-    endpoint:
-        health:
-            show-details: when-authorized
-        jhi-metrics:
-            enabled: true
-    info:
-        git:
-            mode: full
+  endpoints:
+    web:
+      base-path: /management
+      exposure:
+        include: ["configprops", "env", "health", "info", "threaddump", "logfile", "jhi-metrics", "prometheus" ]
+  endpoint:
     health:
-        mail:
-            enabled: false # When using the MailService, configure an SMTP server and set this to true
-    metrics:
-        export:
-            # Prometheus is the default metrics backend
-            prometheus:
-                enabled: true
-                step: 60
-        binders:
-            jvm:
-                enabled: true
-            processor:
-                enabled: true
-            uptime:
-                enabled: true
-            logback:
-                enabled: true
-            files:
-                enabled: true
-            integration:
-                enabled: true
-        distribution:
-            percentiles-histogram:
-                all: true
-            percentiles:
-                all: 0, 0.5, 0.75, 0.95, 0.99, 1.0
-        web:
-            server:
-                auto-time-requests: true
+      show-details: when-authorized
+    jhi-metrics:
+      enabled: true
+  info:
+    git:
+      mode: full
+  health:
+    mail:
+      enabled: false # When using the MailService, configure an SMTP server and set this to true
+  metrics:
+    export:
+      # Prometheus is the default metrics backend
+      prometheus:
+        enabled: true
+        step: 60
+    binders:
+      jvm:
+        enabled: true
+      processor:
+        enabled: true
+      uptime:
+        enabled: true
+      logback:
+        enabled: true
+      files:
+        enabled: true
+      integration:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        all: true
+      percentiles:
+        all: 0, 0.5, 0.75, 0.95, 0.99, 1.0
+    web:
+      server:
+        auto-time-requests: true
 
 spring:
-    application:
-        name: uiserv
-    jpa:
-        open-in-view: false
-        properties:
-            hibernate.jdbc.time_zone: UTC
-        hibernate:
-            ddl-auto: none
-            naming:
-                physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
-                implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
-    messages:
-        basename: i18n/messages
-    mvc:
-        favicon:
-            enabled: false
-    thymeleaf:
-        mode: HTML
+  application:
+    name: uiserv
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+  messages:
+    basename: i18n/messages
+  mvc:
+    favicon:
+      enabled: false
+  thymeleaf:
+    mode: HTML
 
 server:
-    servlet:
-        session:
-            cookie:
-                http-only: true
+  servlet:
+    session:
+      cookie:
+        http-only: true
 
 # Properties to be exposed on the /info management endpoint
 info:
-    # Comma separated list of profiles that will trigger the ribbon to show
-    display-ribbon-on-profiles: "dev"
+  # Comma separated list of profiles that will trigger the ribbon to show
+  display-ribbon-on-profiles: "dev"
 
 # ===================================================================
 # JHipster specific properties
@@ -146,31 +146,31 @@ info:
 # ===================================================================
 
 jhipster:
-    async:
-        core-pool-size: 2
-        max-pool-size: 50
-        queue-capacity: 10000
+  async:
+    core-pool-size: 2
+    max-pool-size: 50
+    queue-capacity: 10000
     # By default CORS is disabled. Uncomment to enable.
     #cors:
-        #allowed-origins: "*"
-        #allowed-methods: "*"
-        #allowed-headers: "*"
-        #exposed-headers: "Authorization,Link,X-Total-Count"
-        #allow-credentials: true
-        #max-age: 1800
-    mail:
-        from: myApp@localhost
-    swagger:
-        default-include-pattern: /api/.*
-        title: uiserv API
-        description: uiserv API documentation
-        version: 0.0.1
-        terms-of-service-url:
-        contact-name:
-        contact-url:
-        contact-email:
-        license:
-        license-url:
+    #allowed-origins: "*"
+    #allowed-methods: "*"
+    #allowed-headers: "*"
+    #exposed-headers: "Authorization,Link,X-Total-Count"
+    #allow-credentials: true
+    #max-age: 1800
+  mail:
+    from: myApp@localhost
+  swagger:
+    default-include-pattern: /api/.*
+    title: uiserv API
+    description: uiserv API documentation
+    version: 0.0.1
+    terms-of-service-url:
+    contact-name:
+    contact-url:
+    contact-email:
+    license:
+    license-url:
 
 # ===================================================================
 # Application specific properties
@@ -179,50 +179,51 @@ jhipster:
 # ===================================================================
 
 application:
-    default-theme-id: citeckTheme
-    #Раньше располагался в конфиге ecos под тем же названием
-    menu-config-authority-order:
-    #A header to look for username if not found in a cookie;
-    #  can turn this attempt off by setting this to empty,
-    #  in particular with "-Dapplication.try-header-for-username="
-    try-header-for-username: X-Alfresco-Remote-User
+  default-theme-id: citeckTheme
+  #Раньше располагался в конфиге ecos под тем же названием
+  menu-config-authority-order:
+  #A header to look for username if not found in a cookie;
+  #  can turn this attempt off by setting this to empty,
+  #  in particular with "-Dapplication.try-header-for-username="
+  try-header-for-username: X-ECOS-User,X-Alfresco-Remote-User
 
 uiserv:
-    config:
-        tabs-enabled:
-            value: true
-        language-switcher-enabled:
-            value: true
-        custom-create-buttons:
-            value: '[]'
-        restrict-access-to-edit-dashboard:
-            value: false
-        active-theme:
-            value: ecos
+  alfresco-service-url: 'http://alfresco/alfresco/s/'
+  config:
+    tabs-enabled:
+      value: true
+    language-switcher-enabled:
+      value: true
+    custom-create-buttons:
+      value: '[]'
+    restrict-access-to-edit-dashboard:
+      value: false
+    active-theme:
+      value: ecos
 
-    ecos-records:
-        apps:
-            alfresco:
-                rec-base-url: /alfresco/s/citeck/ecos/records/
-                rec-user-base-url: /share/proxy/alfresco/citeck/ecos/records/
+  ecos-records:
+    apps:
+      alfresco:
+        rec-base-url: /alfresco/s/citeck/ecos/records/
+        rec-user-base-url: /alfresco/s/citeck/ecos/records/
 
-#eapps:
+    #eapps:
     #ribbon:
-        #listOfServers: localhost:8089
-        #NIWSServerListClassName: com.netflix.loadbalancer.ConfigurationBasedServerList
+    #listOfServers: localhost:8089
+    #NIWSServerListClassName: com.netflix.loadbalancer.ConfigurationBasedServerList
 
 ecos-app:
-    id: ecos-uiserv
-    version: 1.4.0
-    name: UI Server
+  id: ecos-uiserv
+  version: 1.4.0
+  name: UI Server
 
 #alfresco:
 #    schema: https
 
 spring.rabbitmq:
-    host: rabbitmq
-    username: admin
-    password: admin
+  host: rabbitmq
+  username: admin
+  password: admin
 
 # Persisted user configurations limit. If exceeded, the latest configuration is deleted
 max-user-configurations-persisted: 1000

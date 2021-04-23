@@ -1,0 +1,8 @@
+{
+  "id": "view-dashboard",
+  "name": {
+    "ru": "Просмотреть",
+    "en": "View"
+  },
+  "type": "view"
+}

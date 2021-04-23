@@ -159,6 +159,7 @@ public class ActionService {
         action.setName(Json.getMapper().read(actionEntity.getName(), MLText.class));
         action.setPluralName(Json.getMapper().read(actionEntity.getPluralName(), MLText.class));
         action.setType(actionEntity.getType());
+        action.setPreActionModule(actionEntity.getPreActionModule());
         action.setConfirm(Json.getMapper().read(actionEntity.getConfirm(), ActionConfirmDto.class));
         action.setResult(Json.getMapper().read(actionEntity.getResult(), ActionResultDto.class));
 
@@ -209,6 +210,7 @@ public class ActionService {
         actionEntity.setName(Json.getMapper().toString(action.getName()));
         actionEntity.setPluralName(Json.getMapper().toString(action.getPluralName()));
         actionEntity.setType(action.getType());
+        actionEntity.setPreActionModule(action.getPreActionModule());
         actionEntity.setConfirm(Json.getMapper().toString(action.getConfirm()));
         actionEntity.setResult(Json.getMapper().toString(action.getResult()));
         actionEntity.setFeatures(Json.getMapper().toString(action.getFeatures()));

@@ -1,8 +1,0 @@
-{
-    "id": "tasks-actions",
-    "name": {
-        "ru": "Действия для завершения задач",
-        "en": "Actions to complete tasks"
-    },
-    "type": "tasks-actions"
-}

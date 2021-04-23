@@ -1,0 +1,13 @@
+
+modelVersion: "1.0"
+
+source-id: "action"
+
+internal: true
+
+name:
+  ru: UI Действие
+  en: UI Action
+
+controller:
+  type: json

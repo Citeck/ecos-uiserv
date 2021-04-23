@@ -103,7 +103,7 @@ public class DevModuleRecords extends LocalRecordsDao implements LocalRecordsQue
         action.setName(new MLText("Reload " + name));
         action.setType("fetch");
         ObjectData config = ObjectData.create();
-        config.set("url", "/share/proxy/alfresco/citeck/dev/reset-cache");
+        config.set("url", "/gateway/alfresco/alfresco/s/citeck/dev/reset-cache");
         config.set("method", "POST");
         config.set("body", "{\"" + code + "\":true}");
         action.setConfig(config);

@@ -1,0 +1,13 @@
+
+modelVersion: "1.0"
+
+source-id: ""
+
+name:
+  ru: UI Тема
+  en: UI Theme
+
+controller:
+  type: script
+  config:
+    script: ThemeController.groovy

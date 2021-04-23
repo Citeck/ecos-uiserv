@@ -1,0 +1,870 @@
+{
+  "id": "journal-form",
+  "formKey": "journal-form",
+  "system": true,
+  "title": {
+    "en": "Journal form"
+  },
+  "description": {
+    "en": ""
+  },
+  "customModule": null,
+  "typeRef": "emodel/type@journal",
+  "width": "default",
+  "i18n": {
+    "ru": {
+      "Load columns": "Загрузить колонки",
+      "Load columns from external source": "Загрузить колонки из внешнего источника",
+      "Auto columns URL": "URL для загрузки колонок",
+      "Method": "Метод (GET или POST)",
+      "Label": "Наименование",
+      "System name": "Системное имя",
+      "Column attribute": "Атрибут для загрузки данных (по умолчанию используется системное имя)",
+      "Data type": "Тип данных",
+      "Settings": "Настройки",
+      "Attributes": "Атрибуты",
+      "Flags": "Флаги",
+      "Visible": "Видим по умолчанию (если \"Нет\", то пользователь может добавить колонку через настройки)",
+      "Searchable": "Доступен ли поиск по атрибуту?",
+      "Sortable": "Доступна ли сортировка?",
+      "Groupable": "Доступна ли группировка?",
+      "Editable": "Доступно ли редактирование в таблице?",
+      "Hidden": "Атрибут спрятан от пользователя?",
+      "Add columns": "Добавить колонки",
+      "Main tab": "Основное",
+      "Columns tab": "Колонки",
+      "Group Actions": "Групповые действия",
+      "Module ID": "Идентификатор журнала",
+      "Journal Label": "Наименование журнала",
+      "Meta record": "Запись для загрузки метаданных для атрибутов",
+      "Predicate": "Предикат (дополнительные условия для фильтрации записей в журнале)",
+      "Sort by": "Сортировка",
+      "Case Type": "Тип кейса",
+      "Source ID": "Идентификатор источника данных",
+      "Actions": "Действия",
+      "Attribute": "Атрибут",
+      "Ascending": "По возрастанию",
+      "Key": "Ключ",
+      "Value": "Значение",
+      "Add Another": "Добавить",
+      "Group actions": "Групповые действия",
+      "Save": "Сохранить",
+      "Control": "Контрол",
+      "Config": "Конфигурация",
+      "columnFormatter": "Форматтер"
+    },
+    "en": {
+      "Load columns": "Load columns",
+      "Load columns from external source": "Load columns from external source",
+      "Auto columns URL": "URL to load columns config ",
+      "Method": "Method (GET or POST)",
+      "Label": "Наименование",
+      "System name": "System name",
+      "Column attribute": "Attribute to load data (system name used by default)",
+      "Data type": "Data type",
+      "Settings": "Settings",
+      "Attributes": "Attributes",
+      "Flags": "Flags",
+      "Visible": "Visible by default (if \"False\" user can add column in settings)",
+      "Searchable": "Is search by the attribute allowed?",
+      "Sortable": "Is sorting allowed?",
+      "Groupable": "Is grouping allowed?",
+      "Editable": "Is in-table editing allowed?",
+      "Hidden": "Is attribute hidden for user?",
+      "Add columns": "Add columns",
+      "Main tab": "Main",
+      "Columns tab": "Columns",
+      "Group Actions": "Group Actions",
+      "Module ID": "Journal Id",
+      "Journal Label": "Journal Label",
+      "Meta record": "Record to load metadata for attributes",
+      "Predicate": "Predicate (additional filter conditions for records in journal)",
+      "Sort by": "Sort by",
+      "Case Type": "Case Type",
+      "Source ID": "Data source ID",
+      "Actions": "Actions",
+      "Attribute": "Attribute",
+      "Ascending": "Ascending",
+      "Key": "Key",
+      "Value": "Value",
+      "Add Another": "Add Another",
+      "Group actions": "Group actions",
+      "Save": "Save",
+      "Control": "Control",
+      "Config": "Config",
+      "columnFormatter": "Formatter"
+    }
+  },
+  "definition": {
+    "components": [
+      {
+        "scrollableContent": true,
+        "key": "panel4",
+        "type": "panel",
+        "input": false,
+        "components": [
+          {
+            "components": [
+              {
+                "label": "Main tab",
+                "key": "main",
+                "components": [
+                  {
+                    "columns": [
+                      {
+                        "components": [
+                          {
+                            "label": "Module ID",
+                            "defaultValue": "",
+                            "key": "moduleId",
+                            "type": "textfield",
+                            "input": true
+                          },
+                          {
+                            "label": "Source ID",
+                            "defaultValue": "",
+                            "key": "sourceId",
+                            "type": "textfield",
+                            "input": true
+                          },
+                          {
+                            "label": "Predicate",
+                            "defaultValue": "",
+                            "key": "predicate",
+                            "type": "textarea",
+                            "ecos": {
+                              "dataType": "json"
+                            },
+                            "input": true,
+                            "editor": "ace"
+                          },
+                          {
+                            "label": "Sort by",
+                            "disableAddingRemovingRows": false,
+                            "addAnother": "",
+                            "addAnotherPosition": "bottom",
+                            "removePlacement": "col",
+                            "defaultOpen": false,
+                            "layoutFixed": false,
+                            "enableRowGroups": false,
+                            "multiple": true,
+                            "reorder": false,
+                            "defaultValue": [
+                              {
+                                "attribute2": "",
+                                "ascending": false,
+                                "attribute": ""
+                              }
+                            ],
+                            "validate": {
+                              "minLength": "",
+                              "maxLength": ""
+                            },
+                            "key": "sortBy",
+                            "type": "datagrid",
+                            "input": true,
+                            "components": [
+                              {
+                                "label": "Attribute",
+                                "defaultValue": "",
+                                "key": "attribute",
+                                "type": "textfield",
+                                "input": true,
+                                "row": "0-0"
+                              },
+                              {
+                                "label": "Ascending",
+                                "key": "ascending",
+                                "type": "checkbox",
+                                "input": true,
+                                "row": "0-1"
+                              }
+                            ]
+                          }
+                        ],
+                        "type": "column",
+                        "input": false,
+                        "key": "column",
+                        "label": "Column",
+                        "index": 0,
+                        "clearOnHide": true,
+                        "conditional": {
+                          "show": null,
+                          "when": null
+                        }
+                      },
+                      {
+                        "index": 1,
+                        "type": "column",
+                        "input": false,
+                        "key": "column",
+                        "label": "Column",
+                        "components": [
+                          {
+                            "label": "Journal Label",
+                            "defaultValue": {
+                              "ru": "",
+                              "en": ""
+                            },
+                            "key": "label",
+                            "type": "mlText",
+                            "input": true
+                          },
+                          {
+                            "label": "Meta record",
+                            "defaultValue": "",
+                            "key": "metaRecord",
+                            "type": "textfield",
+                            "input": true
+                          },
+                          {
+                            "label": "Case Type",
+                            "journalId": "ecos-types",
+                            "key": "typeRef",
+                            "type": "selectJournal",
+                            "input": true,
+                            "customPredicateJs": null,
+                            "presetFilterPredicatesJs": null
+                          },
+                          {
+                            "label": "Actions",
+                            "multiple": true,
+                            "journalId": "ui-actions",
+                            "key": "actions",
+                            "type": "selectJournal",
+                            "input": true,
+                            "reorder": false
+                          },
+                          {
+                            "label": "Editable",
+                            "key": "editable",
+                            "type": "checkbox",
+                            "input": true
+                          }
+                        ],
+                        "clearOnHide": true,
+                        "conditional": {
+                          "show": null,
+                          "when": null
+                        }
+                      }
+                    ],
+                    "key": "columns7",
+                    "type": "columns",
+                    "input": false,
+                    "tab": 0
+                  },
+                  {
+                    "label": "Attributes",
+                    "keyLabel": "",
+                    "key": "attributes",
+                    "type": "datamap",
+                    "input": true,
+                    "valueComponent": {
+                      "type": "textfield",
+                      "key": "value",
+                      "label": "Value",
+                      "defaultValue": "Value",
+                      "input": true,
+                      "conditional": {
+                        "show": null,
+                        "when": null,
+                        "eq": "",
+                        "json": ""
+                      }
+                    },
+                    "tab": 0
+                  }
+                ]
+              },
+              {
+                "label": "Columns",
+                "key": "columns5",
+                "components": [
+                  {
+                    "columns": [
+                      {
+                        "components": [],
+                        "md": 4,
+                        "type": "column",
+                        "input": false,
+                        "key": "column",
+                        "label": "Column",
+                        "index": 0
+                      },
+                      {
+                        "md": 4,
+                        "type": "column",
+                        "input": false,
+                        "key": "column",
+                        "label": "Column",
+                        "index": 1,
+                        "components": []
+                      },
+                      {
+                        "md": 4,
+                        "type": "column",
+                        "input": false,
+                        "key": "column",
+                        "label": "Column",
+                        "index": 2,
+                        "components": [
+                          {
+                            "label": "Add columns",
+                            "action": "custom",
+                            "state": "",
+                            "showValidations": false,
+                            "custom": "\nlet formInstance = instance.root;\nformInstance.showErrors([]);\n\nconst formData = submission.data;\nif (!formData || !formData.sourceId) {\n    formInstance.showErrors(\"Вы должны указать sourceId\");\n}\n\nlet sourceDaoId = \"source\";\nlet journalSourceId = formData.sourceId;\nconst sourceIdSlashIdx = journalSourceId.indexOf('/');\nif (sourceIdSlashIdx > 0) {\n    sourceDaoId = journalSourceId.substring(0, sourceIdSlashIdx) + \"/\" + sourceDaoId;\n    journalSourceId = journalSourceId.substring(sourceIdSlashIdx + 1);\n}\nlet sourceInfoId = Citeck.Records.get(sourceDaoId + '@' + journalSourceId);\nCiteck.Records.get(sourceInfoId).load('columnsSourceId').then(columnsSourceId => {\n\n    if (!columnsSourceId) {\n        formInstance.showErrors(\"Для данного источника данных не настроен источник с колонками.\")\n        return;\n    }\n\n    const currentColumnsSet = {};\n    const currentColumns = _.get(submission, 'data.columns', [])\n    for (let column of currentColumns) {\n        currentColumnsSet[column.name || ''] = true;\n    }\n\n    const applyAutoColumns = (columns) => {\n\n        columns = columns.filter(c => !c.name || !currentColumnsSet[c.name]);\n\n        if (columns.length) {\n            submission = {\n                ...submission,\n                data: {\n                    ...submission.data,\n                    columns: [\n                        ...submission.data.columns,\n                        ...columns\n                    ]\n                }\n            }\n            formInstance.submission = submission;\n        }\n    }\n\n    Citeck.Dialogs.showFormDialog({\n        title: 'Выбор колонок',\n        showDefaultButtons: true,\n        formDefinition: {\n            components: [\n                {\n                    label: 'Колонки',\n                    key: 'selected-columns',\n                    type: \"selectJournal\",\n                    queryData: submission,\n                    customSourceId: columnsSourceId,\n                    journalId: 'journal-columns',\n                    multiple: true\n                }\n            ]\n        },\n        onSubmit: submission => {\n            let columns = submission.data['selected-columns'] || [];\n            console.log('selected columns', columns);\n            Citeck.Records.get(columns)\n                .load({label: 'label{ru,en}', name: 'name'})\n                .then(applyAutoColumns)\n                .catch(e => formInstance.showErrors(e));\n        }\n    });\n\n}).catch(() => formInstance.showErrors(\"Ошибка при загрузке информации по источнику данных\"));\n\n\n",
+                            "block": true,
+                            "key": "submit2",
+                            "type": "button",
+                            "input": true
+                          }
+                        ]
+                      }
+                    ],
+                    "key": "columns9",
+                    "type": "columns",
+                    "input": false
+                  },
+                  {
+                    "label": "Columns",
+                    "hideLabel": true,
+                    "disableAddingRemovingRows": false,
+                    "addAnother": "",
+                    "addAnotherPosition": "bottom",
+                    "removePlacement": "col",
+                    "defaultOpen": false,
+                    "layoutFixed": false,
+                    "enableRowGroups": false,
+                    "multiple": true,
+                    "reorder": true,
+                    "defaultValue": [
+                      {
+                        "textField": "",
+                        "label": {
+                          "ru": "",
+                          "en": ""
+                        },
+                        "ecosSelect": "",
+                        "types": "",
+                        "name": "",
+                        "attribute": "",
+                        "types2": "",
+                        "checkbox": false,
+                        "visible": true,
+                        "type": "",
+                        "visible2": false,
+                        "visible3": false,
+                        "batchEdit": false,
+                        "searchable": true,
+                        "searchable2": false,
+                        "sortable": true,
+                        "groupable": true,
+                        "editable": true,
+                        "sortable2": false,
+                        "hidden": false,
+                        "editable2": false,
+                        "hidden_flag": false,
+                        "value": "Value",
+                        "attributes": {},
+                        "batchEdit2": false,
+                        "groupable2": false,
+                        "hidden_flag2": false,
+                        "attributes2": {},
+                        "container": {},
+                        "label2": {
+                          "label": "",
+                          "en": "",
+                          "textField": "",
+                          "ru": "",
+                          "name": "",
+                          "value": "",
+                          "attributes": ""
+                        },
+                        "label3": {
+                          "en": "",
+                          "ru": ""
+                        },
+                        "control": {
+                          "type": "",
+                          "config": {}
+                        }
+                      }
+                    ],
+                    "validate": {
+                      "minLength": "",
+                      "maxLength": ""
+                    },
+                    "key": "columns",
+                    "type": "datagrid",
+                    "input": true,
+                    "components": [
+                      {
+                        "label": "",
+                        "key": "panel",
+                        "type": "panel",
+                        "input": false,
+                        "components": [
+                          {
+                            "columns": [
+                              {
+                                "components": [
+                                  {
+                                    "label": "Label",
+                                    "defaultValue": {
+                                      "ru": "",
+                                      "en": ""
+                                    },
+                                    "key": "label",
+                                    "type": "mlText",
+                                    "input": true
+                                  }
+                                ],
+                                "type": "column",
+                                "input": false,
+                                "key": "column",
+                                "label": "Column",
+                                "index": 0
+                              },
+                              {
+                                "index": 1,
+                                "type": "column",
+                                "input": false,
+                                "key": "column",
+                                "label": "Column",
+                                "components": [
+                                  {
+                                    "label": "System name",
+                                    "defaultValue": "",
+                                    "key": "name",
+                                    "type": "textfield",
+                                    "input": true
+                                  }
+                                ]
+                              }
+                            ],
+                            "key": "columns2",
+                            "type": "columns",
+                            "input": false
+                          },
+                          {
+                            "title": "Settings",
+                            "collapsible": true,
+                            "collapsed": true,
+                            "key": "panel3",
+                            "type": "panel",
+                            "input": false,
+                            "components": [
+                              {
+                                "columns": [
+                                  {
+                                    "components": [
+                                      {
+                                        "label": "Column attribute",
+                                        "defaultValue": "",
+                                        "key": "attribute",
+                                        "type": "textfield",
+                                        "input": true
+                                      },
+                                      {
+                                        "label": "Flags",
+                                        "title": "Flags",
+                                        "collapsible": true,
+                                        "key": "panel7",
+                                        "type": "panel",
+                                        "input": false,
+                                        "components": [
+                                          {
+                                            "label": "Visible",
+                                            "defaultValue": true,
+                                            "key": "visible",
+                                            "type": "checkbox",
+                                            "hasThreeStates": true,
+                                            "input": true
+                                          },
+                                          {
+                                            "label": "Searchable",
+                                            "defaultValue": true,
+                                            "key": "searchable",
+                                            "type": "checkbox",
+                                            "hasThreeStates": true,
+                                            "input": true
+                                          },
+                                          {
+                                            "label": "Sortable",
+                                            "defaultValue": true,
+                                            "key": "sortable",
+                                            "type": "checkbox",
+                                            "hasThreeStates": true,
+                                            "input": true
+                                          },
+                                          {
+                                            "label": "Groupable",
+                                            "defaultValue": true,
+                                            "key": "groupable",
+                                            "type": "checkbox",
+                                            "hasThreeStates": true,
+                                            "input": true
+                                          },
+                                          {
+                                            "label": "Editable",
+                                            "defaultValue": true,
+                                            "key": "editable",
+                                            "type": "checkbox",
+                                            "hasThreeStates": true,
+                                            "input": true
+                                          },
+                                          {
+                                            "label": "Hidden",
+                                            "key": "hidden",
+                                            "hasThreeStates": true,
+                                            "properties": {
+                                              "attribute": "hidden"
+                                            },
+                                            "type": "checkbox",
+                                            "input": true
+                                          }
+                                        ],
+                                        "collapsed": true,
+                                        "row": "0-3"
+                                      },
+                                      {
+                                        "title": "Control",
+                                        "collapsible": true,
+                                        "key": "panel2",
+                                        "type": "panel",
+                                        "input": false,
+                                        "components": [
+                                          {
+                                            "label": "columnControl",
+                                            "hideLabel": true,
+                                            "key": "control",
+                                            "type": "container",
+                                            "input": true,
+                                            "components": [
+                                              {
+                                                "label": "Type",
+                                                "defaultValue": "",
+                                                "key": "type",
+                                                "type": "textfield",
+                                                "input": true
+                                              },
+                                              {
+                                                "label": "Config",
+                                                "keyLabel": "",
+                                                "key": "config",
+                                                "type": "datamap",
+                                                "input": true,
+                                                "valueComponent": {
+                                                  "type": "textfield",
+                                                  "key": "value",
+                                                  "label": "Value",
+                                                  "defaultValue": "Value",
+                                                  "input": true,
+                                                  "conditional": {
+                                                    "show": null,
+                                                    "when": null,
+                                                    "eq": "",
+                                                    "json": ""
+                                                  }
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        ],
+                                        "collapsed": true,
+                                        "lazyLoad": false
+                                      },
+                                      {
+                                        "title": "Formatter",
+                                        "collapsible": true,
+                                        "key": "panel5",
+                                        "type": "panel",
+                                        "input": false,
+                                        "components": [
+                                          {
+                                            "label": "columnFormatter",
+                                            "hideLabel": true,
+                                            "key": "formatter",
+                                            "type": "container",
+                                            "input": true,
+                                            "components": [
+                                              {
+                                                "label": "Type",
+                                                "defaultValue": "",
+                                                "key": "type",
+                                                "type": "textfield",
+                                                "input": true
+                                              },
+                                              {
+                                                "label": "Config",
+                                                "keyLabel": "",
+                                                "key": "config",
+                                                "type": "datamap",
+                                                "input": true,
+                                                "valueComponent": {
+                                                  "type": "textfield",
+                                                  "key": "value",
+                                                  "label": "Value",
+                                                  "defaultValue": "Value",
+                                                  "input": true,
+                                                  "conditional": {
+                                                    "show": null,
+                                                    "when": null,
+                                                    "eq": "",
+                                                    "json": ""
+                                                  }
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        ],
+                                        "collapsed": true,
+                                        "lazyLoad": false
+                                      }
+                                    ],
+                                    "type": "column",
+                                    "input": false,
+                                    "key": "column",
+                                    "label": "Column",
+                                    "index": 0
+                                  },
+                                  {
+                                    "index": 1,
+                                    "type": "column",
+                                    "input": false,
+                                    "key": "column",
+                                    "label": "Column",
+                                    "components": [
+                                      {
+                                        "label": "Data type",
+                                        "dataSrc": "values",
+                                        "data": {
+                                          "values": [
+                                            {
+                                              "label": "text",
+                                              "value": "text"
+                                            },
+                                            {
+                                              "label": "number",
+                                              "value": "double"
+                                            },
+                                            {
+                                              "label": "date",
+                                              "value": "date"
+                                            },
+                                            {
+                                              "label": "datetime",
+                                              "value": "datetime"
+                                            },
+                                            {
+                                              "label": "boolean",
+                                              "value": "boolean"
+                                            },
+                                            {
+                                              "label": "assoc",
+                                              "value": "assoc"
+                                            },
+                                            {
+                                              "label": "options",
+                                              "value": "options"
+                                            },
+                                            {
+                                              "label": "person",
+                                              "value": "person"
+                                            },
+                                            {
+                                              "label": "authorityGroup",
+                                              "value": "authorityGroup"
+                                            },
+                                            {
+                                              "label": "authority",
+                                              "value": "authority"
+                                            }
+                                          ]
+                                        },
+                                        "defaultValue": "",
+                                        "key": "type",
+                                        "type": "ecosSelect",
+                                        "input": true
+                                      },
+                                      {
+                                        "label": "Attributes",
+                                        "keyLabel": "",
+                                        "key": "attributes",
+                                        "type": "datamap",
+                                        "input": true
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "key": "columns4",
+                                "type": "columns",
+                                "input": false
+                              }
+                            ]
+                          }
+                        ],
+                        "row": "0-0"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "label": "Create Variants",
+                "key": "createVariants",
+                "components": [
+                  {
+                    "label": "Create Variants",
+                    "disableAddingRemovingRows": false,
+                    "addAnother": "",
+                    "addAnotherPosition": "bottom",
+                    "removePlacement": "col",
+                    "defaultOpen": false,
+                    "layoutFixed": false,
+                    "enableRowGroups": false,
+                    "multiple": true,
+                    "reorder": false,
+                    "defaultValue": [
+                      {
+                        "id": "",
+                        "container": {},
+                        "title": "",
+                        "type": "",
+                        "formKey": "",
+                        "params": {},
+                        "value": "Value",
+                        "ru": "",
+                        "textField": "",
+                        "en": "",
+                        "recordRef": "",
+                        "mlText": {
+                          "ru": "",
+                          "en": ""
+                        },
+                        "selectJournal": "",
+                        "formRef": "",
+                        "attributes2": {}
+                      }
+                    ],
+                    "validate": {
+                      "minLength": "",
+                      "maxLength": ""
+                    },
+                    "key": "createVariants",
+                    "type": "datagrid",
+                    "input": true,
+                    "components": [
+                      {
+                        "key": "panel11",
+                        "type": "panel",
+                        "input": false,
+                        "components": [
+                          {
+                            "label": "Id",
+                            "defaultValue": "",
+                            "key": "id",
+                            "type": "textfield",
+                            "input": true
+                          },
+                          {
+                            "label": "Record Ref",
+                            "defaultValue": "",
+                            "key": "recordRef",
+                            "type": "textfield",
+                            "input": true
+                          }
+                        ],
+                        "row": "0-0"
+                      },
+                      {
+                        "key": "panel12",
+                        "type": "panel",
+                        "input": false,
+                        "components": [
+                          {
+                            "label": "Name",
+                            "key": "name",
+                            "type": "mlText",
+                            "input": true
+                          },
+                          {
+                            "label": "Form",
+                            "journalId": "ecos-forms",
+                            "key": "formRef",
+                            "type": "selectJournal",
+                            "input": true
+                          }
+                        ],
+                        "row": "0-1"
+                      },
+                      {
+                        "label": "Attributes",
+                        "keyLabel": "",
+                        "key": "attributes",
+                        "type": "datamap",
+                        "input": true,
+                        "row": "0-2"
+                      }
+                    ],
+                    "tab": 3
+                  }
+                ]
+              }
+            ],
+            "key": "tabs2",
+            "type": "tabs",
+            "input": false
+          }
+        ]
+      },
+      {
+        "columns": [
+          {
+            "components": [],
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "label": "Column",
+            "index": 0,
+            "clearOnHide": true,
+            "conditional": {
+              "show": null,
+              "when": null
+            }
+          },
+          {
+            "index": 1,
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "label": "Column",
+            "components": [
+              {
+                "label": "Save",
+                "state": "",
+                "theme": "primary",
+                "block": true,
+                "disableOnInvalid": true,
+                "key": "submit",
+                "type": "button",
+                "input": true
+              }
+            ],
+            "clearOnHide": true,
+            "conditional": {
+              "show": null,
+              "when": null
+            }
+          }
+        ],
+        "key": "columns6",
+        "type": "columns",
+        "input": false
+      }
+    ]
+  },
+  "attributes": {}
+}

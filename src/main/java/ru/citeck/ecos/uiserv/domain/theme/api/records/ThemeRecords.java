@@ -26,7 +26,7 @@ import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.uiserv.domain.theme.dto.ThemeDto;
-import ru.citeck.ecos.uiserv.domain.theme.eapp.ThemeModuleHandler;
+import ru.citeck.ecos.uiserv.domain.theme.eapps.ThemeArtifactHandler;
 import ru.citeck.ecos.uiserv.domain.theme.service.ThemeService;
 
 import java.util.*;
@@ -186,9 +186,9 @@ public class ThemeRecords extends LocalRecordsDao implements LocalRecordsQueryWi
             EcosFile theme = ecosMemDir.getChildren().get(0);
             this.setModuleId(theme.getName());
 
-            ThemeModuleHandler.DeployModuleMeta meta = Json.getMapper().read(
+            ThemeArtifactHandler.DeployModuleMeta meta = Json.getMapper().read(
                 theme.getFile("meta.json"),
-                ThemeModuleHandler.DeployModuleMeta.class);
+                ThemeArtifactHandler.DeployModuleMeta.class);
 
             if (meta == null) {
                 throw new IllegalStateException("meta.json is not found");
@@ -213,7 +213,7 @@ public class ThemeRecords extends LocalRecordsDao implements LocalRecordsQueryWi
             EcosMemDir root = new EcosMemDir();
             EcosFile dir = root.createDir(getId());
 
-            ThemeModuleHandler.DeployModuleMeta meta = new ThemeModuleHandler.DeployModuleMeta();
+            ThemeArtifactHandler.DeployModuleMeta meta = new ThemeArtifactHandler.DeployModuleMeta();
 
             meta.setImages(getImages());
             meta.setName(getName());

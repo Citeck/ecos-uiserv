@@ -1,0 +1,15 @@
+
+modelVersion: "1.0"
+
+source-id: ""
+
+name:
+  ru: Меню
+  en: Menu
+
+controller:
+  type: script
+  config:
+    script: MenuController.groovy
+
+

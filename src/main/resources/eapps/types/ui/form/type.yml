@@ -1,0 +1,15 @@
+
+modelVersion: "1.0"
+
+source-id: "eform"
+
+name:
+  ru: Форма
+  en: Form
+
+controller:
+  type: json
+  config:
+    metaFields:
+      name: 'title'
+

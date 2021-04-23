@@ -1,0 +1,18 @@
+{
+  "id": "print",
+  "name": {
+    "ru": "Печатать",
+    "en": "Print"
+  },
+  "type": "open-url",
+  "config": {
+    "url": "/gateway/alfresco/alfresco/citeck/print/printpdf?nodeRef=${recordRef}&print=true"
+  },
+  "evaluator": {
+    "type": "has-attribute",
+    "config": {
+      "attribute": "cm:content"
+    }
+  }
+}
+

@@ -1,0 +1,12 @@
+
+modelVersion: "1.0"
+
+source-id: ""
+
+name:
+  ru: Локализация
+  en: Localization
+
+controller:
+  type: json
+

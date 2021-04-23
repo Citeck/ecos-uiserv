@@ -14,6 +14,7 @@ import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
+import ru.citeck.ecos.uiserv.app.application.props.UiServProperties;
 import ru.citeck.ecos.uiserv.domain.journal.dto.ResolvedJournalDto;
 import ru.citeck.ecos.uiserv.domain.journal.dto.legacy1.Column;
 import ru.citeck.ecos.uiserv.domain.journal.service.format.JournalV1Format;
@@ -32,10 +33,11 @@ public class JournalV1RecordsDao  extends LocalRecordsDao
     implements LocalRecordsQueryWithMetaDao<JournalConfigResp>,
     LocalRecordsMetaDao<JournalConfigResp> {
 
-    private static final String CONFIG_URL = "http://alfresco/share/proxy/alfresco/api/journals/config?journalId=%s";
+    private static final String CONFIG_URL = "/api/journals/config?journalId=%s";
 
     private final ResolvedJournalRecordsDao journalRecordsDao;
     private final JournalV1Format converter;
+    private final UiServProperties properties;
 
     @Qualifier("recordsRestTemplate")
     private final RestTemplate recordsRestTemplate;
@@ -62,10 +64,8 @@ public class JournalV1RecordsDao  extends LocalRecordsDao
 
             if (StringUtils.isBlank(dto.getId())) {
                 try {
-                    JournalConfigResp configResp = recordsRestTemplate.getForObject(
-                        String.format(CONFIG_URL, ref.getId()),
-                        JournalConfigResp.class
-                    );
+                    String url = properties.getAlfrescoServiceUrl() + String.format(CONFIG_URL, ref.getId());
+                    JournalConfigResp configResp = recordsRestTemplate.getForObject(url, JournalConfigResp.class);
                     if (configResp == null) {
                         result.add(converter.convert(dto));
                         continue;
@@ -91,7 +91,10 @@ public class JournalV1RecordsDao  extends LocalRecordsDao
                         result.add(configResp);
                     }
                 } catch (Exception e) {
-                    log.error("JournalConfig query failed. JournalId: '" + ref.getId() + "'", e);
+
+                    log.error("JournalConfig query failed. JournalId: '"
+                        + ref.getId() + ". Msg: '" + e.getMessage() + "'");
+
                     result.add(converter.convert(dto));
                 }
             } else {
