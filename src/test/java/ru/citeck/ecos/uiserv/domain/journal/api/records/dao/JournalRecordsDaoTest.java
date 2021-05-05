@@ -165,9 +165,9 @@ public class JournalRecordsDaoTest {
             "    ]");
 
 
-        journalEntity.setActions("[\"uiserv/action@testAction\",\"uiserv/action@testAction2\"]");
-        List<RecordRef> actions = Json.getMapper().readList(journalEntity.getActions(), RecordRef.class);
-        String actionsString = Json.getMapper().toString(actions);
+        //journalEntity.setActions("[\"uiserv/action@testAction\",\"uiserv/action@testAction2\"]");
+        //List<RecordRef> actions = Json.getMapper().readList(journalEntity.getActions(), RecordRef.class);
+        //String actionsString = Json.getMapper().toString(actions);
 
         journalRepository.save(journalEntity);
 

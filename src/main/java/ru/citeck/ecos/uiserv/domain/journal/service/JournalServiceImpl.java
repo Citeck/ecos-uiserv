@@ -78,7 +78,7 @@ public class JournalServiceImpl implements JournalService {
     @Override
     public Set<JournalWithMeta> getAll(int maxItems, int skipCount) {
 
-        if (maxItems == 0) {
+        if (maxItems <= 0) {
             return Collections.emptySet();
         }
 
