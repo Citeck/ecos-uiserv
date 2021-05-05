@@ -223,6 +223,13 @@ class AdminPageSections : AbstractRecordsDao(), RecordsQueryDao {
                         ObjectData.create("""{
                             "journalId": "file-import-task-item"
                         }""".trimIndent())
+                    ),
+                    PageSection(
+                        MLText("Источники записей"),
+                        SectionType.JOURNAL,
+                        ObjectData.create("""{
+                            "journalId": "records-sources"
+                        }""".trimIndent())
                     )
                 )
             )
