@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class JournalServiceImpl implements JournalService {
 
-    private final Pattern VALID_COLUMN_NAME_PATTERN = Pattern.compile("^[a-zA-Z_][$\\da-zA-Z:_-]*$");
+    private final Pattern VALID_COLUMN_NAME_PATTERN = Pattern.compile("^\\d[a-zA-Z_][$\\da-zA-Z:_-]*$");
     private final Pattern VALID_COLUMN_ATT_PATTERN = Pattern.compile("^[a-zA-Z_][$.\\da-zA-Z:_-]*$");
 
     private final JournalRepository journalRepository;
