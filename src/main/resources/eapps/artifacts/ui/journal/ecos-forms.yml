@@ -7,6 +7,7 @@ name:
 system: true
 
 actions:
+  - uiserv/action@debug-form
   - uiserv/action@ecos-module-download
   - uiserv/action@delete
   - uiserv/action@edit
