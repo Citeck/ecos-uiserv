@@ -1,8 +1,0 @@
-{
-  "id": "debug-form",
-  "name": {
-    "en": "Form test",
-    "ru": "Тестировать форму"
-  },
-  "type": "debug-form"
-}
