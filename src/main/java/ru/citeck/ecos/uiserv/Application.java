@@ -27,7 +27,8 @@ import java.util.Collection;
 @EnableDiscoveryClient
 @EnableJpaRepositories({
     "ru.citeck.ecos.uiserv.app.*.repo",
-    "ru.citeck.ecos.uiserv.domain.*.repo"
+    "ru.citeck.ecos.uiserv.domain.*.repo",
+    "ru.citeck.ecos.uiserv.domain.*.*.*.repo"
 })
 public class Application {
 

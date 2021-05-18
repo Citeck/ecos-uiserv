@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.admin.api.records.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,6 +21,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AdminSecGroupService {
 
     private static final String JOURNAL_NAME = "journal";
@@ -27,16 +29,10 @@ public class AdminSecGroupService {
     private final AdminSecGroupRepository adminSecGroupRepository;
     private final JournalServiceImpl journalService;
 
-    public AdminSecGroupService(@Qualifier("adminSecGroupRepository") AdminSecGroupRepository adminSecGroupRepository,
-                                JournalServiceImpl journalService) {
-        this.adminSecGroupRepository = adminSecGroupRepository;
-        this.journalService = journalService;
-    }
-
     public AdminSecGroupDto save(AdminSecGroupDto dto) {
         AdminSecGroupEntity entity = new AdminSecGroupEntity();
 
-        entity.setExternalId(UUID.randomUUID().toString());
+        entity.setExternalId(dto.getId());
         entity.setName(dto.getName().get());
         entity.setOrder(dto.getOrder());
 
@@ -71,7 +67,7 @@ public class AdminSecGroupService {
 
     private AdminSecGroupDto mapToDto(AdminSecGroupEntity entity) {
         return AdminSecGroupDto.create()
-            .withId(entity.getExternalId()) // GUID
+            .withId(entity.getExternalId())
             .withName(new MLText(entity.getName()))
             .withOrder(entity.getOrder())
             .withSections(DataValue.create(entity.getSections()).asList(AdminSectionDto.class))

@@ -1,0 +1,57 @@
+{
+  "id": "system-management",
+  "name": {
+    "en": "System management",
+    "ru": "Управление системой"
+  },
+  "order": 0,
+  "sections": [
+    {
+      "name": {
+        "en": "Developer tools",
+        "ru": "Инструменты разработчика"
+      },
+      "type": "DEV_TOOLS"
+    },
+    {
+      "name": {
+        "en": "ECOS Applications",
+        "ru": "Приложения ECOS"
+      },
+      "type": "JOURNAL",
+      "config": {
+        "journalId": "ecos-apps"
+      }
+    },
+    {
+      "name": {
+        "en": "ECOS artifacts",
+        "ru": "Артефакты ECOS"
+      },
+      "type": "JOURNAL",
+      "config": {
+        "journalId": "ecos-artifacts"
+      }
+    },
+    {
+      "name": {
+        "en": "Artifact patches",
+        "ru": "Патчи артифактов"
+      },
+      "type": "JOURNAL",
+      "config": {
+        "journalId": "ecos-module-patches"
+      }
+    },
+    {
+      "name": {
+        "en": "Configuration",
+        "ru": "Конфигурация"
+      },
+      "type": "JOURNAL",
+      "config": {
+        "journalId": "ecosConfig"
+      }
+    }
+  ]
+}

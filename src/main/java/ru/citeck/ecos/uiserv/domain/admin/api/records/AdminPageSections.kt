@@ -23,78 +23,78 @@ class AdminPageSections(
         }
 /*
         val result = listOf(
-            PageSectionGroup(
-                MLText("Управление системой"),
-                listOf(
-                    PageSection(
-                        MLText("Инструменты разработчика"),
-                        SectionType.DEV_TOOLS
-                    ),
-                    PageSection(
-                        MLText("Приложения ECOS"),
-                        SectionType.JOURNAL,
-                        ObjectData.create("""{
-                            "journalId": "ecos-apps"
-                        }""".trimIndent())
-                    ),
-                    PageSection(
-                        MLText("Артефакты ECOS"),
-                        SectionType.JOURNAL,
-                        ObjectData.create("""{
-                            "journalId": "ecos-artifacts"
-                        }""".trimIndent())
-                    ),
-                    PageSection(
-                        MLText("Патчи артифактов"),
-                        SectionType.JOURNAL,
-                        ObjectData.create("""{
-                            "journalId": "ecos-module-patches"
-                        }""".trimIndent())
-                    ),
-                    PageSection(
-                        MLText("Конфигурация"),
-                        SectionType.JOURNAL,
-                        ObjectData.create("""{
-                            "journalId": "ecosConfig"
-                        }""".trimIndent())
-                    )
-                )
-            ),
-            PageSectionGroup(
-                MLText("Управление процессами"),
-                listOf(
-                    PageSection(
-                        MLText("Модели бизнес-процессов"),
-                        SectionType.BPM
-                    ),
-                    PageSection(
-                        MLText("CMMN Сценарии"),
-                        SectionType.JOURNAL,
-                        ObjectData.create("""{
-                            "journalId": "cmmn-process-def"
-                        }""".trimIndent())
-                    )
-                )
-            ),
-            PageSectionGroup(
-                MLText("Модель"),
-                listOf(
-                    PageSection(
-                        MLText("Типы данных"),
-                        SectionType.JOURNAL,
-                        ObjectData.create("""{
-                            "journalId": "ecos-types"
-                        }""".trimIndent())
-                    ),
-                    PageSection(
-                        MLText("Шаблоны нумерации"),
-                        SectionType.JOURNAL,
-                        ObjectData.create("""{
-                            "journalId": "number-templates"
-                        }""".trimIndent())
-                    )
-                )
-            ),
+//            PageSectionGroup(
+//                MLText("Управление системой"),
+//                listOf(
+//                    PageSection(
+//                        MLText("Инструменты разработчика"),
+//                        SectionType.DEV_TOOLS
+//                    ),
+//                    PageSection(
+//                        MLText("Приложения ECOS"),
+//                        SectionType.JOURNAL,
+//                        ObjectData.create("""{
+//                            "journalId": "ecos-apps"
+//                        }""".trimIndent())
+//                    ),
+//                    PageSection(
+//                        MLText("Артефакты ECOS"),
+//                        SectionType.JOURNAL,
+//                        ObjectData.create("""{
+//                            "journalId": "ecos-artifacts"
+//                        }""".trimIndent())
+//                    ),
+//                    PageSection(
+//                        MLText("Патчи артифактов"),
+//                        SectionType.JOURNAL,
+//                        ObjectData.create("""{
+//                            "journalId": "ecos-module-patches"
+//                        }""".trimIndent())
+//                    ),
+//                    PageSection(
+//                        MLText("Конфигурация"),
+//                        SectionType.JOURNAL,
+//                        ObjectData.create("""{
+//                            "journalId": "ecosConfig"
+//                        }""".trimIndent())
+//                    )
+//                )
+//            ),
+//            PageSectionGroup(
+//                MLText("Управление процессами"),
+//                listOf(
+//                    PageSection(
+//                        MLText("Модели бизнес-процессов"),
+//                        SectionType.BPM
+//                    ),
+//                    PageSection(
+//                        MLText("CMMN Сценарии"),
+//                        SectionType.JOURNAL,
+//                        ObjectData.create("""{
+//                            "journalId": "cmmn-process-def"
+//                        }""".trimIndent())
+//                    )
+//                )
+//            ),
+//            PageSectionGroup(
+//                MLText("Модель"),
+//                listOf(
+//                    PageSection(
+//                        MLText("Типы данных"),
+//                        SectionType.JOURNAL,
+//                        ObjectData.create("""{
+//                            "journalId": "ecos-types"
+//                        }""".trimIndent())
+//                    ),
+//                    PageSection(
+//                        MLText("Шаблоны нумерации"),
+//                        SectionType.JOURNAL,
+//                        ObjectData.create("""{
+//                            "journalId": "number-templates"
+//                        }""".trimIndent())
+//                    )
+//                )
+//            ),
             PageSectionGroup(
                 MLText("Конфигурация UI"),
                 listOf(
