@@ -1,8 +1,21 @@
 {
   "id": "debug-form",
   "name": {
-    "en": "Form test",
+    "en": "Debug Form",
     "ru": "Тестировать форму"
+  },
+  "icon": "icon-small-right",
+  "confirm": {
+    "title": {
+      "en": "Settings"
+    },
+    "message": null,
+    "formRef": "uiserv/eform@form-debug-settings",
+    "attributesMapping": {
+      "recordRef": "recordRef",
+      "options.readOnly": "readOnly",
+      "options.viewAsHtml": "viewAsHtml"
+    }
   },
   "type": "debug-form"
 }

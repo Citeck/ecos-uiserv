@@ -1,0 +1,84 @@
+{
+  "id": "form-debug-settings",
+  "formKey": "form-debug-settings",
+  "title": {
+    "en": "Form Debug Settings",
+    "ru": "Настройки тестирования формы"
+  },
+  "description": {},
+  "customModule": null,
+  "typeRef": "emodel/type@base",
+  "width": "default",
+  "i18n": {},
+  "definition": {
+    "components": [
+      {
+        "label": "Record Ref",
+        "defaultValue": "",
+        "refreshOn": [],
+        "key": "recordRef",
+        "type": "textfield",
+        "input": true
+      },
+      {
+        "label": "Tips",
+        "className": "alert alert-info",
+        "content": "☝ If there is not the record ref, the form will be launched with create mode",
+        "refreshOnChange": false,
+        "key": "tip",
+        "type": "htmlelement",
+        "input": false
+      },
+      {
+        "title": "Additional Parameters",
+        "collapsible": true,
+        "key": "panel2",
+        "type": "panel",
+        "input": false,
+        "collapsed": true,
+        "components": [
+          {
+            "label": "Options",
+            "className": "",
+            "content": "Options",
+            "refreshOnChange": false,
+            "key": "options",
+            "type": "htmlelement",
+            "input": false
+          },
+          {
+            "label": "Read Only",
+            "labelPosition": "",
+            "key": "readOnly",
+            "type": "checkbox",
+            "input": true
+          },
+          {
+            "label": "View As Html",
+            "labelPosition": "left-left",
+            "key": "viewAsHtml",
+            "type": "checkbox",
+            "input": true
+          }
+        ]
+      },
+      {
+        "label": "Tips",
+        "className": "alert alert-info",
+        "content": "✌ If you want view like in widget Properties, set params Read Only & View As Html",
+        "refreshOnChange": false,
+        "key": "tip",
+        "type": "htmlelement",
+        "input": false
+      },
+      {
+        "type": "button",
+        "key": "submit",
+        "disableOnInvalid": true,
+        "theme": "primary",
+        "input": true
+      }
+    ]
+  },
+  "attributes": {}
+}
