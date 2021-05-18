@@ -1453,6 +1453,19 @@
               }
             },
             {
+              "id": "90342505-91c7-446a-1111-c18b1aa930f2",
+              "label": {
+                "ru": "Нодбраузер Alfresco",
+                "en": "Alfresco NodeBrowser"
+              },
+              "icon": "ui/icon@i-leftmenu-tools",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/gateway/alfresco/alfresco/s/admin/admin-nodebrowser"
+              }
+            },
+            {
               "id": "90342505-91c7-446a-909a-c18b1aa930f2",
               "label": {
                 "ru": "Еще..."
