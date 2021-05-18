@@ -6,7 +6,7 @@
   },
   "type": "open-url",
   "config": {
-    "url": "/share/page/onlyoffice-edit?nodeRef=${recordRef}&new="
+    "url": "/share/page/onlyoffice-edit?nodeRef=${?localId}&new="
   },
   "evaluator": {
     "type": "predicate",
