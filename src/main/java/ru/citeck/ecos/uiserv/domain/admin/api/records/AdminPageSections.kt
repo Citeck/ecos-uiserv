@@ -5,11 +5,14 @@ import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
-import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
+import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
+import ru.citeck.ecos.uiserv.domain.admin.api.records.service.AdminSecGroupService
 
 @Component
-class AdminPageSections : AbstractRecordsDao(), RecordsQueryDao {
+class AdminPageSections(
+    private val adminSecGroupService: AdminSecGroupService
+) : AbstractRecordsDao(), RecordsQueryDao {
 
     override fun getId() = "admin-page-section"
 
@@ -18,7 +21,7 @@ class AdminPageSections : AbstractRecordsDao(), RecordsQueryDao {
         if (recsQuery.language != "groups") {
             return null
         }
-
+/*
         val result = listOf(
             PageSectionGroup(
                 MLText("Управление системой"),
@@ -234,7 +237,8 @@ class AdminPageSections : AbstractRecordsDao(), RecordsQueryDao {
                 )
             )
         )
-
+        */
+        val result = adminSecGroupService.all
         return RecsQueryRes(result)
     }
 
