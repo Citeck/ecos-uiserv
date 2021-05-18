@@ -1,0 +1,30 @@
+{
+  "id": "model",
+  "name": {
+    "en": "Model",
+    "ru": "Модель"
+  },
+  "order": 3,
+  "sections": [
+    {
+      "name": {
+        "en": "Data types",
+        "ru": "Типы данных"
+      },
+      "type": "JOURNAL",
+      "config": {
+        "journalId": "ecos-types"
+      }
+    },
+    {
+      "name": {
+        "en": "Numbering templates",
+        "ru": "Шаблоны нумерации"
+      },
+      "type": "JOURNAL",
+      "config": {
+        "journalId": "number-templates"
+      }
+    }
+  ]
+}
