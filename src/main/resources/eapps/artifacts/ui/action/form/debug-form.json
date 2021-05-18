@@ -7,10 +7,11 @@
   "icon": "icon-small-right",
   "confirm": {
     "title": {
-      "en": "Settings"
+      "en": "Settings",
+      "ru": "Настройки"
     },
     "message": null,
-    "formRef": "uiserv/eform@form-debug-settings",
+    "formRef": "uiserv/form@form-debug-settings",
     "attributesMapping": {
       "recordRef": "recordRef",
       "options.readOnly": "readOnly",
