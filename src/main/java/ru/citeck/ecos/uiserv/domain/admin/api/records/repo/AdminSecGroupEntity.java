@@ -8,9 +8,9 @@ import java.io.Serializable;
 @Data
 @Entity
 @Table(name = "admin_sections_group")
-public class AdminSecGroupEntity {
+public class AdminSecGroupEntity implements Serializable {
 
-//    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
@@ -23,7 +23,7 @@ public class AdminSecGroupEntity {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "order")
+    @Column(name = "\"order\"")
     private float order;
 
     @Column(name = "sections")

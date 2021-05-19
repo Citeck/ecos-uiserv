@@ -1,17 +1,19 @@
 {
+
   "id": "process-management",
   "name": {
     "en": "Process management",
     "ru": "Управление процессами"
   },
-  "order": 1,
+  "order": 1.1,
   "sections": [
     {
       "name": {
         "en": "Business Process Models",
         "ru": "Модели бизнес-процессов"
       },
-      "type": "BPM"
+      "type": "BPM",
+      "config": {}
     },
     {
       "name": {
