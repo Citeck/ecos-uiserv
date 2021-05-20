@@ -8,12 +8,17 @@ import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.domain.admin.api.records.service.AdminSecGroupService
-import java.util.stream.Collectors
+import ru.citeck.ecos.uiserv.domain.journal.service.JournalServiceImpl
 
 @Component
 class AdminPageSections(
-    private val adminSecGroupService: AdminSecGroupService
+    private val adminSecGroupService: AdminSecGroupService,
+    private val journalService: JournalServiceImpl
 ) : AbstractRecordsDao(), RecordsQueryDao {
+
+    companion object {
+        const val JOURNAL_NAME = "journal"
+    }
 
     override fun getId() = "admin-page-section"
 
@@ -23,19 +28,26 @@ class AdminPageSections(
             return null
         }
         val listSecGroup = adminSecGroupService.all ?: emptyList()
-
-        val result = listSecGroup.stream()
+        val result = listSecGroup
             .map { (_, name, _, sections) ->
                 PageSectionGroup(
                     name,
-                    sections.stream()
+                    sections
                         .map { (name1, type, config) ->
-                            PageSection(name1, SectionType.valueOf(type), config)
+                            var pageSecName = name1
+                            if (MLText.EMPTY == name1) {
+                                if (JOURNAL_NAME.equals(type, ignoreCase = true)) {
+                                    val journal = journalService.getJournalById(
+                                        config.getAs(kotlin.collections.HashMap::class.java)?.get("journalId")
+                                            .toString()
+                                    )
+                                    pageSecName = journal.journalDef.name
+                                }
+                            }
+                            PageSection(pageSecName, SectionType.valueOf(type), config)
                         }
-                        .collect(Collectors.toList())
                 )
             }
-            .collect(Collectors.toList())
         return RecsQueryRes(result)
     }
 

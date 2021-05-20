@@ -4,15 +4,14 @@
     "en": "System management",
     "ru": "Управление системой"
   },
-  "order": 1.0,
+  "order": 0.0,
   "sections": [
     {
       "name": {
         "en": "Developer tools",
         "ru": "Инструменты разработчика"
       },
-      "type": "DEV_TOOLS",
-      "config": {}
+      "type": "DEV_TOOLS"
     },
     {
       "name": {

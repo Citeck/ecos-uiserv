@@ -1,7 +1,11 @@
 package ru.citeck.ecos.uiserv.domain.admin.api.records.dto
 
+import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
 import ru.citeck.ecos.commons.data.MLText
+import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
 
+@IncludeNonDefault
+@JsonDeserialize(builder = AdminSecGroupDto.Builder::class)
 data class AdminSecGroupDto(
     val id: String,
     val name: MLText,

@@ -1,13 +1,44 @@
 package ru.citeck.ecos.uiserv.domain.admin.api.records.dto
 
+import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
 
+@IncludeNonDefault
+@JsonDeserialize(builder = AdminSectionDto.Builder::class)
 data class AdminSectionDto(
     val name: MLText,
     val type: String,
     val config: ObjectData
 ) {
+    companion object {
+
+        val EMPTY = create {}
+
+        @JvmStatic
+        fun create(): Builder {
+            return Builder()
+        }
+
+        @JvmStatic
+        fun create(builder: Builder.() -> Unit): AdminSectionDto {
+            val builderObj = Builder()
+            builder.invoke(builderObj)
+            return builderObj.build()
+        }
+    }
+
+    fun copy(): Builder {
+        return Builder(this)
+    }
+
+    fun copy(builder: Builder.() -> Unit): AdminSectionDto {
+        val builderObj = Builder(this)
+        builder.invoke(builderObj)
+        return builderObj.build()
+    }
+
     open class Builder() {
 
         var name: MLText = MLText.EMPTY
