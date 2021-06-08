@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.journal.api.records
 
+import mu.KotlinLogging
 import org.apache.commons.lang.StringUtils
 import org.springframework.stereotype.Component
 import org.springframework.util.DigestUtils
@@ -39,6 +40,10 @@ class ResolvedJournalRecordsDao(
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordAttsDao {
+
+    companion object {
+        private val log = KotlinLogging.logger {}
+    }
 
     override fun getId() = "rjournal"
 
@@ -256,24 +261,32 @@ class ResolvedJournalRecordsDao(
 
         if (!RecordRef.isEmpty(metaRecord) && attributeEdges.isNotEmpty()) {
 
-            val attributes = recordsService.getAtts(metaRecord, attributeEdges)
-            attributes.forEach { name: String, value: DataValue ->
-                val columnIdx = columnIdxByName[name]
-                if (columnIdx != null) {
-                    val column = columns[columnIdx]
-                    if (value.has("type")) {
-                        column.withType(value.get("type").asText())
-                    }
-                    if (value.has("protected")) {
-                        column.withEditable(!value.get("protected").asBoolean())
-                    }
-                    if (value.has("title")) {
-                        column.withName(MLText(value.get("title").asText()))
-                    }
-                    if (value.has("multiple")) {
-                        column.withMultiple(value.get("multiple").asBoolean())
+            try {
+                val attributes = recordsService.getAtts(metaRecord, attributeEdges)
+                attributes.forEach { name: String, value: DataValue ->
+                    val columnIdx = columnIdxByName[name]
+                    if (columnIdx != null) {
+                        val column = columns[columnIdx]
+                        if (value.has("type")) {
+                            column.withType(value.get("type").asText())
+                        }
+                        if (value.has("protected")) {
+                            column.withEditable(!value.get("protected").asBoolean())
+                        }
+                        if (value.has("title")) {
+                            column.withName(MLText(value.get("title").asText()))
+                        }
+                        if (value.has("multiple")) {
+                            column.withMultiple(value.get("multiple").asBoolean())
+                        }
                     }
                 }
+            } catch (e: Exception) {
+                var cause: Throwable = e
+                while (cause.cause != null) {
+                    cause = cause.cause!!
+                }
+                log.warn { "Edge meta can't be resolved for record $metaRecord. Msg: ${cause.message}" }
             }
         }
 
