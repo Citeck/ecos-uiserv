@@ -232,7 +232,7 @@ class ResolvedJournalRecordsDao(
                 }
             }
             if (column.editable == null) {
-                edgeAtts.add("protected")
+                edgeAtts.add("protected?bool")
             }
             if (MLText.isEmpty(column.name)) {
                 val typeAttName = typeAtt?.name
@@ -247,7 +247,7 @@ class ResolvedJournalRecordsDao(
                 if (typeAttMultiple != null) {
                     column.withMultiple(typeAttMultiple)
                 } else {
-                    edgeAtts.add("multiple")
+                    edgeAtts.add("multiple?bool")
                 }
             }
 
@@ -296,7 +296,7 @@ class ResolvedJournalRecordsDao(
                 column.name = MLText(column.id)
             }
             if (column.type == null) {
-                column.withType(AttributeType.TEXT);
+                column.withType(AttributeType.TEXT)
             }
             if (column.searchable == null) {
                 column.searchable = true
