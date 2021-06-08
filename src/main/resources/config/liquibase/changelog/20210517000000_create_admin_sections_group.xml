@@ -8,18 +8,21 @@
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="ext_id" type="varchar">
+            <column name="ext_id" type="VARCHAR">
                 <constraints nullable="false" unique="true"/>
             </column>
-            <column name="name" type="varchar">
-                <constraints nullable="true"/>
-            </column>
-            <column name="order" type="REAL">
+            <column name="name" type="VARCHAR" />
+            <column name="group_order" type="REAL">
                 <constraints nullable="false"/>
             </column>
-            <column name="sections" type="varchar">
+            <column name="sections" type="VARCHAR">
                 <constraints nullable="false"/>
             </column>
+
+            <column name="created_date" type="TIMESTAMP" />
+            <column name="created_by" type="VARCHAR(50)" />
+            <column name="last_modified_date" type="TIMESTAMP" />
+            <column name="last_modified_by" type="VARCHAR(50)" />
 
         </createTable>
 

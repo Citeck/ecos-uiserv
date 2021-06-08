@@ -1,56 +1,52 @@
-package ru.citeck.ecos.uiserv.domain.admin.api.records.service;
+package ru.citeck.ecos.uiserv.domain.admin.service
 
-import lombok.RequiredArgsConstructor;
-import lombok.val;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import ru.citeck.ecos.commons.data.DataValue;
-import ru.citeck.ecos.commons.data.MLText;
-import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.uiserv.domain.admin.api.records.dto.AdminSecGroupDto;
-import ru.citeck.ecos.uiserv.domain.admin.api.records.dto.AdminSectionDto;
-import ru.citeck.ecos.uiserv.domain.admin.api.records.repo.AdminSecGroupEntity;
-import ru.citeck.ecos.uiserv.domain.admin.api.records.repo.AdminSecGroupRepository;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import ru.citeck.ecos.commons.data.DataValue
+import ru.citeck.ecos.commons.data.MLText
+import ru.citeck.ecos.commons.json.Json.mapper
+import ru.citeck.ecos.uiserv.domain.admin.dto.AdminSectionDef
+import ru.citeck.ecos.uiserv.domain.admin.dto.AdminSectionsGroupDef
+import ru.citeck.ecos.uiserv.domain.admin.dto.AdminSectionsGroupDef.Companion.create
+import ru.citeck.ecos.uiserv.domain.admin.repo.AdminSectionsGroupEntity
+import ru.citeck.ecos.uiserv.domain.admin.repo.AdminSectionsGroupRepository
 
 @Service
 @RequiredArgsConstructor
-public class AdminSecGroupService {
-
-    private static final String JOURNAL_NAME = "journal";
-
-    private final AdminSecGroupRepository adminSecGroupRepository;
+class AdminSectionsGroupService(
+    val adminSectionsGroupRepository: AdminSectionsGroupRepository
+) {
 
     @Transactional
-    public AdminSecGroupDto save(AdminSecGroupDto dto) {
-        val entity = adminSecGroupRepository.findByExternalId(dto.getId())
-            .orElse(new AdminSecGroupEntity());
-
-        entity.setExternalId(dto.getId());
-        entity.setName(dto.getName().get());
-        entity.setOrder(dto.getOrder());
-        entity.setSections(Json.getMapper().toString(dto.getSections()));
-
-        return mapToDto(adminSecGroupRepository.save(entity));
+    fun save(dto: AdminSectionsGroupDef): AdminSectionsGroupDef {
+        return mapToDto(adminSectionsGroupRepository.save(mapToEntity(dto)))
     }
 
-    public List<AdminSecGroupDto> getAll() {
-        return adminSecGroupRepository.findAll().stream()
-            .map(this::mapToDto)
-            .sorted(Comparator.comparing(AdminSecGroupDto::getOrder))
-            .collect(Collectors.toList());
+    fun findAll(): List<AdminSectionsGroupDef> {
+        return adminSectionsGroupRepository.findAll()
+            .map { entity: AdminSectionsGroupEntity -> mapToDto(entity) }
+            .sortedBy { it.order }
     }
 
-    private AdminSecGroupDto mapToDto(AdminSecGroupEntity entity) {
-        return AdminSecGroupDto.create()
-            .withId(entity.getExternalId())
-            .withName(new MLText(entity.getName()))
-            .withOrder(entity.getOrder())
-            .withSections(DataValue.create(entity.getSections()).asList(AdminSectionDto.class))
-            .build();
+    private fun mapToDto(entity: AdminSectionsGroupEntity): AdminSectionsGroupDef {
+        return create()
+            .withId(entity.extId)
+            .withName(mapper.read(entity.name, MLText::class.java))
+            .withOrder(entity.groupOrder)
+            .withSections(DataValue.create(entity.sections).asList(AdminSectionDef::class.java))
+            .build()
     }
 
+    private fun mapToEntity(dto: AdminSectionsGroupDef): AdminSectionsGroupEntity {
+        var entity = adminSectionsGroupRepository.findByExtId(dto.id)
+        if (entity == null) {
+            entity = AdminSectionsGroupEntity()
+            entity.extId = dto.id
+        }
+        entity.groupOrder = dto.order
+        entity.name = mapper.toString(dto.name)
+        entity.sections = mapper.toString(dto.sections) ?: "[]"
+        return entity
+    }
 }

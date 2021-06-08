@@ -50,5 +50,5 @@
     <include file="changelog/20210224000000_journal_actions_def.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20210310000000_journal_actions_from_type.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20210324000000_add_actions_pre_action_module.xml" relativeToChangelogFile="true"/>
-    <include file="changelog/20210517000000_create_sections_group_table.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20210517000000_create_admin_sections_group.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

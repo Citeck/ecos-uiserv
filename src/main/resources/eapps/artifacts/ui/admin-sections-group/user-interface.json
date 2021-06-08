@@ -1,76 +1,48 @@
 {
-  "id": "ui-configuration",
+  "id": "user-interface",
   "name": {
     "en": "UI configuration",
     "ru": "Конфигурация UI"
   },
-  "order": 0.4,
+  "order": 30,
   "sections": [
     {
-      "name": {
-        "en": "Journal",
-        "ru": "Журналы"
-      },
       "type": "JOURNAL",
       "config": {
         "journalId": "ecos-journals"
       }
     },
     {
-      "name": {
-        "en": "Forms",
-        "ru": "Формы"
-      },
       "type": "JOURNAL",
       "config": {
         "journalId": "ecos-forms"
       }
     },
     {
-      "name": {
-        "en": "Actions",
-        "ru": "Действия"
-      },
       "type": "JOURNAL",
       "config": {
         "journalId": "ui-actions"
       }
     },
     {
-      "name": {
-        "en": "Dashboards",
-        "ru": "Дашборды"
-      },
       "type": "JOURNAL",
       "config": {
         "journalId": "ecos-dashboards"
       }
     },
     {
-      "name": {
-        "en": "Topics",
-        "ru": "Темы"
-      },
       "type": "JOURNAL",
       "config": {
         "journalId": "ecos-theme"
       }
     },
     {
-      "name": {
-        "en": "Localization",
-        "ru": "Локализация"
-      },
       "type": "JOURNAL",
       "config": {
         "journalId": "ecos-i18n"
       }
     },
     {
-      "name": {
-        "en": "Menu",
-        "ru": "Меню"
-      },
       "type": "JOURNAL",
       "config": {
         "journalId": "ecos-menus"

@@ -1,16 +1,16 @@
-package ru.citeck.ecos.uiserv.domain.admin.api.records.dto
+package ru.citeck.ecos.uiserv.domain.admin.dto
 
 import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
 
 @IncludeNonDefault
-@JsonDeserialize(builder = AdminSecGroupDto.Builder::class)
-data class AdminSecGroupDto(
+@JsonDeserialize(builder = AdminSectionsGroupDef.Builder::class)
+data class AdminSectionsGroupDef(
     val id: String,
     val name: MLText,
     val order: Float,
-    val sections: List<AdminSectionDto>
+    val sections: List<AdminSectionDef>
 ) {
     companion object {
 
@@ -22,7 +22,7 @@ data class AdminSecGroupDto(
         }
 
         @JvmStatic
-        fun create(builder: Builder.() -> Unit): AdminSecGroupDto {
+        fun create(builder: Builder.() -> Unit): AdminSectionsGroupDef {
             val builderObj = Builder()
             builder.invoke(builderObj)
             return builderObj.build()
@@ -33,10 +33,14 @@ data class AdminSecGroupDto(
         return Builder(this)
     }
 
-    fun copy(builder: Builder.() -> Unit): AdminSecGroupDto {
+    fun copy(builder: Builder.() -> Unit): AdminSectionsGroupDef {
         val builderObj = Builder(this)
         builder.invoke(builderObj)
         return builderObj.build()
+    }
+
+    fun withSections(sections: List<AdminSectionDef>?): AdminSectionsGroupDef {
+        return copy().withSections(sections).build()
     }
 
     open class Builder() {
@@ -44,9 +48,9 @@ data class AdminSecGroupDto(
         var id: String = ""
         var name: MLText = MLText.EMPTY
         var order: Float = 0f
-        var sections: List<AdminSectionDto> = emptyList()
+        var sections: List<AdminSectionDef> = emptyList()
 
-        constructor(base: AdminSecGroupDto) : this() {
+        constructor(base: AdminSectionsGroupDef) : this() {
             this.id = base.id
             this.name = base.name
             this.order = base.order
@@ -68,13 +72,13 @@ data class AdminSecGroupDto(
             return this
         }
 
-        fun withSections(list: List<AdminSectionDto>): Builder {
-            this.sections = list
+        fun withSections(sections: List<AdminSectionDef>?): Builder {
+            this.sections = sections ?: emptyList()
             return this
         }
 
-        fun build(): AdminSecGroupDto {
-            return AdminSecGroupDto(
+        fun build(): AdminSectionsGroupDef {
+            return AdminSectionsGroupDef(
                 id,
                 name,
                 order,
