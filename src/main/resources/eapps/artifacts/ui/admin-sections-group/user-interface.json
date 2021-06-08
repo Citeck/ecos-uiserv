@@ -1,0 +1,52 @@
+{
+  "id": "user-interface",
+  "name": {
+    "en": "UI configuration",
+    "ru": "Конфигурация UI"
+  },
+  "order": 30,
+  "sections": [
+    {
+      "type": "JOURNAL",
+      "config": {
+        "journalId": "ecos-journals"
+      }
+    },
+    {
+      "type": "JOURNAL",
+      "config": {
+        "journalId": "ecos-forms"
+      }
+    },
+    {
+      "type": "JOURNAL",
+      "config": {
+        "journalId": "ui-actions"
+      }
+    },
+    {
+      "type": "JOURNAL",
+      "config": {
+        "journalId": "ecos-dashboards"
+      }
+    },
+    {
+      "type": "JOURNAL",
+      "config": {
+        "journalId": "ecos-theme"
+      }
+    },
+    {
+      "type": "JOURNAL",
+      "config": {
+        "journalId": "ecos-i18n"
+      }
+    },
+    {
+      "type": "JOURNAL",
+      "config": {
+        "journalId": "ecos-menus"
+      }
+    }
+  ]
+}

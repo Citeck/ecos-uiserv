@@ -1,0 +1,10 @@
+modelVersion: "1.0"
+
+internal: true
+
+name:
+  ru: Группа разделов администратора
+  en: Admin sections group
+
+controller:
+  type: json
