@@ -123,6 +123,9 @@ public class JournalServiceImpl implements JournalService {
             throw new IllegalArgumentException("Journal without id: " + dto);
         }
 
+        // preprocess config with builder
+        dto = dto.copy().build();
+
         dto.getColumns().forEach(column -> {
             Matcher validNameMatcher = VALID_COLUMN_NAME_PATTERN.matcher(column.getId());
             if (!validNameMatcher.matches()) {

@@ -151,7 +151,7 @@ data class JournalDef(
             actions = base.actions.let { DataValue.create(it).asList(RecordRef::class.java) }
             actionsDef = base.actionsDef.let { DataValue.create(it).asList(JournalActionDef::class.java) }
             editable = base.editable
-            columns = base.columns.toList()
+            withColumns(base.columns)
             computed = base.computed.let { DataValue.create(it).asList(JournalComputedDef::class.java) }
             system = base.system
             properties = ObjectData.deepCopyOrNew(base.properties)
