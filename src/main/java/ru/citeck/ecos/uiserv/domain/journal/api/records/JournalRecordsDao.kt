@@ -157,12 +157,12 @@ class JournalRecordsDao(
         fun getType(): RecordRef = RecordRef.valueOf("emodel/type@journal")
 
         fun getActionsDef(): List<ActionDefRecord> {
-            return journalDef.actionsDef.map { ActionDefRecord(it) }
+            return journalDef?.actionsDef?.map { ActionDefRecord(it) } ?: emptyList()
         }
 
         @AttName("?disp")
         fun getDisplayName(): MLText {
-            return journalDef.name
+            return journalDef?.name ?: MLText.EMPTY
         }
 
         @JsonValue
@@ -172,7 +172,7 @@ class JournalRecordsDao(
         }
 
         open fun getColumns(): List<Any> {
-            return journalDef.columns.map { ColumnAttValue(it) }
+            return journalDef?.columns?.map { ColumnAttValue(it) } ?: emptyList()
         }
 
         open fun getData(): ByteArray {
