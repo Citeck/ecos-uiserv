@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.io.file.mem.EcosMemDir;
@@ -53,7 +54,7 @@ public class ThemeService {
     public static final String ICON_REF_PREFIX = "uiserv/" + IconRecords.ID + "@";
 
     // ThemeController.groovy should has the same constants
-    public static final List<String> RES_EXTENSIONS = Arrays.asList("png", "jpeg", "jpg", "svg", "css");
+    public static final List<String> RES_EXTENSIONS = Arrays.asList("png", "jpeg", "jpg", "ico", "svg", "css");
 
     private static final ResourceData EMPTY_RESOURCE = new ResourceData(null, null);
 
@@ -253,9 +254,13 @@ public class ThemeService {
 
             data = iconDto.getByteData();
             fileName = iconDto.getId();
-            if (!fileName.contains(".") && iconDto.getMimetype() != null) {
-                if (MimeTypeUtils.IMAGE_JPEG.equals(iconDto.getMimetype())) {
+
+            MimeType iconMimetype = iconDto.getMimetype();
+            if (!fileName.contains(".") && iconMimetype != null) {
+                if (MimeTypeUtils.IMAGE_JPEG.equals(iconMimetype)) {
                     fileName += ".jpg";
+                } else if ("image/x-icon".equals(iconMimetype.getType())) {
+                    fileName += ".ico";
                 } else {
                     fileName += ".png";
                 }
@@ -300,9 +305,7 @@ public class ThemeService {
             return dto;
         }
         EcosMemDir stylesDir = ZipUtils.extractZip(resourcesData);
-        stylesDir.findFiles().forEach(f -> {
-            resources.put(f.getPath().toString().replace("\\", "/"), f.readAsBytes());
-        });
+        stylesDir.findFiles().forEach(f -> resources.put(f.getPath().toString().replace("\\", "/"), f.readAsBytes()));
 
         return dto;
     }
