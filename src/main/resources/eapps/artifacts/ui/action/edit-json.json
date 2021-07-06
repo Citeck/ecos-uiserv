@@ -4,6 +4,7 @@
     "ru": "Редактор JSON",
     "en": "JSON Editor"
   },
+  "icon": "icon-code-json",
   "type": "edit-json",
   "config": {
     "editorFormId": "uiserv/form@json-editor-form"
