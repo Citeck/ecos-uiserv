@@ -1,6 +1,5 @@
 {
   "id": "json-editor-form",
-  "formKey": "json-editor",
   "title": {
     "en": "Form editor for JSON config",
     "ru": "Форма редактирования JSON конфигурации"
@@ -19,31 +18,11 @@
           {
             "components": [
               {
-                "label": "ID",
-                "labelPosition": "left-left",
-                "persistent": false,
-                "disabled": true,
-                "defaultValue": "",
-                "refreshOn": [],
-                "key": "id",
-                "type": "textfield",
-                "input": true
-              },
-              {
-                "className": "alert alert-danger",
-                "content": "☝ Don't change ID.",
+                "className": "alert alert-info",
+                "content": "<li>You're going to edit config of this record like JSON. Be careful.</li>\n<li>If you change ID, this configuration won't be changed, there will be new configuration based on this.</li>",
                 "refreshOnChange": false,
+                "refreshOn": [],
                 "key": "html",
-                "type": "htmlelement",
-                "input": false
-              },
-              {
-                "className": "",
-                "content": "<div class=\"spinner-border text-success\" role=\"status\"></div>",
-                "refreshOnChange": false,
-                "refreshOn": [],
-                "key": "html2",
-                "customConditional": "show = _.isEmpty(data.configJson)",
                 "type": "htmlelement",
                 "input": false
               }
@@ -51,49 +30,8 @@
             "type": "column",
             "input": false,
             "key": "column",
-            "index": 0
-          },
-          {
-            "index": 1,
-            "type": "column",
-            "input": false,
-            "key": "column",
-            "components": [
-              {
-                "label": "Name",
-                "labelPosition": "left-left",
-                "persistent": false,
-                "disabled": true,
-                "defaultValue": "",
-                "refreshOn": [],
-                "key": "title",
-                "type": "textfield",
-                "input": true
-              },
-              {
-                "className": "",
-                "content": "<div class=\"alert alert-warning\" role=\"alert\">\r\n  ✌ Be careful with key fields\r\n</div>",
-                "refreshOnChange": false,
-                "key": "html3",
-                "type": "htmlelement",
-                "input": false
-              },
-              {
-                "label": "Expand",
-                "hideLabel": true,
-                "removeIndents": true,
-                "action": "custom",
-                "state": "",
-                "showValidations": false,
-                "custom": "if (!document.fullscreenElement) {\r\n  document.querySelector('.ecos-json-editor-expand .formio-wysiwyg-editor').requestFullscreen();\r\n} else {\r\n  if (document.exitFullscreen) {\r\n    document.exitFullscreen();\r\n  }\r\n}",
-                "leftIcon": "fa fa-arrows-alt",
-                "customClass": "float-right mb-2",
-                "refreshOn": [],
-                "key": "submit2",
-                "type": "button",
-                "input": true
-              }
-            ]
+            "index": 0,
+            "md": 0
           }
         ],
         "key": "columns2",
@@ -132,15 +70,30 @@
             ]
           }
         ],
-        "rows": "",
+        "rows": 40,
         "as": "json",
         "type": "textarea",
+        "customStyle": "{background: 'green' }",
         "input": true
       },
       {
         "columns": [
           {
-            "components": [],
+            "components": [
+              {
+                "label": "Full Screen",
+                "removeIndents": true,
+                "action": "custom",
+                "state": "",
+                "showValidations": false,
+                "custom": "if (!document.fullscreenElement) {\r\n  document.querySelector('.ecos-json-editor-expand .formio-wysiwyg-editor').requestFullscreen();\r\n} else {\r\n  if (document.exitFullscreen) {\r\n    document.exitFullscreen();\r\n  }\r\n}",
+                "leftIcon": "fa fa-arrows-alt",
+                "refreshOn": [],
+                "key": "submit2",
+                "type": "button",
+                "input": true
+              }
+            ],
             "md": 10,
             "type": "column",
             "input": false,
