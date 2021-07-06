@@ -14,8 +14,14 @@
     "formRef": "uiserv/form@form-debug-settings",
     "attributesMapping": {
       "recordRef": "recordRef",
+      "parser.readViewMode": "readViewMode",
+      "parser.viewWidgetProperties": "viewWidgetProperties",
+      "parser.isDebugModeOn": "isDebugModeOn",
       "options.readOnly": "readOnly",
-      "options.viewAsHtml": "viewAsHtml"
+      "options.viewAsHtml": "viewAsHtml",
+      "options.fullWidthColumns": "fullWidthColumns",
+      "options.viewAsHtmlConfig.hidePanels": "hidePanels",
+      "options.useNarrowButtons": "useNarrowButtons"
     }
   },
   "type": "debug-form"

@@ -1,0 +1,461 @@
+{
+  "id": "form-debug-settings",
+  "formKey": "form-debug-settings",
+  "title": {
+    "en": "Debug Form Settings"
+  },
+  "description": {},
+  "customModule": null,
+  "typeRef": "emodel/type@base",
+  "width": "default",
+  "i18n": {},
+  "definition": {
+    "components": [
+      {
+        "columns": [
+          {
+            "components": [
+              {
+                "label": "Record Ref",
+                "defaultValue": "",
+                "refreshOn": [
+                  "store"
+                ],
+                "calculateValue": "value = _.get(data, ['store', component.key], component.defaultValue)",
+                "allowCalculateOverride": true,
+                "key": "recordRef",
+                "type": "textfield",
+                "input": true
+              }
+            ],
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 0
+          },
+          {
+            "index": 1,
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "components": [
+              {
+                "label": "Tips",
+                "className": "alert alert-info",
+                "content": "☝ If there is not the record ref, the form will be launched with create mode",
+                "refreshOnChange": false,
+                "key": "tip",
+                "type": "htmlelement",
+                "input": false
+              }
+            ]
+          }
+        ],
+        "key": "columns4",
+        "type": "columns",
+        "input": false
+      },
+      {
+        "title": "Parameters",
+        "refreshOn": [],
+        "key": "panel3",
+        "type": "panel",
+        "input": false,
+        "components": [
+          {
+            "columns": [
+              {
+                "components": [
+                  {
+                    "label": "Read View Mode",
+                    "labelPosition": "left-left",
+                    "tooltip": "is like content of widget Properties; Inline form",
+                    "refreshOn": [
+                      "store"
+                    ],
+                    "calculateValue": "value = _.get(data, ['store', component.key], component.defaultValue);",
+                    "allowCalculateOverride": true,
+                    "key": "readViewMode",
+                    "logic": [
+                      {
+                        "name": "true",
+                        "trigger": {
+                          "type": "javascript",
+                          "javascript": "result = data.readOnly && data.viewAsHtml"
+                        },
+                        "actions": [
+                          {
+                            "name": "set",
+                            "type": "property",
+                            "property": {
+                              "label": "Disabled",
+                              "value": "disabled",
+                              "type": "boolean"
+                            },
+                            "state": "true"
+                          }
+                        ]
+                      }
+                    ],
+                    "type": "checkbox",
+                    "input": true
+                  },
+                  {
+                    "label": "View Widget Properties",
+                    "data": {
+                      "values": [
+                        {
+                          "label": "Wide",
+                          "value": "wide"
+                        },
+                        {
+                          "label": "Narrow",
+                          "value": "narrow"
+                        },
+                        {
+                          "label": "Mobile",
+                          "value": "mobile"
+                        }
+                      ]
+                    },
+                    "valueProperty": "value",
+                    "searchEnabled": false,
+                    "defaultValue": "",
+                    "refreshOn": [
+                      "store"
+                    ],
+                    "calculateValue": "value = _.get(data, ['store', component.key], component.defaultValue)",
+                    "allowCalculateOverride": true,
+                    "key": "viewWidgetProperties",
+                    "type": "select",
+                    "input": true
+                  }
+                ],
+                "type": "column",
+                "input": false,
+                "key": "column",
+                "index": 0
+              },
+              {
+                "index": 1,
+                "type": "column",
+                "input": false,
+                "key": "column",
+                "components": [
+                  {
+                    "className": "alert alert-info",
+                    "content": "📝 Note:\n\n<li>Wide - widget is in wide column (&gt;= 2/3 of width)</li>\n<li>Narrow - small column (&lt;= 1/3 of width)</li>\n<li>Mobile is view for mobile devices. If it's available</li>\n<div>These define only approximate view of form</div>",
+                    "refreshOnChange": false,
+                    "refreshOn": [],
+                    "key": "html",
+                    "type": "htmlelement",
+                    "input": false
+                  }
+                ]
+              }
+            ],
+            "key": "columns3",
+            "type": "columns",
+            "input": false
+          }
+        ]
+      },
+      {
+        "title": "Extended Parameters",
+        "refreshOn": [],
+        "key": "panel2",
+        "type": "panel",
+        "input": false,
+        "components": [
+          {
+            "columns": [
+              {
+                "components": [
+                  {
+                    "label": "Read Only",
+                    "labelPosition": "left-left",
+                    "refreshOn": [
+                      "store"
+                    ],
+                    "calculateValue": "value = _.get(data, ['store', component.key], component.defaultValue)",
+                    "allowCalculateOverride": true,
+                    "key": "readOnly",
+                    "logic": [
+                      {
+                        "name": "disabled",
+                        "trigger": {
+                          "type": "simple",
+                          "simple": {
+                            "show": true,
+                            "when": "readViewMode",
+                            "eq": "true"
+                          }
+                        },
+                        "actions": [
+                          {
+                            "name": "sat",
+                            "type": "property",
+                            "property": {
+                              "label": "Disabled",
+                              "value": "disabled",
+                              "type": "boolean"
+                            },
+                            "state": "true"
+                          }
+                        ]
+                      }
+                    ],
+                    "type": "checkbox",
+                    "input": true
+                  },
+                  {
+                    "label": "View As Html",
+                    "labelPosition": "left-left",
+                    "refreshOn": [
+                      "store"
+                    ],
+                    "calculateValue": "value = _.get(data, ['store', component.key], component.defaultValue)",
+                    "allowCalculateOverride": true,
+                    "key": "viewAsHtml",
+                    "logic": [
+                      {
+                        "name": "disabled",
+                        "trigger": {
+                          "type": "simple",
+                          "simple": {
+                            "show": true,
+                            "when": "readViewMode",
+                            "eq": "true"
+                          }
+                        },
+                        "actions": [
+                          {
+                            "name": "sat",
+                            "type": "property",
+                            "property": {
+                              "label": "Disabled",
+                              "value": "disabled",
+                              "type": "boolean"
+                            },
+                            "state": "true"
+                          }
+                        ]
+                      }
+                    ],
+                    "type": "checkbox",
+                    "input": true
+                  },
+                  {
+                    "label": "Full-width Columns",
+                    "labelPosition": "left-left",
+                    "tooltip": "Content will be in one columns",
+                    "refreshOn": [
+                      "store"
+                    ],
+                    "calculateValue": "value = _.get(data, ['store', component.key], component.defaultValue)",
+                    "allowCalculateOverride": true,
+                    "key": "fullWidthColumns",
+                    "logic": [
+                      {
+                        "name": "disabled",
+                        "trigger": {
+                          "type": "simple",
+                          "simple": {
+                            "show": true,
+                            "when": "viewWidgetProperties",
+                            "eq": "narrow"
+                          }
+                        },
+                        "actions": [
+                          {
+                            "name": "set",
+                            "type": "property",
+                            "property": {
+                              "label": "Disabled",
+                              "value": "disabled",
+                              "type": "boolean"
+                            },
+                            "state": "true"
+                          }
+                        ]
+                      }
+                    ],
+                    "type": "checkbox",
+                    "input": true
+                  },
+                  {
+                    "label": "Narrow Buttons",
+                    "labelPosition": "left-left",
+                    "refreshOn": [
+                      "store"
+                    ],
+                    "calculateValue": "value = _.get(data, ['store', component.key], component.defaultValue)",
+                    "allowCalculateOverride": true,
+                    "key": "useNarrowButtons",
+                    "type": "checkbox",
+                    "input": true
+                  },
+                  {
+                    "label": "Without Panels",
+                    "labelPosition": "left-left",
+                    "tooltip": "The content will stay on the  form but the title and some indentations will be removed",
+                    "refreshOn": [
+                      "store"
+                    ],
+                    "calculateValue": "value = _.get(data, ['store', component.key], component.defaultValue)",
+                    "allowCalculateOverride": true,
+                    "key": "hidePanels",
+                    "logic": [
+                      {
+                        "name": "disabled",
+                        "trigger": {
+                          "type": "simple",
+                          "simple": {
+                            "show": true,
+                            "when": "viewWidgetProperties",
+                            "eq": "narrow"
+                          }
+                        },
+                        "actions": [
+                          {
+                            "name": "set",
+                            "type": "property",
+                            "property": {
+                              "label": "Disabled",
+                              "value": "disabled",
+                              "type": "boolean"
+                            },
+                            "state": "true"
+                          }
+                        ]
+                      }
+                    ],
+                    "type": "checkbox",
+                    "input": true
+                  },
+                  {
+                    "label": "Debug Mode",
+                    "labelPosition": "left-left",
+                    "tooltip": "Some debug parts will be turned on, which are available ",
+                    "refreshOn": [
+                      "store"
+                    ],
+                    "calculateValue": "value = _.get(data, ['store', component.key], component.defaultValue)",
+                    "allowCalculateOverride": true,
+                    "key": "isDebugModeOn",
+                    "type": "checkbox",
+                    "input": true
+                  }
+                ],
+                "type": "column",
+                "input": false,
+                "key": "column",
+                "index": 0
+              },
+              {
+                "index": 1,
+                "type": "column",
+                "input": false,
+                "key": "column",
+                "components": [
+                  {
+                    "className": "alert alert-info",
+                    "content": "🚧 Some settings can be disabled because base settings cover extended params",
+                    "refreshOnChange": false,
+                    "refreshOn": [],
+                    "key": "html2",
+                    "type": "htmlelement",
+                    "input": false
+                  },
+                  {
+                    "label": "Tips",
+                    "className": "alert alert-info",
+                    "content": "💡 If you want view like in widget Properties, set params Read Only & View As Html.\nIt's the same View Mode",
+                    "refreshOnChange": false,
+                    "refreshOn": [],
+                    "key": "tip",
+                    "type": "htmlelement",
+                    "input": false
+                  }
+                ]
+              }
+            ],
+            "key": "columns",
+            "type": "columns",
+            "input": false
+          }
+        ]
+      },
+      {
+        "columns": [
+          {
+            "components": [
+              {
+                "label": "Reset Storage",
+                "action": "custom",
+                "state": "",
+                "showValidations": false,
+                "custom": "window.localStorage.setItem('dataDebugFormAction', '');",
+                "tooltip": "Form settings will be removed from local storage",
+                "refreshOn": [],
+                "key": "submit",
+                "type": "button",
+                "input": true
+              }
+            ],
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 0,
+            "md": 10
+          },
+          {
+            "md": 2,
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 1,
+            "components": [
+              {
+                "action": "custom",
+                "state": "",
+                "showValidations": false,
+                "custom": "window.localStorage.setItem('dataDebugFormAction', JSON.stringify(data));\ninstance.root.submit();",
+                "theme": "primary",
+                "tooltip": "Form settings will be saved in local storage",
+                "block": true,
+                "refreshOn": [],
+                "key": "submit2",
+                "type": "button",
+                "input": true
+              }
+            ]
+          }
+        ],
+        "customClass": "mt-2",
+        "key": "columns2",
+        "type": "columns",
+        "input": false
+      },
+      {
+        "label": "get settings",
+        "source": {
+          "type": "custom",
+          "custom": {
+            "syncData": "value = 'dataDebugFormAction';",
+            "asyncData": "const d = window.localStorage.getItem(data) || \"{}\";\nvalue = JSON.parse(d);"
+          },
+          "forceLoad": false
+        },
+        "update": {
+          "type": "any-change",
+          "rate": 1000
+        },
+        "key": "store",
+        "type": "asyncData",
+        "input": true
+      }
+    ]
+  },
+  "attributes": {}
+}
