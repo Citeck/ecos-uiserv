@@ -1,0 +1,198 @@
+{
+  "id": "json-editor-form",
+  "formKey": "json-editor",
+  "title": {
+    "en": "Form editor for JSON config",
+    "ru": "Форма редактирования JSON конфигурации"
+  },
+  "description": {
+    "en": ""
+  },
+  "customModule": null,
+  "typeRef": "emodel/type@base",
+  "width": "default",
+  "i18n": {},
+  "definition": {
+    "components": [
+      {
+        "columns": [
+          {
+            "components": [
+              {
+                "label": "ID",
+                "labelPosition": "left-left",
+                "persistent": false,
+                "disabled": true,
+                "defaultValue": "",
+                "refreshOn": [],
+                "key": "id",
+                "type": "textfield",
+                "input": true
+              },
+              {
+                "className": "alert alert-danger",
+                "content": "☝ Don't change ID.",
+                "refreshOnChange": false,
+                "key": "html",
+                "type": "htmlelement",
+                "input": false
+              },
+              {
+                "className": "",
+                "content": "<div class=\"spinner-border text-success\" role=\"status\"></div>",
+                "refreshOnChange": false,
+                "refreshOn": [],
+                "key": "html2",
+                "customConditional": "show = _.isEmpty(data.configJson)",
+                "type": "htmlelement",
+                "input": false
+              }
+            ],
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 0
+          },
+          {
+            "index": 1,
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "components": [
+              {
+                "label": "Name",
+                "labelPosition": "left-left",
+                "persistent": false,
+                "disabled": true,
+                "defaultValue": "",
+                "refreshOn": [],
+                "key": "title",
+                "type": "textfield",
+                "input": true
+              },
+              {
+                "className": "",
+                "content": "<div class=\"alert alert-warning\" role=\"alert\">\r\n  ✌ Be careful with key fields\r\n</div>",
+                "refreshOnChange": false,
+                "key": "html3",
+                "type": "htmlelement",
+                "input": false
+              },
+              {
+                "label": "Expand",
+                "hideLabel": true,
+                "removeIndents": true,
+                "action": "custom",
+                "state": "",
+                "showValidations": false,
+                "custom": "if (!document.fullscreenElement) {\r\n  document.querySelector('.ecos-json-editor-expand .formio-wysiwyg-editor').requestFullscreen();\r\n} else {\r\n  if (document.exitFullscreen) {\r\n    document.exitFullscreen();\r\n  }\r\n}",
+                "leftIcon": "fa fa-arrows-alt",
+                "customClass": "float-right mb-2",
+                "refreshOn": [],
+                "key": "submit2",
+                "type": "button",
+                "input": true
+              }
+            ]
+          }
+        ],
+        "key": "columns2",
+        "type": "columns",
+        "input": false
+      },
+      {
+        "label": "Record Configuration",
+        "editor": "ace",
+        "wysiwyg": "",
+        "customClass": "ecos-json-editor-expand",
+        "persistent": false,
+        "defaultValue": "{}",
+        "refreshOn": [],
+        "calculateValue": "value = _.get(data, 'configJson._config');",
+        "allowCalculateOverride": true,
+        "key": "configuration",
+        "logic": [
+          {
+            "name": "disabled",
+            "trigger": {
+              "type": "javascript",
+              "javascript": "result = _.isEmpty(data.configJson)"
+            },
+            "actions": [
+              {
+                "name": "disable",
+                "type": "property",
+                "property": {
+                  "label": "Disabled",
+                  "value": "disabled",
+                  "type": "boolean"
+                },
+                "state": "true"
+              }
+            ]
+          }
+        ],
+        "rows": "",
+        "as": "json",
+        "type": "textarea",
+        "input": true
+      },
+      {
+        "columns": [
+          {
+            "components": [],
+            "md": 10,
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 0
+          },
+          {
+            "md": 2,
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 1,
+            "components": [
+              {
+                "state": "",
+                "theme": "primary",
+                "block": true,
+                "disableOnInvalid": true,
+                "refreshOn": [],
+                "key": "submit",
+                "type": "button",
+                "input": true
+              }
+            ]
+          }
+        ],
+        "key": "columns3",
+        "type": "columns",
+        "input": false
+      },
+      {
+        "label": "getJson",
+        "source": {
+          "type": "record",
+          "record": {
+            "id": "{{recordId}}",
+            "attributes": {
+              "_config": ".json"
+            }
+          },
+          "forceLoad": false
+        },
+        "update": {
+          "type": "once",
+          "rate": 1000
+        },
+        "executionCondition": "value = _.isEmpty(data.configJson);",
+        "key": "configJson",
+        "type": "asyncData",
+        "input": true
+      }
+    ]
+  },
+  "attributes": {}
+}
