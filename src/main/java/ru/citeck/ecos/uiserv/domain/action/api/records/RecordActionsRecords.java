@@ -38,7 +38,11 @@ public class RecordActionsRecords extends LocalRecordsDao implements LocalRecord
             .map(rec -> rec.withDefaultAppName("alfresco"))
             .collect(Collectors.toList());
 
-        RecordsActionsDto actionsForRecords = actionService.getActionsForRecords(targetRefs, query.actions);
+        List<RecordRef> queryActions = query.actions;
+        if (queryActions == null) {
+            queryActions = Collections.emptyList();
+        }
+        RecordsActionsDto actionsForRecords = actionService.getActionsForRecords(targetRefs, queryActions);
 
         int actionsSize = actionsForRecords.getRecordActions().size();
         Long[] recordsActions = new Long[actionsSize];
