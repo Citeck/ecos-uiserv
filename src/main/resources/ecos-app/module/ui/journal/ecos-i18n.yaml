@@ -13,6 +13,7 @@ actions:
   - uiserv/action@ecos-module-download
   - uiserv/action@delete
   - uiserv/action@module-copy
+  - uiserv/action@edit-json
 
 columns:
 

@@ -1,0 +1,11 @@
+{
+  "id": "edit-json",
+  "name": {
+    "ru": "Редактор JSON",
+    "en": "JSON Editor"
+  },
+  "type": "edit-json",
+  "config": {
+    "editorFormId": "uiserv/eform@json-editor-form"
+  }
+}
