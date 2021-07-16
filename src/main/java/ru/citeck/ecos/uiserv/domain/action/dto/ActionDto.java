@@ -100,6 +100,14 @@ public class ActionDto {
         this.typeRef = typeRef;
     }
 
+    public String getPreActionModule() {
+        return preActionModule;
+    }
+
+    public void setPreActionModule(String preActionModule) {
+        this.preActionModule = preActionModule;
+    }
+
     public ActionConfirmDef getConfirm() {
         return confirm;
     }
