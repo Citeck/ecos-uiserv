@@ -16,6 +16,9 @@ data class JournalActionDef(
     val id: String,
     val name: MLText,
     val pluralName: MLText,
+
+    var preActionModule: String,
+
     val icon: String,
     val confirm: ActionConfirmDef,
 
@@ -59,6 +62,7 @@ data class JournalActionDef(
         var id: String = ""
         var name: MLText = MLText.EMPTY
         var pluralName: MLText = MLText.EMPTY
+        var preActionModule: String = ""
         var icon: String = ""
         var confirm: ActionConfirmDef = ActionConfirmDef.EMPTY
         var type: String = ""
@@ -70,6 +74,7 @@ data class JournalActionDef(
             this.id = base.id
             this.name = base.name
             this.pluralName = base.pluralName
+            this.preActionModule = base.preActionModule
             this.icon = base.icon
             this.confirm = base.confirm
             this.type = base.type
@@ -96,6 +101,11 @@ data class JournalActionDef(
 
         fun withPluralName(pluralName: MLText?): Builder {
             this.pluralName = pluralName ?: MLText.EMPTY
+            return this
+        }
+
+        fun withPreActionModule(preActionModule: String?): Builder {
+            this.preActionModule = preActionModule ?: ""
             return this
         }
 
@@ -134,6 +144,7 @@ data class JournalActionDef(
                 id,
                 name,
                 pluralName,
+                preActionModule,
                 icon,
                 confirm,
                 type,
