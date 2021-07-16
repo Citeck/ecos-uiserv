@@ -28,6 +28,7 @@ public class ActionDto {
     private String preActionModule;
 
     private ActionConfirmDef confirm;
+
     private ActionResultDto result;
 
     private String type;
@@ -97,6 +98,14 @@ public class ActionDto {
 
     public void setTypeRef(RecordRef typeRef) {
         this.typeRef = typeRef;
+    }
+
+    public String getPreActionModule() {
+        return preActionModule;
+    }
+
+    public void setPreActionModule(String preActionModule) {
+        this.preActionModule = preActionModule;
     }
 
     public ActionConfirmDef getConfirm() {

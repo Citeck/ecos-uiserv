@@ -30,6 +30,7 @@ class ActionEntityMapper(
         action.icon = actionEntity.icon
         action.name = mapper.read(actionEntity.name, MLText::class.java)
         action.pluralName = mapper.read(actionEntity.pluralName, MLText::class.java)
+        action.preActionModule = actionEntity.preActionModule
         action.type = actionEntity.type
         action.confirm = mapper.read(actionEntity.confirm, ActionConfirmDef::class.java)
         action.result = mapper.read(actionEntity.result, ActionResultDto::class.java)
@@ -76,6 +77,7 @@ class ActionEntityMapper(
         actionEntity.icon = action.icon
         actionEntity.name = mapper.toString(action.name)
         actionEntity.pluralName = mapper.toString(action.pluralName)
+        actionEntity.preActionModule = action.preActionModule
         actionEntity.type = action.type
         actionEntity.confirm = mapper.toString(action.confirm)
         actionEntity.result = mapper.toString(action.result)
