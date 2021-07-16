@@ -1,6 +1,5 @@
 package ru.citeck.ecos.uiserv.domain.action.repo
 
-import lombok.Data
 import ru.citeck.ecos.uiserv.app.common.repo.AbstractAuditingEntity
 import ru.citeck.ecos.uiserv.domain.evaluator.repo.EvaluatorEntity
 import java.util.*
@@ -22,6 +21,9 @@ class ActionEntity : AbstractAuditingEntity() {
     var type: String? = null
     var icon: String? = null
 
+    @Column(name = "pre_action_module")
+    var preActionModule: String? = null
+
     @Lob
     @Column(name = "config_json")
     var configJson: String? = null
@@ -34,7 +36,6 @@ class ActionEntity : AbstractAuditingEntity() {
     var features: String? = null
     var pluralName: String? = null
     var predicate: String? = null
-    var preActionModule: String? = null
 
     override fun equals(other: Any?): Boolean {
         if (this === other) {
