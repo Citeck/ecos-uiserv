@@ -36,7 +36,6 @@ class ActionEntity : AbstractAuditingEntity() {
     var features: String? = null
     var pluralName: String? = null
     var predicate: String? = null
-    var preActionModule: String? = null
 
     override fun equals(other: Any?): Boolean {
         if (this === other) {
