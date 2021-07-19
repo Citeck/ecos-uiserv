@@ -10,6 +10,39 @@
     "create": {
       "items": [
         {
+          "id": "cea557ba-61cc-4b1a-a856-9f5ae39a578d",
+          "label": {
+            "ru": "Создать задачу",
+            "en": "Create task"
+          },
+          "type": "SECTION",
+          "items": [
+            {
+              "id": "41f6c1f4-2287-4686-9eb7-a529e4007378",
+              "label": {
+                "ru": "Поручение",
+                "en": "Assignment"
+              },
+              "type": "START_WORKFLOW",
+              "config": {
+                "processDef": "eproc/bpmn-def@activiti$perform"
+              }
+            },
+            {
+              "id": "69bb8444-ea0e-4c10-aa55-b0e79a27e831",
+              "label": {
+                "ru": "Согласование",
+                "en": "Approval"
+              },
+              "type": "START_WORKFLOW",
+              "config": {
+                "processDef": "eproc/bpmn-def@activiti$confirm"
+              }
+            }
+          ],
+          "allowedFor": []
+        },
+        {
           "id": "create-123",
           "type": "CREATE_IN_SECTION",
           "config": {
