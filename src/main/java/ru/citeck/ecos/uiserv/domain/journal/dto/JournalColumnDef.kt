@@ -35,7 +35,7 @@ class JournalColumnDef(
      * Can be nested, e.g. ecos:counterparty.ecos:inn
      * Allowed characters: ^[a-zA-Z][$.\da-zA-Z:_-]*$
      *
-     * If not specified field 'name' will be used to load data
+     * If not specified field 'id' will be used to load data
      */
     val attribute: String,
 
