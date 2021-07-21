@@ -136,7 +136,7 @@ public class MenuFactory {
             return Collections.emptyList();
         }
         Map<String, String> params = new HashMap<>();
-        child.getConfig().forEach((k, v) -> {
+        child.getConfig().forEachJ((k, v) -> {
             params.put(k, v.textValue());
         });
 
@@ -160,7 +160,7 @@ public class MenuFactory {
         MenuItemActionDto actionDto = newData.getAction();
         if (actionDto != null) {
             Map<String, String> params = new HashMap<>();
-            actionDto.getConfig().forEach((k, v) -> {
+            actionDto.getConfig().forEachJ((k, v) -> {
                 params.put(k, v.textValue());
             });
             targetElement.setAction(actionDto.getType(), params);
@@ -193,7 +193,7 @@ public class MenuFactory {
                 params = new HashMap<>();
             }
             Map<String, String> newParams = new HashMap<>();
-            config.forEach((k, v) -> newParams.put(k, v.textValue()));
+            config.forEachJ((k, v) -> newParams.put(k, v.textValue()));
             params.putAll(newParams);
             targetElement.setParams(params);
         }
