@@ -25,6 +25,11 @@ public class IconArtifactHandler implements EcosArtifactHandler<BinArtifact> {
         iconService.save(convertToDto(iconModule));
     }
 
+    @Override
+    public void deleteArtifact(@NotNull String s) {
+        iconService.deleteById(s);
+    }
+
     private IconDto convertToDto(BinArtifact module) {
 
         String extension = FilenameUtils.getExtension(module.getPath());

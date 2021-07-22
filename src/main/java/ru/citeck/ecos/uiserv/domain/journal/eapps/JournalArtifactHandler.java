@@ -21,6 +21,11 @@ public class JournalArtifactHandler implements EcosArtifactHandler<JournalDef> {
     }
 
     @Override
+    public void deleteArtifact(@NotNull String s) {
+        journalService.delete(s);
+    }
+
+    @Override
     public void listenChanges(@NotNull Consumer<JournalDef> consumer) {
         journalService.onJournalChanged(consumer);
     }

@@ -20,6 +20,11 @@ public class ConfigArtifactHandler implements EcosArtifactHandler<ConfigDto> {
         service.update(configDto);
     }
 
+    @Override
+    public void deleteArtifact(@NotNull String s) {
+        service.delete(s);
+    }
+
     @NotNull
     @Override
     public String getArtifactType() {

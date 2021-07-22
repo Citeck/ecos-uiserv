@@ -15,6 +15,10 @@ class AdminSectionsGroupArtifactHandler(
         adminSectionsGroupService.save(artifact)
     }
 
+    override fun deleteArtifact(artifactId: String) {
+        error("Unsupported")
+    }
+
     override fun getArtifactType(): String {
         return "ui/admin-sections-group"
     }
