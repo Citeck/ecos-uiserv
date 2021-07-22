@@ -20,6 +20,11 @@ public class I18nArtifactHandler implements EcosArtifactHandler<I18nDto> {
         service.upload(dto);
     }
 
+    @Override
+    public void deleteArtifact(@NotNull String s) {
+        service.delete(s);
+    }
+
     @NotNull
     @Override
     public String getArtifactType() {

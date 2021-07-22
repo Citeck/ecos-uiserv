@@ -28,6 +28,11 @@ public class DashboardArtifactHandler implements EcosArtifactHandler<DashboardDt
     }
 
     @Override
+    public void deleteArtifact(@NotNull String s) {
+        dashboardService.removeDashboard(s);
+    }
+
+    @Override
     public void listenChanges(@NotNull Consumer<DashboardDto> consumer) {
         dashboardService.addChangeListener(consumer);
     }

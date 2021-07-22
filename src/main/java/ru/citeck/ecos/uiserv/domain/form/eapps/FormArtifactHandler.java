@@ -28,6 +28,11 @@ public class FormArtifactHandler implements EcosArtifactHandler<EcosFormModel> {
         formService.addChangeListener(consumer);
     }
 
+    @Override
+    public void deleteArtifact(@NotNull String s) {
+        formService.delete(s);
+    }
+
     @NotNull
     @Override
     public String getArtifactType() {

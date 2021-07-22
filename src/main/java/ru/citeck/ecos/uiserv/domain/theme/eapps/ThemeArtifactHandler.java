@@ -40,6 +40,11 @@ public class ThemeArtifactHandler implements EcosArtifactHandler<ThemeArtifactHa
     }
 
     @Override
+    public void deleteArtifact(@NotNull String s) {
+        themeService.delete(s);
+    }
+
+    @Override
     public void listenChanges(@NotNull Consumer<DeployModule> consumer) {
         //todo
     }

@@ -20,6 +20,10 @@ public class ActionArtifactHandler implements EcosArtifactHandler<ActionDto> {
         actionService.updateAction(actionModule);
     }
 
+    @Override
+    public void deleteArtifact(@NotNull String s) {
+        actionService.deleteAction(s);
+    }
 
     @Override
     public void listenChanges(@NotNull Consumer<ActionDto> consumer) {

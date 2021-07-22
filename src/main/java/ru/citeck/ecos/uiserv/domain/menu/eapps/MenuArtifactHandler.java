@@ -25,6 +25,11 @@ public class MenuArtifactHandler implements EcosArtifactHandler<MenuDeployArtifa
     }
 
     @Override
+    public void deleteArtifact(@NotNull String s) {
+        menuService.deleteByExtId(s);
+    }
+
+    @Override
     public void listenChanges(@NotNull Consumer<MenuDeployArtifact> consumer) {
 
         menuService.addOnChangeListener(menuDto -> {
