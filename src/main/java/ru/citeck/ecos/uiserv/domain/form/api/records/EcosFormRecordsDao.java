@@ -100,7 +100,7 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
 
     @Nullable
     @Override
-    public RecsQueryRes<?> queryRecords(@NotNull RecordsQuery recordsQuery) {
+    public RecsQueryRes<EcosFormRecord> queryRecords(@NotNull RecordsQuery recordsQuery) {
 
         RecsQueryRes<EcosFormRecord> result = new RecsQueryRes<>();
 
