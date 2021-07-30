@@ -41,6 +41,14 @@ public class EcosFormModel {
         this.attributes = ObjectData.deepCopy(model.getAttributes());
     }
 
+    public RecordRef getTypeRef() {
+        return typeRef;
+    }
+
+    public ObjectData getDefinition() {
+        return definition;
+    }
+
     public String getId() {
         return id;
     }

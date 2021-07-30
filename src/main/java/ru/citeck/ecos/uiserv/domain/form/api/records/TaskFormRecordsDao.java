@@ -19,6 +19,7 @@ import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
+import ru.citeck.ecos.uiserv.domain.form.service.FormDefUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -167,7 +168,7 @@ public class TaskFormRecordsDao extends LocalRecordsDao
         }
 
         DataValue resultComponent = definition;
-        DataValue components = getInnerComponents(definition);
+        DataValue components = FormDefUtils.getInnerComponents(definition);
 
         if (components.isArray()) {
 
@@ -216,7 +217,7 @@ public class TaskFormRecordsDao extends LocalRecordsDao
             result.add(new Outcome(label, key.substring(OUTCOME_PREFIX.length())));
         }
 
-        DataValue components = getInnerComponents(definition);
+        DataValue components = FormDefUtils.getInnerComponents(definition);
         if (components.isArray()) {
             for (DataValue value : components) {
                 getOutcomes(value, result, i18n);
@@ -237,14 +238,6 @@ public class TaskFormRecordsDao extends LocalRecordsDao
             component.set("columns", inner);
         } else {
             component.set("components", inner);
-        }
-    }
-
-    private DataValue getInnerComponents(DataValue component) {
-        if (component.get("type").asText().equals("columns")) {
-            return component.get("columns");
-        } else {
-            return component.get("components");
         }
     }
 
