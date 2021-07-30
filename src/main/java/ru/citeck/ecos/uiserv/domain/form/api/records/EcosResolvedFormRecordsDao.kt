@@ -9,6 +9,9 @@ import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
+import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
+import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.domain.ecostype.dto.EcosTypeInfo
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.form.service.FormDefUtils
@@ -17,17 +20,30 @@ import ru.citeck.ecos.uiserv.domain.form.service.FormDefUtils
 class EcosResolvedFormRecordsDao(
     private val ecosFormRecordsDao: EcosFormRecordsDao,
     private val ecosTypeService: EcosTypeService
-) : AbstractRecordsDao(), RecordAttsDao {
+) : AbstractRecordsDao(), RecordAttsDao, RecordsQueryDao {
 
     companion object {
         const val ID = "rform"
     }
 
+    override fun queryRecords(recsQuery: RecordsQuery): Any? {
+        val formsResult = ecosFormRecordsDao.queryRecords(recsQuery) ?: return null
+        val queryResult = RecsQueryRes<ResolvedFormRecord>()
+        queryResult.setHasMore(formsResult.getHasMore())
+        queryResult.setTotalCount(formsResult.getTotalCount())
+        queryResult.setRecords(formsResult.getRecords().map { mapToResolvedRecord(it) })
+        return queryResult
+    }
+
     override fun getRecordAtts(recordId: String): Any? {
         val form = ecosFormRecordsDao.getRecordAtts(recordId) ?: return null
+        return mapToResolvedRecord(form)
+    }
+
+    private fun mapToResolvedRecord(form: EcosFormRecord): ResolvedFormRecord {
         var typeRef = form.typeRef
         if (RecordRef.isEmpty(typeRef)) {
-            typeRef = ecosTypeService.getTypeRefByForm(RecordRef.create("uiserv", "form", recordId))
+            typeRef = ecosTypeService.getTypeRefByForm(RecordRef.create("uiserv", "form", form.id))
         }
         val typeInfo = ecosTypeService.getTypeInfo(typeRef)
         return ResolvedFormRecord(form, typeInfo)
