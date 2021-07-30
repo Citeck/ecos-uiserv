@@ -30,6 +30,9 @@ class EcosTypesConfig(
     private val typeByJournal = ConcurrentHashMap<RecordRef, RecordRef>()
     private val journalByType = ConcurrentHashMap<RecordRef, RecordRef>()
 
+    private val typeByForm = ConcurrentHashMap<RecordRef, RecordRef>()
+    private val formByType = ConcurrentHashMap<RecordRef, RecordRef>()
+
     private var typesSyncStarted = false
 
     @Value("\${uiserv.ecos-types-sync.active}")
@@ -64,17 +67,27 @@ class EcosTypesConfig(
             parentByType[typeRef] = newParentRef
         }
 
-        val prevJournal = journalByType[typeRef] ?: RecordRef.EMPTY
-        val newJournal = type.journalRef ?: RecordRef.EMPTY
+        updateRefs(journalByType, typeByJournal, typeRef, type.journalRef)
+        updateRefs(formByType, typeByForm, typeRef, type.formRef)
+    }
 
-        if (newJournal != prevJournal) {
-            if (RecordRef.isNotEmpty(prevJournal)) {
-                typeByJournal.remove(prevJournal)
+    private fun updateRefs(
+        refByTypeMap: MutableMap<RecordRef, RecordRef>,
+        typeByRefMap: MutableMap<RecordRef, RecordRef>,
+        typeRef: RecordRef,
+        newRef: RecordRef?
+    ) {
+        val newRefNotNull = newRef ?: RecordRef.EMPTY
+        val prevRef = refByTypeMap[typeRef] ?: RecordRef.EMPTY
+
+        if (newRef != prevRef) {
+            if (RecordRef.isNotEmpty(prevRef)) {
+                typeByRefMap.remove(prevRef)
             }
-            if (RecordRef.isNotEmpty(newJournal)) {
-                typeByJournal[newJournal] = typeRef
+            if (RecordRef.isNotEmpty(newRef)) {
+                typeByRefMap[newRefNotNull] = typeRef
             }
-            journalByType[typeRef] = newJournal
+            refByTypeMap[typeRef] = newRefNotNull
         }
     }
 
@@ -88,6 +101,10 @@ class EcosTypesConfig(
 
     fun getTypeRefByJournal(journalRef: RecordRef): RecordRef {
         return typeByJournal[journalRef] ?: RecordRef.EMPTY
+    }
+
+    fun getTypeRefByForm(formRef: RecordRef): RecordRef {
+        return typeByForm[formRef] ?: RecordRef.EMPTY
     }
 
     fun getTypeInfo(typeRef: RecordRef): EcosTypeInfo? {
