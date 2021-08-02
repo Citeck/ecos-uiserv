@@ -20,4 +20,20 @@ public class BoardDef {
     private MLText name;
     private List<RecordRef> actions;
     private List<BoardColumnDef> columns;
+
+    public BoardDef(){
+    }
+    public BoardDef(String id){
+        this.id = id;
+    }
+    public BoardDef(BoardDef other){
+        this.id = other.getId();
+        this.typeRef = other.getTypeRef();
+        this.journalRef = other.getJournalRef();
+        this.cardFormRef = other.getCardFormRef();
+        this.readOnly = other.getReadOnly();
+        this.name = other.getName();
+        this.actions = other.getActions();
+        this.columns = other.getColumns();
+    }
 }

@@ -7,13 +7,14 @@ import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
+import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.repo.BoardEntity;
 import ru.citeck.ecos.uiserv.domain.board.repo.BoardRepository;
 
 import java.util.UUID;
 
 public class BoardMapper {
-    public static BoardDef entityToDto(@NotNull BoardEntity entity) {
+    public static BoardWithMeta entityToDto(@NotNull BoardEntity entity) {
         BoardDef boardDto = new BoardDef();
         boardDto.setId(entity.getExtId());
         boardDto.setReadOnly(entity.getReadOnly());
@@ -33,7 +34,13 @@ public class BoardMapper {
         if (entity.getActions() != null) {
             boardDto.setActions(Json.getMapper().readList(entity.getActions(), RecordRef.class));
         }
-        return boardDto;
+        BoardWithMeta boardWithMeta = new BoardWithMeta();
+        boardWithMeta.setBoardDef(boardDto);
+        boardWithMeta.setModifier(entity.getLastModifiedBy());
+        boardWithMeta.setModified(entity.getLastModifiedDate());
+        boardWithMeta.setCreator(entity.getCreatedBy());
+        boardWithMeta.setCreated(entity.getCreatedDate());
+        return boardWithMeta;
     }
 
     public static BoardEntity dtoToEntity(@NotNull BoardRepository repository, @NotNull BoardDef board) {

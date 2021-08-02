@@ -11,6 +11,8 @@ import java.util.Objects;
 @Data
 @Table(name = "board")
 public class BoardEntity extends AbstractAuditingEntity {
+    public static String ID = "id";
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "board_seq_gen")
     @SequenceGenerator(name = "board_seq_gen")

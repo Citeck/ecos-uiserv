@@ -1,19 +1,29 @@
 package ru.citeck.ecos.uiserv.domain.board.service;
 
-import org.jetbrains.annotations.NotNull;
 import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
+import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public interface BoardService {
 
-    Optional<BoardDef> getBoardById(String id);
+    Optional<BoardWithMeta> getBoardById(String id);
 
-    void delete(@NotNull String id);
+    void delete(String id);
 
-    List<BoardDef> getBordsForExactType(@NotNull RecordRef typeRef);
+    List<BoardWithMeta> getBoardsForExactType(RecordRef typeRef);
 
-    String save(@NotNull BoardDef boardDef);
+    BoardWithMeta save(BoardDef boardDef);
+
+    long getCount();
+
+    long getCount(Predicate predicate);
+
+    List<BoardWithMeta> getAll(int maxItems, int skipCount, Predicate predicate);
+
+    void onBoardChanged(Consumer<BoardDef> listener);
 }

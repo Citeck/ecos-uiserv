@@ -12,6 +12,7 @@ import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
+import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 
 import java.util.Arrays;
@@ -51,10 +52,10 @@ public class BoardServiceContextTest {
         service.save(boardDef);
         assertThat(service.getBoardById(id), boardDefOprional);
 
-        List<BoardDef> list = service.getBordsForExactType(boardDef.getTypeRef());
+        List<BoardWithMeta> list = service.getBoardsForExactType(boardDef.getTypeRef());
         assertTrue(list!=null);
         assertNotNull(list.get(0));
-        assertThat(list.get(0), is(boardDef));
+        assertThat(list.get(0).getBoardDef(), is(boardDef));
 
     }
 }
