@@ -13,6 +13,7 @@ import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.domain.ecostype.dto.EcosTypeInfo
+import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeAttsUtils
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.form.service.FormDefUtils
 
@@ -66,7 +67,7 @@ class EcosResolvedFormRecordsDao(
             val mappedDef = FormDefUtils.mapInputComponents(definition.getData().copy()) { component ->
 
                 val componentAtt: String = FormDefUtils.getComponentAtt(component)
-                val attDef: AttributeDef? = attributes[componentAtt]
+                val attDef: AttributeDef? = attributes[componentAtt] ?: EcosTypeAttsUtils.STD_ATTS[componentAtt]
 
                 if (attDef != null && !MLText.isEmpty(attDef.name) && isLabelEmpty(component, componentAtt)) {
                     component.set("label", attDef.name)
