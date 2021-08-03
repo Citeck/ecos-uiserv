@@ -64,7 +64,7 @@ public class BoardRecordsDao implements RecordAttsDao, RecordsQueryDao, RecordMu
     public Object queryRecords(@NotNull RecordsQuery recordsQuery) {
 
         RecsQueryRes<BoardWithMeta> result = new RecsQueryRes<>();
-        if (recordsQuery.getLanguage() == BY_TYPE) {
+        if (BY_TYPE.equals(recordsQuery.getLanguage())) {
             TypeQuery typeQuery = recordsQuery.getQuery(TypeQuery.class);
             if (RecordRef.isEmpty(typeQuery.getTypeRef())) {
                 return result;
@@ -72,11 +72,11 @@ public class BoardRecordsDao implements RecordAttsDao, RecordsQueryDao, RecordMu
             List<BoardWithMeta> boards = boardService.getBoardsForExactType(typeQuery.getTypeRef());
             result.setRecords(boards);
             result.setTotalCount(boards.size());
-        } else{
+        } else {
             final QueryPage page = recordsQuery.getPage();
             int maxItemsCount = page.getMaxItems() <= 0 ? 10000 : page.getMaxItems();
             int skipCount = page.getSkipCount();
-            if (recordsQuery.getLanguage() == PredicateService.LANGUAGE_PREDICATE) {
+            if (PredicateService.LANGUAGE_PREDICATE.equals(recordsQuery.getLanguage())) {
                 Predicate predicate = recordsQuery.getQuery(Predicate.class);
                 result.setRecords(boardService.getAll(maxItemsCount, skipCount, predicate));
                 result.setTotalCount(boardService.getCount(predicate));
