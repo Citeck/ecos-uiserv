@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.app.web;
+package ru.citeck.ecos.uiserv;
 
 import org.springframework.test.web.servlet.MockMvc;
 

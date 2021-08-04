@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.app.web;
+package ru.citeck.ecos.uiserv;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;

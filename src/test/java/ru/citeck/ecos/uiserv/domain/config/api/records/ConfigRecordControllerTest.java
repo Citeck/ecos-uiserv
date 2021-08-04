@@ -20,8 +20,8 @@ import ru.citeck.ecos.records3.spring.web.rest.RecordsRestApi;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.config.dto.ConfigDto;
 import ru.citeck.ecos.uiserv.domain.config.service.ConfigEntityService;
-import ru.citeck.ecos.uiserv.app.web.TestEntityRecordUtil;
-import ru.citeck.ecos.uiserv.app.web.TestUtil;
+import ru.citeck.ecos.uiserv.TestEntityRecordUtil;
+import ru.citeck.ecos.uiserv.TestUtil;
 
 import java.io.IOException;
 import java.util.Optional;
