@@ -1,0 +1,22 @@
+---
+id: board
+name:
+  en: Board
+  ru: Доска
+
+system: true
+
+sourceId: uiserv/board
+
+journalRef: uiserv/board@ecos-boards
+
+defaultCreateVariant: false
+
+createVariants:
+
+  - id: create-new-board
+    name: { ru: Создать доску, en: Create board }
+
+  - id: upload-board
+    name: { ru: Загрузить доску, en: Upload board }
+    formRef: uiserv/form@ecos-module-upload

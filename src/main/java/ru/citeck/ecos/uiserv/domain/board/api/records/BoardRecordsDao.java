@@ -23,6 +23,7 @@ import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class BoardRecordsDao implements RecordAttsDao, RecordsQueryDao, RecordMutateDtoDao<BoardDef>, RecordDeleteDao {
@@ -54,8 +55,11 @@ public class BoardRecordsDao implements RecordAttsDao, RecordsQueryDao, RecordMu
         if (localBoardId.isEmpty()) {
             return new BoardWithMeta();
         } else {
-            return boardService.getBoardById(localBoardId)
-                .orElseThrow(() -> new IllegalArgumentException("Board with ID \'" + localBoardId + "\' was not found"));
+            Optional<BoardWithMeta> board = boardService.getBoardById(localBoardId);
+            if (!board.isPresent()) {
+                log.warn("Board with ID {} was not found", localBoardId);
+            }
+            return board.orElse(new BoardWithMeta(localBoardId));
         }
     }
 

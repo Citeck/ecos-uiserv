@@ -45,18 +45,18 @@ public class BoardServiceContextTest {
         BoardDef boardDef = BoardTestData.getTestBoard();
         service.save(boardDef);
         Matcher<BoardDef> boardDefMatcher = is(boardDef);
-        assertThat(service.getBoardById(BoardTestData.ID).get().getBoardDef(), boardDefMatcher);
+        assertThat(service.getBoardById(BoardTestData.BOARD_ID).get().getBoardDef(), boardDefMatcher);
 
-        service.delete(BoardTestData.ID);
-        assertThat(service.getBoardById(BoardTestData.ID), is(Optional.empty()));
+        service.delete(BoardTestData.BOARD_ID);
+        assertThat(service.getBoardById(BoardTestData.BOARD_ID), is(Optional.empty()));
 
         boardDef.setColumns(Arrays.asList(new BoardColumnDef("first", new MLText("1st Column")), new BoardColumnDef("second", new MLText("2d Column"))));
         service.save(boardDef);
-        assertThat(service.getBoardById(BoardTestData.ID).get().getBoardDef(), boardDefMatcher);
+        assertThat(service.getBoardById(BoardTestData.BOARD_ID).get().getBoardDef(), boardDefMatcher);
 
         boardDef.setReadOnly(true);
         service.save(boardDef);
-        assertThat(service.getBoardById(BoardTestData.ID).get().getBoardDef(), boardDefMatcher);
+        assertThat(service.getBoardById(BoardTestData.BOARD_ID).get().getBoardDef(), boardDefMatcher);
 
         List<BoardWithMeta> list = service.getBoardsForExactType(boardDef.getTypeRef());
         assertTrue(list != null);

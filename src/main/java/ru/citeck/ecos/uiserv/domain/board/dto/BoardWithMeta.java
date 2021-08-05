@@ -22,8 +22,19 @@ public class BoardWithMeta {
     @AttName("_creator")
     private String creator;
 
+    public String getLocalId() {
+        if (boardDef != null)
+            return boardDef.getId();
+        return "";
+    }
+
     public BoardWithMeta() {
     }
+
+    public BoardWithMeta(String id) {
+        boardDef = new BoardDef(id);
+    }
+
     public BoardWithMeta(BoardWithMeta other) {
         this.boardDef = other.boardDef;
         this.modified = other.modified;

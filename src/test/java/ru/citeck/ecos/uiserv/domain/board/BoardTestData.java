@@ -8,13 +8,13 @@ import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 public class BoardTestData {
 
     public static final String UISERV_APP_ID = "uiserv";
-    public static String ID = "test-board";
+    public static String BOARD_ID = "test-board";
     public static String PROP_ID = "id";
     public static String PROP_NAME = "name";
     public static String PROP_READ_ONLY = "readOnly";
     public static String PROP_TYPE = "typeRef";
     public static String PROP_COLUMNS = "columns";
-    public static final BoardDef testBoard = new BoardDef(ID);
+    public static final BoardDef testBoard = new BoardDef(BOARD_ID);
     public static final RecordRef testTypeRef = RecordRef.create("emodel", "type", "testType");
 
     static {
