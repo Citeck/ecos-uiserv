@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.board.api.records;
 
 import lombok.Data;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records2.request.query.SortBy;
+import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
 import ru.citeck.ecos.records3.record.dao.delete.DelStatus;
 import ru.citeck.ecos.records3.record.dao.delete.RecordDeleteDao;
@@ -26,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class BoardRecordsDao implements RecordAttsDao, RecordsQueryDao, RecordMutateDtoDao<BoardDef>, RecordDeleteDao {
+public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao, RecordsQueryDao, RecordMutateDtoDao<BoardDef>, RecordDeleteDao {
 
     private static final Logger log = LoggerFactory.getLogger(BoardRecordsDao.class);
     @Autowired
@@ -51,7 +54,7 @@ public class BoardRecordsDao implements RecordAttsDao, RecordsQueryDao, RecordMu
      */
     @Nullable
     @Override
-    public Object getRecordAtts(@NotNull String localBoardId) {
+    public BoardWithMeta getRecordAtts(@NotNull String localBoardId) {
         if (localBoardId.isEmpty()) {
             return new BoardWithMeta();
         } else {
@@ -65,9 +68,10 @@ public class BoardRecordsDao implements RecordAttsDao, RecordsQueryDao, RecordMu
 
     @Nullable
     @Override
-    public Object queryRecords(@NotNull RecordsQuery recordsQuery) {
-
+    public RecsQueryRes<BoardWithMeta> queryRecords(@NotNull RecordsQuery recordsQuery) {
+//add sorting
         RecsQueryRes<BoardWithMeta> result = new RecsQueryRes<>();
+        List<SortBy> sorts = recordsQuery.getSortBy();
         if (BY_TYPE.equals(recordsQuery.getLanguage())) {
             TypeQuery typeQuery = recordsQuery.getQuery(TypeQuery.class);
             if (RecordRef.isEmpty(typeQuery.getTypeRef())) {

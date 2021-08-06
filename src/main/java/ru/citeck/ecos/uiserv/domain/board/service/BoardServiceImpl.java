@@ -88,7 +88,8 @@ public class BoardServiceImpl implements BoardService {
             return Collections.emptyList();
         }
         final PageRequest page = PageRequest.of(skipCount / maxItems, maxItems,
-            Sort.by(Sort.Direction.DESC, BoardEntity.ID));
+            Sort.by(Sort.Direction.DESC, BoardEntity.ID)
+        );
         return repository.findAll(toSpecification(predicate), page)
             .stream().map(BoardMapper::entityToDto)
             .collect(Collectors.toList());

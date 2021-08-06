@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.citeck.ecos.commons.data.MLText;
+import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
@@ -33,7 +34,10 @@ public class BoardServiceContextTest {
     @Test
     public void createTest() {
         BoardDef boardDef = BoardTestData.getNewBoard();
-        BoardDef createdBoardDef = service.save(boardDef).getBoardDef();
+        BoardWithMeta boardWithMeta = service.save(boardDef);
+        assertNotNull(boardWithMeta.getModifier());
+
+        BoardDef createdBoardDef = boardWithMeta.getBoardDef();
         boardDef.setId(createdBoardDef.getId());
 
         Matcher<BoardDef> boardDefMatcher = is(boardDef);
@@ -67,5 +71,10 @@ public class BoardServiceContextTest {
     @Test
     public void deleteNull() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> service.delete(null));
+    }
+
+    public void sorted(){
+        /*Predicate predicate = new ;
+        List<BoardWithMeta> boards = service.getAll(10, 0, predicate);*/
     }
 }

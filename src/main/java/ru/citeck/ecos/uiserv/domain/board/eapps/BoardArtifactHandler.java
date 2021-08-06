@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 @Component
 @RequiredArgsConstructor
 public class BoardArtifactHandler implements EcosArtifactHandler<BoardDef> {
-    private BoardService service;
+    final private BoardService service;
 
     @Override
     public void deleteArtifact(@NotNull String id) {

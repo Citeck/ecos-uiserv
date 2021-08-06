@@ -1,0 +1,11 @@
+
+modelVersion: "1.0"
+
+name:
+  ru: Доска
+  en: Board
+
+source-id: "board"
+
+controller:
+  type: json
