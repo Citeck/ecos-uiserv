@@ -74,6 +74,7 @@ public class EcosFormServiceImpl implements EcosFormService {
         PageRequest page = PageRequest.of(skip / max, max, Sort.by(Sort.Direction.DESC, "id"));
 
         FilterPredicate dto = PredicateUtils.convertToDto(predicate, FilterPredicate.class);
+        //dto always not null - when predicate does not contain FilterPredicate dto has null fields
         if (dto == null) {
             return formsRepository.findAll(page).stream()
                 .map(this::mapToDto)
@@ -101,7 +102,7 @@ public class EcosFormServiceImpl implements EcosFormService {
                 .collect(Collectors.toList());
 
         } else {
-
+            //logical error: lost simple predicates like 'eq', 'gt' etc.
             return formsRepository.findAll(page).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());

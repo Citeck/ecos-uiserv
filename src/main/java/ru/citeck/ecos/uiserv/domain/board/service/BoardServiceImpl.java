@@ -49,7 +49,7 @@ public class BoardServiceImpl implements BoardService {
     @Transactional
     public BoardWithMeta save(BoardDef boardDef) {
         Assert.notNull(boardDef, "Board must not be null");
-        if (boardDef.getTypeRef() != null && boardDef.getColumns() != null && !boardDef.getColumns().isEmpty()) {
+        /*if (boardDef.getTypeRef() != null && boardDef.getColumns() != null && !boardDef.getColumns().isEmpty()) {
             EcosTypeInfo typeInfo = typeService.getTypeInfo(boardDef.getTypeRef());
             if (typeInfo != null && typeInfo.getModel() != null && typeInfo.getModel().getStatuses() != null) {
                 final Set<String> typeStatuses = typeInfo.getModel().getStatuses().stream()
@@ -60,7 +60,7 @@ public class BoardServiceImpl implements BoardService {
                             log.warn("Unknown status '{}' for type '{}'", boardColumnDef.getId(), typeInfo.getId());
                     });
             }
-        }
+        }*/
         BoardEntity entity = repository.save(BoardMapper.dtoToEntity(repository, boardDef));
         BoardWithMeta result = BoardMapper.entityToDto(entity);
 
@@ -69,9 +69,9 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public List<BoardWithMeta> getBoardsForExactType(RecordRef typeRef) {
+    public List<BoardWithMeta> getBoardsForExactType(RecordRef typeRef, Sort sort) {
         Assert.notNull(typeRef, "To select boards typeRef must not be null");
-        List<BoardEntity> boardEntities = repository.findAllByTypeRef(typeRef.toString());
+        List<BoardEntity> boardEntities = repository.findAllByTypeRef(typeRef.toString(), sort);
         return boardEntities.stream().map(BoardMapper::entityToDto).collect(Collectors.toList());
     }
 
@@ -83,13 +83,14 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public List<BoardWithMeta> getAll(int maxItems, int skipCount, Predicate predicate) {
+    public List<BoardWithMeta> getAll(int maxItems, int skipCount, Predicate predicate, Sort sort) {
         if (maxItems == 0) {
             return Collections.emptyList();
         }
         final PageRequest page = PageRequest.of(skipCount / maxItems, maxItems,
-            Sort.by(Sort.Direction.DESC, BoardEntity.ID)
+            sort != null ? sort : Sort.by(Sort.Direction.DESC, BoardEntity.ID)
         );
+
         return repository.findAll(toSpecification(predicate), page)
             .stream().map(BoardMapper::entityToDto)
             .collect(Collectors.toList());
@@ -126,6 +127,7 @@ public class BoardServiceImpl implements BoardService {
                 builder.like(builder.lower(root.get("extId")), "%" + predicateDto.localId.toLowerCase() + "%");
             specification = specification != null ? specification.or(idSpecification) : idSpecification;
         }
+
         return specification;
     }
 

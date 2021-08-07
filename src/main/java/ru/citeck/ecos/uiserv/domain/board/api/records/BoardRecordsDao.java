@@ -1,17 +1,17 @@
 package ru.citeck.ecos.uiserv.domain.board.api.records;
 
 import lombok.Data;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
-import ru.citeck.ecos.records2.request.query.SortBy;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
 import ru.citeck.ecos.records3.record.dao.delete.DelStatus;
@@ -27,6 +27,7 @@ import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao, RecordsQueryDao, RecordMutateDtoDao<BoardDef>, RecordDeleteDao {
@@ -69,15 +70,27 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
     @Nullable
     @Override
     public RecsQueryRes<BoardWithMeta> queryRecords(@NotNull RecordsQuery recordsQuery) {
-//add sorting
         RecsQueryRes<BoardWithMeta> result = new RecsQueryRes<>();
-        List<SortBy> sorts = recordsQuery.getSortBy();
+        //TODO: add getSortOrder() or getSort() to ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
+        List<Sort.Order> sorts = recordsQuery.getSortBy()
+            .stream()
+            .map(sortBy -> {
+                if (StringUtils.isNotBlank(sortBy.getAttribute())) {
+                    return Optional.of(sortBy.isAscending() ? Sort.Order.asc(sortBy.getAttribute()) : Sort.Order.desc(sortBy.getAttribute()));
+                }
+                return Optional.<Sort.Order>empty();
+            })
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toList());
+        Sort sort = sorts.isEmpty() ? null : Sort.by(sorts);
+
         if (BY_TYPE.equals(recordsQuery.getLanguage())) {
             TypeQuery typeQuery = recordsQuery.getQuery(TypeQuery.class);
             if (RecordRef.isEmpty(typeQuery.getTypeRef())) {
                 return result;
             }
-            List<BoardWithMeta> boards = boardService.getBoardsForExactType(typeQuery.getTypeRef());
+            List<BoardWithMeta> boards = boardService.getBoardsForExactType(typeQuery.getTypeRef(), sort);
             result.setRecords(boards);
             result.setTotalCount(boards.size());
         } else {
@@ -86,11 +99,11 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
             int skipCount = page.getSkipCount();
             if (PredicateService.LANGUAGE_PREDICATE.equals(recordsQuery.getLanguage())) {
                 Predicate predicate = recordsQuery.getQuery(Predicate.class);
-                result.setRecords(boardService.getAll(maxItemsCount, skipCount, predicate));
+                result.setRecords(boardService.getAll(maxItemsCount, skipCount, predicate, sort));
                 result.setTotalCount(boardService.getCount(predicate));
             } else {
                 log.warn("Unsupported query language '{}'", recordsQuery.getLanguage());
-                result.setRecords(boardService.getAll(maxItemsCount, skipCount, null));
+                result.setRecords(boardService.getAll(maxItemsCount, skipCount, null, sort));
                 result.setTotalCount(boardService.getCount());
             }
         }

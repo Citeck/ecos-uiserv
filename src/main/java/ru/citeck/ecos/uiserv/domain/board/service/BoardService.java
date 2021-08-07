@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.board.service;
 
+import org.springframework.data.domain.Sort;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
@@ -15,7 +16,7 @@ public interface BoardService {
 
     void delete(String id);
 
-    List<BoardWithMeta> getBoardsForExactType(RecordRef typeRef);
+    List<BoardWithMeta> getBoardsForExactType(RecordRef typeRef, Sort sort);
 
     BoardWithMeta save(BoardDef boardDef);
 
@@ -23,7 +24,7 @@ public interface BoardService {
 
     long getCount(Predicate predicate);
 
-    List<BoardWithMeta> getAll(int maxItems, int skipCount, Predicate predicate);
+    List<BoardWithMeta> getAll(int maxItems, int skipCount, Predicate predicate, Sort sort);
 
     void onBoardChanged(Consumer<BoardDef> listener);
 }
