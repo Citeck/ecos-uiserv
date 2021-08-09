@@ -17,4 +17,6 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long>,
     List<BoardEntity> findAllByTypeRefIn(List<String> types);
 
     Optional<BoardEntity> findByExtId(String extId);
+
+    List<BoardEntity> findAllByJournalRef(String journal, Sort sort);
 }

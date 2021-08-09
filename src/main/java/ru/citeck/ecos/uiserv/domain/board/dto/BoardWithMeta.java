@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.domain.board.dto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 
 import java.time.Instant;
@@ -41,5 +42,9 @@ public class BoardWithMeta {
         this.modifier = other.modifier;
         this.created = other.created;
         this.creator = other.creator;
+    }
+
+    public RecordRef getRef(){
+        return RecordRef.create("uiserv", "board", getLocalId());
     }
 }

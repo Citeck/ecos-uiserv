@@ -27,4 +27,6 @@ public interface BoardService {
     List<BoardWithMeta> getAll(int maxItems, int skipCount, Predicate predicate, Sort sort);
 
     void onBoardChanged(Consumer<BoardDef> listener);
+
+    List<BoardWithMeta> getBoardsForJournal(RecordRef journalRef);
 }

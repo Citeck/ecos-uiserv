@@ -47,6 +47,12 @@
       "config": {
         "journalId": "ecos-menus"
       }
+    },
+    {
+      "type": "JOURNAL",
+      "config": {
+        "journalId": "ecos-boards"
+      }
     }
   ]
 }

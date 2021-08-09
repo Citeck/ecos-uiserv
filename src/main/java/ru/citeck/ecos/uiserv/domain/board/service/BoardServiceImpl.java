@@ -112,6 +112,14 @@ public class BoardServiceImpl implements BoardService {
             changeListeners.add(listener);
     }
 
+    @Override
+    public List<BoardWithMeta> getBoardsForJournal(RecordRef journalRef) {
+        Assert.notNull(journalRef, "To select boards journalRef must not be null");
+        return repository.findAllByJournalRef(journalRef.toString(), Sort.by(Sort.Direction.DESC, BoardEntity.ID))
+            .stream().map(BoardMapper::entityToDto)
+            .collect(Collectors.toList());
+    }
+
     /* Also common part with JournalServiceImpl -> common interface*/
     private Specification<BoardEntity> toSpecification(Predicate predicate) {
         if (predicate == null)
