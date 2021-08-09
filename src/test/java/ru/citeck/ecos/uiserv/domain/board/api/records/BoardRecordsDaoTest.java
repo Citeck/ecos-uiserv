@@ -1,6 +1,5 @@
 package ru.citeck.ecos.uiserv.domain.board.api.records;
 
-import org.hamcrest.core.IsNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

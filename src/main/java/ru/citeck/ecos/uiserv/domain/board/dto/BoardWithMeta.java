@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
+import ru.citeck.ecos.uiserv.domain.board.repo.BoardEntity;
 
 import java.time.Instant;
 
@@ -44,7 +45,7 @@ public class BoardWithMeta {
         this.creator = other.creator;
     }
 
-    public RecordRef getRef(){
-        return RecordRef.create("uiserv", "board", getLocalId());
+    public RecordRef getRef() {
+        return RecordRef.create(BoardEntity.APP_NAME, BoardEntity.SOURCE_ID, getLocalId());
     }
 }

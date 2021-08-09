@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.records2.RecordConstants;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
@@ -35,7 +36,7 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
     private static final Logger log = LoggerFactory.getLogger(BoardRecordsDao.class);
     @Autowired
     private BoardService boardService;
-    public static final String ID = "board";
+    public static final String ID = "board"; //BoardEntity.SOURCE_ID
     public static final String BY_TYPE = "by-type";
 
     /**
@@ -75,8 +76,18 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
         List<Sort.Order> sorts = recordsQuery.getSortBy()
             .stream()
             .map(sortBy -> {
-                if (StringUtils.isNotBlank(sortBy.getAttribute())) {
-                    return Optional.of(sortBy.isAscending() ? Sort.Order.asc(sortBy.getAttribute()) : Sort.Order.desc(sortBy.getAttribute()));
+                String attribute = sortBy.getAttribute();
+                if (StringUtils.isNotBlank(attribute)) {
+                    if (RecordConstants.ATT_MODIFIED.equals(attribute)) {
+                        attribute = "lastModifiedDate";
+                    } else if (RecordConstants.ATT_MODIFIER.equals(attribute)) {
+                        attribute = "lastModifiedBy";
+                    } else if (RecordConstants.ATT_CREATED.equals(attribute)) {
+                        attribute = "createdDate";
+                    } else if (RecordConstants.ATT_CREATOR.equals(attribute)) {
+                        attribute = "createdBy";
+                    }
+                    return Optional.of(sortBy.isAscending() ? Sort.Order.asc(attribute) : Sort.Order.desc(attribute));
                 }
                 return Optional.<Sort.Order>empty();
             })
@@ -107,7 +118,6 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
                 result.setTotalCount(boardService.getCount());
             }
         }
-        //AbstractRecordsDao: predicateService
         return result;
     }
 

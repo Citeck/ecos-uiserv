@@ -8,7 +8,7 @@ system: true
 
 sourceId: uiserv/board
 
-journalRef: uiserv/board@ecos-boards
+journalRef: uiserv/journal@ecos-boards
 
 defaultCreateVariant: false
 

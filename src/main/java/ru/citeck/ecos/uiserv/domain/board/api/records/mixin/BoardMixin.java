@@ -9,6 +9,7 @@ import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.record.atts.value.AttValueCtx;
 import ru.citeck.ecos.records3.record.mixin.AttMixin;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
+import ru.citeck.ecos.uiserv.domain.board.repo.BoardEntity;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 import ru.citeck.ecos.uiserv.domain.journal.api.records.ResolvedJournalRecordsDao;
 
@@ -47,7 +48,7 @@ public class BoardMixin implements AttMixin {
     @Nullable
     @Override
     public Object getAtt(@NotNull String path, @NotNull AttValueCtx attValueCtx) throws Exception {
-        RecordRef journalRef = RecordRef.create("uiserv", "journal", attValueCtx.getLocalId());
+        RecordRef journalRef = RecordRef.create(BoardEntity.APP_NAME, "journal", attValueCtx.getLocalId());
         Attributes attribute = Attributes.fromString(path);
         switch (attribute) {
             case BOARDS:

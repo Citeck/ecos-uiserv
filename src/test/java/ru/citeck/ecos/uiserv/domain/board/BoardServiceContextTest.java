@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.board;
 
 import org.hamcrest.Matcher;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.jupiter.api.Assertions;
@@ -9,11 +10,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.citeck.ecos.commons.data.MLText;
-import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
+import ru.citeck.ecos.uiserv.domain.board.repo.BoardRepository;
+import ru.citeck.ecos.uiserv.domain.board.service.BoardMapper;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 
 import java.util.Arrays;
@@ -30,6 +32,13 @@ public class BoardServiceContextTest {
 
     @Autowired
     private BoardService service;
+    @Autowired
+    private BoardRepository repository;
+
+    @Before
+    public void createTestBoard(){
+        repository.save(BoardMapper.dtoToEntity(repository, BoardTestData.getTestBoard()));
+    }
 
     @Test
     public void createTest() {
@@ -45,14 +54,17 @@ public class BoardServiceContextTest {
     }
 
     @Test
-    public void baseTest() {
+    public void deleteTest() {
+        service.delete(BoardTestData.BOARD_ID);
+        assertThat(service.getBoardById(BoardTestData.BOARD_ID), is(Optional.empty()));
+    }
+
+    @Test
+    public void modifyTest() {
         BoardDef boardDef = BoardTestData.getTestBoard();
         service.save(boardDef);
         Matcher<BoardDef> boardDefMatcher = is(boardDef);
         assertThat(service.getBoardById(BoardTestData.BOARD_ID).get().getBoardDef(), boardDefMatcher);
-
-        service.delete(BoardTestData.BOARD_ID);
-        assertThat(service.getBoardById(BoardTestData.BOARD_ID), is(Optional.empty()));
 
         boardDef.setColumns(Arrays.asList(new BoardColumnDef("first", new MLText("1st Column")), new BoardColumnDef("second", new MLText("2d Column"))));
         service.save(boardDef);
@@ -61,6 +73,11 @@ public class BoardServiceContextTest {
         boardDef.setReadOnly(true);
         service.save(boardDef);
         assertThat(service.getBoardById(BoardTestData.BOARD_ID).get().getBoardDef(), boardDefMatcher);
+    }
+
+    @Test
+    public void selectForExactTypeTest() {
+        BoardDef boardDef = BoardTestData.getTestBoard();
 
         List<BoardWithMeta> list = service.getBoardsForExactType(boardDef.getTypeRef(), null);
         assertTrue(list != null);
@@ -71,10 +88,5 @@ public class BoardServiceContextTest {
     @Test
     public void deleteNull() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> service.delete(null));
-    }
-
-    public void sorted(){
-        /*Predicate predicate = new ;
-        List<BoardWithMeta> boards = service.getAll(10, 0, predicate);*/
     }
 }
