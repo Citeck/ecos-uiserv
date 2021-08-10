@@ -34,10 +34,14 @@ import java.util.stream.Collectors;
 public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao, RecordsQueryDao, RecordMutateDtoDao<BoardDef>, RecordDeleteDao {
 
     private static final Logger log = LoggerFactory.getLogger(BoardRecordsDao.class);
-    @Autowired
     private BoardService boardService;
     public static final String ID = "board"; //BoardEntity.SOURCE_ID
     public static final String BY_TYPE = "by-type";
+
+    @Autowired
+    public BoardRecordsDao(BoardService service){
+        this.boardService = service;
+    }
 
     /**
      * Returns this data source identifier
@@ -61,7 +65,7 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
             return new BoardWithMeta();
         } else {
             Optional<BoardWithMeta> board = boardService.getBoardById(localBoardId);
-            if (!board.isPresent()) {
+            if (board == null || !board.isPresent()) {
                 log.warn("Board with ID {} was not found", localBoardId);
             }
             return board.orElse(new BoardWithMeta(localBoardId));
@@ -73,28 +77,29 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
     public RecsQueryRes<BoardWithMeta> queryRecords(@NotNull RecordsQuery recordsQuery) {
         RecsQueryRes<BoardWithMeta> result = new RecsQueryRes<>();
         //TODO: add getSortOrder() or getSort() to ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
-        List<Sort.Order> sorts = recordsQuery.getSortBy()
-            .stream()
-            .map(sortBy -> {
-                String attribute = sortBy.getAttribute();
-                if (StringUtils.isNotBlank(attribute)) {
-                    if (RecordConstants.ATT_MODIFIED.equals(attribute)) {
-                        attribute = "lastModifiedDate";
-                    } else if (RecordConstants.ATT_MODIFIER.equals(attribute)) {
-                        attribute = "lastModifiedBy";
-                    } else if (RecordConstants.ATT_CREATED.equals(attribute)) {
-                        attribute = "createdDate";
-                    } else if (RecordConstants.ATT_CREATOR.equals(attribute)) {
-                        attribute = "createdBy";
+        List<Sort.Order> sorts = recordsQuery.getSortBy() == null ? null :
+            recordsQuery.getSortBy()
+                .stream()
+                .map(sortBy -> {
+                    String attribute = sortBy.getAttribute();
+                    if (StringUtils.isNotBlank(attribute)) {
+                        if (RecordConstants.ATT_MODIFIED.equals(attribute)) {
+                            attribute = "lastModifiedDate";
+                        } else if (RecordConstants.ATT_MODIFIER.equals(attribute)) {
+                            attribute = "lastModifiedBy";
+                        } else if (RecordConstants.ATT_CREATED.equals(attribute)) {
+                            attribute = "createdDate";
+                        } else if (RecordConstants.ATT_CREATOR.equals(attribute)) {
+                            attribute = "createdBy";
+                        }
+                        return Optional.of(sortBy.isAscending() ? Sort.Order.asc(attribute) : Sort.Order.desc(attribute));
                     }
-                    return Optional.of(sortBy.isAscending() ? Sort.Order.asc(attribute) : Sort.Order.desc(attribute));
-                }
-                return Optional.<Sort.Order>empty();
-            })
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .collect(Collectors.toList());
-        Sort sort = sorts.isEmpty() ? null : Sort.by(sorts);
+                    return Optional.<Sort.Order>empty();
+                })
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        Sort sort = sorts == null || sorts.isEmpty() ? null : Sort.by(sorts);
 
         if (BY_TYPE.equals(recordsQuery.getLanguage())) {
             TypeQuery typeQuery = recordsQuery.getQuery(TypeQuery.class);

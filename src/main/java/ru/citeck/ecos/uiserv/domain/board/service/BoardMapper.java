@@ -43,9 +43,9 @@ public class BoardMapper {
         return boardWithMeta;
     }
 
-    public static BoardEntity dtoToEntity(@NotNull BoardRepository repository, @NotNull BoardDef board) {
+    public static BoardEntity dtoToEntity(BoardRepository repository, @NotNull BoardDef board) {
         BoardEntity entity = null;
-        if (!StringUtils.isBlank(board.getId())) {
+        if (repository != null && !StringUtils.isBlank(board.getId())) {
             entity = repository.findByExtId(board.getId()).orElse(null);
         }
         if (entity == null) {

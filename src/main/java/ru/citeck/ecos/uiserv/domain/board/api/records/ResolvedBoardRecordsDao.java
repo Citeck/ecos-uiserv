@@ -3,8 +3,6 @@ package ru.citeck.ecos.uiserv.domain.board.api.records;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
@@ -32,7 +30,8 @@ public class ResolvedBoardRecordsDao extends AbstractRecordsDao implements Recor
     @Override
     public Object queryRecords(@NotNull RecordsQuery recordsQuery) {
         RecsQueryRes<BoardWithMeta> queryRes = recordsDao.queryRecords(recordsQuery);
-        queryRes.withRecords(record -> new ResolvedBoardRecord(record.getBoardDef(), ecosTypeService));
+        if (queryRes != null)
+            queryRes.withRecords(record -> new ResolvedBoardRecord(record.getBoardDef(), ecosTypeService));
         return queryRes;
     }
 

@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.domain.board.dto;
 import lombok.Data;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.uiserv.domain.board.repo.BoardEntity;
 
 import java.util.List;
 
@@ -35,5 +36,13 @@ public class BoardDef {
         this.name = other.getName();
         this.actions = other.getActions();
         this.columns = other.getColumns();
+    }
+
+    public RecordRef getRef() {
+        return RecordRef.create(BoardEntity.APP_NAME, BoardEntity.SOURCE_ID, id);
+    }
+
+    public static RecordRef createRef(String localId) {
+        return RecordRef.create(BoardEntity.APP_NAME, BoardEntity.SOURCE_ID, localId);
     }
 }

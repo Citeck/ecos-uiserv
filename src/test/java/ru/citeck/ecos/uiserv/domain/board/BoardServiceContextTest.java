@@ -80,7 +80,7 @@ public class BoardServiceContextTest {
         BoardDef boardDef = BoardTestData.getTestBoard();
 
         List<BoardWithMeta> list = service.getBoardsForExactType(boardDef.getTypeRef(), null);
-        assertTrue(list != null);
+        assertNotNull(list);
         assertNotNull(list.get(0));
         assertThat(list.get(0).getBoardDef(), is(boardDef));
     }
