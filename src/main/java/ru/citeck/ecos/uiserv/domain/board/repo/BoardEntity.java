@@ -12,7 +12,6 @@ import java.util.Objects;
 @Table(name = "board")
 public class BoardEntity extends AbstractAuditingEntity {
     public static String ID = "id";
-    public static String APP_NAME = "uiserv";
     public static String SOURCE_ID = "board";
 
     @Id
@@ -21,23 +20,15 @@ public class BoardEntity extends AbstractAuditingEntity {
     private Long id;
 
     @NotNull
-    @Column(name = "ext_id")
     private String extId;
-    @Column(name = "type_ref")
     private String typeRef;
-    @Column(name = "journal_ref")
     private String journalRef;
-    @Column(name = "card_form_ref")
     private String cardFormRef;
 
-    @Column(name = "read_only")
     private Boolean readOnly;
 
-    @Column(name = "name")
     private String name;
-    @Column(name = "actions")
     private String actions;
-    @Column(name = "columns")
     private String columns;
 
     @Override

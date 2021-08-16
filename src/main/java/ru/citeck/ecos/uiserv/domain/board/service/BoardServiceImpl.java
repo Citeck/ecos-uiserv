@@ -2,9 +2,8 @@ package ru.citeck.ecos.uiserv.domain.board.service;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -14,53 +13,41 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.uiserv.app.application.constants.AppConstants;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.repo.BoardEntity;
 import ru.citeck.ecos.uiserv.domain.board.repo.BoardRepository;
-import ru.citeck.ecos.uiserv.domain.ecostype.dto.EcosTypeInfo;
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
-    private static final Logger log = LoggerFactory.getLogger(BoardServiceImpl.class);
     private final EcosTypeService typeService;
     private final BoardRepository repository;
     private final List<Consumer<BoardDef>> changeListeners = new CopyOnWriteArrayList<>();
 
     @Override
-    public Optional<BoardWithMeta> getBoardById(String id) {
+    public BoardWithMeta getBoardById(String id) {
         if (StringUtils.isBlank(id)) {
-            return Optional.empty();
+            return null;
         }
-        return repository.findByExtId(id).map(BoardMapper::entityToDto);
+        return repository.findByExtId(id)
+            .map(BoardMapper::entityToDto)
+            .orElse(null);
     }
 
     @Override
     @Transactional
     public BoardWithMeta save(BoardDef boardDef) {
         Assert.notNull(boardDef, "Board must not be null");
-        /*if (boardDef.getTypeRef() != null && boardDef.getColumns() != null && !boardDef.getColumns().isEmpty()) {
-            EcosTypeInfo typeInfo = typeService.getTypeInfo(boardDef.getTypeRef());
-            if (typeInfo != null && typeInfo.getModel() != null && typeInfo.getModel().getStatuses() != null) {
-                final Set<String> typeStatuses = typeInfo.getModel().getStatuses().stream()
-                    .map(statusDef -> statusDef.getId()).collect(Collectors.toSet());
-                boardDef.getColumns().stream()
-                    .forEach(boardColumnDef -> {
-                        if (!typeStatuses.contains(boardColumnDef.getId()))
-                            log.warn("Unknown status '{}' for type '{}'", boardColumnDef.getId(), typeInfo.getId());
-                    });
-            }
-        }*/
         BoardEntity entity = repository.save(BoardMapper.dtoToEntity(repository, boardDef));
         BoardWithMeta result = BoardMapper.entityToDto(entity);
 
@@ -108,8 +95,9 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public void onBoardChanged(Consumer<BoardDef> listener) {
-        if (listener != null)
+        if (listener != null) {
             changeListeners.add(listener);
+        }
     }
 
     @Override
@@ -120,7 +108,12 @@ public class BoardServiceImpl implements BoardService {
             .collect(Collectors.toList());
     }
 
-    /* Also common part with JournalServiceImpl -> common interface*/
+    @Override
+    public List<BoardWithMeta> getBoardsForJournal(String journalLocalId) {
+        Assert.notNull(journalLocalId, "To select boards journal local ID must not be null");
+        return getBoardsForJournal(RecordRef.create(AppConstants.APP_NAME, "journal", journalLocalId));
+    }
+
     private Specification<BoardEntity> toSpecification(Predicate predicate) {
         if (predicate == null)
             return null;

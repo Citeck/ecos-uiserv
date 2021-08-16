@@ -8,24 +8,22 @@ import ru.citeck.ecos.records3.RecordsProperties;
 import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.RecordsServiceFactory;
 import ru.citeck.ecos.records3.record.request.RequestContext;
+import ru.citeck.ecos.uiserv.app.application.constants.AppConstants;
 import ru.citeck.ecos.uiserv.domain.board.api.records.BoardRecordsDao;
 import ru.citeck.ecos.uiserv.domain.board.api.records.ResolvedBoardRecordsDao;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.eapps.BoardArtifactHandler;
-import ru.citeck.ecos.uiserv.domain.board.repo.BoardEntity;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class BoardContextlessTest {
-    RecordsServiceFactory recordsServiceFactory;
-    BoardService boardService;
-    BoardArtifactHandler boardArtifactHandler;
-    RecordsService recordsService;
+    private RecordsServiceFactory recordsServiceFactory;
+    private BoardService boardService;
+    private BoardArtifactHandler boardArtifactHandler;
+    private RecordsService recordsService;
 
     @BeforeEach
     private void init(){
@@ -35,7 +33,7 @@ public class BoardContextlessTest {
             protected RecordsProperties createProperties() {
                 RecordsProperties properties = super.createProperties();
                 properties.setAppInstanceId("102030");
-                properties.setAppName(BoardEntity.APP_NAME);
+                properties.setAppName(AppConstants.APP_NAME);
                 return properties;
             }
         };
@@ -58,8 +56,8 @@ public class BoardContextlessTest {
     private void testBoard(BoardDef boardDef){
         boardArtifactHandler.deployArtifact(boardDef);
 
-        Optional<BoardWithMeta> result = boardService.getBoardById(boardDef.getId());
-        assertEquals(boardDef, result.get().getBoardDef());
+        BoardWithMeta result = boardService.getBoardById(boardDef.getId());
+        assertEquals(boardDef, result.getBoardDef());
 
         BoardDef boardFromRecords = recordsService.getAtts(boardDef.getRef(), BoardDef.class);
         //attention: LocalRecordsResolver.getAttsFromSource returns actions=[], columns=[] instead of null value

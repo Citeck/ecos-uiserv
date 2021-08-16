@@ -49,7 +49,7 @@ public class BoardRecordsDaoTest {
         String jsonString = new JSONObject()
             .put(QUERY,
                 new JSONObject().put("sourceId", BoardRecordsDao.ID)
-                    .put(LANGUAGE, BoardRecordsDao.BY_TYPE)
+                    .put(LANGUAGE, BoardRecordsDao.LANG_BY_TYPE)
                     .put(QUERY, new JSONObject().put("typeRef", BoardTestData.testTypeRef.toString()))).toString(2);
 
         final ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(TestEntityRecordUtil.URL_RECORDS_QUERY)

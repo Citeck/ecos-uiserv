@@ -1,15 +1,12 @@
 package ru.citeck.ecos.uiserv.domain.board.api.records;
 
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import ru.citeck.ecos.records2.RecordConstants;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
@@ -22,24 +19,24 @@ import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.QueryPage;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
+import ru.citeck.ecos.uiserv.app.common.api.records.Utils;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao, RecordsQueryDao, RecordMutateDtoDao<BoardDef>, RecordDeleteDao {
 
-    private static final Logger log = LoggerFactory.getLogger(BoardRecordsDao.class);
     private BoardService boardService;
-    public static final String ID = "board"; //BoardEntity.SOURCE_ID
-    public static final String BY_TYPE = "by-type";
+    public static final String ID = "board";
+    public static final String LANG_BY_TYPE = "by-type";
 
     @Autowired
-    public BoardRecordsDao(BoardService service){
+    public BoardRecordsDao(BoardService service) {
         this.boardService = service;
     }
 
@@ -56,7 +53,6 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
      * Returns a BoardWithMeta
      *
      * @param localBoardId not null board local ID
-     * @throws IllegalArgumentException if board with ID localBoardId was not found
      */
     @Nullable
     @Override
@@ -64,11 +60,12 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
         if (localBoardId.isEmpty()) {
             return new BoardWithMeta();
         } else {
-            Optional<BoardWithMeta> board = boardService.getBoardById(localBoardId);
-            if (board == null || !board.isPresent()) {
+            BoardWithMeta board = boardService.getBoardById(localBoardId);
+            if (board == null) {
                 log.warn("Board with ID {} was not found", localBoardId);
+                return new BoardWithMeta(localBoardId);
             }
-            return board.orElse(new BoardWithMeta(localBoardId));
+            return board;
         }
     }
 
@@ -76,32 +73,8 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
     @Override
     public RecsQueryRes<BoardWithMeta> queryRecords(@NotNull RecordsQuery recordsQuery) {
         RecsQueryRes<BoardWithMeta> result = new RecsQueryRes<>();
-        //TODO: add getSortOrder() or getSort() to ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
-        List<Sort.Order> sorts = recordsQuery.getSortBy() == null ? null :
-            recordsQuery.getSortBy()
-                .stream()
-                .map(sortBy -> {
-                    String attribute = sortBy.getAttribute();
-                    if (StringUtils.isNotBlank(attribute)) {
-                        if (RecordConstants.ATT_MODIFIED.equals(attribute)) {
-                            attribute = "lastModifiedDate";
-                        } else if (RecordConstants.ATT_MODIFIER.equals(attribute)) {
-                            attribute = "lastModifiedBy";
-                        } else if (RecordConstants.ATT_CREATED.equals(attribute)) {
-                            attribute = "createdDate";
-                        } else if (RecordConstants.ATT_CREATOR.equals(attribute)) {
-                            attribute = "createdBy";
-                        }
-                        return Optional.of(sortBy.isAscending() ? Sort.Order.asc(attribute) : Sort.Order.desc(attribute));
-                    }
-                    return Optional.<Sort.Order>empty();
-                })
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-        Sort sort = sorts == null || sorts.isEmpty() ? null : Sort.by(sorts);
-
-        if (BY_TYPE.equals(recordsQuery.getLanguage())) {
+        Sort sort = Utils.getSort(recordsQuery);
+        if (LANG_BY_TYPE.equals(recordsQuery.getLanguage())) {
             TypeQuery typeQuery = recordsQuery.getQuery(TypeQuery.class);
             if (RecordRef.isEmpty(typeQuery.getTypeRef())) {
                 return result;
@@ -119,8 +92,8 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
                 result.setTotalCount(boardService.getCount(predicate));
             } else {
                 log.warn("Unsupported query language '{}'", recordsQuery.getLanguage());
-                result.setRecords(boardService.getAll(maxItemsCount, skipCount, null, sort));
-                result.setTotalCount(boardService.getCount());
+                result.setRecords(Collections.emptyList());
+                result.setTotalCount(0);
             }
         }
         return result;
@@ -128,7 +101,10 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
 
     @Override
     public BoardDef getRecToMutate(@NotNull String localId) {
-        return boardService.getBoardById(localId).map(boardWithMeta -> new BoardDef(boardWithMeta.getBoardDef())).orElse(new BoardDef(localId));
+        BoardWithMeta boardWithMeta = boardService.getBoardById(localId);
+        return boardWithMeta != null ?
+            new BoardDef(boardWithMeta.getBoardDef()) :
+            new BoardDef(localId);
     }
 
     @NotNull
@@ -144,8 +120,6 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
         return DelStatus.OK;
     }
 
-    /*It would be nice to make a parent interface contained typeRef (getter/setter), as
-     * typeRef is used in several cases (Journals, Forms, Action, here) */
     @Data
     public static class TypeQuery {
         private RecordRef typeRef;

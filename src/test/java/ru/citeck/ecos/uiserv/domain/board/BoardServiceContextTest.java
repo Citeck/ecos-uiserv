@@ -20,7 +20,6 @@ import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
@@ -56,7 +55,7 @@ public class BoardServiceContextTest {
     @Test
     public void deleteTest() {
         service.delete(BoardTestData.BOARD_ID);
-        assertThat(service.getBoardById(BoardTestData.BOARD_ID), is(Optional.empty()));
+        assertNull(service.getBoardById(BoardTestData.BOARD_ID));
     }
 
     @Test
@@ -64,15 +63,15 @@ public class BoardServiceContextTest {
         BoardDef boardDef = BoardTestData.getTestBoard();
         service.save(boardDef);
         Matcher<BoardDef> boardDefMatcher = is(boardDef);
-        assertThat(service.getBoardById(BoardTestData.BOARD_ID).get().getBoardDef(), boardDefMatcher);
+        assertThat(service.getBoardById(BoardTestData.BOARD_ID).getBoardDef(), boardDefMatcher);
 
         boardDef.setColumns(Arrays.asList(new BoardColumnDef("first", new MLText("1st Column")), new BoardColumnDef("second", new MLText("2d Column"))));
         service.save(boardDef);
-        assertThat(service.getBoardById(BoardTestData.BOARD_ID).get().getBoardDef(), boardDefMatcher);
+        assertThat(service.getBoardById(BoardTestData.BOARD_ID).getBoardDef(), boardDefMatcher);
 
         boardDef.setReadOnly(true);
         service.save(boardDef);
-        assertThat(service.getBoardById(BoardTestData.BOARD_ID).get().getBoardDef(), boardDefMatcher);
+        assertThat(service.getBoardById(BoardTestData.BOARD_ID).getBoardDef(), boardDefMatcher);
     }
 
     @Test

@@ -13,7 +13,6 @@ import ru.citeck.ecos.uiserv.domain.board.service.BoardMapper;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -50,11 +49,11 @@ public class BoardServiceMock implements BoardService {
     }
 
     @Override
-    public Optional<BoardWithMeta> getBoardById(String id) {
+    public BoardWithMeta getBoardById(String id) {
         if (StringUtils.isBlank(id) || data.get(id) == null) {
-            return Optional.empty();
+            return null;
         }
-        return Optional.of(BoardMapper.entityToDto(data.get(id)));
+        return BoardMapper.entityToDto(data.get(id));
     }
 
     @Override
@@ -69,10 +68,27 @@ public class BoardServiceMock implements BoardService {
 
     @Override
     public List<BoardWithMeta> getBoardsForJournal(RecordRef journalRef) {
-        if (journalRef == null)
+        if (journalRef == null) {
             return null;
+        }
         return data.values().stream()
             .filter(boardEntity -> journalRef.toString().equals(boardEntity.getJournalRef()))
+            .map(BoardMapper::entityToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BoardWithMeta> getBoardsForJournal(String journalLocalId) {
+        if (journalLocalId == null) {
+            return null;
+        }
+        return data.values().stream()
+            .filter(boardEntity -> {
+                String journalRefStr = boardEntity.getJournalRef();
+                int idx = journalRefStr.indexOf('@');
+                String entityJournalLocalId = idx==-1?journalRefStr:
+                    journalRefStr.substring(idx+1);
+                return journalLocalId.equals(entityJournalLocalId);
+            })
             .map(BoardMapper::entityToDto).collect(Collectors.toList());
     }
 

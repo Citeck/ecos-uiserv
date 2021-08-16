@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.board.service;
 
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Sort;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
@@ -7,12 +8,11 @@ import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 public interface BoardService {
 
-    Optional<BoardWithMeta> getBoardById(String id);
+    @Nullable BoardWithMeta getBoardById(String id);
 
     void delete(String id);
 
@@ -29,4 +29,6 @@ public interface BoardService {
     void onBoardChanged(Consumer<BoardDef> listener);
 
     List<BoardWithMeta> getBoardsForJournal(RecordRef journalRef);
+
+    List<BoardWithMeta> getBoardsForJournal(String journalLocalId);
 }

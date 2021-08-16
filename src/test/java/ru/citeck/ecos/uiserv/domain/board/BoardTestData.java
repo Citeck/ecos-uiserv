@@ -2,16 +2,17 @@ package ru.citeck.ecos.uiserv.domain.board;
 
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.uiserv.app.application.constants.AppConstants;
+import ru.citeck.ecos.uiserv.domain.board.api.records.BoardRecordsDao;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
-import ru.citeck.ecos.uiserv.domain.board.repo.BoardEntity;
 
 import java.util.Arrays;
 import java.util.Locale;
 
 public class BoardTestData {
 
-    public static final String UISERV_APP_ID = BoardEntity.APP_NAME;
+    public static final String UISERV_APP_ID = AppConstants.APP_NAME;
     public static String BOARD_ID = "test-board";
     public static String PROP_ID = "id";
     public static String PROP_NAME = "name";
@@ -34,7 +35,7 @@ public class BoardTestData {
     }
 
     public static String getEmptyId() {
-        return BoardEntity.APP_NAME +"/"+ BoardEntity.SOURCE_ID+"@";
+        return UISERV_APP_ID + "/" + BoardRecordsDao.ID + "@";
     }
 
     public static BoardDef getNewBoard() {

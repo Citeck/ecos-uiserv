@@ -15,10 +15,9 @@ import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService;
 @Component
 @RequiredArgsConstructor
 public class ResolvedBoardRecordsDao extends AbstractRecordsDao implements RecordsQueryDao, RecordAttsDao {
-    //private static final Logger log = LoggerFactory.getLogger(ResolvedBoardRecordsDao.class);
 
-    final private BoardRecordsDao recordsDao;
-    final private EcosTypeService ecosTypeService;
+    private final BoardRecordsDao recordsDao;
+    private final EcosTypeService ecosTypeService;
 
     @NotNull
     @Override
@@ -30,8 +29,9 @@ public class ResolvedBoardRecordsDao extends AbstractRecordsDao implements Recor
     @Override
     public Object queryRecords(@NotNull RecordsQuery recordsQuery) {
         RecsQueryRes<BoardWithMeta> queryRes = recordsDao.queryRecords(recordsQuery);
-        if (queryRes != null)
+        if (queryRes != null) {
             queryRes.withRecords(record -> new ResolvedBoardRecord(record.getBoardDef(), ecosTypeService));
+        }
         return queryRes;
     }
 

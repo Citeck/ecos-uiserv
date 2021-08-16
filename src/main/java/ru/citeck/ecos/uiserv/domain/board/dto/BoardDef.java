@@ -3,7 +3,8 @@ package ru.citeck.ecos.uiserv.domain.board.dto;
 import lombok.Data;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.uiserv.domain.board.repo.BoardEntity;
+import ru.citeck.ecos.uiserv.app.application.constants.AppConstants;
+import ru.citeck.ecos.uiserv.domain.board.api.records.BoardRecordsDao;
 
 import java.util.List;
 
@@ -11,7 +12,6 @@ import java.util.List;
 public class BoardDef {
     private String id;
 
-    //private String extId;
     private RecordRef typeRef;
     private RecordRef journalRef;
     private RecordRef cardFormRef;
@@ -22,12 +22,14 @@ public class BoardDef {
     private List<RecordRef> actions;
     private List<BoardColumnDef> columns;
 
-    public BoardDef(){
+    public BoardDef() {
     }
-    public BoardDef(String id){
+
+    public BoardDef(String id) {
         this.id = id;
     }
-    public BoardDef(BoardDef other){
+
+    public BoardDef(BoardDef other) {
         this.id = other.getId();
         this.typeRef = other.getTypeRef();
         this.journalRef = other.getJournalRef();
@@ -39,10 +41,10 @@ public class BoardDef {
     }
 
     public RecordRef getRef() {
-        return RecordRef.create(BoardEntity.APP_NAME, BoardEntity.SOURCE_ID, id);
+        return RecordRef.create(AppConstants.APP_NAME, BoardRecordsDao.ID, id);
     }
 
     public static RecordRef createRef(String localId) {
-        return RecordRef.create(BoardEntity.APP_NAME, BoardEntity.SOURCE_ID, localId);
+        return RecordRef.create(AppConstants.APP_NAME, BoardRecordsDao.ID, localId);
     }
 }
