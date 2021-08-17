@@ -15,12 +15,14 @@ import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.domain.ecostype.dto.EcosTypeInfo
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeAttsUtils
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
+import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
 import ru.citeck.ecos.uiserv.domain.form.service.FormDefUtils
 
 @Component
 class EcosResolvedFormRecordsDao(
     private val ecosFormRecordsDao: EcosFormRecordsDao,
-    private val ecosTypeService: EcosTypeService
+    private val ecosTypeService: EcosTypeService,
+    private val formService: EcosFormService
 ) : AbstractRecordsDao(), RecordAttsDao, RecordsQueryDao {
 
     companion object {
@@ -47,7 +49,7 @@ class EcosResolvedFormRecordsDao(
             typeRef = ecosTypeService.getTypeRefByForm(RecordRef.create("uiserv", "form", form.id))
         }
         val typeInfo = ecosTypeService.getTypeInfo(typeRef)
-        return ResolvedFormRecord(form, typeInfo)
+        return ResolvedFormRecord(form, typeInfo, formService)
     }
 
     override fun getId(): String {
@@ -56,26 +58,50 @@ class EcosResolvedFormRecordsDao(
 
     class ResolvedFormRecord(
         @AttName("...") val form: EcosFormRecord,
-        val typeInfo: EcosTypeInfo?
+        val typeInfo: EcosTypeInfo?,
+        val formService: EcosFormService
     ) {
         fun getDefinition(): ObjectData {
             val definition: ObjectData = form.definition
             val attributes = typeInfo?.model?.attributes?.associateBy { it.id } ?: emptyMap()
-            if (attributes.isEmpty()) {
-                return definition
-            }
-            val mappedDef = FormDefUtils.mapInputComponents(definition.getData().copy()) { component ->
-
-                val componentAtt: String = FormDefUtils.getComponentAtt(component)
-                val attDef: AttributeDef? = attributes[componentAtt] ?: EcosTypeAttsUtils.STD_ATTS[componentAtt]
-
-                if (attDef != null && !MLText.isEmpty(attDef.name) && isLabelEmpty(component, componentAtt)) {
-                    component.set("label", attDef.name)
-                } else {
-                    component
-                }
+            val mappedDef = FormDefUtils.mapComponents(definition.getData().copy(), { true }) {
+                mapComponent(it, attributes)
             }
             return ObjectData.create(mappedDef)
+        }
+
+        private fun mapComponent(component: DataValue, attributes: Map<String, AttributeDef>): DataValue? {
+
+            if (component.get("type").asText() == "include-form") {
+                val formRef = RecordRef.valueOf(component.get("formRef").asText())
+                if (formRef.id.isBlank()) {
+                    return null
+                }
+                if (component.get("conditionalForm").asBoolean(false)) {
+                    return component
+                }
+                val formDef = formService.getFormById(formRef.id).orElse(null)
+                if (formDef != null && formDef.definition != null) {
+                    val components = formDef.definition.get("components")
+                    if (components.isArray()) {
+                        return components
+                    }
+                }
+                return null
+            }
+
+            if (!component.get("input").asBoolean(false) || attributes.isEmpty()) {
+                return component
+            }
+
+            val componentAtt: String = FormDefUtils.getComponentAtt(component)
+            val attDef: AttributeDef? = attributes[componentAtt] ?: EcosTypeAttsUtils.STD_ATTS[componentAtt]
+
+            return if (attDef != null && !MLText.isEmpty(attDef.name) && isLabelEmpty(component, componentAtt)) {
+                component.set("label", attDef.name)
+            } else {
+                component
+            }
         }
 
         private fun isLabelEmpty(component: DataValue, attribute: String): Boolean {

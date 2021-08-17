@@ -6,8 +6,15 @@ object FormDefUtils {
 
     @JvmStatic
     fun mapInputComponents(component: DataValue, action: (DataValue) -> DataValue?): DataValue? {
+        return mapComponents(component, { it.get("input").asBoolean(false) }, action)
+    }
 
-        val result = if (component.get("input").asBoolean(false)) {
+    @JvmStatic
+    fun mapComponents(component: DataValue,
+                      condition: (DataValue) -> Boolean?,
+                      action: (DataValue) -> DataValue?): DataValue? {
+
+        val result = if (condition.invoke(component) == true) {
             action.invoke(component) ?: return null
         } else {
             component
@@ -18,8 +25,14 @@ object FormDefUtils {
         if (inner.isArray()) {
             val mappedInner = DataValue.createArr()
             for (value in inner) {
-                val mappedValue = mapInputComponents(value, action) ?: continue
-                mappedInner.add(mappedValue)
+                val mappedValue = mapComponents(value, condition, action) ?: continue
+                if (!value.isArray() && mappedValue.isArray()) {
+                    mappedValue.forEach { mappedElement ->
+                        mapComponents(mappedElement, condition, action)?.let { mappedInner.add(it) }
+                    }
+                } else {
+                    mappedInner.add(mappedValue)
+                }
             }
             result.set(innerKey, mappedInner)
         }
