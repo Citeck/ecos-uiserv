@@ -51,4 +51,5 @@
     <include file="changelog/20210224000000_journal_actions_def.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20210310000000_journal_actions_from_type.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20210517000000_create_admin_sections_group.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20210817000000_update_dahsboards.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

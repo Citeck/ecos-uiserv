@@ -110,6 +110,10 @@ public class DashboardService {
         List<String> authorities = StringUtils.isNotBlank(user) ?
             Collections.singletonList(user) : Collections.emptyList();
 
+        authorities = authorities.stream()
+            .map(String::toLowerCase)
+            .collect(Collectors.toList());
+
         List<DashboardEntity> dashboards;
         if (!RecordRef.isEmpty(recordRef)) {
 

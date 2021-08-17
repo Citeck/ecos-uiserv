@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.dashdoard.repo;
 
 import lombok.Data;
+import org.hibernate.annotations.ColumnTransformer;
 import ru.citeck.ecos.uiserv.app.common.repo.AbstractAuditingEntity;
 
 import javax.persistence.*;
@@ -16,9 +17,9 @@ public class DashboardEntity extends AbstractAuditingEntity {
     @SequenceGenerator(name = "dashboards_seq_gen")
     private Long id;
 
-    @Column(name = "ext_id")
     private String extId;
     private String typeRef;
+    @ColumnTransformer(write = "LOWER(?)")
     private String authority;
     private String appliedToRef;
     private float priority;
