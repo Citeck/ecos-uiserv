@@ -72,7 +72,7 @@ class EcosResolvedFormRecordsDao(
 
         private fun mapComponent(component: DataValue, attributes: Map<String, AttributeDef>): DataValue? {
 
-            if (component.get("type").asText() == "include-form") {
+            if (component.get("type").asText() == "includeForm") {
                 val formRef = RecordRef.valueOf(component.get("formRef").asText())
                 if (formRef.id.isBlank()) {
                     return null

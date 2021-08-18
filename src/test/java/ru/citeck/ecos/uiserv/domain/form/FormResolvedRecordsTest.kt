@@ -125,7 +125,7 @@ class FormResolvedRecordsTest : FormsTestBase() {
                     *componentsOfBaseForm.toTypedArray(),
                     mapOf(
                         "id" to "id222",
-                        "type" to "include-form",
+                        "type" to "includeForm",
                         "formRef" to "uiserv/form@test-form-to-import"
                     )
                 )
