@@ -1,8 +1,8 @@
 ---
 id: board
 name:
-  en: Board
-  ru: Доска
+  en: Kanban board
+  ru: Канбан доска
 
 system: true
 
@@ -15,8 +15,8 @@ defaultCreateVariant: false
 createVariants:
 
   - id: create-new-board
-    name: { ru: Создать доску, en: Create board }
+    name: { ru: Создать конфигурацию канбан доски, en: Create kanban board config }
 
   - id: upload-board
-    name: { ru: Загрузить доску, en: Upload board }
+    name: { ru: Загрузить конфигурацию канбан доски, en: Upload kanban board config }
     formRef: uiserv/form@ecos-module-upload

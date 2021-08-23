@@ -14,7 +14,9 @@ import ru.citeck.ecos.uiserv.domain.board.repo.BoardRepository;
 import java.util.UUID;
 
 public class BoardMapper {
+
     public static BoardWithMeta entityToDto(@NotNull BoardEntity entity) {
+
         BoardDef boardDto = new BoardDef();
         boardDto.setId(entity.getExtId());
         boardDto.setReadOnly(entity.getReadOnly());
@@ -44,6 +46,7 @@ public class BoardMapper {
     }
 
     public static BoardEntity dtoToEntity(BoardRepository repository, @NotNull BoardDef board) {
+
         BoardEntity entity = null;
         if (repository != null && !StringUtils.isBlank(board.getId())) {
             entity = repository.findByExtId(board.getId()).orElse(null);

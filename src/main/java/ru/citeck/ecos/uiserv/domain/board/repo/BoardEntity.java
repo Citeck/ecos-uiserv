@@ -11,6 +11,7 @@ import java.util.Objects;
 @Data
 @Table(name = "board")
 public class BoardEntity extends AbstractAuditingEntity {
+
     public static String ID = "id";
     public static String SOURCE_ID = "board";
 

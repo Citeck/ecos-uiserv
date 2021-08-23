@@ -16,9 +16,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class ResolvedBoardRecord {
+
     @AttName("...")
-    private BoardDef boardDef;
-    private EcosTypeService typeService;
+    private final BoardDef boardDef;
+    private final EcosTypeService typeService;
 
     public static final String ID = "rboard";
 
@@ -48,7 +49,7 @@ public class ResolvedBoardRecord {
             }
             if (typeService != null) {
                 EcosTypeInfo typeInfo = typeService.getTypeInfo(boardDef.getTypeRef());
-                if (typeInfo != null && typeInfo.getModel() != null && typeInfo.getModel().getStatuses() != null) {
+                if (typeInfo != null && typeInfo.getModel() != null) {
                     List<BoardColumnDef> columns = new ArrayList<>();
                     for (StatusDef statusDef : typeInfo.getModel().getStatuses()) {
                         columns.add(new BoardColumnDef(statusDef.getId(), statusDef.getName()));
@@ -61,8 +62,10 @@ public class ResolvedBoardRecord {
     }
 
     public RecordRef getTypeRef() {
+
         if (boardDef != null && boardDef.getTypeRef() != null
-            && !StringUtils.isBlank(boardDef.getTypeRef().getId())) {
+                && !StringUtils.isBlank(boardDef.getTypeRef().getId())) {
+
             return RecordRef.create(boardDef.getTypeRef().getAppName(), ID, boardDef.getTypeRef().getId());
         }
         return RecordRef.EMPTY;

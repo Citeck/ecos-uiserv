@@ -12,6 +12,7 @@ import java.time.Instant;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class BoardWithMeta {
+
     @AttName("...")
     private BoardDef boardDef;
 

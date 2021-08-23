@@ -29,9 +29,12 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao, RecordsQueryDao, RecordMutateDtoDao<BoardDef>, RecordDeleteDao {
+public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao,
+                                                                   RecordsQueryDao,
+                                                                   RecordMutateDtoDao<BoardDef>,
+                                                                   RecordDeleteDao {
 
-    private BoardService boardService;
+    private final BoardService boardService;
     public static final String ID = "board";
     public static final String LANG_BY_TYPE = "by-type";
 
@@ -72,9 +75,12 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
     @Nullable
     @Override
     public RecsQueryRes<BoardWithMeta> queryRecords(@NotNull RecordsQuery recordsQuery) {
+
         RecsQueryRes<BoardWithMeta> result = new RecsQueryRes<>();
         Sort sort = Utils.getSort(recordsQuery);
+
         if (LANG_BY_TYPE.equals(recordsQuery.getLanguage())) {
+
             TypeQuery typeQuery = recordsQuery.getQuery(TypeQuery.class);
             if (RecordRef.isEmpty(typeQuery.getTypeRef())) {
                 return result;
@@ -82,7 +88,9 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
             List<BoardWithMeta> boards = boardService.getBoardsForExactType(typeQuery.getTypeRef(), sort);
             result.setRecords(boards);
             result.setTotalCount(boards.size());
+
         } else {
+
             final QueryPage page = recordsQuery.getPage();
             int maxItemsCount = page.getMaxItems() <= 0 ? 10000 : page.getMaxItems();
             int skipCount = page.getSkipCount();
@@ -110,7 +118,9 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
     @NotNull
     @Override
     public String saveMutatedRec(BoardDef boardDef) {
-        return boardService.save(boardDef).getBoardDef().getId();
+        return boardService.save(boardDef)
+            .getBoardDef()
+            .getId();
     }
 
     @NotNull

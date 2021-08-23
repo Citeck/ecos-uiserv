@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface BoardRepository extends JpaRepository<BoardEntity, Long>,
-    JpaSpecificationExecutor<BoardEntity> {
+                                         JpaSpecificationExecutor<BoardEntity> {
 
     List<BoardEntity> findAllByTypeRef(String type, Sort sort);
 

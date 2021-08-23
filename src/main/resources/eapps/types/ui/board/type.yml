@@ -2,8 +2,8 @@
 modelVersion: "1.0"
 
 name:
-  ru: Доска
-  en: Board
+  ru: Канбан доска
+  en: Kanban board
 
 source-id: "board"
 

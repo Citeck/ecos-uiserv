@@ -18,7 +18,6 @@ import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.repo.BoardEntity;
 import ru.citeck.ecos.uiserv.domain.board.repo.BoardRepository;
-import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
-    private final EcosTypeService typeService;
+
     private final BoardRepository repository;
     private final List<Consumer<BoardDef>> changeListeners = new CopyOnWriteArrayList<>();
 
@@ -77,7 +76,6 @@ public class BoardServiceImpl implements BoardService {
         final PageRequest page = PageRequest.of(skipCount / maxItems, maxItems,
             sort != null ? sort : Sort.by(Sort.Direction.DESC, BoardEntity.ID)
         );
-
         return repository.findAll(toSpecification(predicate), page)
             .stream().map(BoardMapper::entityToDto)
             .collect(Collectors.toList());
@@ -115,8 +113,9 @@ public class BoardServiceImpl implements BoardService {
     }
 
     private Specification<BoardEntity> toSpecification(Predicate predicate) {
-        if (predicate == null)
+        if (predicate == null) {
             return null;
+        }
         PredicateDto predicateDto = PredicateUtils.convertToDto(predicate, PredicateDto.class);
         Specification<BoardEntity> specification = null;
         if (StringUtils.isNotBlank(predicateDto.name)) {

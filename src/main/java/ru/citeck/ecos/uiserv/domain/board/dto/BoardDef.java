@@ -10,6 +10,7 @@ import java.util.List;
 
 @Data
 public class BoardDef {
+
     private String id;
 
     private RecordRef typeRef;

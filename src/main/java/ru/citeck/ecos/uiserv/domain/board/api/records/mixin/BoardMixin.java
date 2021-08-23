@@ -34,11 +34,9 @@ public class BoardMixin implements AttMixin {
     }
 
     private final BoardService boardService;
-    private final ResolvedJournalRecordsDao resolvedJournalRecordsDao;
 
     public BoardMixin(BoardService boardService, ResolvedJournalRecordsDao resolvedJournalRecordsDao) {
         this.boardService = boardService;
-        this.resolvedJournalRecordsDao = resolvedJournalRecordsDao;
         resolvedJournalRecordsDao.addAttributesMixin(this);
     }
 
