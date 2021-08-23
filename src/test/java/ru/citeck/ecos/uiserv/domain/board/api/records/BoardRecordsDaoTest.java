@@ -171,8 +171,9 @@ public class BoardRecordsDaoTest {
     }
 
     private static String getTestBoardJson() throws Exception {
-        if (testBoardJson != null)
+        if (testBoardJson != null) {
             return testBoardJson;
+        }
         testBoardJson = getJsonToSend(new JSONObject()
             .put(RECORDS, new JSONArray().put(BoardTestData.getEmptyId() + BoardTestData.BOARD_ID))
             .put(ATTRIBUTES, new JSONArray()
@@ -185,8 +186,9 @@ public class BoardRecordsDaoTest {
     }
 
     private static String queryTestBoardJson() throws Exception {
-        if (queryBoardJson != null)
+        if (queryBoardJson != null) {
             return queryBoardJson;
+        }
         queryBoardJson = getJsonToSend(new JSONObject()
             .put(QUERY,
                 new JSONObject().put("sourceId", BoardTestData.UISERV_APP_ID + "/" + BoardRecordsDao.ID)

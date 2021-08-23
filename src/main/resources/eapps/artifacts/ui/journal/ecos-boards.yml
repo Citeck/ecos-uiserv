@@ -1,8 +1,8 @@
 ---
 id: ecos-boards
 name:
-  ru: Доски
-  en: Boards
+  ru: Канбан доски
+  en: Kanban boards
 
 system: true
 
