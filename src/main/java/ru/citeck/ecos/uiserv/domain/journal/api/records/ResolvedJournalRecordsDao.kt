@@ -21,6 +21,7 @@ import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.domain.ecostype.dto.EcosTypeInfo
+import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeAttsUtils
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
@@ -208,7 +209,7 @@ class ResolvedJournalRecordsDao(
                                     typeInfo: EcosTypeInfo?): List<ResolvedColumnDef> {
 
         val typeAtts: Map<String, AttributeDef> =
-            typeInfo?.model?.attributes?.map { it.id to it }?.toMap() ?: emptyMap()
+            typeInfo?.model?.attributes?.associate { it.id to it } ?: emptyMap()
 
         val attributeEdges = HashMap<String, String>()
         val columnIdxByName = HashMap<String, Int>()
@@ -220,7 +221,7 @@ class ResolvedJournalRecordsDao(
 
             val attribute = column.id
 
-            val typeAtt = typeAtts[column.id]
+            val typeAtt = typeAtts[column.id] ?: EcosTypeAttsUtils.STD_ATTS[column.id]
 
             val edgeAtts = ArrayList<String>()
             if (column.type == null) {

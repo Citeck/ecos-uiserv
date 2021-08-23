@@ -7,21 +7,17 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
+import ru.citeck.ecos.records2.predicate.model.VoidPredicate;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
-import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.domain.form.repo.EcosFormEntity;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
-import ru.citeck.ecos.uiserv.domain.form.repo.EcosFormsRepository;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -35,9 +31,9 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     private static final String DEFAULT_KEY = "DEFAULT";
 
-    private List<Consumer<EcosFormModel>> listeners = new CopyOnWriteArrayList<>();
+    private final List<Consumer<EcosFormModel>> listeners = new CopyOnWriteArrayList<>();
 
-    private final EcosFormsRepository formsRepository;
+    private final FormsEntityDao formsEntityDao;
     private final RecordsService recordsService;
 
     @Override
@@ -47,7 +43,7 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     @Override
     public int getCount() {
-        return (int) formsRepository.count();
+        return (int) formsEntityDao.count();
     }
 
     @Override
@@ -57,10 +53,10 @@ public class EcosFormServiceImpl implements EcosFormService {
             return;
         }
 
-        EcosFormEntity form = formsRepository.findByExtId(formId).orElse(null);
+        EcosFormEntity form = formsEntityDao.findByExtId(formId);
         if (form != null && StringUtils.isBlank(form.getTypeRef())) {
             form.setTypeRef(typeRef.toString());
-            formsRepository.save(form);
+            formsEntityDao.save(form);
         }
     }
 
@@ -70,67 +66,18 @@ public class EcosFormServiceImpl implements EcosFormService {
         if (max == 0) {
             return Collections.emptyList();
         }
-
-        PageRequest page = PageRequest.of(skip / max, max, Sort.by(Sort.Direction.DESC, "id"));
-
-        FilterPredicate dto = PredicateUtils.convertToDto(predicate, FilterPredicate.class);
-        //dto always not null - when predicate does not contain FilterPredicate dto has null fields
-        if (dto == null) {
-            return formsRepository.findAll(page).stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        if (predicate == null) {
+            predicate = VoidPredicate.INSTANCE;
         }
-
-        Specification<EcosFormEntity> spec = null;
-        if (StringUtils.isNotBlank(dto.getModuleId())) {
-            spec = (root, query, builder) ->
-                builder.like(builder.lower(root.get("extId")), "%" + dto.getModuleId().toLowerCase() + "%");
-        }
-        if (StringUtils.isNotBlank(dto.getTitle())) {
-            spec = orSpec(spec, (root, query, builder) ->
-                builder.like(builder.lower(root.get("title")), "%" + dto.getTitle().toLowerCase() + "%"));
-        }
-        if (StringUtils.isNotBlank(dto.getFormKey())) {
-            spec = orSpec(spec, (root, query, builder) ->
-                builder.like(builder.lower(root.get("formKey")), "%" + dto.getFormKey().toLowerCase() + "%"));
-        }
-
-        if (spec != null) {
-
-            return formsRepository.findAll(spec, page).stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
-
-        } else {
-            //logical error: lost simple predicates like 'eq', 'gt' etc.
-            return formsRepository.findAll(page).stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
-        }
+        return formsEntityDao.findAll(predicate, max, skip).stream()
+            .map(this::mapToDto)
+            .collect(Collectors.toList());
     }
 
-    private Specification<EcosFormEntity> orSpec(Specification<EcosFormEntity> spec0,
-                                                 Specification<EcosFormEntity> spec1) {
-        if (spec0 == null) {
-            return spec1;
-        } else if (spec1 == null) {
-            return spec0;
-        }
-        return spec0.or(spec1);
-    }
 
     @Override
     public List<EcosFormModel> getAllForms(int max, int skip) {
-
-        if (max == 0) {
-            return Collections.emptyList();
-        }
-
-        PageRequest page = PageRequest.of(skip / max, max, Sort.by(Sort.Direction.DESC, "id"));
-
-        return formsRepository.findAll(page).stream()
-            .map(this::mapToDto)
-            .collect(Collectors.toList());
+        return getAllForms(VoidPredicate.INSTANCE, max, skip);
     }
 
     @Override
@@ -140,7 +87,8 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     @Override
     public Optional<EcosFormModel> getFormByKey(String formKey) {
-        return formsRepository.findFirstByFormKey(formKey).map(this::mapToDto);
+        return Optional.ofNullable(formsEntityDao.findFirstByFormKey(formKey))
+            .map(this::mapToDto);
     }
 
     @Override
@@ -177,13 +125,14 @@ public class EcosFormServiceImpl implements EcosFormService {
         if (StringUtils.isBlank(id)) {
             return Optional.empty();
         }
-        return formsRepository.findByExtId(id).map(this::mapToDto);
+        return Optional.ofNullable(formsEntityDao.findByExtId(id))
+            .map(this::mapToDto);
     }
 
     @Override
     public String save(EcosFormModel model) {
 
-        EcosFormEntity entity = formsRepository.save(mapToEntity(model));
+        EcosFormEntity entity = formsEntityDao.save(mapToEntity(model));
         EcosFormModel result = mapToDto(entity);
 
         listeners.forEach(it -> it.accept(result));
@@ -193,13 +142,16 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     @Override
     public void delete(String id) {
-        formsRepository.findByExtId(id).ifPresent(formsRepository::delete);
+        Optional.ofNullable(formsEntityDao.findByExtId(id))
+            .ifPresent(formsEntityDao::delete);
     }
 
     @Override
     public List<EcosFormModel> getFormsForExactType(RecordRef typeRef) {
-        List<EcosFormEntity> forms = formsRepository.findAllByTypeRef(typeRef.toString());
-        return forms.stream().map(this::mapToDto).collect(Collectors.toList());
+        List<EcosFormEntity> forms = formsEntityDao.findAllByTypeRef(typeRef.toString());
+        return forms.stream()
+            .map(this::mapToDto)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -217,17 +169,18 @@ public class EcosFormServiceImpl implements EcosFormService {
         try {
             ParentsAndFormByType parents = recordsService.getMeta(typeRef, ParentsAndFormByType.class);
             if (!RecordRef.isEmpty(parents.form)) {
-                formsRepository.findByExtId(parents.form.getId()).ifPresent(addIfNotAdded);
+                Optional.ofNullable(formsEntityDao.findByExtId(parents.form.getId()))
+                    .ifPresent(addIfNotAdded);
             }
 
-            formsRepository.findAllByTypeRef(typeRef.toString()).forEach(addIfNotAdded);
+            formsEntityDao.findAllByTypeRef(typeRef.toString()).forEach(addIfNotAdded);
 
             if (parents.parents != null) {
                 List<String> typesStr = parents.parents.stream().map(Object::toString).collect(Collectors.toList());
-                formsRepository.findAllByTypeRefIn(typesStr).forEach(addIfNotAdded);
+                formsEntityDao.findAllByTypeRefIn(typesStr).forEach(addIfNotAdded);
             }
         } catch (Exception e) {
-            formsRepository.findAllByTypeRef(typeRef.toString()).forEach(addIfNotAdded);
+            formsEntityDao.findAllByTypeRef(typeRef.toString()).forEach(addIfNotAdded);
             log.error("Parents forms can't be received", e);
         }
 
@@ -258,7 +211,7 @@ public class EcosFormServiceImpl implements EcosFormService {
 
         EcosFormEntity entity = null;
         if (!StringUtils.isBlank(model.getId())) {
-            entity = formsRepository.findByExtId(model.getId()).orElse(null);
+            entity = formsEntityDao.findByExtId(model.getId());
         }
         if (entity == null) {
             entity = new EcosFormEntity();
@@ -282,13 +235,6 @@ public class EcosFormServiceImpl implements EcosFormService {
         entity.setAttributes(Json.getMapper().toString(model.getAttributes()));
 
         return entity;
-    }
-
-    @Data
-    public static class FilterPredicate {
-        private String moduleId;
-        private String formKey;
-        private String title;
     }
 
     @Data

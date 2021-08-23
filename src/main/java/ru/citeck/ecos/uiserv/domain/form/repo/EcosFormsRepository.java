@@ -1,11 +1,11 @@
 package ru.citeck.ecos.uiserv.domain.form.repo;
 
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @SuppressWarnings("unused")
 @Repository
@@ -16,7 +16,9 @@ public interface EcosFormsRepository extends JpaRepository<EcosFormEntity, Long>
 
     List<EcosFormEntity> findAllByTypeRefIn(List<String> types);
 
-    Optional<EcosFormEntity> findByExtId(String extId);
+    @Nullable
+    EcosFormEntity findByExtId(String extId);
 
-    Optional<EcosFormEntity> findFirstByFormKey(String formKey);
+    @Nullable
+    EcosFormEntity findFirstByFormKey(String formKey);
 }

@@ -73,6 +73,14 @@ open class DashboardRecordsTest {
                     "authority": "admin",
                     "config": "{\"key5\":\"value5\"}"
                 }
+            """,
+            """
+                {
+                    "id": "with-applied-to-ref-and-authority-upper-case",
+                    "appliedToRef": "workspace://SpaceStore/123",
+                    "authority": "ADMIN_UPPER",
+                    "config": "{\"key6\":\"value7\"}"
+                }
             """
         ).forEach {
 
@@ -186,6 +194,9 @@ open class DashboardRecordsTest {
         val expectedConfig = DashboardDto(expected)
         if (RecordRef.isNotEmpty(expectedConfig.appliedToRef) && expectedConfig.appliedToRef.appName.isBlank()) {
             expectedConfig.appliedToRef = expectedConfig.appliedToRef.addAppName("alfresco")
+        }
+        if (!expectedConfig.authority.isNullOrBlank()) {
+            expectedConfig.authority = expectedConfig.authority.toLowerCase()
         }
 
         assertEquals(expectedConfig, actual)
