@@ -17,8 +17,8 @@ import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.TestEntityRecordUtil;
 import ru.citeck.ecos.uiserv.TestUtil;
 import ru.citeck.ecos.uiserv.domain.board.BoardTestData;
+import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.repo.BoardRepository;
-import ru.citeck.ecos.uiserv.domain.board.service.BoardMapper;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -41,6 +41,9 @@ public class BoardRecordsDaoTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private BoardService service;
 
     @Autowired
     private BoardRepository repository;
@@ -164,11 +167,12 @@ public class BoardRecordsDaoTest {
     }
 
     private void createTestBoardDef() {
-        repository.save(BoardMapper.dtoToEntity(repository, BoardTestData.getTestBoard()));
+        BoardDef boardDef = BoardTestData.getTestBoard();
+        service.save(boardDef);
     }
 
     private void deleteTestBoardDef() {
-        repository.delete(BoardMapper.dtoToEntity(repository, BoardTestData.getTestBoard()));
+        service.delete(BoardTestData.BOARD_ID);
     }
 
     private void deleteAll() {
