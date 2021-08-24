@@ -43,9 +43,6 @@ public class BoardRecordsDaoTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private BoardService service;
-
-    @Autowired
     private BoardRepository repository;
 
     @Test
