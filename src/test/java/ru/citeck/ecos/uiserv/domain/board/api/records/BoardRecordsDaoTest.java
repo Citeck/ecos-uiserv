@@ -18,6 +18,7 @@ import ru.citeck.ecos.uiserv.TestEntityRecordUtil;
 import ru.citeck.ecos.uiserv.TestUtil;
 import ru.citeck.ecos.uiserv.domain.board.BoardTestData;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
+import ru.citeck.ecos.uiserv.domain.board.repo.BoardRepository;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -43,6 +44,9 @@ public class BoardRecordsDaoTest {
 
     @Autowired
     private BoardService service;
+
+    @Autowired
+    private BoardRepository repository;
 
     @Test
     public void queryByTypeRef_WithEmptyResult() throws Exception {
@@ -134,6 +138,7 @@ public class BoardRecordsDaoTest {
 
     @Test
     public void queryByPredicates_withOneResult() throws Exception {
+        deleteAll();
         createTestBoardDef();
         final ResultActions resultActions = mockMvc.perform(
             MockMvcRequestBuilders.post(TestEntityRecordUtil.URL_RECORDS_QUERY)
@@ -151,7 +156,7 @@ public class BoardRecordsDaoTest {
 
     @Test
     public void queryByPredicates_withEmptyResult() throws Exception {
-        deleteTestBoardDef();
+        deleteAll();
         mockMvc.perform(
                 MockMvcRequestBuilders.post(TestEntityRecordUtil.URL_RECORDS_QUERY)
                     .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -168,6 +173,11 @@ public class BoardRecordsDaoTest {
 
     private void deleteTestBoardDef() {
         service.delete(BoardTestData.BOARD_ID);
+    }
+
+    private void deleteAll() {
+        repository.deleteAll();
+        repository.flush();
     }
 
     private static String getTestBoardJson() throws Exception {
