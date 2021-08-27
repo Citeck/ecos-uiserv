@@ -1,0 +1,49 @@
+{
+  "id": "board-card-default",
+  "formKey": "",
+  "title": {
+    "en": "board-card-default"
+  },
+  "description": {},
+  "customModule": null,
+  "typeRef": "",
+  "width": "default",
+  "i18n": {},
+  "definition": {
+    "components": [
+      {
+        "label": {
+          "en": "Author",
+          "ru": "Автор"
+        },
+        "disabled": true,
+        "key": "_creator",
+        "refreshOn": [],
+        "type": "selectOrgstruct",
+        "input": true,
+        "defaultValue": ""
+      },
+      {
+        "label": {
+          "en": "Creation date",
+          "ru": "Дата создания"
+        },
+        "key": "_created",
+        "format": "dd-MM-yyyy HH:mm",
+        "datePicker": {
+          "minDate": "",
+          "maxDate": ""
+        },
+        "timePicker": {
+          "showMeridian": false
+        },
+        "defaultValue": "",
+        "refreshOn": [],
+        "type": "datetime",
+        "input": true,
+        "suffix": true
+      }
+    ]
+  },
+  "attributes": {}
+}
