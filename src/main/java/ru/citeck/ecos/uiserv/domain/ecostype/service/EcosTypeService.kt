@@ -1,13 +1,16 @@
 package ru.citeck.ecos.uiserv.domain.ecostype.service
 
 import org.springframework.stereotype.Service
+import ru.citeck.ecos.model.lib.type.dto.CreateVariantDef
 import ru.citeck.ecos.records2.RecordRef
+import ru.citeck.ecos.uiserv.app.common.service.AuthoritiesSupport
 import ru.citeck.ecos.uiserv.domain.ecostype.config.EcosTypesConfig
 import ru.citeck.ecos.uiserv.domain.ecostype.dto.EcosTypeInfo
 
 @Service
 class EcosTypeService(
-    private val typesConfig: EcosTypesConfig
+    private val typesConfig: EcosTypesConfig,
+    private val authoritiesSupport: AuthoritiesSupport
 ) {
 
     fun getTypeRefByJournal(journalRef: RecordRef?): RecordRef {
@@ -45,6 +48,18 @@ class EcosTypeService(
         if (typeRef == null) {
             return null
         }
-        return typesConfig.getTypeInfo(typeRef)
+        val typeInfo = typesConfig.getTypeInfo(typeRef) ?: return null
+
+        val copy = EcosTypeInfo(typeInfo)
+        copy.inhCreateVariants = filterCreateVariants(copy.inhCreateVariants)
+        return copy
+    }
+
+    private fun filterCreateVariants(variants: List<CreateVariantDef>?): List<CreateVariantDef>? {
+        variants ?: return null
+        val currentAuthorities = authoritiesSupport.currentUserAuthorities.toHashSet()
+        return variants.filter {
+            it.allowedFor.isEmpty() || it.allowedFor.any { auth -> currentAuthorities.contains(auth) }
+        }
     }
 }
