@@ -18,7 +18,7 @@ class EcosTypeInfo(
     val inhSourceId: String?,
     val parents: List<RecordRef>?,
     val inhDashboardType: String?,
-    val inhCreateVariants: List<CreateVariantDef>?,
+    var inhCreateVariants: List<CreateVariantDef>?,
     @AttName("resolvedModel?json")
     val model: TypeModelDef?,
     @AttName(RecordConstants.ATT_ACTIONS)
@@ -28,4 +28,19 @@ class EcosTypeInfo(
     fun getDisplayName(): String {
         return MLText.getClosestValue(name, RequestContext.getLocale())
     }
+
+    constructor(info: EcosTypeInfo) : this(
+        info.id,
+        info.name,
+        info.parentRef,
+        info.formRef,
+        info.journalRef,
+        info.metaRecord,
+        info.inhSourceId,
+        info.parents,
+        info.inhDashboardType,
+        info.inhCreateVariants,
+        info.model,
+        info.inhActions
+    )
 }
