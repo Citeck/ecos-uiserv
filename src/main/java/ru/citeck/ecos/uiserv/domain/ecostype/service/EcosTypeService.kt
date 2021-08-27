@@ -51,15 +51,15 @@ class EcosTypeService(
         val typeInfo = typesConfig.getTypeInfo(typeRef) ?: return null
 
         val copy = EcosTypeInfo(typeInfo)
-        val variants = copy.inhCreateVariants
-        if (variants != null) {
-            copy.inhCreateVariants = filter(variants)
-        }
+        copy.inhCreateVariants = filterCreateVariants(copy.inhCreateVariants)
         return copy
     }
 
-    fun filter(variants: List<CreateVariantDef>): List<CreateVariantDef> {
-        return variants.filter { it.allowedFor.isEmpty()
-            || it.allowedFor.any { authoritiesSupport.currentUserAuthorities.contains(it) } }
+    private fun filterCreateVariants(variants: List<CreateVariantDef>?): List<CreateVariantDef>? {
+        variants ?: return null
+        val currentAuthorities = authoritiesSupport.currentUserAuthorities.toHashSet()
+        return variants.filter {
+            it.allowedFor.isEmpty() || it.allowedFor.any { auth -> currentAuthorities.contains(auth) }
+        }
     }
 }
