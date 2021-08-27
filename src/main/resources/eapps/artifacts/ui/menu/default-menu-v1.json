@@ -25,7 +25,7 @@
               },
               "type": "START_WORKFLOW",
               "config": {
-                "processDef": "eproc/bpmn-def@activiti$perform"
+                "processDef": "eproc/bpmn-def@flowable$flowable-perform"
               }
             },
             {
