@@ -20,19 +20,19 @@ import ru.citeck.ecos.records3.record.dao.query.dto.query.QueryPage;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.uiserv.app.common.api.records.Utils;
-import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao,
-                                                                   RecordsQueryDao,
-                                                                   RecordMutateDtoDao<BoardDef>,
-                                                                   RecordDeleteDao {
+    RecordsQueryDao,
+    RecordMutateDtoDao<BoardRecord>,
+    RecordDeleteDao {
 
     private final BoardService boardService;
     public static final String ID = "board";
@@ -59,44 +59,47 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
      */
     @Nullable
     @Override
-    public BoardWithMeta getRecordAtts(@NotNull String localBoardId) {
+    public BoardRecord getRecordAtts(@NotNull String localBoardId) {
         if (localBoardId.isEmpty()) {
-            return new BoardWithMeta();
+            return new BoardRecord();
         } else {
             BoardWithMeta board = boardService.getBoardById(localBoardId);
             if (board == null) {
                 log.warn("Board with ID {} was not found", localBoardId);
-                return new BoardWithMeta(localBoardId);
+                return new BoardRecord(localBoardId);
             }
-            return board;
+            return new BoardRecord(board);
         }
     }
 
     @Nullable
     @Override
-    public RecsQueryRes<BoardWithMeta> queryRecords(@NotNull RecordsQuery recordsQuery) {
+    public RecsQueryRes<BoardRecord> queryRecords(@NotNull RecordsQuery recordsQuery) {
 
-        RecsQueryRes<BoardWithMeta> result = new RecsQueryRes<>();
+        RecsQueryRes<BoardRecord> result = new RecsQueryRes<>();
         Sort sort = Utils.getSort(recordsQuery);
 
         if (LANG_BY_TYPE.equals(recordsQuery.getLanguage())) {
-
             TypeQuery typeQuery = recordsQuery.getQuery(TypeQuery.class);
             if (RecordRef.isEmpty(typeQuery.getTypeRef())) {
                 return result;
             }
             List<BoardWithMeta> boards = boardService.getBoardsForExactType(typeQuery.getTypeRef(), sort);
-            result.setRecords(boards);
+            result.setRecords(boards
+                .stream()
+                .map(boardWithMeta -> new BoardRecord(boardWithMeta))
+                .collect(Collectors.toList()));
             result.setTotalCount(boards.size());
-
         } else {
-
             final QueryPage page = recordsQuery.getPage();
             int maxItemsCount = page.getMaxItems() <= 0 ? 10000 : page.getMaxItems();
             int skipCount = page.getSkipCount();
             if (PredicateService.LANGUAGE_PREDICATE.equals(recordsQuery.getLanguage())) {
                 Predicate predicate = recordsQuery.getQuery(Predicate.class);
-                result.setRecords(boardService.getAll(maxItemsCount, skipCount, predicate, sort));
+                result.setRecords(boardService.getAll(maxItemsCount, skipCount, predicate, sort)
+                    .stream()
+                    .map(boardWithMeta -> new BoardRecord(boardWithMeta))
+                    .collect(Collectors.toList()));
                 result.setTotalCount(boardService.getCount(predicate));
             } else {
                 log.warn("Unsupported query language '{}'", recordsQuery.getLanguage());
@@ -108,17 +111,17 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
     }
 
     @Override
-    public BoardDef getRecToMutate(@NotNull String localId) {
+    public BoardRecord getRecToMutate(@NotNull String localId) {
         BoardWithMeta boardWithMeta = boardService.getBoardById(localId);
         return boardWithMeta != null ?
-            new BoardDef(boardWithMeta.getBoardDef()) :
-            new BoardDef(localId);
+            new BoardRecord(boardWithMeta) :
+            new BoardRecord(localId);
     }
 
     @NotNull
     @Override
-    public String saveMutatedRec(BoardDef boardDef) {
-        return boardService.save(boardDef)
+    public String saveMutatedRec(BoardRecord boardRecord) {
+        return boardService.save(boardRecord.getBoardDef())
             .getBoardDef()
             .getId();
     }
