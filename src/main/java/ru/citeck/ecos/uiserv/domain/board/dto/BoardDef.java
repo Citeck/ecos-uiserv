@@ -2,9 +2,12 @@ package ru.citeck.ecos.uiserv.domain.board.dto;
 
 import lombok.Data;
 import ru.citeck.ecos.commons.data.MLText;
+import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.app.application.constants.AppConstants;
 import ru.citeck.ecos.uiserv.domain.board.api.records.BoardRecordsDao;
+import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
 
 import java.util.List;
 
@@ -47,5 +50,13 @@ public class BoardDef {
 
     public static RecordRef createRef(String localId) {
         return RecordRef.create(AppConstants.APP_NAME, BoardRecordsDao.ID, localId);
+    }
+
+    @JsonProperty("_content")
+    public void setContent(List<ObjectData> content) {
+        String dataUriContent = content.get(0).get("url", "");
+        ObjectData data = Json.getMapper().read(dataUriContent, ObjectData.class);
+
+        Json.getMapper().applyData(this, data);
     }
 }

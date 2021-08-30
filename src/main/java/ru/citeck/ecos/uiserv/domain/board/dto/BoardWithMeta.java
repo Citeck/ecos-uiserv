@@ -1,13 +1,21 @@
 package ru.citeck.ecos.uiserv.domain.board.dto;
 
+import ecos.com.fasterxml.jackson210.annotation.JsonValue;
+import ecos.com.fasterxml.jackson210.databind.JsonNode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.app.application.constants.AppConstants;
 import ru.citeck.ecos.uiserv.domain.board.api.records.BoardRecordsDao;
+import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.commons.json.YamlUtils;
 
+
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+
+
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -50,5 +58,15 @@ public class BoardWithMeta {
 
     public RecordRef getRef() {
         return RecordRef.create(AppConstants.APP_NAME, BoardRecordsDao.ID, getLocalId());
+    }
+
+    @JsonValue
+    @com.fasterxml.jackson.annotation.JsonValue
+    public JsonNode toNonDefaultJson() {
+        return Json.getMapper().toNonDefaultJson(boardDef);
+    }
+
+    public byte[] getData() {
+        return YamlUtils.toNonDefaultString(toNonDefaultJson()).getBytes(StandardCharsets.UTF_8);
     }
 }
