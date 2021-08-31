@@ -28,9 +28,10 @@ public class ResolvedBoardRecordsDao extends AbstractRecordsDao implements Recor
     @Nullable
     @Override
     public Object queryRecords(@NotNull RecordsQuery recordsQuery) {
-        RecsQueryRes<BoardWithMeta> queryRes = recordsDao.queryRecords(recordsQuery);
+        RecsQueryRes<BoardRecord> queryRes = recordsDao.queryRecords(recordsQuery);
         if (queryRes != null) {
-            queryRes.withRecords(record -> new ResolvedBoardRecord(record.getBoardDef(), ecosTypeService));
+            queryRes.withRecords(record ->
+                new ResolvedBoardRecord(record.getBoardDef(), ecosTypeService));
         }
         return queryRes;
     }
@@ -38,7 +39,7 @@ public class ResolvedBoardRecordsDao extends AbstractRecordsDao implements Recor
     @Nullable
     @Override
     public ResolvedBoardRecord getRecordAtts(@NotNull String localBoardId) {
-        BoardWithMeta board = recordsDao.getRecordAtts(localBoardId);
+        BoardRecord board = recordsDao.getRecordAtts(localBoardId);
         if (board != null) {
             return new ResolvedBoardRecord(board.getBoardDef(), ecosTypeService);
         }
