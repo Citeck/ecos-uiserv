@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Component
 public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao,
     RecordsQueryDao,
-    RecordMutateDtoDao<BoardRecord>,
+    RecordMutateDtoDao<BoardMutRecord>,
     RecordDeleteDao {
 
     private final BoardService boardService;
@@ -87,7 +87,7 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
             List<BoardWithMeta> boards = boardService.getBoardsForExactType(typeQuery.getTypeRef(), sort);
             result.setRecords(boards
                 .stream()
-                .map(boardWithMeta -> new BoardRecord(boardWithMeta))
+                .map(BoardRecord::new)
                 .collect(Collectors.toList()));
             result.setTotalCount(boards.size());
         } else {
@@ -98,7 +98,7 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
                 Predicate predicate = recordsQuery.getQuery(Predicate.class);
                 result.setRecords(boardService.getAll(maxItemsCount, skipCount, predicate, sort)
                     .stream()
-                    .map(boardWithMeta -> new BoardRecord(boardWithMeta))
+                    .map(BoardRecord::new)
                     .collect(Collectors.toList()));
                 result.setTotalCount(boardService.getCount(predicate));
             } else {
@@ -111,17 +111,17 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
     }
 
     @Override
-    public BoardRecord getRecToMutate(@NotNull String localId) {
+    public BoardMutRecord getRecToMutate(@NotNull String localId) {
         BoardWithMeta boardWithMeta = boardService.getBoardById(localId);
         return boardWithMeta != null ?
-            new BoardRecord(boardWithMeta) :
-            new BoardRecord(localId);
+            new BoardMutRecord(boardWithMeta.getBoardDef()) :
+            new BoardMutRecord(localId);
     }
 
     @NotNull
     @Override
-    public String saveMutatedRec(BoardRecord boardRecord) {
-        return boardService.save(boardRecord.getBoardDef())
+    public String saveMutatedRec(BoardMutRecord boardRecord) {
+        return boardService.save(boardRecord)
             .getBoardDef()
             .getId();
     }
