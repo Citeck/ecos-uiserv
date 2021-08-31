@@ -1,5 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.board.dto;
 
+import ecos.com.fasterxml.jackson210.annotation.JsonIgnore;
+import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
 import lombok.Data;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.records2.RecordRef;
@@ -41,6 +43,7 @@ public class BoardDef {
         this.columns = other.getColumns();
     }
 
+    @JsonIgnore
     public RecordRef getRef() {
         return RecordRef.create(AppConstants.APP_NAME, BoardRecordsDao.ID, id);
     }
