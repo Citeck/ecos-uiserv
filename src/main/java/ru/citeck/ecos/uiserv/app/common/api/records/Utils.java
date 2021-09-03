@@ -35,7 +35,7 @@ public class Utils {
                     String attribute = sortBy.getAttribute();
                     if (StringUtils.isNotBlank(attribute)) {
                         attribute = ATTRIBUTES_MAP.getOrDefault(attribute, attribute);
-                        return Optional.of(sortBy.isAscending() ? Sort.Order.asc(attribute) : Sort.Order.desc(attribute));
+                        return Optional.of(sortBy.getAscending() ? Sort.Order.asc(attribute) : Sort.Order.desc(attribute));
                     }
                     return Optional.<Sort.Order>empty();
                 })
