@@ -78,6 +78,10 @@ class ResolvedMenuRecords(
             subMenus = processMenuItems(originalDef, authorities.map { it.toLowerCase() }.toSet())
         }
 
+        fun getUser(): SubMenuDef {
+            return subMenus["user"] ?: SubMenuDef()
+        }
+
         fun getLeft(): SubMenuDef {
             return subMenus["left"] ?: SubMenuDef()
         }
