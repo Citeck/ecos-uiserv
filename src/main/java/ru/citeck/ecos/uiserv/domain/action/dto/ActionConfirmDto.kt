@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.domain.action.dto
 import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
+import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
 import ru.citeck.ecos.records2.RecordRef
 
@@ -12,6 +13,7 @@ data class ActionConfirmDef(
     val title: MLText,
     val message: MLText,
     val formRef: RecordRef,
+    val formAttributes: ObjectData,
     val attributesMapping: Map<String, String>
 ) {
     companion object {
@@ -46,12 +48,14 @@ data class ActionConfirmDef(
         var title: MLText = MLText.EMPTY
         var message: MLText = MLText.EMPTY
         var formRef: RecordRef = RecordRef.EMPTY
+        var formAttributes: ObjectData = ObjectData.create()
         var attributesMapping: Map<String, String> = emptyMap()
 
         constructor(base: ActionConfirmDef) : this() {
             this.title = base.title
             this.message = base.message
             this.formRef = base.formRef
+            this.formAttributes = base.formAttributes.deepCopy()
             this.attributesMapping = DataValue.create(attributesMapping).asMap(String::class.java, String::class.java)
         }
 
@@ -70,13 +74,18 @@ data class ActionConfirmDef(
             return this
         }
 
+        fun withFormAttributes(formAttributes: ObjectData?): Builder {
+            this.formAttributes = formAttributes ?: ObjectData.create()
+            return this
+        }
+
         fun withAttributesMapping(attributesMapping: Map<String, String>?): Builder {
             this.attributesMapping = attributesMapping ?: emptyMap()
             return this
         }
 
         fun build(): ActionConfirmDef {
-            return ActionConfirmDef(title, message, formRef, attributesMapping)
+            return ActionConfirmDef(title, message, formRef, formAttributes, attributesMapping)
         }
     }
 }
