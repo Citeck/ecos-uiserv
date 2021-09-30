@@ -6,6 +6,7 @@ import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.model.lib.attributes.dto.AttOptionDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
+import ru.citeck.ecos.model.lib.status.constants.StatusConstants
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records3.record.request.RequestContext
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
@@ -20,6 +21,11 @@ class ColumnEditorResolver(
     fun resolve(column: JournalColumnDef.Builder, typeAtt: AttributeDef?) {
 
         if (column.editor.type.isNotBlank()) {
+            return
+        }
+
+        if (column.id == StatusConstants.ATT_STATUS) {
+            column.withEditor(ColumnEditorDef("select", ObjectData.create()))
             return
         }
 
