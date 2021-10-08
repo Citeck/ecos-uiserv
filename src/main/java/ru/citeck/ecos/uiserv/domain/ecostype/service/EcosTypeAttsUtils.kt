@@ -19,6 +19,16 @@ object EcosTypeAttsUtils {
             .withType(AttributeType.TEXT)
             .build(),
         AttributeDef.create()
+            .withId("_name")
+            .withName(
+                MLText(
+                    Locale("ru") to "Имя",
+                    Locale.ENGLISH to "Name"
+                )
+            )
+            .withType(AttributeType.MLTEXT)
+            .build(),
+        AttributeDef.create()
             .withId("_status")
             .withName(
                 MLText(
