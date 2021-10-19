@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.domain.journal.api.records
 import ecos.com.fasterxml.jackson210.annotation.JsonValue
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
+import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.commons.json.YamlUtils
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
@@ -83,7 +84,7 @@ class JournalSettingsRecordsDao(
         }
 
         @AttName("?disp")
-        fun getDisplayName(): String {
+        fun getDisplayName(): MLText {
             return base.name
         }
 
@@ -108,8 +109,10 @@ class JournalSettingsRecordsDao(
         override fun has(name: String): Boolean {
             return if ("Write" == name) {
                 permService.canWrite(dto)
-            } else {
+            } else if ("Read" == name) {
                 permService.canRead(dto)
+            } else {
+                false
             }
         }
     }

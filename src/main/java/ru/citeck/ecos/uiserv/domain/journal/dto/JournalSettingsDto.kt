@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.journal.dto
 
 import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
+import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
 
@@ -8,7 +9,7 @@ import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
 @JsonDeserialize(builder = JournalSettingsDto.Builder::class)
 open class JournalSettingsDto(
         val id: String,
-        val name: String,
+        val name: MLText,
         val authority: String,
         val journalId: String,
         val settings: ObjectData,
@@ -79,7 +80,7 @@ open class JournalSettingsDto(
     open class Builder() {
 
         var id: String = ""
-        var name: String = ""
+        var name: MLText = MLText.EMPTY
         var authority: String = ""
         var journalId: String = ""
         var settings: ObjectData = ObjectData.create()
@@ -90,7 +91,7 @@ open class JournalSettingsDto(
             name = base.name
             authority = base.authority
             journalId = base.journalId
-            settings = ObjectData.deepCopyOrNew(base.settings)
+            settings = base.settings.deepCopy()
             creator = base.creator
         }
 
@@ -99,8 +100,8 @@ open class JournalSettingsDto(
             return this
         }
 
-        fun withName(name: String?): Builder {
-            this.name = name ?: ""
+        fun withName(name: MLText?): Builder {
+            this.name = name ?: MLText.EMPTY
             return this
         }
 

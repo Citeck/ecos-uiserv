@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.uiserv.app.common.service.AuthoritiesSupport;
@@ -81,7 +82,8 @@ public class JournalPrefApi {
         builder.withSettings(settings);
 
         if (settings != null) {
-            builder.withName(settings.get("title").asText());
+            String title = settings.get("title").asText();
+            builder.withName(Json.getMapper().read(title, MLText.class));
         }
         journalSettingsService.save(builder.build());
     }
@@ -119,7 +121,8 @@ public class JournalPrefApi {
                 .withJournalId(journalId)
                 .withAuthority(username);
         if (settings != null) {
-            builder.setName(settings.get("title").asText());
+            String title = settings.get("title").asText();
+            builder.withName(Json.getMapper().read(title, MLText.class));
         }
 
         JournalSettingsDto result = journalSettingsService.save(builder.build());

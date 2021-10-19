@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextImpl
 import org.springframework.security.core.userdetails.User
 import org.springframework.test.context.junit4.SpringRunner
 import ru.citeck.ecos.commons.data.DataValue
+import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.utils.func.UncheckedSupplier
 import ru.citeck.ecos.records2.RecordRef
@@ -211,14 +212,14 @@ internal class JournalSettingsRecordsDaoTest {
         Mockito.doAnswer {
             assertEquals("test-id", it.arguments[0])
             return@doAnswer journalSettingsRecordsDao.JournalSettingsRecord(JournalSettingsDto.create {
-                withName("test-name")
+                withName(MLText("test-name"))
             })
         }.`when`(journalSettingsRecordsDao).getRecordAtts(any(String::class.java))
 
         Mockito.verify(journalSettingsRecordsDao, Mockito.times(0)).getRecordAtts(any(String::class.java))
 
         val recToMutate = journalSettingsRecordsDao.getRecToMutate("test-id")
-        assertEquals("test-name", recToMutate.name)
+        assertEquals("{\"en\":\"test-name\"}", recToMutate.name.toString())
 
         Mockito.verify(journalSettingsRecordsDao, Mockito.times(1)).getRecordAtts(any(String::class.java))
     }
@@ -238,7 +239,7 @@ internal class JournalSettingsRecordsDaoTest {
         val check1 = repo.findByExtId("id1")
         assertNotNull(check1)
         assertEquals("id1", check1?.extId)
-        assertEquals("name1", check1?.name)
+        assertEquals("{\"en\":\"name1\"}", check1?.name)
         assertEquals("admin", check1?.authority)
         assertEquals("journal1", check1?.journalId)
         assertEquals("{}", check1?.settings)
@@ -272,7 +273,7 @@ internal class JournalSettingsRecordsDaoTest {
         val check2 = repo.findByExtId("id1")
         assertNotNull(check2)
         assertEquals("id1", check2?.extId)
-        assertEquals("name1", check2?.name)
+        assertEquals("{\"en\":\"name1\"}", check2?.name)
         assertEquals("admin", check2?.authority)
         assertEquals("journal1", check2?.journalId)
         assertEquals("{}", check2?.settings)
@@ -285,7 +286,7 @@ internal class JournalSettingsRecordsDaoTest {
         val check3 = repo.findByExtId("id1")
         assertNotNull(check3)
         assertEquals("id1", check3?.extId)
-        assertEquals("anotherName", check3?.name)
+        assertEquals("{\"en\":\"anotherName\"}", check3?.name)
         assertEquals("admin", check3?.authority)
         assertEquals("journal1", check3?.journalId)
         assertEquals("{}", check3?.settings)
@@ -308,7 +309,7 @@ internal class JournalSettingsRecordsDaoTest {
         val check1 = repo.findByExtId("id1")
         assertNotNull(check1)
         assertEquals("id1", check1?.extId)
-        assertEquals("name1", check1?.name)
+        assertEquals("{\"en\":\"name1\"}", check1?.name)
         assertEquals("user1", check1?.authority)
         assertEquals("journal1", check1?.journalId)
         assertEquals("{}", check1?.settings)
@@ -331,7 +332,7 @@ internal class JournalSettingsRecordsDaoTest {
         val check2 = repo.findByExtId("id1")
         assertNotNull(check2)
         assertEquals("id1", check2?.extId)
-        assertEquals("name1", check2?.name)
+        assertEquals("{\"en\":\"name1\"}", check2?.name)
         assertEquals("user1", check2?.authority)
         assertEquals("journal1", check2?.journalId)
         assertEquals("{}", check2?.settings)
@@ -344,7 +345,7 @@ internal class JournalSettingsRecordsDaoTest {
         val check3 = repo.findByExtId("id1")
         assertNotNull(check3)
         assertEquals("id1", check3?.extId)
-        assertEquals("anotherNameUser1", check3?.name)
+        assertEquals("{\"en\":\"anotherNameUser1\"}", check3?.name)
         assertEquals("user1", check3?.authority)
         assertEquals("journal1", check3?.journalId)
         assertEquals("{}", check3?.settings)
@@ -361,7 +362,7 @@ internal class JournalSettingsRecordsDaoTest {
         val check4 = repo.findByExtId("id1")
         assertNotNull(check4)
         assertEquals("id1", check4?.extId)
-        assertEquals("anotherNameAdmin", check4?.name)
+        assertEquals("{\"en\":\"anotherNameAdmin\"}", check4?.name)
         assertEquals("user1", check4?.authority)
         assertEquals("journal1", check4?.journalId)
         assertEquals("{}", check4?.settings)
@@ -384,7 +385,7 @@ internal class JournalSettingsRecordsDaoTest {
         val check1 = repo.findByExtId("id1")
         assertNotNull(check1)
         assertEquals("id1", check1?.extId)
-        assertEquals("name1", check1?.name)
+        assertEquals("{\"en\":\"name1\"}", check1?.name)
         assertEquals("user1", check1?.authority)
         assertEquals("journal1", check1?.journalId)
         assertEquals("{}", check1?.settings)
@@ -418,7 +419,7 @@ internal class JournalSettingsRecordsDaoTest {
         val check2 = repo.findByExtId("id1")
         assertNotNull(check2)
         assertEquals("id1", check2?.extId)
-        assertEquals("name1", check2?.name)
+        assertEquals("{\"en\":\"name1\"}", check2?.name)
         assertEquals("user1", check2?.authority)
         assertEquals("journal1", check2?.journalId)
         assertEquals("{}", check2?.settings)
@@ -431,7 +432,7 @@ internal class JournalSettingsRecordsDaoTest {
         val check3 = repo.findByExtId("id1")
         assertNotNull(check3)
         assertEquals("id1", check3?.extId)
-        assertEquals("anotherNameAdmin", check3?.name)
+        assertEquals("{\"en\":\"anotherNameAdmin\"}", check3?.name)
         assertEquals("user1", check3?.authority)
         assertEquals("journal1", check3?.journalId)
         assertEquals("{}", check3?.settings)
@@ -454,7 +455,7 @@ internal class JournalSettingsRecordsDaoTest {
         val check1 = repo.findByExtId("id1")
         assertNotNull(check1)
         assertEquals("id1", check1?.extId)
-        assertEquals("name1", check1?.name)
+        assertEquals("{\"en\":\"name1\"}", check1?.name)
         assertEquals("GROUP_all", check1?.authority)
         assertEquals("journal1", check1?.journalId)
         assertEquals("{}", check1?.settings)
@@ -488,7 +489,7 @@ internal class JournalSettingsRecordsDaoTest {
         val check2 = repo.findByExtId("id1")
         assertNotNull(check2)
         assertEquals("id1", check2?.extId)
-        assertEquals("name1", check2?.name)
+        assertEquals("{\"en\":\"name1\"}", check2?.name)
         assertEquals("GROUP_all", check2?.authority)
         assertEquals("journal1", check2?.journalId)
         assertEquals("{}", check2?.settings)
@@ -501,7 +502,7 @@ internal class JournalSettingsRecordsDaoTest {
         val check3 = repo.findByExtId("id1")
         assertNotNull(check3)
         assertEquals("id1", check3?.extId)
-        assertEquals("anotherNameAdmin", check3?.name)
+        assertEquals("{\"en\":\"anotherNameAdmin\"}", check3?.name)
         assertEquals("GROUP_all", check3?.authority)
         assertEquals("journal1", check3?.journalId)
         assertEquals("{}", check3?.settings)
@@ -693,11 +694,11 @@ internal class JournalSettingsRecordsDaoTest {
         Mockito.doReturn(listOf(
                 JournalSettingsDto.create {
                     withId("id1")
-                    withName("name1")
+                    withName(MLText("name1"))
                 },
                 JournalSettingsDto.create {
                     withId("id2")
-                    withName("name2")
+                    withName(MLText("name2"))
                 }
         )).`when`(journalSettingsService).searchSettings("journal1")
         Mockito.doReturn(emptyList<JournalSettingsDto>())
@@ -712,8 +713,8 @@ internal class JournalSettingsRecordsDaoTest {
         })
         assertEquals(2, queryRecords1.getTotalCount())
         assertEquals(false, queryRecords1.getHasMore())
-        assertTrue(queryRecords1.getRecords().stream().anyMatch({ it.name == "name1" }))
-        assertTrue(queryRecords1.getRecords().stream().anyMatch({ it.name == "name2" }))
+        assertTrue(queryRecords1.getRecords().stream().anyMatch({ it.id == "id1" }))
+        assertTrue(queryRecords1.getRecords().stream().anyMatch({ it.id == "id2" }))
 
         Mockito.verify(journalSettingsService, Mockito.times(1)).searchSettings(any(String::class.java))
 

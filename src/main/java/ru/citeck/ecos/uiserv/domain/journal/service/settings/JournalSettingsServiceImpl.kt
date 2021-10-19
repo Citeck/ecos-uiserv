@@ -5,8 +5,9 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
-import ru.citeck.ecos.commons.json.Json.mapper
+import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.uiserv.app.common.service.AuthoritiesSupport
 import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType
@@ -16,7 +17,6 @@ import ru.citeck.ecos.uiserv.domain.journal.repo.JournalSettingsEntity
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalSettingsRepository
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService
 import java.util.*
-import java.util.function.Consumer
 import java.util.stream.Collectors
 import kotlin.collections.ArrayList
 
@@ -157,8 +157,8 @@ class JournalSettingsServiceImpl(
                 isNew = true
             }
         }
-        settingsEntity.name = dto.name
-        settingsEntity.settings = mapper.toString(dto.settings)
+        settingsEntity.name = dto.name.toString()
+        settingsEntity.settings = Json.mapper.toString(dto.settings)
         settingsEntity.journalId = dto.journalId
         settingsEntity.authority = dto.authority
         return Pair(settingsEntity, isNew)
@@ -167,10 +167,10 @@ class JournalSettingsServiceImpl(
     private fun toDto(entity: JournalSettingsEntity): JournalSettingsDto {
         return JournalSettingsDto.create()
                 .withId(entity.extId)
-                .withName(entity.name)
+                .withName(Json.mapper.read(entity.name, MLText::class.java))
                 .withAuthority(entity.authority)
                 .withJournalId(entity.journalId)
-                .withSettings(mapper.read(entity.settings, ObjectData::class.java))
+                .withSettings(Json.mapper.read(entity.settings, ObjectData::class.java))
                 .withCreator(entity.createdBy)
                 .build()
     }
@@ -180,7 +180,7 @@ class JournalSettingsServiceImpl(
         val prefSettings = ObjectData.create(pref.data)
         return JournalSettingsDto.create {
             withId(pref.fileId)
-            withName(prefSettings.get("title").asText())
+            withName(Json.mapper.read(prefSettings.get("title").asText(), MLText::class.java))
             withAuthority(currentUsername)
             withJournalId(journalId)
             withSettings(prefSettings)

@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
 import org.springframework.security.core.userdetails.User
 import org.springframework.test.context.junit4.SpringRunner
+import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.utils.func.UncheckedSupplier
 import ru.citeck.ecos.commons.utils.io.IOUtils
@@ -92,7 +93,7 @@ internal class JournalSettingsServiceImplTest {
                 val foundedDto = service.getById("searchable-id")
                 assertNotNull(foundedDto)
                 assertEquals("searchable-id", foundedDto?.id)
-                assertEquals("some-name", foundedDto?.name)
+                assertEquals("{\"en\":\"some-name\"}", foundedDto?.name.toString())
                 assertEquals("user-1", foundedDto?.authority)
                 assertEquals("some-journal", foundedDto?.journalId)
                 assertEquals(ObjectData.create("{}"), foundedDto?.settings)
@@ -123,7 +124,7 @@ internal class JournalSettingsServiceImplTest {
 
         val dto = service.getById("old-prefs-id-test-3")
         assertEquals("old-prefs-id-test-3", dto?.id)
-        assertEquals("old-prefs-title", dto?.name)
+        assertEquals("{\"en\":\"old-prefs-title\"}", dto?.name.toString())
         assertEquals("user1", dto?.authority)
         assertEquals("", dto?.journalId)
         assertEquals(ObjectData.create(String(readFully)), dto?.settings)
@@ -140,14 +141,14 @@ internal class JournalSettingsServiceImplTest {
             override fun get() {
                 val createdDto = service.save(JournalSettingsDto.create {
                     withId("some-id")
-                    withName("some-name")
+                    withName(MLText("some-name"))
                     withAuthority("some-authority")
                     withJournalId("some-journal")
                     withSettings(ObjectData.create("{}"))
                 })
 
                 assertEquals("some-id", createdDto.id)
-                assertEquals("some-name", createdDto.name)
+                assertEquals("{\"en\":\"some-name\"}", createdDto.name.toString())
                 assertEquals("some-authority", createdDto.authority)
                 assertEquals("some-journal", createdDto.journalId)
                 assertEquals(ObjectData.create("{}"), createdDto.settings)
@@ -158,14 +159,14 @@ internal class JournalSettingsServiceImplTest {
 
                 val updatedDto = service.save(JournalSettingsDto.create {
                     withId("some-id")
-                    withName("updated-name")
+                    withName(MLText("updated-name"))
                     withAuthority("some-authority")
                     withJournalId("some-journal")
                     withSettings(ObjectData.create("{}"))
                 })
 
                 assertEquals("some-id", updatedDto.id)
-                assertEquals("updated-name", updatedDto.name)
+                assertEquals("{\"en\":\"updated-name\"}", updatedDto.name.toString())
                 assertEquals("some-authority", updatedDto.authority)
                 assertEquals("some-journal", updatedDto.journalId)
                 assertEquals(ObjectData.create("{}"), updatedDto.settings)
@@ -198,14 +199,14 @@ internal class JournalSettingsServiceImplTest {
             override fun get() {
                 val createdDto = service.save(JournalSettingsDto.create {
                     withId("some-id")
-                    withName("some-name")
+                    withName(MLText("some-name"))
                     withAuthority("some-authority")
                     withJournalId("some-journal")
                     withSettings(ObjectData.create("{}"))
                 })
 
                 assertEquals("some-id", createdDto.id)
-                assertEquals("some-name", createdDto.name)
+                assertEquals("{\"en\":\"some-name\"}", createdDto.name.toString())
                 assertEquals("some-authority", createdDto.authority)
                 assertEquals("some-journal", createdDto.journalId)
                 assertEquals(ObjectData.create("{}"), createdDto.settings)
@@ -221,7 +222,7 @@ internal class JournalSettingsServiceImplTest {
                 val exception1 = assertThrows(IllegalAccessException::class.java, {
                     service.save(JournalSettingsDto.create {
                         withId("some-id")
-                        withName("updated-name")
+                        withName(MLText("updated-name"))
                         withAuthority("some-authority")
                         withJournalId("some-journal")
                         withSettings(ObjectData.create("{}"))
@@ -238,7 +239,7 @@ internal class JournalSettingsServiceImplTest {
                 val exception2 = assertThrows(IllegalAccessException::class.java, {
                     service.save(JournalSettingsDto.create {
                         withId("another-id")
-                        withName("another-name")
+                        withName(MLText("another-name"))
                         withAuthority("some-authority")
                         withJournalId("some-journal")
                         withSettings(ObjectData.create("{}"))
@@ -257,7 +258,7 @@ internal class JournalSettingsServiceImplTest {
             override fun get() {
                 service.save(JournalSettingsDto.create {
                     withId("some-id")
-                    withName("updated-name")
+                    withName(MLText("updated-name"))
                     withAuthority("some-authority")
                     withJournalId("some-journal")
                     withSettings(ObjectData.create("{}"))
@@ -269,7 +270,7 @@ internal class JournalSettingsServiceImplTest {
                 val updatedDto = service.getById("some-id")
                 assertNotNull(updatedDto)
                 assertEquals("some-id", updatedDto?.id)
-                assertEquals("updated-name", updatedDto?.name)
+                assertEquals("{\"en\":\"updated-name\"}", updatedDto?.name.toString())
                 assertEquals("some-authority", updatedDto?.authority)
                 assertEquals("some-journal", updatedDto?.journalId)
                 assertEquals(ObjectData.create("{}"), updatedDto?.settings)
@@ -278,7 +279,7 @@ internal class JournalSettingsServiceImplTest {
 
                 service.save(JournalSettingsDto.create {
                     withId("another-id")
-                    withName("another-name")
+                    withName(MLText("another-name"))
                     withAuthority("some-authority")
                     withJournalId("some-journal")
                     withSettings(ObjectData.create("{}"))
@@ -287,7 +288,7 @@ internal class JournalSettingsServiceImplTest {
                 val createdForAnotherDto = service.getById("another-id")
                 assertNotNull(createdForAnotherDto)
                 assertEquals("another-id", createdForAnotherDto?.id)
-                assertEquals("another-name", createdForAnotherDto?.name)
+                assertEquals("{\"en\":\"another-name\"}", createdForAnotherDto?.name.toString())
                 assertEquals("some-authority", createdForAnotherDto?.authority)
                 assertEquals("some-journal", createdForAnotherDto?.journalId)
                 assertEquals(ObjectData.create("{}"), createdForAnotherDto?.settings)
@@ -308,7 +309,7 @@ internal class JournalSettingsServiceImplTest {
             override fun get() {
                 service.save(JournalSettingsDto.create {
                     withId("some-id")
-                    withName("some-name")
+                    withName(MLText("some-name"))
                     withAuthority("some-authority")
                     withJournalId("some-journal")
                     withSettings(ObjectData.create("{}"))
@@ -364,7 +365,7 @@ internal class JournalSettingsServiceImplTest {
             override fun get() {
                 service.save(JournalSettingsDto.create {
                     withId("some-id")
-                    withName("some-name")
+                    withName(MLText("some-name"))
                     withAuthority("some-authority")
                     withJournalId("some-journal")
                     withSettings(ObjectData.create("{}"))
@@ -441,22 +442,22 @@ internal class JournalSettingsServiceImplTest {
         setContext("user1")
         val foundResult1 = service.searchSettings("journal-1")
         assertEquals(3, foundResult1.size)
-        assertTrue(foundResult1.stream().anyMatch({ it.name == "name-1" }))
-        assertTrue(foundResult1.stream().anyMatch({ it.name == "name-2" }))
-        assertTrue(foundResult1.stream().anyMatch({ it.name == "name-5" }))
+        assertTrue(foundResult1.stream().anyMatch({ it.id == "id-1" }))
+        assertTrue(foundResult1.stream().anyMatch({ it.id == "id-2" }))
+        assertTrue(foundResult1.stream().anyMatch({ it.id == "id-5" }))
         clearContext()
 
         setContext("user2")
         val foundResult2 = service.searchSettings("journal-1")
         assertEquals(2, foundResult2.size)
-        assertTrue(foundResult2.stream().anyMatch({ it.name == "name-3" }))
-        assertTrue(foundResult2.stream().anyMatch({ it.name == "name-5" }))
+        assertTrue(foundResult2.stream().anyMatch({ it.id == "id-3" }))
+        assertTrue(foundResult2.stream().anyMatch({ it.id == "id-5" }))
         clearContext()
 
         setContext("user1")
         val foundResult3 = service.searchSettings("journal-2")
         assertEquals(1, foundResult3.size)
-        assertTrue(foundResult3.stream().anyMatch({ it.name == "name-4" }))
+        assertTrue(foundResult3.stream().anyMatch({ it.id == "id-4" }))
         clearContext()
 
         setContext("user2")
@@ -486,13 +487,13 @@ internal class JournalSettingsServiceImplTest {
         val foundResult1 = service.searchSettings("journal1")
         assertEquals(2, foundResult1.size)
         assertEquals("old-prefs-id-test-1", foundResult1[0].id)
-        assertEquals("old-prefs-title", foundResult1[0].name)
+        assertEquals("{\"en\":\"old-prefs-title\"}", foundResult1[0].name.toString())
         assertEquals("user1", foundResult1[0].authority)
         assertEquals("journal1", foundResult1[0].journalId)
         assertEquals(ObjectData.create(String(readFully)), foundResult1[0].settings)
         assertEquals("user1", foundResult1[0].creator)
         assertEquals("id-1", foundResult1[1].id)
-        assertEquals("name-1", foundResult1[1].name)
+        assertEquals("{\"en\":\"name-1\"}", foundResult1[1].name.toString())
         assertEquals("GROUP_all", foundResult1[1].authority)
         assertEquals("journal1", foundResult1[1].journalId)
         assertEquals(ObjectData.create("{}"), foundResult1[1].settings)
@@ -503,7 +504,7 @@ internal class JournalSettingsServiceImplTest {
         val foundResult2 = service.searchSettings("journal1")
         assertEquals(1, foundResult2.size)
         assertEquals("id-1", foundResult2[0].id)
-        assertEquals("name-1", foundResult2[0].name)
+        assertEquals("{\"en\":\"name-1\"}", foundResult2[0].name.toString())
         assertEquals("GROUP_all", foundResult2[0].authority)
         assertEquals("journal1", foundResult2[0].journalId)
         assertEquals(ObjectData.create("{}"), foundResult2[0].settings)
@@ -532,7 +533,7 @@ internal class JournalSettingsServiceImplTest {
         val foundResult1 = service.searchSettings("journal1")
         assertEquals(1, foundResult1.size)
         assertEquals("id-1-overriden", foundResult1[0].id)
-        assertEquals("name-1", foundResult1[0].name)
+        assertEquals("{\"en\":\"name-1\"}", foundResult1[0].name.toString())
         assertEquals("GROUP_all", foundResult1[0].authority)
         assertEquals("journal1", foundResult1[0].journalId)
         assertEquals(ObjectData.create("{}"), foundResult1[0].settings)
@@ -548,21 +549,21 @@ internal class JournalSettingsServiceImplTest {
             override fun get() {
                 service.save(JournalSettingsDto.create {
                     withId("id-1")
-                    withName("name-1")
+                    withName(MLText("name-1"))
                     withAuthority("auth-1")
                     withJournalId("journal-1")
                     withSettings(ObjectData.create("{}"))
                 })
                 service.save(JournalSettingsDto.create {
                     withId("id-2")
-                    withName("name-2")
+                    withName(MLText("name-2"))
                     withAuthority("auth-1")
                     withJournalId("journal-1")
                     withSettings(ObjectData.create("{}"))
                 })
                 service.save(JournalSettingsDto.create {
                     withId("id-4")
-                    withName("name-4")
+                    withName(MLText("name-4"))
                     withAuthority("auth-1")
                     withJournalId("journal-2")
                     withSettings(ObjectData.create("{}"))
@@ -574,7 +575,7 @@ internal class JournalSettingsServiceImplTest {
             override fun get() {
                 service.save(JournalSettingsDto.create {
                     withId("id-3")
-                    withName("name-3")
+                    withName(MLText("name-3"))
                     withAuthority("auth-2")
                     withJournalId("journal-1")
                     withSettings(ObjectData.create("{}"))
