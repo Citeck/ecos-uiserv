@@ -107,12 +107,26 @@ public class JournalPrefService {
         USER /*, GROUP*/
     }
 
-    @Getter
-    @Setter
     @AllArgsConstructor
     public static class JournalPreferences {
         private String fileId;
         private JsonNode data;
+
+        public String getFileId() {
+            return fileId;
+        }
+
+        public void setFileId(String fileId) {
+            this.fileId = fileId;
+        }
+
+        public JsonNode getData() {
+            return data;
+        }
+
+        public void setData(JsonNode data) {
+            this.data = data;
+        }
     }
 
     @Getter

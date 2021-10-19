@@ -1,0 +1,37 @@
+{
+  "title": "old-prefs-title",
+  "sortBy": [
+    {
+      "attribute": "cm:created",
+      "ascending": false
+    }
+  ],
+  "groupBy": [],
+  "columns": [
+    {
+      "text": "Регистрационный номер",
+      "attribute": "idocs:date",
+      "type": "text",
+      "visible": true,
+      "editable": false
+    }
+  ],
+  "predicate": {
+    "t": "and",
+    "val": [
+      {
+        "att": "idocs:date",
+        "t": "ge",
+        "val": "2021-09-14T00:00:00.000+07:00"
+      },
+      {
+        "att": "idocs:date",
+        "t": "lt",
+        "val": "2021-09-15T00:00:00.000+07:00"
+      }
+    ]
+  },
+  "permissions": {
+    "Write": true
+  }
+}

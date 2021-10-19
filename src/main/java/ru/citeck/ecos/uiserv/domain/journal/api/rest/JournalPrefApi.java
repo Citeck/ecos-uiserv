@@ -10,19 +10,23 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.uiserv.app.common.service.AuthoritiesSupport;
 import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils;
+import ru.citeck.ecos.uiserv.app.web.exception.JournalPrefsNotFoundException;
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType;
 import ru.citeck.ecos.uiserv.domain.file.service.FileService;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSettingsDto;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService;
-import ru.citeck.ecos.uiserv.app.web.exception.JournalPrefsNotFoundException;
-import ru.citeck.ecos.uiserv.domain.journal.service.JournalSettingsService;
+import ru.citeck.ecos.uiserv.domain.journal.service.settings.JournalSettingsService;
 
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * @deprecated use ru.citeck.ecos.uiserv.domain.journal.api.records.JournalSettingsRecordsDao
+ */
 @RestController
 @RequestMapping("/api/journalprefs")
 @RequiredArgsConstructor
+@Deprecated
 public class JournalPrefApi {
 
     private final JournalPrefService journalPrefService;
@@ -71,12 +75,15 @@ public class JournalPrefApi {
         if (!Objects.equals(username, dto.getAuthority())) {
             throw new RuntimeException("Access denied");
         }
-        dto.setSettings(Json.getMapper().read(bytes, ObjectData.class));
 
-        if (dto.getSettings() != null) {
-            dto.setName(dto.getSettings().get("title").asText());
+        JournalSettingsDto.Builder builder = dto.copy();
+        ObjectData settings = Json.getMapper().read(bytes, ObjectData.class);
+        builder.withSettings(settings);
+
+        if (settings != null) {
+            builder.withName(settings.get("title").asText());
         }
-        journalSettingsService.save(dto);
+        journalSettingsService.save(builder.build());
     }
 
     @DeleteMapping("/id/{journalViewPrefsId}")
@@ -93,7 +100,7 @@ public class JournalPrefApi {
             }
         } else {
             fileService.deployFileOverride(FileType.JOURNALPREFS, journalViewPrefsId, null, null,
-                Collections.emptyMap());
+                    Collections.emptyMap());
         }
     }
 
@@ -106,16 +113,16 @@ public class JournalPrefApi {
         username = validateUsername(username);
         validateBody(bytes);
 
-        JournalSettingsDto journalSettingsDto = new JournalSettingsDto();
-        journalSettingsDto.setSettings(Json.getMapper().read(bytes, ObjectData.class));
-        journalSettingsDto.setJournalId(journalId);
-
-        if (journalSettingsDto.getSettings() != null) {
-            journalSettingsDto.setName(journalSettingsDto.getSettings().get("title").asText());
+        ObjectData settings = Json.getMapper().read(bytes, ObjectData.class);
+        JournalSettingsDto.Builder builder = JournalSettingsDto.create()
+                .withSettings(settings)
+                .withJournalId(journalId)
+                .withAuthority(username);
+        if (settings != null) {
+            builder.setName(settings.get("title").asText());
         }
-        journalSettingsDto.setAuthority(username);
 
-        JournalSettingsDto result = journalSettingsService.save(journalSettingsDto);
+        JournalSettingsDto result = journalSettingsService.save(builder.build());
         return result.getId();
     }
 
@@ -128,11 +135,11 @@ public class JournalPrefApi {
 
         List<JournalSettingsDto> settings = journalSettingsService.getSettings(username, journalId);
         List<JournalPrefService.JournalPreferences> preferences =
-            journalPrefService.find(journalId, username, includeUserLocal);
+                journalPrefService.find(journalId, username, includeUserLocal);
 
         preferences = preferences == null ? new ArrayList<>() : new ArrayList<>(preferences);
         settings.stream().map(s ->
-            new JournalPrefService.JournalPreferences(s.getId(), s.getSettings().getAs(JsonNode.class))
+                new JournalPrefService.JournalPreferences(s.getId(), s.getSettings().getAs(JsonNode.class))
         ).forEach(preferences::add);
 
         return preferences;
