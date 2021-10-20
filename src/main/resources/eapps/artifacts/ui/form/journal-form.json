@@ -533,6 +533,7 @@
                     "label": {
                       "ru": "Actions Configuration"
                     },
+                    "multiple": true,
                     "disableAddingRemovingRows": false,
                     "addAnother": "",
                     "addAnotherPosition": "bottom",
