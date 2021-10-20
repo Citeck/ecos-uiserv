@@ -118,7 +118,7 @@ internal class JournalSettingsRecordsDaoTest {
 
         SecurityUtils.doAsUser("user-1", object : UncheckedSupplier<Unit> {
             override fun get() {
-                assertEquals("journal-settings@ext-id-1", getAtt("ext-id-1", "?id").asText())
+                assertEquals("uiserv/journal-settings@ext-id-1", getAtt("ext-id-1", "?id").asText())
                 assertEquals("ext-id-1", getAtt("ext-id-1", "id").asText())
                 assertEquals("ext-id-1", getAtt("ext-id-1", "moduleId").asText())
                 assertEquals("some-name-1", getAtt("ext-id-1", "name").asText())
@@ -130,7 +130,7 @@ internal class JournalSettingsRecordsDaoTest {
                 assertFalse(getAtt("ext-id-1", "permissions._has.Write").asBoolean())
                 assertTrue(getAtt("ext-id-1", "permissions._has.Read").asBoolean())
 
-                assertEquals("journal-settings@ext-id-2", getAtt("ext-id-2", "?id").asText())
+                assertEquals("uiserv/journal-settings@ext-id-2", getAtt("ext-id-2", "?id").asText())
                 assertEquals("ext-id-2", getAtt("ext-id-2", "id").asText())
                 assertEquals("ext-id-2", getAtt("ext-id-2", "moduleId").asText())
                 assertEquals("", getAtt("ext-id-2", "name").asText())
@@ -146,7 +146,7 @@ internal class JournalSettingsRecordsDaoTest {
 
         SecurityUtils.doAsUser("user-2", object : UncheckedSupplier<Unit> {
             override fun get() {
-                assertEquals("journal-settings@ext-id-1", getAtt("ext-id-1", "?id").asText())
+                assertEquals("uiserv/journal-settings@ext-id-1", getAtt("ext-id-1", "?id").asText())
                 assertEquals("ext-id-1", getAtt("ext-id-1", "id").asText())
                 assertEquals("ext-id-1", getAtt("ext-id-1", "moduleId").asText())
                 assertEquals("", getAtt("ext-id-1", "name").asText())
@@ -158,7 +158,7 @@ internal class JournalSettingsRecordsDaoTest {
                 assertFalse(getAtt("ext-id-1", "permissions._has.Write").asBoolean())
                 assertFalse(getAtt("ext-id-1", "permissions._has.Read").asBoolean())
 
-                assertEquals("journal-settings@ext-id-2", getAtt("ext-id-2", "?id").asText())
+                assertEquals("uiserv/journal-settings@ext-id-2", getAtt("ext-id-2", "?id").asText())
                 assertEquals("ext-id-2", getAtt("ext-id-2", "id").asText())
                 assertEquals("ext-id-2", getAtt("ext-id-2", "moduleId").asText())
                 assertEquals("some-name-2", getAtt("ext-id-2", "name").asText())
@@ -174,7 +174,7 @@ internal class JournalSettingsRecordsDaoTest {
 
         SecurityUtils.doAsUser("admin", object : UncheckedSupplier<Unit> {
             override fun get() {
-                assertEquals("journal-settings@ext-id-1", getAtt("ext-id-1", "?id").asText())
+                assertEquals("uiserv/journal-settings@ext-id-1", getAtt("ext-id-1", "?id").asText())
                 assertEquals("ext-id-1", getAtt("ext-id-1", "id").asText())
                 assertEquals("ext-id-1", getAtt("ext-id-1", "moduleId").asText())
                 assertEquals("some-name-1", getAtt("ext-id-1", "name").asText())
@@ -186,7 +186,7 @@ internal class JournalSettingsRecordsDaoTest {
                 assertTrue(getAtt("ext-id-1", "permissions._has.Write").asBoolean())
                 assertTrue(getAtt("ext-id-1", "permissions._has.Read").asBoolean())
 
-                assertEquals("journal-settings@ext-id-2", getAtt("ext-id-2", "?id").asText())
+                assertEquals("uiserv/journal-settings@ext-id-2", getAtt("ext-id-2", "?id").asText())
                 assertEquals("ext-id-2", getAtt("ext-id-2", "id").asText())
                 assertEquals("ext-id-2", getAtt("ext-id-2", "moduleId").asText())
                 assertEquals("some-name-2", getAtt("ext-id-2", "name").asText())
