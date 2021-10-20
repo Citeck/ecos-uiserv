@@ -92,7 +92,7 @@ public class ConfigRecordControllerTest {
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(queryJson))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id", is(RECORD_ID_AT + id)))
+            .andExpect(jsonPath("$.id", is("uiserv/" + RECORD_ID_AT + id)))
             .andExpect(jsonPath("$.attributes.title", is("test-config-title")))
             .andExpect(jsonPath("$.attributes.description", is("test-config-description")))
             .andExpect(jsonPath("$.attributes.value.type", is("TOP")))
