@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.journal.service.settings
 
 import org.apache.commons.lang.StringUtils
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Propagation
@@ -9,6 +10,7 @@ import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.uiserv.app.common.service.AuthoritiesSupport
+import ru.citeck.ecos.uiserv.app.security.constants.AuthoritiesConstants
 import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType
 import ru.citeck.ecos.uiserv.domain.file.service.FileService
@@ -22,16 +24,16 @@ import kotlin.collections.ArrayList
 
 @Service
 @Transactional(
-        rollbackFor = [Throwable::class],
-        isolation = Isolation.READ_COMMITTED,
-        propagation = Propagation.REQUIRED
+    rollbackFor = [Throwable::class],
+    isolation = Isolation.READ_COMMITTED,
+    propagation = Propagation.REQUIRED
 )
 class JournalSettingsServiceImpl(
-        private val authoritiesSupport: AuthoritiesSupport,
-        private val repo: JournalSettingsRepository,
-        private val permService: JournalSettingsPermissionsService,
-        private val journalPrefService: JournalPrefService,
-        private val fileService: FileService
+    private val authoritiesSupport: AuthoritiesSupport,
+    private val repo: JournalSettingsRepository,
+    private val permService: JournalSettingsPermissionsService,
+    private val journalPrefService: JournalPrefService,
+    private val fileService: FileService
 ) : JournalSettingsService {
 
     @Override
@@ -91,6 +93,35 @@ class JournalSettingsServiceImpl(
 
     @Override
     override fun searchSettings(journalId: String): List<JournalSettingsDto> {
+        val searchSpecification = composeSearchSpecification(journalId)
+        val foundedJournalSettings = repo.findAll(searchSpecification).stream()
+            .map { toDto(it) }
+            .collect(Collectors.toList())
+
+        val foundedJournalPrefs = searchJournalPrefs(journalId)
+
+        return mergeSettingsAndPrefs(foundedJournalSettings, foundedJournalPrefs)
+    }
+
+    private fun composeSearchSpecification(journalId: String): Specification<JournalSettingsEntity> {
+        val currentUserAuthorities = fetchAllUserAuthorities()
+
+        var specification = JournalSettingsSpecification.journalEquals(journalId)
+
+        if (isAdmin()) {
+            specification = specification.and(
+                JournalSettingsSpecification.authorityIn(currentUserAuthorities)
+                    .or(JournalSettingsSpecification.authorityNotEqualToCreator())
+            )
+        } else {
+            specification = specification.and(
+                JournalSettingsSpecification.authorityIn(currentUserAuthorities)
+            )
+        }
+        return specification
+    }
+
+    private fun fetchAllUserAuthorities(): List<String> {
         val username = getCurrentUsername()
 
         var currentUserAuthorities = authoritiesSupport.currentUserAuthorities
@@ -98,14 +129,7 @@ class JournalSettingsServiceImpl(
             currentUserAuthorities = ArrayList(currentUserAuthorities)
             currentUserAuthorities.add(username)
         }
-
-        val foundedJournalSettings = repo.findAllByAuthorityInAndJournalId(currentUserAuthorities, journalId).stream()
-                .map { toDto(it) }
-                .collect(Collectors.toList())
-
-        val foundedJournalPrefs = searchJournalPrefs(journalId)
-
-        return mergeSettingsAndPrefs(foundedJournalSettings, foundedJournalPrefs)
+        return currentUserAuthorities
     }
 
     private fun searchJournalPrefs(journalId: String): List<JournalSettingsDto> {
@@ -135,8 +159,8 @@ class JournalSettingsServiceImpl(
     override fun getSettings(authority: String?, journalId: String?): List<JournalSettingsDto> {
         val configs: List<JournalSettingsEntity> = repo.findAllByAuthorityAndJournalId(authority, journalId)
         return configs.stream()
-                .map { entity: JournalSettingsEntity -> toDto(entity) }
-                .collect(Collectors.toList())
+            .map { entity: JournalSettingsEntity -> toDto(entity) }
+            .collect(Collectors.toList())
     }
 
     private fun toEntity(dto: JournalSettingsDto): Pair<JournalSettingsEntity, Boolean> {
@@ -166,13 +190,13 @@ class JournalSettingsServiceImpl(
 
     private fun toDto(entity: JournalSettingsEntity): JournalSettingsDto {
         return JournalSettingsDto.create()
-                .withId(entity.extId)
-                .withName(Json.mapper.read(entity.name, MLText::class.java))
-                .withAuthority(entity.authority)
-                .withJournalId(entity.journalId)
-                .withSettings(Json.mapper.read(entity.settings, ObjectData::class.java))
-                .withCreator(entity.createdBy)
-                .build()
+            .withId(entity.extId)
+            .withName(Json.mapper.read(entity.name, MLText::class.java))
+            .withAuthority(entity.authority)
+            .withJournalId(entity.journalId)
+            .withSettings(Json.mapper.read(entity.settings, ObjectData::class.java))
+            .withCreator(entity.createdBy)
+            .build()
     }
 
     private fun toDto(pref: JournalPrefService.JournalPreferences, journalId: String?): JournalSettingsDto {
@@ -198,5 +222,10 @@ class JournalSettingsServiceImpl(
             username = username.replaceFirst("alfresco/".toRegex(), "")
         }
         return username
+    }
+
+    private fun isAdmin(): Boolean {
+        return authoritiesSupport.currentUserAuthorities.stream()
+            .anyMatch { it == AuthoritiesConstants.ADMIN }
     }
 }
