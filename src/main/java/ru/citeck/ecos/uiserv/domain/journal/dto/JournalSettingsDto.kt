@@ -23,6 +23,10 @@ open class JournalSettingsDto(
             other.settings,
             other.creator)
 
+    constructor() : this(
+            "", MLText.EMPTY, "", "", ObjectData.create(), ""
+    )
+
 
     companion object {
 

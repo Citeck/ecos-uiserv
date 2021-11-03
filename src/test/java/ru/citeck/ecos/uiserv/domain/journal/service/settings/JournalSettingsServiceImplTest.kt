@@ -62,6 +62,8 @@ internal class JournalSettingsServiceImplTest {
         for (file in files) {
             fileService.delete(FileType.JOURNALPREFS, file.fileId)
         }
+
+        clearContext()
     }
 
     @After
@@ -73,6 +75,8 @@ internal class JournalSettingsServiceImplTest {
         for (file in files) {
             fileService.delete(FileType.JOURNALPREFS, file.fileId)
         }
+
+        clearContext()
     }
 
     @Test
@@ -403,6 +407,7 @@ internal class JournalSettingsServiceImplTest {
     fun searchSettings() {
         val service = JournalSettingsServiceImpl(authoritiesSupport, repo, permService, journalPrefService, fileService)
 
+        setContext("admin")
         repo.save(JournalSettingsEntity().apply {
             extId = "id-1"
             name = "name-1"
@@ -438,6 +443,7 @@ internal class JournalSettingsServiceImplTest {
             journalId = "journal-1"
             settings = "{}"
         })
+        clearContext()
 
         setContext("user1")
         val foundResult1 = service.searchSettings("journal-1")
@@ -463,6 +469,87 @@ internal class JournalSettingsServiceImplTest {
         setContext("user2")
         val foundResult4 = service.searchSettings("journal-2")
         assertEquals(0, foundResult4.size)
+        clearContext()
+    }
+
+    @Test
+    fun searchUserSettingsByAdmin() {
+        val service = JournalSettingsServiceImpl(authoritiesSupport, repo, permService, journalPrefService, fileService)
+
+        setContext("admin")
+        repo.save(JournalSettingsEntity().apply {
+            extId = "id-1"
+            name = "name-1"
+            authority = "user1"
+            journalId = "journal-1"
+            settings = "{}"
+        })
+        repo.save(JournalSettingsEntity().apply {
+            extId = "id-2"
+            name = "name-2"
+            authority = "user1"
+            journalId = "journal-1"
+            settings = "{}"
+        })
+        repo.save(JournalSettingsEntity().apply {
+            extId = "id-3"
+            name = "name-3"
+            authority = "user2"
+            journalId = "journal-1"
+            settings = "{}"
+        })
+        repo.save(JournalSettingsEntity().apply {
+            extId = "id-4"
+            name = "name-4"
+            authority = "user1"
+            journalId = "journal-2"
+            settings = "{}"
+        })
+        repo.save(JournalSettingsEntity().apply {
+            extId = "id-5"
+            name = "name-5"
+            authority = "GROUP_all"
+            journalId = "journal-1"
+            settings = "{}"
+        })
+        repo.save(JournalSettingsEntity().apply {
+            extId = "id-6"
+            name = "name-6"
+            authority = "admin"
+            journalId = "journal-1"
+            settings = "{}"
+        })
+        clearContext()
+
+        setContext("admin")
+        val foundResult1 = service.searchSettings("journal-1")
+        assertEquals(5, foundResult1.size)
+        assertTrue(foundResult1.stream().anyMatch({ it.id == "id-1" }))
+        assertTrue(foundResult1.stream().anyMatch({ it.id == "id-2" }))
+        assertTrue(foundResult1.stream().anyMatch({ it.id == "id-3" }))
+        assertTrue(foundResult1.stream().anyMatch({ it.id == "id-5" }))
+        assertTrue(foundResult1.stream().anyMatch({ it.id == "id-6" }))
+        clearContext()
+
+        setContext("admin")
+        val foundResult2 = service.searchSettings("journal-2")
+        assertEquals(1, foundResult2.size)
+        assertTrue(foundResult2.stream().anyMatch({ it.id == "id-4" }))
+        clearContext()
+
+        setContext("anotherAdmin")
+        val foundResult3 = service.searchSettings("journal-1")
+        assertEquals(4, foundResult3.size)
+        assertTrue(foundResult3.stream().anyMatch({ it.id == "id-1" }))
+        assertTrue(foundResult3.stream().anyMatch({ it.id == "id-2" }))
+        assertTrue(foundResult3.stream().anyMatch({ it.id == "id-3" }))
+        assertTrue(foundResult3.stream().anyMatch({ it.id == "id-5" }))
+        clearContext()
+
+        setContext("anotherAdmin")
+        val foundResult4 = service.searchSettings("journal-2")
+        assertEquals(1, foundResult4.size)
+        assertTrue(foundResult4.stream().anyMatch({ it.id == "id-4" }))
         clearContext()
     }
 
@@ -604,6 +691,15 @@ internal class JournalSettingsServiceImplTest {
                     SimpleGrantedAuthority("ROLE_USER")
             )
             val user = User("admin", "admin", authorities)
+            return Pair(user, authorities)
+        } else if (username == "anotherAdmin") {
+            val authorities = listOf<GrantedAuthority>(
+                SimpleGrantedAuthority("anotherAdmin"),
+                SimpleGrantedAuthority("GROUP_all"),
+                SimpleGrantedAuthority("ROLE_ADMIN"),
+                SimpleGrantedAuthority("ROLE_USER")
+            )
+            val user = User("anotherAdmin", "anotherAdmin", authorities)
             return Pair(user, authorities)
         } else if (username == "user1") {
             val authorities = listOf<GrantedAuthority>(

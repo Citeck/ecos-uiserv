@@ -23,13 +23,13 @@ import java.nio.charset.StandardCharsets
 
 @Component
 class JournalSettingsRecordsDao(
-        private val journalSettingsService: JournalSettingsService,
-        private val permService: JournalSettingsPermissionsService
+    private val journalSettingsService: JournalSettingsService,
+    private val permService: JournalSettingsPermissionsService
 ) : AbstractRecordsDao(),
-        RecordsQueryDao,
-        RecordAttsDao,
-        RecordMutateDtoDao<JournalSettingsRecordsDao.JournalSettingsRecord>,
-        RecordDeleteDao {
+    RecordsQueryDao,
+    RecordAttsDao,
+    RecordMutateDtoDao<JournalSettingsRecordsDao.JournalSettingsRecord>,
+    RecordDeleteDao {
 
     @Override
     override fun getId(): String = "journal-settings"
@@ -76,16 +76,15 @@ class JournalSettingsRecordsDao(
         }
     }
 
-    inner class JournalSettingsRecord(
-            private val base: JournalSettingsDto
-    ) : JournalSettingsDto.Builder(base) {
-        fun getModuleId(): String? {
-            return base.id
+    inner class JournalSettingsRecord(other: JournalSettingsDto) : JournalSettingsDto.Builder(other) {
+
+        fun getModuleId(): String {
+            return id
         }
 
         @AttName("?disp")
         fun getDisplayName(): MLText {
-            return base.name
+            return name
         }
 
         @JsonValue
@@ -99,18 +98,18 @@ class JournalSettingsRecordsDao(
         }
 
         fun getPermissions(): SettingsPermissions {
-            return SettingsPermissions(base)
+            return SettingsPermissions(this)
         }
     }
 
     inner class SettingsPermissions constructor(
-            private val dto: JournalSettingsDto
+        private val record: JournalSettingsRecord
     ) : AttValue {
         override fun has(name: String): Boolean {
             return if ("Write" == name) {
-                permService.canWrite(dto)
+                permService.canWrite(record.build())
             } else if ("Read" == name) {
-                permService.canRead(dto)
+                permService.canRead(record.build())
             } else {
                 false
             }
@@ -118,6 +117,6 @@ class JournalSettingsRecordsDao(
     }
 
     data class RequestPredicate(
-            val journalId: String?
+        val journalId: String?
     )
 }

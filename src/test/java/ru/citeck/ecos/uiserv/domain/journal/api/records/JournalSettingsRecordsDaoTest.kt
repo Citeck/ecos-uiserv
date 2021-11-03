@@ -73,6 +73,8 @@ internal class JournalSettingsRecordsDaoTest {
         for (file in files) {
             fileService.delete(FileType.JOURNALPREFS, file.fileId)
         }
+
+        clearContext()
     }
 
     @After
@@ -84,6 +86,8 @@ internal class JournalSettingsRecordsDaoTest {
         for (file in files) {
             fileService.delete(FileType.JOURNALPREFS, file.fileId)
         }
+
+        clearContext()
     }
 
     @Test
@@ -507,6 +511,45 @@ internal class JournalSettingsRecordsDaoTest {
         assertEquals("journal1", check3?.journalId)
         assertEquals("{}", check3?.settings)
         assertEquals("admin", check3?.createdBy)
+        clearContext()
+    }
+
+    @Test
+    fun mutateMl() {
+        //create record by admin for GROUP_all
+        setContext("admin")
+        recordsService.mutate(RecordAtts(
+                RecordRef.create("uiserv", "journal-settings", "id1"),
+                ObjectData.create()
+                        .set("name?json", ObjectData.create()
+                                .set("ru", "123")
+                                .set("en", "321"))
+                        .set("authority", "GROUP_all")
+                        .set("journalId", "journal1")
+                        .set("settings", "{}")
+        ))
+        val check1 = repo.findByExtId("id1")
+        assertNotNull(check1)
+        assertEquals("id1", check1?.extId)
+        assertEquals("{\"ru\":\"123\",\"en\":\"321\"}", check1?.name)
+        assertEquals("GROUP_all", check1?.authority)
+        assertEquals("journal1", check1?.journalId)
+        assertEquals("{}", check1?.settings)
+        assertEquals("admin", check1?.createdBy)
+
+        recordsService.mutate(RecordAtts(
+                RecordRef.create("uiserv", "journal-settings", "id1"),
+                ObjectData.create()
+                        .set("name", "{\"ru\":\"some\",\"en\":\"body\"}")
+        ))
+        val check2 = repo.findByExtId("id1")
+        assertNotNull(check2)
+        assertEquals("id1", check2?.extId)
+        assertEquals("{\"ru\":\"some\",\"en\":\"body\"}", check2?.name)
+        assertEquals("GROUP_all", check2?.authority)
+        assertEquals("journal1", check2?.journalId)
+        assertEquals("{}", check2?.settings)
+        assertEquals("admin", check2?.createdBy)
         clearContext()
     }
 
