@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.core.task.AsyncTaskExecutor
-import ru.citeck.ecos.model.lib.type.dto.TypeModelDef
+import ru.citeck.ecos.model.lib.type.dto.TypeInfo
 import ru.citeck.ecos.model.lib.type.repo.TypesRepo
 import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
 import ru.citeck.ecos.records2.RecordRef
@@ -118,16 +118,15 @@ class EcosTypesConfig(
 
         return object : TypesRepo {
 
-            override fun getModel(typeRef: RecordRef): TypeModelDef {
-                return typesDao.getRecord(typeRef.id).orElse(null)?.model ?: return TypeModelDef.EMPTY
-            }
-
-            override fun getParent(typeRef: RecordRef): RecordRef {
-                return typesDao.getRecord(typeRef.id).orElse(null)?.parentRef ?: RecordRef.EMPTY
-            }
-
             override fun getChildren(typeRef: RecordRef): List<RecordRef> {
                 return childrenByType[typeRef] ?: emptyList()
+            }
+
+            override fun getTypeInfo(typeRef: RecordRef): TypeInfo? {
+                return TypeInfo.create {
+                    withModel(typesDao.getRecord(typeRef.id).orElse(null)?.model)
+                    withParentRef(typesDao.getRecord(typeRef.id).orElse(null)?.parentRef)
+                }
             }
         }
     }
