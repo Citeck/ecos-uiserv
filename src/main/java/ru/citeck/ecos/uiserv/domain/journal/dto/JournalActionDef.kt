@@ -27,6 +27,10 @@ data class JournalActionDef(
 
     val features: Map<String, Boolean>,
 
+    val execForRecordsBatchSize: Int,
+    val execForRecordsParallelBatchesCount: Int,
+    val timeoutErrorMessage: MLText,
+
     val predicate: Predicate
 ) {
 
@@ -68,6 +72,9 @@ data class JournalActionDef(
         var type: String = ""
         var config: ObjectData = ObjectData.create()
         var features: Map<String, Boolean> = emptyMap()
+        var execForRecordsBatchSize: Int = 1
+        var execForRecordsParallelBatchesCount: Int = 1
+        var timeoutErrorMessage: MLText = MLText.EMPTY
         var predicate: Predicate = VoidPredicate.INSTANCE
 
         constructor(base: JournalActionDef) : this() {
@@ -80,12 +87,15 @@ data class JournalActionDef(
             this.type = base.type
             this.config = ObjectData.deepCopyOrNew(base.config)
             this.features = base.features
+            this.execForRecordsBatchSize = base.execForRecordsBatchSize
+            this.execForRecordsParallelBatchesCount = base.execForRecordsParallelBatchesCount
+            this.timeoutErrorMessage = base.timeoutErrorMessage
             this.predicate = Json.mapper.copy(base.predicate) ?: VoidPredicate.INSTANCE
         }
 
         fun withConfigMap(map: Map<String, String>) {
             val obj = ObjectData.create();
-            map.forEach { (k, v) -> obj.set(k, v)}
+            map.forEach { (k, v) -> obj.set(k, v) }
             withConfig(obj);
         }
 
@@ -134,6 +144,21 @@ data class JournalActionDef(
             return this
         }
 
+        fun withExecForRecordsBatchSize(execForRecordsBatchSize: Int?): Builder {
+            this.execForRecordsBatchSize = execForRecordsBatchSize ?: 1
+            return this
+        }
+
+        fun withExecForRecordsParallelBatchesCount(execForRecordsParallelBatchesCount: Int?): Builder {
+            this.execForRecordsParallelBatchesCount = execForRecordsParallelBatchesCount ?: 1
+            return this
+        }
+
+        fun withTimeoutErrorMessage(timeoutErrorMessage: MLText?): Builder {
+            this.timeoutErrorMessage = timeoutErrorMessage ?: MLText.EMPTY
+            return this
+        }
+
         fun withPredicate(predicate: Predicate?): Builder {
             this.predicate = predicate ?: VoidPredicate.INSTANCE
             return this
@@ -150,6 +175,9 @@ data class JournalActionDef(
                 type,
                 config,
                 features,
+                execForRecordsBatchSize,
+                execForRecordsParallelBatchesCount,
+                timeoutErrorMessage,
                 predicate
             )
         }
