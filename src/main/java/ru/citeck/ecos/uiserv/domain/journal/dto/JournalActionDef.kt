@@ -72,7 +72,7 @@ data class JournalActionDef(
         var type: String = ""
         var config: ObjectData = ObjectData.create()
         var features: Map<String, Boolean> = emptyMap()
-        var execForRecordsBatchSize: Int = 1
+        var execForRecordsBatchSize: Int = 0
         var execForRecordsParallelBatchesCount: Int = 1
         var timeoutErrorMessage: MLText = MLText.EMPTY
         var predicate: Predicate = VoidPredicate.INSTANCE
@@ -145,7 +145,7 @@ data class JournalActionDef(
         }
 
         fun withExecForRecordsBatchSize(execForRecordsBatchSize: Int?): Builder {
-            this.execForRecordsBatchSize = execForRecordsBatchSize ?: 1
+            this.execForRecordsBatchSize = execForRecordsBatchSize ?: 0
             return this
         }
 
