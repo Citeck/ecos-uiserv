@@ -564,13 +564,7 @@
                           "en": ""
                         },
                         "configMap": {},
-                        "preActionModule": "",
-                        "execForRecordsBatchSize": 0,
-                        "execForRecordsParallelBatchesCount": 1,
-                        "timeoutErrorMessage": {
-                          "ru": "",
-                          "en": ""
-                        }
+                        "preActionModule": ""
                       }
                     ],
                     "validate": {
@@ -604,51 +598,6 @@
                               "en": "Name"
                             },
                             "key": "name",
-                            "type": "mlText",
-                            "input": true
-                          },
-                          {
-                            "label": {
-                              "ru": "Размер батча",
-                              "en": "Batch size"
-                            },
-                            "key": "execForRecordsBatchSize",
-                            "validate": {
-                              "integer": false
-                            },
-                            "clearOnHide": false,
-                            "isBigNumber": false,
-                            "delimiterValue": " ",
-                            "refreshOn": [],
-                            "defaultValue": 0,
-                            "type": "number",
-                            "input": true
-                          },
-                          {
-                            "label": {
-                              "ru": "Количество параллельных батчей",
-                              "en": "Parallel batches count"
-                            },
-                            "key": "execForRecordsParallelBatchesCount",
-                            "validate": {
-                              "integer": false
-                            },
-                            "clearOnHide": false,
-                            "isBigNumber": false,
-                            "delimiterValue": " ",
-                            "refreshOn": [],
-                            "defaultValue": 1,
-                            "type": "number",
-                            "input": true
-                          },
-                          {
-                            "label": {
-                              "ru": "Сообщение при ошибке timeout",
-                              "en": "Timeout error message"
-                            },
-                            "key": "timeoutErrorMessage",
-                            "clearOnHide": false,
-                            "refreshOn": [],
                             "type": "mlText",
                             "input": true
                           }

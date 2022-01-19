@@ -37,10 +37,6 @@ public class ActionDto {
     private Predicate predicate;
     private RecordEvaluatorDto evaluator;
 
-    private int execForRecordsBatchSize;
-    private int execForRecordsParallelBatchesCount;
-    private MLText timeoutErrorMessage;
-
     private Map<String, Boolean> features = new HashMap<>();
 
     public ActionDto() {
@@ -59,9 +55,6 @@ public class ActionDto {
         this.evaluator = other.evaluator;
         this.typeRef = other.typeRef;
         this.preActionModule = other.preActionModule;
-        this.execForRecordsBatchSize = other.execForRecordsBatchSize;
-        this.execForRecordsParallelBatchesCount = other.execForRecordsParallelBatchesCount;
-        this.timeoutErrorMessage = other.timeoutErrorMessage;
 
         this.config = ObjectData.deepCopy(other.config);
         this.features = DataValue.create(features).asMap(String.class, Boolean.class);
@@ -161,30 +154,6 @@ public class ActionDto {
 
     public void setEvaluator(RecordEvaluatorDto evaluator) {
         this.evaluator = evaluator;
-    }
-
-    public int getExecForRecordsBatchSize() {
-        return execForRecordsBatchSize;
-    }
-
-    public void setExecForRecordsBatchSize(int execForRecordsBatchSize) {
-        this.execForRecordsBatchSize = execForRecordsBatchSize;
-    }
-
-    public int getExecForRecordsParallelBatchesCount() {
-        return execForRecordsParallelBatchesCount;
-    }
-
-    public void setExecForRecordsParallelBatchesCount(int execForRecordsParallelBatchesCount) {
-        this.execForRecordsParallelBatchesCount = execForRecordsParallelBatchesCount;
-    }
-
-    public MLText getTimeoutErrorMessage() {
-        return timeoutErrorMessage;
-    }
-
-    public void setTimeoutErrorMessage(MLText timeoutErrorMessage) {
-        this.timeoutErrorMessage = timeoutErrorMessage;
     }
 
     public Map<String, Boolean> getFeatures() {
