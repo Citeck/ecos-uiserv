@@ -5,6 +5,8 @@ import ecos.com.fasterxml.jackson210.databind.JsonNode;
 import lombok.Data;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.json.YamlUtils;
+import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils;
+import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
@@ -43,5 +45,9 @@ public class BoardRecord {
 
     public byte[] getData() {
         return YamlUtils.toNonDefaultString(toNonDefaultJson()).getBytes(StandardCharsets.UTF_8);
+    }
+
+    public RecordRef getEcosType() {
+        return TypeUtils.getTypeRef("board");
     }
 }

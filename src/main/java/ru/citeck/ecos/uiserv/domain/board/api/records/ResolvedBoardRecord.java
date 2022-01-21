@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.model.lib.status.dto.StatusDef;
+import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef;
@@ -95,5 +96,9 @@ public class ResolvedBoardRecord {
             return RecordRef.create(boardDef.getCardFormRef().getAppName(), ID, boardDef.getCardFormRef().getId());
         }
         return RecordRef.valueOf("uiserv/form@board-card-default");
+    }
+
+    public RecordRef getEcosType() {
+        return TypeUtils.getTypeRef("board");
     }
 }
