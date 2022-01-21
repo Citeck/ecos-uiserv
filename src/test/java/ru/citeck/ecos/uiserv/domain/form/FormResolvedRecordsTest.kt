@@ -33,6 +33,7 @@ class FormResolvedRecordsTest : FormsTestBase() {
             RecordRef.EMPTY,
             RecordRef.EMPTY,
             RecordRef.EMPTY,
+            RecordRef.EMPTY,
             "",
             emptyList(),
             "",

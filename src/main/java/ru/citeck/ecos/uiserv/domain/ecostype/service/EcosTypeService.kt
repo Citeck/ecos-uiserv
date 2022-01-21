@@ -21,6 +21,14 @@ class EcosTypeService(
         return typesConfig.getTypeRefByForm(ref)
     }
 
+    fun getTypeRefByBoard(boardId: String?): RecordRef {
+        if (boardId.isNullOrBlank()) {
+            return RecordRef.EMPTY
+        }
+        val ref = RecordRef.create("uiserv", "board", boardId);
+        return typesConfig.getTypeRefByBoard(ref)
+    }
+
     fun getTypeRefByJournal(journalRef: RecordRef?): RecordRef {
         if (journalRef == null || RecordRef.isEmpty(journalRef)) {
             return RecordRef.EMPTY

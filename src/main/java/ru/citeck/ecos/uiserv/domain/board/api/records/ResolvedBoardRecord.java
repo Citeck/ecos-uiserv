@@ -43,30 +43,48 @@ public class ResolvedBoardRecord {
     }
 
     public List<BoardColumnDef> getColumns() {
-        if (boardDef != null) {
-            if (!CollectionUtils.isEmpty(boardDef.getColumns())) {
-                return Collections.unmodifiableList(boardDef.getColumns());
+        if (boardDef == null) {
+            return Collections.emptyList();
+        }
+        if (!CollectionUtils.isEmpty(boardDef.getColumns())) {
+            return Collections.unmodifiableList(boardDef.getColumns());
+        }
+        EcosTypeInfo typeInfo = typeService.getTypeInfo(boardDef.getTypeRef());
+        if (typeInfo != null && typeInfo.getModel() != null) {
+            List<BoardColumnDef> columns = new ArrayList<>();
+            for (StatusDef statusDef : typeInfo.getModel().getStatuses()) {
+                columns.add(new BoardColumnDef(statusDef.getId(), statusDef.getName()));
             }
-            if (typeService != null) {
-                EcosTypeInfo typeInfo = typeService.getTypeInfo(boardDef.getTypeRef());
-                if (typeInfo != null && typeInfo.getModel() != null) {
-                    List<BoardColumnDef> columns = new ArrayList<>();
-                    for (StatusDef statusDef : typeInfo.getModel().getStatuses()) {
-                        columns.add(new BoardColumnDef(statusDef.getId(), statusDef.getName()));
-                    }
-                    return columns;
-                }
-            }
+            return columns;
         }
         return new ArrayList<>();
     }
 
     public RecordRef getTypeRef() {
 
-        if (boardDef != null && boardDef.getTypeRef() != null
-                && !StringUtils.isBlank(boardDef.getTypeRef().getId())) {
+        if (boardDef == null) {
+            return RecordRef.EMPTY;
+        }
+        if (RecordRef.isNotEmpty(boardDef.getTypeRef())) {
+            return boardDef.getTypeRef();
+        }
+        return typeService.getTypeRefByBoard(boardDef.getId());
+    }
 
-            return RecordRef.create(boardDef.getTypeRef().getAppName(), ID, boardDef.getTypeRef().getId());
+    public RecordRef getJournalRef() {
+
+        if (boardDef == null) {
+            return RecordRef.EMPTY;
+        }
+        if (RecordRef.isNotEmpty(boardDef.getJournalRef())) {
+            return boardDef.getJournalRef();
+        }
+        RecordRef typeRef = getTypeRef();
+        if (RecordRef.isNotEmpty(typeRef)) {
+            EcosTypeInfo typeInfo = typeService.getTypeInfo(typeRef);
+            if (typeInfo != null) {
+                return typeInfo.getJournalRef();
+            }
         }
         return RecordRef.EMPTY;
     }

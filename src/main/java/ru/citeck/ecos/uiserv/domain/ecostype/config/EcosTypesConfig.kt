@@ -33,6 +33,9 @@ class EcosTypesConfig(
     private val typeByForm = ConcurrentHashMap<RecordRef, RecordRef>()
     private val formByType = ConcurrentHashMap<RecordRef, RecordRef>()
 
+    private val typeByBoard = ConcurrentHashMap<RecordRef, RecordRef>()
+    private val boardByType = ConcurrentHashMap<RecordRef, RecordRef>()
+
     private var typesSyncStarted = false
 
     @Value("\${uiserv.ecos-types-sync.active}")
@@ -69,6 +72,7 @@ class EcosTypesConfig(
 
         updateRefs(journalByType, typeByJournal, typeRef, type.journalRef)
         updateRefs(formByType, typeByForm, typeRef, type.formRef)
+        updateRefs(boardByType, typeByBoard, typeRef, type.boardRef)
     }
 
     private fun updateRefs(
@@ -105,6 +109,10 @@ class EcosTypesConfig(
 
     fun getTypeRefByForm(formRef: RecordRef): RecordRef {
         return typeByForm[formRef] ?: RecordRef.EMPTY
+    }
+
+    fun getTypeRefByBoard(boardRef: RecordRef): RecordRef {
+        return typeByBoard[boardRef] ?: RecordRef.EMPTY
     }
 
     fun getTypeInfo(typeRef: RecordRef): EcosTypeInfo? {
