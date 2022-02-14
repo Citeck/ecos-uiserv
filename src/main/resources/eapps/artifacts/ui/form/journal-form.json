@@ -7,7 +7,7 @@
   "description": {},
   "customModule": null,
   "typeRef": "emodel/type@journal",
-  "width": "default",
+  "width": "lg",
   "i18n": {
     "ru": {
       "Load columns": "Загрузить колонки",
@@ -127,8 +127,30 @@
                               "ru": "Идентификатор журнала",
                               "en": "Journal ID"
                             },
-                            "defaultValue": "",
                             "key": "localId",
+                            "defaultValue": "",
+                            "refreshOn": [],
+                            "logic": [
+                              {
+                                "name": "disabled",
+                                "trigger": {
+                                  "type": "javascript",
+                                  "javascript": "result = _.get(instance, 'root.options.formMode') !== 'CREATE';"
+                                },
+                                "actions": [
+                                  {
+                                    "name": "setDisabled",
+                                    "type": "property",
+                                    "property": {
+                                      "label": "Disabled",
+                                      "value": "disabled",
+                                      "type": "boolean"
+                                    },
+                                    "state": "true"
+                                  }
+                                ]
+                              }
+                            ],
                             "type": "textfield",
                             "input": true
                           },
