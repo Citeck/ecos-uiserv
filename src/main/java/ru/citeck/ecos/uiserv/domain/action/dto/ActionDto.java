@@ -64,7 +64,7 @@ public class ActionDto {
         this.timeoutErrorMessage = other.timeoutErrorMessage;
 
         this.config = ObjectData.deepCopy(other.config);
-        this.features = DataValue.create(features).asMap(String.class, Boolean.class);
+        this.features = DataValue.create(other.features).asMap(String.class, Boolean.class);
     }
 
     public String getId() {
