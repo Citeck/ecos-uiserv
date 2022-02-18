@@ -52,6 +52,6 @@ public class ActionDto {
 
         this.config = ObjectData.deepCopy(other.config);
         this.attributes = ObjectData.deepCopy(other.attributes);
-        this.features = DataValue.create(features).asMap(String.class, Boolean.class);
+        this.features = DataValue.create(other.features).asMap(String.class, Boolean.class);
     }
 }
