@@ -63,7 +63,7 @@ class EcosResolvedFormRecordsDao(
     ) {
         fun getDefinition(): ObjectData {
             val definition: ObjectData = form.definition
-            val attributes = typeInfo?.model?.attributes?.associateBy { it.id } ?: emptyMap()
+            val attributes = typeInfo?.model?.getAllAttributes()?.associateBy { it.id } ?: emptyMap()
             val mappedDef = FormDefUtils.mapComponents(definition.getData().copy(), { true }) {
                 mapComponent(it, attributes)
             }

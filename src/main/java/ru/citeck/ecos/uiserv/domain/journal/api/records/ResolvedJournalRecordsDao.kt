@@ -209,7 +209,7 @@ class ResolvedJournalRecordsDao(
                                     typeInfo: EcosTypeInfo?): List<ResolvedColumnDef> {
 
         val typeAtts: Map<String, AttributeDef> =
-            typeInfo?.model?.attributes?.associate { it.id to it } ?: emptyMap()
+            typeInfo?.model?.getAllAttributes()?.associate { it.id to it } ?: emptyMap()
 
         val attributeEdges = HashMap<String, String>()
         val columnIdxByName = HashMap<String, Int>()
