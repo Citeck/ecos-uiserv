@@ -9,13 +9,14 @@ system: true
 sourceId: uiserv/board
 
 journalRef: uiserv/journal@ecos-boards
+formRef: uiserv/form@kanban-board-config
 
 defaultCreateVariant: false
 
 createVariants:
 
-  #- id: create-new-board
-  #  name: { ru: Создать конфигурацию канбан доски, en: Create kanban board config }
+  - id: create-new-board
+    name: { ru: Создать конфигурацию канбан доски, en: Create kanban board config }
 
   - id: upload-board
     name: { ru: Загрузить конфигурацию канбан доски, en: Upload kanban board config }
