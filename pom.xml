@@ -9,7 +9,7 @@
     <parent>
         <groupId>ru.citeck.ecos</groupId>
         <artifactId>ecos-micro-base</artifactId>
-        <version>3.42.1</version>
+        <version>3.43.0</version>
     </parent>
     <repositories>
         <repository>
@@ -374,8 +374,29 @@
         </dependency>
 
         <dependency>
+            <groupId>ru.citeck.ecos.config</groupId>
+            <artifactId>ecos-config-spring</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>ru.citeck.ecos.rabbitmq</groupId>
             <artifactId>ecos-rabbitmq-spring</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.citeck.ecos.zookeeper</groupId>
+            <artifactId>ecos-zookeeper-spring</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.citeck.ecos</groupId>
+            <artifactId>ecos-curator-framework</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.citeck.ecos</groupId>
+            <artifactId>ecos-curator-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

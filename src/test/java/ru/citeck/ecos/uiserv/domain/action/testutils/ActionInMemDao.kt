@@ -4,6 +4,7 @@ import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.PredicateUtils
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.ValuePredicate
+import ru.citeck.ecos.records2.predicate.model.VoidPredicate
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
 import ru.citeck.ecos.uiserv.domain.action.dao.ActionDao
 import ru.citeck.ecos.uiserv.domain.action.repo.ActionEntity
@@ -20,7 +21,7 @@ class ActionInMemDao(private val predicateService: PredicateService) : ActionDao
             } else {
                 it
             }
-        }
+        } ?: VoidPredicate.INSTANCE
 
         val actions = predicateService.filter(data.values, mappedFilter)
         if (skip >= actions.size || max == 0) {

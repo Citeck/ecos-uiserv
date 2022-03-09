@@ -4,6 +4,7 @@ import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.PredicateUtils
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.ValuePredicate
+import ru.citeck.ecos.records2.predicate.model.VoidPredicate
 import ru.citeck.ecos.uiserv.domain.form.repo.EcosFormEntity
 import ru.citeck.ecos.uiserv.domain.form.service.FormsEntityDao
 
@@ -36,7 +37,7 @@ class FormsEntityInMemDao(
             } else {
                 it
             }
-        }
+        } ?: VoidPredicate.INSTANCE
         val fixedMax = if (max < 0) {
             1000
         } else {
