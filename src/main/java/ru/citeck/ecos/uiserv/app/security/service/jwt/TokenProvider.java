@@ -20,6 +20,7 @@ import io.github.jhipster.config.JHipsterProperties;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import ru.citeck.ecos.context.lib.auth.data.TokenAuthData;
 
 @Component
 public class TokenProvider {
@@ -95,6 +96,19 @@ public class TokenProvider {
         User principal = new User(claims.getSubject(), "", authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+    }
+
+    public TokenAuthData getAuthData(String token) {
+
+        Claims claims = Jwts.parser()
+            .setSigningKey(key)
+            .parseClaimsJws(token)
+            .getBody();
+
+        List<String> authorities = Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+            .collect(Collectors.toList());
+
+        return new TokenAuthData(claims.getSubject(), authorities, token);
     }
 
     public boolean validateToken(String authToken) {
