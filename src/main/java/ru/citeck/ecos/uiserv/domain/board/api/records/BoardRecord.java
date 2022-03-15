@@ -47,7 +47,7 @@ public class BoardRecord {
         return YamlUtils.toNonDefaultString(toNonDefaultJson()).getBytes(StandardCharsets.UTF_8);
     }
 
-    public RecordRef getEcosType() {
-        return TypeUtils.getTypeRef("board");
+    public String getEcosType() {
+        return "board";
     }
 }

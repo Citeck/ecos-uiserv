@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.json.YamlUtils;
+import ru.citeck.ecos.events2.type.RecordEventsService;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
@@ -28,9 +29,9 @@ import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.domain.i18n.dto.I18nDto;
 import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService;
 
+import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,14 @@ public class I18nRecords extends LocalRecordsDao implements LocalRecordsQueryWit
     MutableRecordsLocalDao<I18nRecords.I18nRecord> {
 
     private final I18nService i18nService;
+    private final RecordEventsService recordEventsService;
+
+    @PostConstruct
+    public void init() {
+        i18nService.addListener((before, after) ->
+            recordEventsService.emitRecChanged(before, after, getId(), I18nRecord::new)
+        );
+    }
 
     @Override
     public RecordsQueryResult<I18nRecord> queryLocalRecords(@NotNull RecordsQuery recordsQuery,
@@ -166,9 +175,8 @@ public class I18nRecords extends LocalRecordsDao implements LocalRecordsQueryWit
             setId(value);
         }
 
-        @AttName(".type")
-        public RecordRef getEcosType() {
-            return RecordRef.valueOf("emodel/type@i18n");
+        public String getEcosType() {
+            return "i18n";
         }
 
         @JsonIgnore

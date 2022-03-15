@@ -8,7 +8,7 @@ import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 public interface BoardService {
 
@@ -26,7 +26,7 @@ public interface BoardService {
 
     List<BoardWithMeta> getAll(int maxItems, int skipCount, Predicate predicate, Sort sort);
 
-    void onBoardChanged(Consumer<BoardDef> listener);
+    void onBoardChanged(BiConsumer<BoardDef, BoardDef> listener);
 
     List<BoardWithMeta> getBoardsForJournal(RecordRef journalRef);
 

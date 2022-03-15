@@ -98,7 +98,7 @@ public class ResolvedBoardRecord {
         return RecordRef.valueOf("uiserv/form@board-card-default");
     }
 
-    public RecordRef getEcosType() {
-        return TypeUtils.getTypeRef("board");
+    public String getEcosType() {
+        return "board";
     }
 }

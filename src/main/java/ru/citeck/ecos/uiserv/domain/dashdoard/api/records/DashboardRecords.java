@@ -4,14 +4,16 @@ import ecos.com.fasterxml.jackson210.annotation.JsonIgnore;
 import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
 import ecos.com.fasterxml.jackson210.annotation.JsonValue;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.json.YamlUtils;
+import ru.citeck.ecos.events2.type.RecordEventsService;
+import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
@@ -26,12 +28,14 @@ import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
 
+import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DashboardRecords extends AbstractRecordsDao
     implements RecordsQueryDao,
                RecordMutateDtoDao<DashboardRecords.DashboardRecord>,
@@ -43,16 +47,18 @@ public class DashboardRecords extends AbstractRecordsDao
     public static final String ID = "dashboard";
 
     private final DashboardService dashboardService;
+    private final RecordEventsService recordEventsService;
+
+    @PostConstruct
+    public void init() {
+        dashboardService.addChangeListener((before, after) ->
+            recordEventsService.emitRecChanged(before, after, getId(), DashboardRecord::new));
+    }
 
     @NotNull
     @Override
     public String getId() {
         return ID;
-    }
-
-    @Autowired
-    public DashboardRecords(DashboardService dashboardService) {
-        this.dashboardService = dashboardService;
     }
 
     @NotNull
@@ -154,6 +160,10 @@ public class DashboardRecords extends AbstractRecordsDao
         public String getDisplayName() {
             String result = getId();
             return result != null ? result : "Dashboard";
+        }
+
+        public String getEcosType() {
+            return "dashboard";
         }
 
         @JsonProperty("_content")

@@ -5,12 +5,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
 import ecos.com.fasterxml.jackson210.annotation.JsonValue;
+import kotlin.Unit;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.json.YamlUtils;
+import ru.citeck.ecos.events2.type.RecordEventsService;
+import ru.citeck.ecos.model.lib.type.repo.TypesRepo;
+import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils;
 import ru.citeck.ecos.records2.QueryContext;
 import ru.citeck.ecos.records2.RecordMeta;
 import ru.citeck.ecos.records2.RecordRef;
@@ -35,6 +39,7 @@ import ru.citeck.ecos.records3.record.request.RequestContext;
 import ru.citeck.ecos.uiserv.domain.action.service.ActionService;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto;
 
+import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -54,12 +59,25 @@ public class ActionRecords extends LocalRecordsDao
 
     private final RecordsService recordsService;
     private final ActionService actionService;
+    private RecordEventsService recordEventsService;
+    private TypesRepo typesRepo;
 
     @Autowired
-    public ActionRecords(RecordsService recordsService, ActionService actionService) {
+    public ActionRecords(RecordsService recordsService, ActionService actionService, TypesRepo typesRepo) {
         setId(ID);
         this.recordsService = recordsService;
         this.actionService = actionService;
+        this.typesRepo = typesRepo;
+    }
+
+    @PostConstruct
+    public void init() {
+        actionService.onActionChanged((before, after) -> {
+            if (recordEventsService != null) {
+                recordEventsService.emitRecChanged(before, after, getId(), ActionRecord::new);
+            }
+            return Unit.INSTANCE;
+        });
     }
 
     @Override
@@ -304,6 +322,11 @@ public class ActionRecords extends LocalRecordsDao
         return filteredActions;
     }
 
+    @Autowired(required = false)
+    public void setRecordEventsService(RecordEventsService recordEventsService) {
+        this.recordEventsService = recordEventsService;
+    }
+
     @Data
     public static class RecordTypeMeta {
         @AttName("_type?id")
@@ -411,7 +434,7 @@ public class ActionRecords extends LocalRecordsDao
         }
     }
 
-    public static class ActionRecord extends ActionDto {
+    public class ActionRecord extends ActionDto {
 
         public ActionRecord(ActionDto model) {
             super(model);
@@ -428,15 +451,19 @@ public class ActionRecords extends LocalRecordsDao
             setId(value);
         }
 
-        @AttName(".disp")
+        @AttName("?disp")
         public String getDisplayName() {
             MLText mlName = getName();
             String name = mlName != null ? mlName.getClosestValue(QueryContext.getCurrent().getLocale()) : null;
             return StringUtils.defaultString(name, "Action");
         }
 
-        public String get_formKey() {
-            return "action_" + getType();
+        public RecordRef getEcosType() {
+            RecordRef typeRef = TypeUtils.getTypeRef("ui-action/" + this.getType());
+            if (typesRepo.getTypeInfo(typeRef) != null) {
+                return typeRef;
+            }
+            return TypeUtils.getTypeRef("ui-action");
         }
 
         @JsonProperty("_content")

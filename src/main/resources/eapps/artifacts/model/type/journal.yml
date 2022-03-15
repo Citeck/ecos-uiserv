@@ -21,3 +21,40 @@ createVariants:
   - id: upload-journal
     name: { ru: Загрузить журнал, en: Upload journal }
     formRef: uiserv/form@ecos-module-upload
+
+model:
+  attributes:
+    - id: name
+      type: MLTEXT
+    - id: actions
+      multiple: true
+    - id: sourceId
+    - id: metaRecord
+    - id: predicate
+      type: JSON
+    - id: queryData
+      type: JSON
+    - id: typeRef
+    - id: groupBy
+      multiple: true
+    - id: sortBy
+      type: JSON
+      multiple: true
+    - id: actionsFromType
+      type: BOOLEAN
+    - id: actionsDef
+      type: JSON
+      multiple: true
+    - id: editable
+      type: BOOLEAN
+    - id: computed
+      multiple: true
+      type: JSON
+    - id: properties
+      type: JSON
+    - id: columns
+      multiple: true
+      type: JSON
+  systemAttributes:
+    - id: system
+      type: BOOLEAN

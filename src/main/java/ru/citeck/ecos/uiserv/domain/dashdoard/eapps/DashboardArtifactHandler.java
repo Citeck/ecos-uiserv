@@ -34,7 +34,7 @@ public class DashboardArtifactHandler implements EcosArtifactHandler<DashboardDt
 
     @Override
     public void listenChanges(@NotNull Consumer<DashboardDto> consumer) {
-        dashboardService.addChangeListener(consumer);
+        dashboardService.addChangeListener((before, after) -> consumer.accept(after));
     }
 
     @NotNull

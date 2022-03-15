@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,8 @@ import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardEntity;
 import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardRepository;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -29,7 +32,7 @@ public class DashboardService {
     private final DashboardRepository repo;
     private final RecordsService recordsService;
 
-    private Consumer<DashboardDto> changeListener;
+    private final List<BiConsumer<DashboardDto, DashboardDto>> changeListeners = new CopyOnWriteArrayList<>();
 
     public List<DashboardDto> getAllDashboards() {
         return repo.findAll()
@@ -38,8 +41,8 @@ public class DashboardService {
             .collect(Collectors.toList());
     }
 
-    public void addChangeListener(Consumer<DashboardDto> changeListener) {
-        this.changeListener = changeListener;
+    public void addChangeListener(BiConsumer<DashboardDto, DashboardDto> changeListener) {
+        changeListeners.add(changeListener);
     }
 
     public Optional<DashboardDto> getDashboardById(String id) {
@@ -57,9 +60,18 @@ public class DashboardService {
 
     public DashboardDto saveDashboard(DashboardDto dashboard) {
         updateAuthority(dashboard);
-        DashboardEntity entity = mapToEntity(dashboard);
+
+        DashboardEntity entityBefore = findEntityForDto(dashboard);
+        DashboardDto valueBefore = Optional.ofNullable(entityBefore)
+            .map(this::mapToDto)
+            .orElse(null);
+
+        DashboardEntity entity = mapToEntity(dashboard, entityBefore);
         DashboardDto result = mapToDto(repo.save(entity));
-        changeListener.accept(result);
+
+        for (BiConsumer<DashboardDto, DashboardDto> listener : changeListeners) {
+            listener.accept(valueBefore, result);
+        }
         return result;
     }
 
@@ -202,10 +214,11 @@ public class DashboardService {
         return dto;
     }
 
-    private DashboardEntity mapToEntity(DashboardDto dto) {
+    @Nullable
+    private DashboardEntity findEntityForDto(DashboardDto dto) {
 
         Optional<DashboardEntity> optEntity;
-        String authority = StringUtils.isBlank(dto.getAuthority()) ? null : dto.getAuthority();
+        String authority = getAuthorityFromDto(dto);
         RecordRef recordRef = dto.getAppliedToRef();
 
         if (RecordRef.isNotEmpty(recordRef) && recordRef.getAppName().isEmpty()) {
@@ -230,9 +243,32 @@ public class DashboardService {
             }
         }
 
-        RecordRef finalRecordRef = recordRef;
+        return optEntity.orElse(null);
+    }
 
-        DashboardEntity entity = optEntity.orElseGet(() -> {
+    @Nullable
+    private String getAuthorityFromDto(DashboardDto dto) {
+        return StringUtils.isBlank(dto.getAuthority()) ? null : dto.getAuthority();
+    }
+
+    @Nullable
+    private RecordRef getAppliedToRefFromDto(DashboardDto dto) {
+        RecordRef recordRef = dto.getAppliedToRef();
+        if (RecordRef.isNotEmpty(recordRef) && recordRef.getAppName().isEmpty()) {
+            recordRef = recordRef.addAppName("alfresco");
+        }
+        return recordRef;
+    }
+
+    private DashboardEntity mapToEntity(DashboardDto dto) {
+        return mapToEntity(dto, findEntityForDto(dto));
+    }
+
+    private DashboardEntity mapToEntity(DashboardDto dto, @Nullable DashboardEntity entity) {
+
+        RecordRef appliedToRef = getAppliedToRefFromDto(dto);
+
+        if (entity == null) {
 
             DashboardEntity newDashboard = new DashboardEntity();
 
@@ -247,13 +283,13 @@ public class DashboardService {
             }
 
             newDashboard.setExtId(extId);
-            newDashboard.setAuthority(authority);
+            newDashboard.setAuthority(getAuthorityFromDto(dto));
             newDashboard.setTypeRef(RecordRef.toString(dto.getTypeRef()));
-            if (RecordRef.isNotEmpty(finalRecordRef)) {
-                newDashboard.setAppliedToRef(finalRecordRef.toString());
+            if (RecordRef.isNotEmpty(appliedToRef)) {
+                newDashboard.setAppliedToRef(RecordRef.toString(appliedToRef));
             }
-            return newDashboard;
-        });
+            entity = newDashboard;
+        }
 
         if (dto.getConfig() != null && dto.getConfig().size() > 0) {
             entity.setConfig(Json.getMapper().toBytes(dto.getConfig()));

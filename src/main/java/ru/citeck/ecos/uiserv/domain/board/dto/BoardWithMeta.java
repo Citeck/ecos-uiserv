@@ -40,6 +40,10 @@ public class BoardWithMeta {
         boardDef = new BoardDef(id);
     }
 
+    public BoardWithMeta(BoardDef other) {
+       this.boardDef = other;
+    }
+
     public BoardWithMeta(BoardWithMeta other) {
         this.boardDef = other.boardDef;
         this.modified = other.modified;

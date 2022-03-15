@@ -135,9 +135,8 @@ public class DevModuleRecords extends LocalRecordsDao implements LocalRecordsQue
             return id;
         }
 
-        @AttName(".type")
-        public RecordRef getEcosType() {
-            return RecordRef.valueOf("emodel/type@dev-module");
+        public String getEcosType() {
+            return "dev-module";
         }
     }
 }

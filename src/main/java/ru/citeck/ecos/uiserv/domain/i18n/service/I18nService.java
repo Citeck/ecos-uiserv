@@ -22,7 +22,9 @@ import ru.citeck.ecos.uiserv.domain.i18n.repo.I18nRepository;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +38,8 @@ public class I18nService implements MessageResolver {
 
     private final AtomicBoolean initialized = new AtomicBoolean();
     private String cacheKey;
+
+    private List<BiConsumer<I18nDto, I18nDto>> listeners = new CopyOnWriteArrayList<>();
 
     @Nullable
     public I18nDto getById(String id) {
@@ -111,8 +115,16 @@ public class I18nService implements MessageResolver {
             throw new IllegalArgumentException(error + ": " + Json.getMapper().toString(dto));
         }
 
+        I18nDto before = repo.findByTenantAndExtId("", dto.getId())
+            .map(this::toDto)
+            .orElse(null);
+
         I18nDto result = toDto(repo.save(toEntity(dto)));
         initialized.set(false);
+
+        for (BiConsumer<I18nDto, I18nDto> listener : listeners) {
+            listener.accept(before, result);
+        }
 
         return result;
     }
@@ -252,6 +264,10 @@ public class I18nService implements MessageResolver {
         }
 
         return spec;
+    }
+
+    public void addListener(BiConsumer<I18nDto, I18nDto> listener) {
+        listeners.add(listener);
     }
 
     public static class StrList extends ArrayList<String> {

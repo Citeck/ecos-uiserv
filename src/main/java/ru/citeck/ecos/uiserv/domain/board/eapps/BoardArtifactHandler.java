@@ -26,7 +26,7 @@ public class BoardArtifactHandler implements EcosArtifactHandler<BoardDef> {
 
     @Override
     public void listenChanges(@NotNull Consumer<BoardDef> consumer) {
-        service.onBoardChanged(consumer);
+        service.onBoardChanged((before, after) -> consumer.accept(after));
     }
 
     @NotNull

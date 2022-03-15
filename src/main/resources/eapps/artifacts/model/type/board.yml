@@ -20,3 +20,18 @@ createVariants:
   - id: upload-board
     name: { ru: Загрузить конфигурацию канбан доски, en: Upload kanban board config }
     formRef: uiserv/form@ecos-module-upload
+
+model:
+  attributes:
+    - id: typeRef
+    - id: journalRef
+    - id: cardFormRef
+    - id: readOnly
+      type: BOOLEAN
+    - id: name
+      type: MLTEXT
+    - id: actions
+      multiple: true
+    - id: columns
+      multiple: true
+      type: JSON

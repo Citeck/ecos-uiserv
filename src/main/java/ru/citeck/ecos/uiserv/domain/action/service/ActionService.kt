@@ -19,6 +19,8 @@ import ru.citeck.ecos.uiserv.domain.action.dto.RecordsActionsDto
 import ru.citeck.ecos.uiserv.domain.action.repo.ActionEntity
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.function.BiConsumer
 import java.util.function.Consumer
 
 @Service
@@ -32,7 +34,7 @@ class ActionService(
     }
 
     private val actionProviders: MutableMap<String, ActionsProvider> = ConcurrentHashMap()
-    private var changeListener: Consumer<ActionDto>? = null
+    private var changeListeners: MutableList<(ActionDto?, ActionDto) -> Unit> = CopyOnWriteArrayList()
 
     fun getAction(id: String): ActionDto? {
 
@@ -81,13 +83,20 @@ class ActionService(
     }
 
     fun updateAction(action: ActionDto) {
+
+        val before = actionDao.getAction(action.id)?.let { actionEntityMapper.toDto(it) }
+
         var actionEntity = actionEntityMapper.toEntity(action)
         actionEntity = actionDao.save(actionEntity)
-        changeListener?.accept(actionEntityMapper.toDto(actionEntity)!!)
+        val after = actionEntityMapper.toDto(actionEntity)!!
+
+        for (listener in changeListeners) {
+            listener(before, after)
+        }
     }
 
-    fun onActionChanged(listener: Consumer<ActionDto>?) {
-        changeListener = listener
+    fun onActionChanged(action: (ActionDto?, ActionDto) -> Unit) {
+        changeListeners.add(action)
     }
 
     fun deleteAction(id: String?) {

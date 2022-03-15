@@ -27,7 +27,7 @@ public class JournalArtifactHandler implements EcosArtifactHandler<JournalDef> {
 
     @Override
     public void listenChanges(@NotNull Consumer<JournalDef> consumer) {
-        journalService.onJournalChanged(consumer);
+        journalService.onJournalChanged((before, after) -> consumer.accept(after));
     }
 
     @NotNull

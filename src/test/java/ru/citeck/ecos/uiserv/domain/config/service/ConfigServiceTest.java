@@ -15,6 +15,7 @@ import ru.citeck.ecos.uiserv.app.test.config.TestConfigData;
 import ru.citeck.ecos.uiserv.domain.config.dto.ConfigDto;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,7 +31,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-@ActiveProfiles(profiles = "test-config-data")
+@ActiveProfiles(profiles = { "test-config-data", "test" })
 public class ConfigServiceTest {
 
     @Autowired

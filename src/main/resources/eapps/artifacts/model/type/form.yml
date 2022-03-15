@@ -8,6 +8,7 @@ sourceId: uiserv/form
 
 system: true
 
+formRef: uiserv/form@ECOS_FORM
 journalRef: uiserv/journal@ecos-forms
 
 createVariants:
@@ -18,3 +19,47 @@ createVariants:
   - id: upload-form
     name: { ru: Загрузить форму, en: Upload form }
     formRef: uiserv/form@ecos-module-upload
+
+model:
+  attributes:
+    - id: formKey
+      name:
+        en: Form key
+        ru: Ключ формы
+    - id: title
+      name:
+        en: Title
+        ru: Заголовок
+      type: MLTEXT
+    - id: description
+      name:
+        en: Description
+        ru: Описание
+      type: MLTEXT
+    - id: customModule
+      name:
+        en: Custom JS Module
+        ru: Кастомный JS модуль
+    - id: typeRef
+      name:
+        en: Type
+        ru: Тип
+    - id: width
+      name:
+        en: Ширина
+        ru: Width
+    - id: i18n
+      name:
+        en: Localization
+        ru: Локализация
+      type: JSON
+    - id: definition
+      name:
+        en: Form content
+        ru: Содержимое формы
+      type: JSON
+    - id: attributes
+      name:
+        en: Attributes
+        ru: Атрибуты
+      type: JSON

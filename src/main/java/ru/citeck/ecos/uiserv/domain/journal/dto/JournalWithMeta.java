@@ -31,6 +31,10 @@ public class JournalWithMeta {
         this.notExists = !exists;
     }
 
+    public JournalWithMeta(JournalDef def) {
+        this.journalDef = def;
+    }
+
     public JournalWithMeta(JournalWithMeta other) {
         this.journalDef = other.journalDef;
         this.modified = other.modified;

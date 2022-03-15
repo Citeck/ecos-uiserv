@@ -9,6 +9,7 @@ import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.commons.json.YamlUtils
+import ru.citeck.ecos.events2.type.RecordEventsService
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.model.Predicate
@@ -29,12 +30,14 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
 import java.nio.charset.StandardCharsets
 import java.util.*
+import javax.annotation.PostConstruct
 
 @Component
 @RequiredArgsConstructor
 class JournalRecordsDao(
     private val journalService: JournalService,
-    private val ecosTypeService: EcosTypeService
+    private val ecosTypeService: EcosTypeService,
+    private val recordEventsService: RecordEventsService
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordAttsDao,
@@ -43,6 +46,15 @@ class JournalRecordsDao(
 
     companion object {
         const val ID = "journal"
+    }
+
+    @PostConstruct
+    fun init() {
+        journalService.onJournalChanged { before, after ->
+            recordEventsService.emitRecChanged(before, after, getId()) {
+                JournalRecord(JournalWithMeta(it))
+            }
+        }
     }
 
     override fun getId() = ID

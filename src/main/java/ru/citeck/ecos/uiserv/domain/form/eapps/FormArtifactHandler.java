@@ -25,7 +25,7 @@ public class FormArtifactHandler implements EcosArtifactHandler<EcosFormModel> {
 
     @Override
     public void listenChanges(@NotNull Consumer<EcosFormModel> consumer) {
-        formService.addChangeListener(consumer);
+        formService.addChangeListener((before, after) -> consumer.accept(after));
     }
 
     @Override

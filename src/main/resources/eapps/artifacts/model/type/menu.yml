@@ -15,3 +15,16 @@ createVariants:
     name: { ru: Загрузить меню, en: Upload menu }
     recordRef: uiserv/menu@
     formRef: uiserv/form@ecos-module-upload
+
+model:
+  attributes:
+    - id: type
+    - id: authorities
+      multiple: true
+    - id: subMenu
+      type: JSON
+  systemAttributes:
+    - id: system
+      type: BOOLEAN
+    - id: version
+      type: NUMBER

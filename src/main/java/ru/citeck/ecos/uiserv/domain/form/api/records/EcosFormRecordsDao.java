@@ -1,17 +1,21 @@
 package ru.citeck.ecos.uiserv.domain.form.api.records;
 
+import kotlin.Unit;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.events2.type.RecordEventsService;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate;
+import ru.citeck.ecos.records3.record.atts.schema.resolver.AttSchemaResolver;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
 import ru.citeck.ecos.records3.record.dao.delete.RecordDeleteDao;
@@ -21,9 +25,11 @@ import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.QueryPage;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
+import ru.citeck.ecos.records3.record.request.RequestContext;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,9 +37,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class EcosFormRecordsDao extends AbstractRecordsDao
     implements RecordsQueryDao,
-               RecordMutateDtoDao<EcosFormRecord>,
-               RecordDeleteDao,
-               RecordAttsDao {
+    RecordMutateDtoDao<EcosFormRecord>,
+    RecordDeleteDao,
+    RecordAttsDao {
 
     public static final String ID = "form";
 
@@ -45,6 +51,16 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
     private static final Set<String> SYSTEM_FORMS = new HashSet<>(Arrays.asList(DEFAULT_FORM_ID, ECOS_FORM_ID));
 
     private final EcosFormService ecosFormService;
+    private RecordEventsService recordEventsService;
+
+    @PostConstruct
+    public void init() {
+        ecosFormService.addChangeListener((before, after) -> {
+            if (recordEventsService != null) {
+                recordEventsService.emitRecChanged(before, after, getId(), EcosFormRecord::new);
+            }
+        });
+    }
 
     @NotNull
     @Override
@@ -171,6 +187,11 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
             });
 
         return result;
+    }
+
+    @Autowired(required = false)
+    public void setRecordEventsService(RecordEventsService recordEventsService) {
+        this.recordEventsService = recordEventsService;
     }
 
     @Data

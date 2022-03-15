@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.core.task.AsyncTaskExecutor
+import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.model.lib.type.dto.TypeInfo
 import ru.citeck.ecos.model.lib.type.repo.TypesRepo
 import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
@@ -131,9 +132,13 @@ class EcosTypesConfig(
             }
 
             override fun getTypeInfo(typeRef: RecordRef): TypeInfo? {
+                val typeInfo = typesDao.getRecord(typeRef.id).orElse(null) ?: return null
                 return TypeInfo.create {
-                    withModel(typesDao.getRecord(typeRef.id).orElse(null)?.model)
-                    withParentRef(typesDao.getRecord(typeRef.id).orElse(null)?.parentRef)
+                    withId(typeInfo.id)
+                    withName(typeInfo.name ?: MLText.EMPTY)
+                    withSourceId(typeInfo.inhSourceId ?: "")
+                    withParentRef(typeInfo.parentRef)
+                    withModel(typeInfo.model)
                 }
             }
         }

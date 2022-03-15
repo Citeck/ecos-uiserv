@@ -14,3 +14,32 @@ createVariants:
   - id: upload-action
     name: { ru: Загрузить действие, en: Upload action }
     formRef: uiserv/form@ecos-module-upload
+
+model:
+  attributes:
+    - id: name
+      type: MLTEXT
+    - id: pluralName
+      type: MLTEXT
+    - id: icon
+    - id: typeRef
+    - id: preActionModule
+    - id: confirm
+      type: JSON
+    - id: result
+      type: JSON
+    - id: type
+    - id: config
+      type: JSON
+    - id: predicate
+      type: JSON
+    - id: evaluator
+      type: JSON
+    - id: execForRecordsBatchSize
+      type: NUMBER
+    - id: execForRecordsParallelBatchesCount
+      type: NUMBER
+    - id: timeoutErrorMessage
+      type: MLTEXT
+    - id: features
+      type: JSON

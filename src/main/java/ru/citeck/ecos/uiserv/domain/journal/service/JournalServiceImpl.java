@@ -17,6 +17,8 @@ import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,7 +35,7 @@ public class JournalServiceImpl implements JournalService {
     private final JournalRepository journalRepository;
     private final JournalMapper journalMapper;
 
-    private Consumer<JournalDef> changeListener;
+    private final List<BiConsumer<JournalDef, JournalDef>> changeListeners = new CopyOnWriteArrayList<>();
 
     public long getLastModifiedTimeMs() {
         return journalRepository.getLastModifiedTime()
@@ -112,8 +114,8 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
-    public void onJournalChanged(Consumer<JournalDef> consumer) {
-        changeListener = consumer;
+    public void onJournalChanged(BiConsumer<JournalDef, JournalDef> consumer) {
+        changeListeners.add(consumer);
     }
 
     @Override
@@ -141,12 +143,19 @@ public class JournalServiceImpl implements JournalService {
             }
         });
 
+        JournalDef valueBefore = journalRepository.findByExtId(dto.getId())
+            .map(journalMapper::entityToDto)
+            .map(JournalWithMeta::getJournalDef)
+            .orElse(null);
+
         JournalEntity journalEntity = journalMapper.dtoToEntity(dto);
         JournalEntity storedJournalEntity = journalRepository.save(journalEntity);
 
         JournalWithMeta journalDto = journalMapper.entityToDto(storedJournalEntity);
 
-        changeListener.accept(journalDto.getJournalDef());
+        for (BiConsumer<JournalDef, JournalDef> listener : changeListeners) {
+            listener.accept(valueBefore, journalDto.getJournalDef());
+        }
         return journalDto;
     }
 

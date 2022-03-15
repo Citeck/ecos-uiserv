@@ -5,21 +5,22 @@ import ecos.com.fasterxml.jackson210.annotation.JsonValue
 import lombok.Data
 import lombok.RequiredArgsConstructor
 import org.apache.commons.lang.StringUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.commons.json.YamlUtils.toNonDefaultString
-import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
-import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
+import ru.citeck.ecos.events2.type.RecordEventsService
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.atts.value.AttValue
-import ru.citeck.ecos.records3.record.dao.delete.RecordDeleteDao
+import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
+import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
 import ru.citeck.ecos.records3.record.dao.delete.DelStatus
+import ru.citeck.ecos.records3.record.dao.delete.RecordDeleteDao
 import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
-import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
-import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService
+import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.domain.i18n.service.MessageResolver
 import ru.citeck.ecos.uiserv.domain.menu.api.records.MenuRecords.MenuRecord
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
@@ -28,7 +29,7 @@ import ru.citeck.ecos.uiserv.domain.menu.service.MenuService
 import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.stream.Collectors
-import kotlin.collections.HashMap
+import javax.annotation.PostConstruct
 
 @Component
 @RequiredArgsConstructor
@@ -44,6 +45,15 @@ class MenuRecords(
     companion object {
         const val ID = "menu"
         private const val AUTHORITIES_QUERY_LANG = "authorities"
+    }
+
+    private var recordEventsService: RecordEventsService? = null
+
+    @PostConstruct
+    fun init() {
+        menuService.addOnChangeListener { before, after ->
+            recordEventsService?.emitRecChanged(before, after, getId()) { MenuRecord(it) }
+        }
     }
 
     override fun getId() = ID
@@ -94,6 +104,11 @@ class MenuRecords(
         return DelStatus.OK
     }
 
+    @Autowired(required = false)
+    fun setRecordEventsService(recordEventsService: RecordEventsService) {
+        this.recordEventsService = recordEventsService
+    }
+
     @Data
     class MenuQuery {
         val user: String? = null
@@ -108,6 +123,10 @@ class MenuRecords(
                 newSubMenu[k] = v
             }
             super.setSubMenu(newSubMenu)
+        }
+
+        fun getEcosType(): String {
+            return "menu"
         }
 
         fun isDefaultMenu(): Boolean {

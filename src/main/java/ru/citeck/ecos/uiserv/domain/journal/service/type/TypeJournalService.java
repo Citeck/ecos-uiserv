@@ -48,7 +48,7 @@ public class TypeJournalService {
             .maximumSize(100)
             .build(CacheLoader.from(this::getJournalByFormIdImpl));
 
-        formService.addChangeListener(form -> journalByFormIdCache.invalidate(form.getId()));
+        formService.addChangeListener((before, after) -> journalByFormIdCache.invalidate(after.getId()));
     }
 
     public Optional<JournalWithMeta> getJournalForType(RecordRef typeRef) {

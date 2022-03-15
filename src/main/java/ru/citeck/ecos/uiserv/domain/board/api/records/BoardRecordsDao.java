@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.events2.type.RecordEventsService;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
@@ -23,6 +24,7 @@ import ru.citeck.ecos.uiserv.app.common.api.records.Utils;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 
+import javax.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,12 +37,28 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
     RecordDeleteDao {
 
     private final BoardService boardService;
+    private RecordEventsService recordEventsService;
+
     public static final String ID = "board";
     public static final String LANG_BY_TYPE = "by-type";
 
     @Autowired
     public BoardRecordsDao(BoardService service) {
         this.boardService = service;
+    }
+
+    @PostConstruct
+    public void init() {
+        boardService.onBoardChanged((before, after) -> {
+            if (recordEventsService != null) {
+                recordEventsService.emitRecChanged(
+                    before,
+                    after,
+                    getId(),
+                    def -> new BoardRecord(new BoardWithMeta(def))
+                );
+            }
+        });
     }
 
     /**
@@ -131,6 +149,11 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
     public DelStatus delete(@NotNull String localId) {
         boardService.delete(localId);
         return DelStatus.OK;
+    }
+
+    @Autowired(required = false)
+    public void setRecordEventsService(RecordEventsService recordEventsService) {
+        this.recordEventsService = recordEventsService;
     }
 
     @Data

@@ -33,5 +33,6 @@ public class I18nArtifactHandler implements EcosArtifactHandler<I18nDto> {
 
     @Override
     public void listenChanges(@NotNull Consumer<I18nDto> consumer) {
+        service.addListener((before, after) -> consumer.accept(after));
     }
 }

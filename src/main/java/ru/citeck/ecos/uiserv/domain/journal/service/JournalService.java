@@ -6,7 +6,7 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
 
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 public interface JournalService {
 
@@ -26,7 +26,7 @@ public interface JournalService {
 
     long getCount(Predicate predicate);
 
-    void onJournalChanged(Consumer<JournalDef> consumer);
+    void onJournalChanged(BiConsumer<JournalDef, JournalDef> consumer);
 
     JournalWithMeta save(JournalDef dto);
 

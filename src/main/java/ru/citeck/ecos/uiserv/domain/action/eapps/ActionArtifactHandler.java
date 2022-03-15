@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.action.eapps;
 
+import kotlin.Unit;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -27,7 +28,10 @@ public class ActionArtifactHandler implements EcosArtifactHandler<ActionDto> {
 
     @Override
     public void listenChanges(@NotNull Consumer<ActionDto> consumer) {
-        actionService.onActionChanged(consumer);
+        actionService.onActionChanged((before, after) -> {
+            consumer.accept(after);
+            return Unit.INSTANCE;
+        });
     }
 
     @NotNull

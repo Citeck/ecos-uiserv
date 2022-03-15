@@ -6,6 +6,7 @@ import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public interface EcosFormService {
@@ -36,5 +37,5 @@ public interface EcosFormService {
 
     void delete(String id);
 
-    void addChangeListener(Consumer<EcosFormModel> listener);
+    void addChangeListener(BiConsumer<EcosFormModel, EcosFormModel> listener);
 }

@@ -23,7 +23,7 @@ import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -51,7 +51,7 @@ public class MenuService {
 
     private final RecordsService recordsService;
 
-    private final List<Consumer<MenuDto>> onChangeListeners = new CopyOnWriteArrayList<>();
+    private final List<BiConsumer<MenuDto, MenuDto>> onChangeListeners = new CopyOnWriteArrayList<>();
 
     @PostConstruct
     public void init() {
@@ -74,10 +74,20 @@ public class MenuService {
     public MenuDto upload(MenuDeployArtifact module) {
 
         MenuDto menuDto = readerService.readMenu(module.getData(), module.getFilename());
-        MenuEntity entity = mapToEntity(menuDto);
 
+        MenuDto menuBefore = null;
+        MenuEntity entityBefore = menuDao.findByExtId(menuDto.getId());
+        if (entityBefore != null) {
+            menuBefore = mapToDto(entityBefore);
+        }
+
+        MenuEntity entity = mapToEntity(menuDto);
         MenuDto result = mapToDto(menuDao.save(entity));
-        onChangeListeners.forEach(it -> it.accept(result));
+
+        for (BiConsumer<MenuDto, MenuDto> listener : onChangeListeners) {
+            listener.accept(menuBefore, result);
+        }
+
         return result;
     }
 
@@ -202,7 +212,7 @@ public class MenuService {
         Set<String> allUserAuthorities = new HashSet<>(userAuthorities);
         allUserAuthorities.remove(DEFAULT_AUTHORITY);
         priority.retainAll(allUserAuthorities);
-        allUserAuthorities.removeAll(priority);
+        priority.forEach(allUserAuthorities::remove);
 
         List<String> orderedAuthorities = new LinkedList<>();
         orderedAuthorities.addAll(priority);
@@ -229,12 +239,20 @@ public class MenuService {
             throw new IllegalArgumentException("Dto cannot be null");
         }
 
+        MenuDto valueBefore = null;
         if (StringUtils.isBlank(dto.getId())) {
             dto.setId(UUID.randomUUID().toString());
+        } else {
+            MenuEntity entityBefore = menuDao.findByExtId(dto.getId());
+            if (entityBefore != null) {
+                valueBefore = mapToDto(entityBefore);
+            }
         }
 
         MenuDto result = mapToDto(menuDao.save(mapToEntity(dto)));
-        onChangeListeners.forEach(it -> it.accept(result));
+        for (BiConsumer<MenuDto, MenuDto> listener : onChangeListeners) {
+            listener.accept(valueBefore, result);
+        }
         return result;
     }
 
@@ -245,7 +263,7 @@ public class MenuService {
         menuDao.deleteByExtId(menuId);
     }
 
-    public void addOnChangeListener(Consumer<MenuDto> listener) {
+    public void addOnChangeListener(BiConsumer<MenuDto, MenuDto> listener) {
         onChangeListeners.add(listener);
     }
 

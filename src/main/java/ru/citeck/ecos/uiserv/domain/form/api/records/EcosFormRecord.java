@@ -1,15 +1,13 @@
 package ru.citeck.ecos.uiserv.domain.form.api.records;
 
-import ecos.com.fasterxml.jackson210.annotation.JsonIgnore;
 import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
 import ecos.com.fasterxml.jackson210.annotation.JsonValue;
-import org.apache.commons.lang.StringUtils;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.json.YamlUtils;
-import ru.citeck.ecos.records2.QueryContext;
-import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
+import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils;
+import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
 
 import java.nio.charset.StandardCharsets;
@@ -29,18 +27,12 @@ public class EcosFormRecord extends EcosFormModel {
         setId(value);
     }
 
-    @AttName(".disp")
-    public String getDisplayName() {
-        String name = MLText.getClosestValue(getTitle(), QueryContext.getCurrent().getLocale());
-        if (StringUtils.isBlank(name)) {
-            name = "Form";
+    public MLText getDisplayName() {
+        MLText title = getTitle();
+        if (MLText.isEmpty(title)) {
+            return new MLText("Form");
         }
-        return name;
-    }
-
-    @JsonIgnore
-    public String get_formKey() {
-        return "module_form";
+        return title;
     }
 
     @JsonProperty("_content")
@@ -50,6 +42,10 @@ public class EcosFormRecord extends EcosFormModel {
         ObjectData data = Json.getMapper().read(dataUriContent, ObjectData.class);
 
         Json.getMapper().applyData(this, data);
+    }
+
+    public String getEcosType() {
+        return "form";
     }
 
     @JsonValue

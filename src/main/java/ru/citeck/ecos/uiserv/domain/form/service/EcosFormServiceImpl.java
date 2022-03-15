@@ -21,6 +21,7 @@ import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -31,13 +32,13 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     private static final String DEFAULT_KEY = "DEFAULT";
 
-    private final List<Consumer<EcosFormModel>> listeners = new CopyOnWriteArrayList<>();
+    private final List<BiConsumer<EcosFormModel, EcosFormModel>> listeners = new CopyOnWriteArrayList<>();
 
     private final FormsEntityDao formsEntityDao;
     private final RecordsService recordsService;
 
     @Override
-    public void addChangeListener(Consumer<EcosFormModel> listener) {
+    public void addChangeListener(BiConsumer<EcosFormModel, EcosFormModel> listener) {
         listeners.add(listener);
     }
 
@@ -132,10 +133,18 @@ public class EcosFormServiceImpl implements EcosFormService {
     @Override
     public String save(EcosFormModel model) {
 
+        EcosFormEntity entityBefore = formsEntityDao.findByExtId(model.getId());
+        EcosFormModel formDtoBefore = null;
+        if (entityBefore != null) {
+            formDtoBefore = mapToDto(entityBefore);
+        }
+
         EcosFormEntity entity = formsEntityDao.save(mapToEntity(model));
         EcosFormModel result = mapToDto(entity);
 
-        listeners.forEach(it -> it.accept(result));
+        for (BiConsumer<EcosFormModel, EcosFormModel> listener : listeners) {
+            listener.accept(formDtoBefore, result);
+        }
 
         return result.getId();
     }

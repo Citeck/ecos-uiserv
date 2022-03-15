@@ -21,7 +21,9 @@ import ru.citeck.ecos.uiserv.domain.board.repo.BoardRepository;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -31,7 +33,7 @@ import java.util.stream.Collectors;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository repository;
-    private final List<Consumer<BoardDef>> changeListeners = new CopyOnWriteArrayList<>();
+    private final List<BiConsumer<BoardDef, BoardDef>> changeListeners = new CopyOnWriteArrayList<>();
 
     @Override
     public BoardWithMeta getBoardById(String id) {
@@ -47,10 +49,17 @@ public class BoardServiceImpl implements BoardService {
     @Transactional
     public BoardWithMeta save(BoardDef boardDef) {
         Assert.notNull(boardDef, "Board must not be null");
+
+        BoardDef beforeBoardDef = Optional.ofNullable(getBoardById(boardDef.getId()))
+            .map(BoardWithMeta::getBoardDef)
+            .orElse(null);
+
         BoardEntity entity = repository.save(BoardMapper.dtoToEntity(repository, boardDef));
         BoardWithMeta result = BoardMapper.entityToDto(entity);
 
-        changeListeners.forEach(listener -> listener.accept(result.getBoardDef()));
+        for (BiConsumer<BoardDef, BoardDef> listener : changeListeners) {
+            listener.accept(beforeBoardDef, result.getBoardDef());
+        }
         return result;
     }
 
@@ -92,10 +101,8 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public void onBoardChanged(Consumer<BoardDef> listener) {
-        if (listener != null) {
-            changeListeners.add(listener);
-        }
+    public void onBoardChanged(BiConsumer<BoardDef, BoardDef> listener) {
+        changeListeners.add(listener);
     }
 
     @Override

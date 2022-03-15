@@ -15,3 +15,12 @@ createVariants:
   - id: upload-i18n
     name: { ru: Загрузить локализацию, en: Upload localization }
     formRef: uiserv/form@ecos-module-upload
+
+model:
+  attributes:
+    - id: order
+      type: NUMBER
+    - id: locales
+      multiple: true
+    - id: messages
+      type: JSON

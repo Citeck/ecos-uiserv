@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.action.testutils
 
 import org.junit.jupiter.api.BeforeEach
+import ru.citeck.ecos.model.lib.type.repo.DefaultTypesRepo
 import ru.citeck.ecos.records3.RecordsProperties
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.RecordsServiceFactory
@@ -42,6 +43,10 @@ open class ActionsTestBase {
         )
         actionService.setActionProviders(listOf(actionsDaoProvider))
 
-        recordsServices.recordsService.register(ActionRecords(recordsServices.recordsService, actionService))
+        recordsServices.recordsService.register(ActionRecords(
+            recordsServices.recordsService,
+            actionService,
+            DefaultTypesRepo()
+        ))
     }
 }

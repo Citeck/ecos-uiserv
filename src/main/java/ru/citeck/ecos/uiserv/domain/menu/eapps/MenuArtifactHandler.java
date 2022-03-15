@@ -32,12 +32,12 @@ public class MenuArtifactHandler implements EcosArtifactHandler<MenuDeployArtifa
     @Override
     public void listenChanges(@NotNull Consumer<MenuDeployArtifact> consumer) {
 
-        menuService.addOnChangeListener(menuDto -> {
+        menuService.addOnChangeListener((before, after) -> {
 
             MenuDeployArtifact artifact = new MenuDeployArtifact();
-            artifact.setFilename(NameUtils.escape(menuDto.getId()) + ".json");
-            artifact.setData(Json.getMapper().toBytes(menuDto));
-            artifact.setId(menuDto.getId());
+            artifact.setFilename(NameUtils.escape(after.getId()) + ".json");
+            artifact.setData(Json.getMapper().toBytes(after));
+            artifact.setId(after.getId());
 
             consumer.accept(artifact);
         });

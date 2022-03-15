@@ -15,13 +15,14 @@ import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class BoardServiceMock implements BoardService {
 
     ConcurrentHashMap<String, BoardEntity> data = new ConcurrentHashMap<>();
-    private final List<Consumer<BoardDef>> changeListeners = new CopyOnWriteArrayList<>();
+    private final List<BiConsumer<BoardDef, BoardDef>> changeListeners = new CopyOnWriteArrayList<>();
     PredicateService predicateService;
 
     public BoardServiceMock(RecordsServiceFactory recordsServiceFactory) {
@@ -35,10 +36,20 @@ public class BoardServiceMock implements BoardService {
 
     @Override
     public BoardWithMeta save(BoardDef boardDef) {
+
+        BoardEntity entityBefore = data.get(boardDef.getId());
+        BoardDef valueBefore = null;
+        if (entityBefore != null) {
+            valueBefore = BoardMapper.entityToDto(entityBefore).getBoardDef();
+        }
+
         BoardEntity entity = BoardMapper.dtoToEntity(null, boardDef);
         data.put(boardDef.getId(), entity);
         BoardWithMeta boardWithMeta = BoardMapper.entityToDto(entity);
-        changeListeners.forEach(listener -> listener.accept(boardWithMeta.getBoardDef()));
+
+        for (BiConsumer<BoardDef, BoardDef> listener : changeListeners) {
+            listener.accept(valueBefore, boardWithMeta.getBoardDef());
+        }
         return boardWithMeta;
     }
 
@@ -102,7 +113,7 @@ public class BoardServiceMock implements BoardService {
     }
 
     @Override
-    public void onBoardChanged(Consumer<BoardDef> listener) {
+    public void onBoardChanged(BiConsumer<BoardDef, BoardDef> listener) {
         changeListeners.add(listener);
     }
 }

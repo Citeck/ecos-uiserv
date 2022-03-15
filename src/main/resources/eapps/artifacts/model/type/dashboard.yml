@@ -17,3 +17,15 @@ createVariants:
   - id: upload-dashboard
     name: { ru: Загрузить дашборд, en: Upload dashboard }
     formRef: uiserv/form@ecos-module-upload
+
+model:
+  attributes:
+    - id: typeRef
+    - id: appliedToRef
+    - id: authority
+    - id: priority
+      type: NUMBER
+    - id: config
+      type: JSON
+    - id: attributes
+      type: JSON
