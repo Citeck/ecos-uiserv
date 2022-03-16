@@ -7,7 +7,7 @@
   "description": {},
   "customModule": null,
   "typeRef": "emodel/type@journal",
-  "width": "default",
+  "width": "lg",
   "i18n": {
     "ru": {
       "Load columns": "Загрузить колонки",
@@ -127,8 +127,30 @@
                               "ru": "Идентификатор журнала",
                               "en": "Journal ID"
                             },
-                            "defaultValue": "",
                             "key": "localId",
+                            "defaultValue": "",
+                            "refreshOn": [],
+                            "logic": [
+                              {
+                                "name": "disabled",
+                                "trigger": {
+                                  "type": "javascript",
+                                  "javascript": "result = _.get(instance, 'root.options.formMode') !== 'CREATE';"
+                                },
+                                "actions": [
+                                  {
+                                    "name": "setDisabled",
+                                    "type": "property",
+                                    "property": {
+                                      "label": "Disabled",
+                                      "value": "disabled",
+                                      "type": "boolean"
+                                    },
+                                    "state": "true"
+                                  }
+                                ]
+                              }
+                            ],
                             "type": "textfield",
                             "input": true
                           },
@@ -570,7 +592,14 @@
                         "timeoutErrorMessage": {
                           "ru": "",
                           "en": ""
-                        }
+                        },
+                        "container": {},
+                        "features": {
+                          "execForRecord": false,
+                          "execForRecords": false,
+                          "execForQuery": false
+                        },
+                        "checkbox": false
                       }
                     ],
                     "validate": {
@@ -709,6 +738,86 @@
                               "type": "textfield",
                               "input": true
                             }
+                          },
+                          {
+                            "label": {
+                              "ru": "Features"
+                            },
+                            "key": "features",
+                            "refreshOn": [],
+                            "type": "container",
+                            "input": true,
+                            "components": [
+                              {
+                                "label": {
+                                  "ru": "Columns"
+                                },
+                                "key": "objectObject",
+                                "columns": [
+                                  {
+                                    "components": [
+                                      {
+                                        "label": {
+                                          "ru": "For Record"
+                                        },
+                                        "key": "execForRecord",
+                                        "labelPosition": "",
+                                        "defaultValue": false,
+                                        "refreshOn": [],
+                                        "type": "checkbox",
+                                        "input": true
+                                      }
+                                    ],
+                                    "md": 4,
+                                    "type": "column",
+                                    "input": false,
+                                    "key": "column",
+                                    "index": 0
+                                  },
+                                  {
+                                    "md": 4,
+                                    "type": "column",
+                                    "input": false,
+                                    "key": "column",
+                                    "index": 1,
+                                    "components": [
+                                      {
+                                        "label": {
+                                          "ru": "For Records"
+                                        },
+                                        "key": "execForRecords",
+                                        "labelPosition": "",
+                                        "defaultValue": false,
+                                        "refreshOn": [],
+                                        "type": "checkbox",
+                                        "input": true
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "md": 4,
+                                    "type": "column",
+                                    "input": false,
+                                    "key": "column",
+                                    "index": 2,
+                                    "components": [
+                                      {
+                                        "label": {
+                                          "ru": "For Query"
+                                        },
+                                        "key": "execForQuery",
+                                        "defaultValue": false,
+                                        "refreshOn": [],
+                                        "type": "checkbox",
+                                        "input": true
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "type": "columns",
+                                "input": false
+                              }
+                            ]
                           }
                         ],
                         "row": "0-1"
