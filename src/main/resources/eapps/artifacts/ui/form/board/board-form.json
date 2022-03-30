@@ -1,0 +1,417 @@
+{
+  "id": "board-form",
+  "title": {
+    "en": "Kanban board config"
+  },
+  "description": {},
+  "customModule": null,
+  "typeRef": "",
+  "width": "lg",
+  "i18n": {},
+  "definition": {
+    "components": [
+      {
+        "label": {
+          "ru": "Columns"
+        },
+        "columns": [
+          {
+            "components": [
+              {
+                "label": {
+                  "ru": "Идентификатор доски",
+                  "en": "Kanban ID"
+                },
+                "disabled": true,
+                "key": "localId",
+                "defaultValue": "",
+                "refreshOn": [],
+                "logic": [
+                  {
+                    "name": "Disable",
+                    "trigger": {
+                      "type": "javascript",
+                      "javascript": "result = _.get(instance, 'options.formMode') === 'CREATE';"
+                    },
+                    "actions": [
+                      {
+                        "name": "take off",
+                        "type": "property",
+                        "property": {
+                          "label": "Disabled",
+                          "value": "disabled",
+                          "type": "boolean"
+                        },
+                        "state": "false"
+                      }
+                    ]
+                  }
+                ],
+                "type": "textfield",
+                "input": true
+              },
+              {
+                "label": {
+                  "en": "Kanban board name",
+                  "ru": "Имя канбан-доски"
+                },
+                "key": "name",
+                "refreshOn": [],
+                "type": "mlText",
+                "input": true
+              },
+              {
+                "label": {
+                  "ru": "Возможно ли перемещать сущности между статусами",
+                  "en": "Is it possible to move entities between states"
+                },
+                "key": "readOnly",
+                "labelPosition": "left-left",
+                "defaultValue": false,
+                "refreshOn": [],
+                "type": "checkbox",
+                "input": true
+              }
+            ],
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 0
+          },
+          {
+            "index": 1,
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "components": [
+              {
+                "label": {
+                  "ru": "Тип",
+                  "en": "Type"
+                },
+                "key": "typeRef",
+                "journalId": "ecos-types",
+                "queryData": "",
+                "refreshOn": [],
+                "calculateValue": "const formMode = _.get(instance, 'options.formMode');\n\nvalue = formMode === 'CREATE' ? _.get(instance, 'options.typeRef') : _.get(data, 'recordAsyncData.typeRef')\n",
+                "allowCalculateOverride": true,
+                "type": "selectJournal",
+                "input": true
+              },
+              {
+                "label": {
+                  "ru": "Журнал",
+                  "en": "Journal"
+                },
+                "key": "journalRef",
+                "journalId": "ecos-journals",
+                "refreshOn": [],
+                "type": "selectJournal",
+                "input": true,
+                "queryData": ""
+              },
+              {
+                "label": {
+                  "ru": "Форма",
+                  "en": "Form"
+                },
+                "key": "cardFormRef",
+                "journalId": "ecos-forms",
+                "refreshOn": [],
+                "type": "selectJournal",
+                "input": true,
+                "queryData": ""
+              },
+              {
+                "label": {
+                  "ru": "Действия",
+                  "en": "Actions"
+                },
+                "multiple": true,
+                "key": "actions",
+                "reorder": false,
+                "journalId": "ui-actions",
+                "defaultValue": [],
+                "refreshOn": [],
+                "type": "selectJournal",
+                "input": true
+              }
+            ]
+          }
+        ],
+        "key": "columns4",
+        "type": "columns",
+        "input": false
+      },
+      {
+        "label": {
+          "ru": "Колонки",
+          "en": "Columns"
+        },
+        "key": "columns",
+        "multiple": true,
+        "validate": {
+          "minLength": "",
+          "maxLength": ""
+        },
+        "disableAddingRemovingRows": false,
+        "addAnother": "",
+        "addAnotherPosition": "bottom",
+        "removePlacement": "col",
+        "defaultOpen": false,
+        "layoutFixed": false,
+        "enableRowGroups": false,
+        "reorder": true,
+        "defaultValue": [
+          {
+            "name": "",
+            "type": "",
+            "id": "",
+            "submit4": false,
+            "computed": [
+              null
+            ],
+            "status": ""
+          }
+        ],
+        "refreshOn": [],
+        "type": "datagrid",
+        "input": true,
+        "components": [
+          {
+            "label": {
+              "ru": "Системное имя"
+            },
+            "key": "id",
+            "defaultValue": "",
+            "refreshOn": [],
+            "calculateValue": "const statusId = _.get(row, 'status');\n\nif (!statusId) {\n  return;\n}\n\nvalue = statusId;",
+            "allowCalculateOverride": true,
+            "type": "textfield",
+            "input": true,
+            "row": "0-0"
+          },
+          {
+            "label": {
+              "ru": "Название колонки",
+              "en": "Column name"
+            },
+            "key": "name",
+            "refreshOn": [],
+            "calculateValue": "const statusId = _.get(row, 'status');\n\nif (!statusId) {\n  return;\n}\n\nconst statuses = _.get(data, 'recordAsyncData.statuses');\n\nif (_.isEmpty(statuses)) {\n  return;\n}\n\nvalue = _.get(statuses.find(item => item.id === statusId), 'name');",
+            "allowCalculateOverride": true,
+            "type": "mlText",
+            "input": true,
+            "row": "0-1"
+          },
+          {
+            "label": {
+              "ru": "Статус",
+              "en": "Status"
+            },
+            "key": "panel",
+            "refreshOn": [],
+            "type": "panel",
+            "input": false,
+            "components": [
+              {
+                "label": {
+                  "en": "Data type",
+                  "ru": "Статус"
+                },
+                "key": "status",
+                "hideLabel": true,
+                "customClass": "mt-n3 pt-1",
+                "dataSrc": "custom",
+                "data": {
+                  "custom": "let statuses = _.get(data, 'typeRef') ? _.get(data, 'statusesAsyncData.values', []) : [];\n\nif (_.get(instance, 'options.formMode') === 'CREATE') {\n  statuses = _.get(instance, 'options.statuses', [])\n}\n\nif (!Array.isArray(statuses)) {\n  statuses = [statuses];\n}\n\nvalues = (statuses || []).map(item => ({\n  label: item.name || item.id,\n  value: item.id\n}));"
+                },
+                "valueProperty": "value",
+                "defaultValue": "",
+                "refreshOn": [
+                  "recordAsyncData"
+                ],
+                "logic": [
+                  {
+                    "name": "Reset value if typeRef was removed",
+                    "trigger": {
+                      "type": "javascript",
+                      "javascript": "result = _.isEmpty(_.get(data, 'typeRef')) && !_.isEmpty(_.get(row, 'status'));"
+                    },
+                    "actions": [
+                      {
+                        "name": "Reset value",
+                        "type": "value",
+                        "value": "if (result) {\n  value = '';  \n}\n"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "Reset value if statuses list was changed",
+                    "trigger": {
+                      "type": "javascript",
+                      "javascript": "const statuses = _.get(data, 'statusesAsyncData.values');\nconst typeRef = _.get(data, 'typeRef');\nconst statusName = _.get(row, 'status');\n\nresult = !_.isEmpty(statuses) && !_.isEmpty(typeRef) && !_.isEmpty(statusName) && !_.find(statuses, ['id', statusName]);"
+                    },
+                    "actions": [
+                      {
+                        "name": "clear",
+                        "type": "value",
+                        "value": "if (result) {\n  value = '';\n}"
+                      }
+                    ]
+                  }
+                ],
+                "type": "select",
+                "input": true
+              }
+            ],
+            "row": "0-2"
+          }
+        ]
+      },
+      {
+        "label": {
+          "ru": "Columns"
+        },
+        "hidden": true,
+        "key": "objectObject",
+        "columns": [
+          {
+            "components": [
+              {
+                "source": {
+                  "type": "record",
+                  "record": {
+                    "id": "{{ recordId }}",
+                    "attributes": {
+                      "typeRef": "typeRef?id"
+                    }
+                  },
+                  "forceLoad": false
+                },
+                "update": {
+                  "type": "once"
+                },
+                "executionCondition": "value = _.get(instance, 'options.formMode') === 'EDIT';\n",
+                "key": "recordAsyncData",
+                "type": "asyncData",
+                "input": true
+              },
+              {
+                "label": "Statuses Async Data",
+                "source": {
+                  "type": "recordsScript",
+                  "recordsScript": {
+                    "attributes": {
+                      "values": "model.statuses{id,name}[]"
+                    },
+                    "script": "value = _.get(data, 'typeRef');"
+                  },
+                  "forceLoad": false
+                },
+                "update": {
+                  "type": "disabled"
+                },
+                "refreshOn": [
+                  {
+                    "label": "typeRef",
+                    "value": "typeRef"
+                  }
+                ],
+                "executionCondition": "// value = !_.isEmpty(_.get(data, 'typeRef'));\n\nvalue = _.isEmpty(_.get(data, 'statusesAsyncData.values')) || _.get(data, 'typeRef');",
+                "key": "statusesAsyncData",
+                "type": "asyncData",
+                "input": true
+              }
+            ],
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 0
+          },
+          {
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 1,
+            "components": []
+          }
+        ],
+        "type": "columns",
+        "input": false
+      },
+      {
+        "label": {
+          "ru": "Actions"
+        },
+        "columns": [
+          {
+            "components": [],
+            "md": 3,
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 0
+          },
+          {
+            "md": 3,
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 1,
+            "components": []
+          },
+          {
+            "md": 3,
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 2,
+            "components": [
+              {
+                "label": {
+                  "ru": "Отменить",
+                  "en": "Cancel"
+                },
+                "action": "event",
+                "state": "",
+                "showValidations": false,
+                "event": "cancel",
+                "block": true,
+                "key": "submit3",
+                "type": "button",
+                "input": true
+              }
+            ]
+          },
+          {
+            "md": 3,
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 3,
+            "components": [
+              {
+                "label": {
+                  "ru": "Сохранить",
+                  "en": "Save"
+                },
+                "state": "",
+                "theme": "primary",
+                "block": true,
+                "disableOnInvalid": true,
+                "key": "submit",
+                "type": "button",
+                "input": true
+              }
+            ]
+          }
+        ],
+        "key": "columns2",
+        "type": "columns",
+        "input": false
+      }
+    ]
+  },
+  "attributes": {}
+}
