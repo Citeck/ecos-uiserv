@@ -9,7 +9,7 @@ system: true
 sourceId: uiserv/board
 
 journalRef: uiserv/journal@ecos-boards
-formRef: uiserv/form@kanban-board-config
+formRef: uiserv/form@board-form
 
 defaultCreateVariant: false
 
