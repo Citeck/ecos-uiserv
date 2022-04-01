@@ -15,6 +15,7 @@ import ru.citeck.ecos.records2.predicate.PredicateUtils
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.Predicates
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
+import ru.citeck.ecos.records3.record.atts.dto.RecordAtts
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
@@ -263,7 +264,17 @@ class ResolvedJournalRecordsDao(
         if (!RecordRef.isEmpty(metaRecord) && attributeEdges.isNotEmpty()) {
 
             try {
-                val attributes = recordsService.getAtts(metaRecord, attributeEdges)
+                val attributes = if (metaRecord.appName == "alfresco") {
+                    try {
+                        recordsService.getAtts(metaRecord, attributeEdges)
+                    } catch (e: Exception) {
+                        // todo: solution should be more elegant
+                        log.warn { "Exception while metaRecord edge atts request: $metaRecord atts: $attributeEdges" }
+                        RecordAtts(metaRecord)
+                    }
+                } else {
+                    recordsService.getAtts(metaRecord, attributeEdges)
+                }
                 attributes.forEach { name: String, value: DataValue ->
                     val columnIdx = columnIdxByName[name]
                     if (columnIdx != null) {
