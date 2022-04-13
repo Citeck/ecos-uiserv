@@ -1,0 +1,9 @@
+{
+  "id": "download-text-json",
+  "type": "download",
+  "config": {
+    "downloadType": "text",
+    "attribute": "?json",
+    "extension": "json"
+  }
+}

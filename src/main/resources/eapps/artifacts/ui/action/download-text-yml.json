@@ -1,0 +1,9 @@
+{
+  "id": "download-text-yml",
+  "type": "download",
+  "config": {
+    "downloadType": "text",
+    "attribute": "?json|yaml()",
+    "extension": "yml"
+  }
+}
