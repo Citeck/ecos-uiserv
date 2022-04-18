@@ -13,7 +13,6 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.json.YamlUtils;
 import ru.citeck.ecos.events2.type.RecordEventsService;
-import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
@@ -70,7 +69,12 @@ public class DashboardRecords extends AbstractRecordsDao
 
     @Override
     public DashboardRecord getRecToMutate(@NotNull String dashboardId) {
-        return new DashboardRecord(getDashboardRecord(dashboardId));
+        if (dashboardId.isEmpty()) {
+            return new DashboardRecord();
+        }
+        return dashboardService.getDashboardById(dashboardId)
+            .map(DashboardRecord::new)
+            .orElseThrow(() -> new IllegalArgumentException("Dashboard with id '" + dashboardId + "' is not found!"));
     }
 
     @NotNull
@@ -82,18 +86,12 @@ public class DashboardRecords extends AbstractRecordsDao
     @Nullable
     @Override
     public Object getRecordAtts(@NotNull String dashboardId) {
-        return getDashboardRecord(dashboardId);
-    }
-
-    @NotNull
-    private DashboardRecord getDashboardRecord(@NotNull String dashboardId) {
-
         if (dashboardId.isEmpty()) {
             return new DashboardRecord();
         }
         return dashboardService.getDashboardById(dashboardId)
             .map(DashboardRecord::new)
-            .orElseThrow(() -> new IllegalArgumentException("Dashboard with id '" + dashboardId + "' is not found!"));
+            .orElse(null);
     }
 
     @Nullable

@@ -103,15 +103,14 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
     @Nullable
     @Override
     public EcosFormRecord getRecordAtts(@NotNull String formId) {
-        return toRecord(Optional.of(formId)
-            .filter(str -> !str.isEmpty())
-            .map(x -> ecosFormService.getFormById(x)
-                .orElseThrow(() -> new IllegalArgumentException("Form with id " + formId + " not found!")))
-            .orElseGet(() -> {
-                final EcosFormModel form = new EcosFormRecord(new EcosFormModel());
-                form.setId("");
-                return form;
-            }));
+        if (formId.isEmpty()) {
+            final EcosFormModel form = new EcosFormRecord(new EcosFormModel());
+            form.setId("");
+            return toRecord(form);
+        }
+        return ecosFormService.getFormById(formId)
+            .map(this::toRecord)
+            .orElse(null);
     }
 
     @Nullable
