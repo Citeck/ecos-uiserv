@@ -4,7 +4,7 @@ properties([
 timestamps {
   node {
 
-    def repoUrl = "git@bitbucket.org:citeck/ecos-uiserv.git"
+    def repoUrl = "git@gitlab.citeck.ru:citeck-projects/ecos-uiserv.git"
 
     stage('Checkout Script Tools SCM') {
       dir('jenkins-script-tools') {
