@@ -1,9 +1,12 @@
-pipelines:
-    branches:
-      develop:
-        - step:
-           script:
-             - git remote add sync git@github.com:Citeck/ecos-uiserv.git
-             - git checkout develop
-             - git pull
-             - git push sync develop
+stages:
+  - mirror
+
+mirror-master:
+  stage: mirror
+  cache: {}
+  script:
+    - git remote add sync git@github.com:Citeck/ecos-uiserv.git
+    - git checkout develop
+    - git pull
+    - git push sync develop
+                        
