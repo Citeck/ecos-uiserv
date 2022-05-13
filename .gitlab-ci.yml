@@ -7,6 +7,7 @@ mirror-develop:
   stage: mirror
   variables:
     TARGET_REPO: "https://github.com/Citeck/ecos-uiserv.git"
+    GIT_STRATEGY: clone
   cache: {}
   only:
     - develop
