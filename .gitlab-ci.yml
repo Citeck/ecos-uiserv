@@ -1,14 +1,18 @@
 stages:
   - mirror
 
-mirror-master:
+mirror-develop:
   tags: 
     - shell
   stage: mirror
+  variables:
+    TARGET_REPO: "https://github.com/Citeck/ecos-uiserv.git"
   cache: {}
+  only:
+    - develop
   script:
-    - git remote add sync git@github.com:Citeck/ecos-uiserv.git
-    - git checkout develop
-    - git pull
-    - git push sync develop
+    - git remote add mirror $TARGET_REPO
+    - git remote show mirror
+    - git fetch mirror
+    - git push --progress mirror HEAD:develop
                         
