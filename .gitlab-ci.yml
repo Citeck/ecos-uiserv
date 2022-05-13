@@ -21,5 +21,5 @@ mirror-master:
     - git remote add mirror $TARGET_REPO
     - git remote show mirror
     - git fetch mirror
-    - git push --progress mirror HEAD:master
+    - git push -f --progress mirror HEAD:master
                         
