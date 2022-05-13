@@ -3,7 +3,7 @@ stages:
 
 mirror-master:
   tags: 
-    - gitlab-runner
+    - shell
   stage: mirror
   cache: {}
   script:
