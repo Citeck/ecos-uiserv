@@ -1,13 +1,13 @@
 stages:
   - mirror
 
-mirror-develop:
+mirror-master:
   tags: 
     - shell
   stage: mirror
   variables:
     TARGET_REPO: "https://github.com/Citeck/ecos-uiserv.git"
-    UPSTREAM_BRANCH: "develop"
+    UPSTREAM_BRANCH: "master"
     GIT_STRATEGY: clone
   cache: {}
   only:
