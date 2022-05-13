@@ -11,10 +11,10 @@ mirror-master:
     GIT_STRATEGY: clone
   cache: {}
   only:
-    - develop
+    - master
   script:
     - git remote add mirror $TARGET_REPO
     - git remote show mirror
     - git fetch mirror
-    - git push --progress mirror HEAD:develop
+    - git push --progress mirror HEAD:master
                         
