@@ -2,7 +2,8 @@ stages:
   - mirror
 
 mirror-master:
-  tags: shell
+  tags: 
+    - shell
   stage: mirror
   cache: {}
   script:
