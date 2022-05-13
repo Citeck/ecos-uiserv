@@ -6,7 +6,7 @@ mirror-master:
     - shell
   stage: mirror
   variables:
-    TARGET_REPO: "https://github.com/Citeck/ecos-uiserv.git"
+    TARGET_REPO: "git@github.com:Citeck/ecos-uiserv.git"
     UPSTREAM_BRANCH: "master"
     GIT_STRATEGY: clone
   cache: {}
