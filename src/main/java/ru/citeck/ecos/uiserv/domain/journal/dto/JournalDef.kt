@@ -36,6 +36,8 @@ data class JournalDef(
 
     val queryData: ObjectData,
 
+    val searchConfig: JournalSearchConfig,
+
     /**
      * ECOS type.
      */
@@ -125,6 +127,7 @@ data class JournalDef(
         var metaRecord: RecordRef = RecordRef.EMPTY
         var predicate: Predicate = VoidPredicate.INSTANCE
         var queryData: ObjectData = ObjectData.create()
+        var searchConfig: JournalSearchConfig = JournalSearchConfig.EMPTY
         var typeRef: RecordRef = RecordRef.EMPTY
         var groupBy: List<String> = emptyList()
         var sortBy: List<JournalSortByDef> = emptyList()
@@ -144,6 +147,7 @@ data class JournalDef(
             metaRecord = base.metaRecord
             predicate = base.predicate.copy()
             queryData = ObjectData.deepCopyOrNew(base.queryData)
+            searchConfig = base.searchConfig
             typeRef = base.typeRef
             groupBy = base.groupBy.let { DataValue.create(it).asStrList() }
             sortBy = base.sortBy.let { DataValue.create(it).asList(JournalSortByDef::class.java) }
@@ -184,6 +188,11 @@ data class JournalDef(
 
         fun withQueryData(queryData: ObjectData?): Builder {
             this.queryData = queryData ?: ObjectData.create()
+            return this
+        }
+
+        fun withSearchConfig(searchConfig: JournalSearchConfig?): Builder {
+            this.searchConfig = searchConfig ?: JournalSearchConfig.EMPTY
             return this
         }
 
@@ -251,6 +260,7 @@ data class JournalDef(
                 metaRecord,
                 predicate,
                 queryData,
+                searchConfig,
                 typeRef,
                 groupBy,
                 sortBy,

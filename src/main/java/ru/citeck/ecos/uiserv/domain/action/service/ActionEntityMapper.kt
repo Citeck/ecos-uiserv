@@ -12,6 +12,7 @@ import ru.citeck.ecos.uiserv.domain.action.dao.ActionDao
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionConfirmDef
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionResultDto
+import ru.citeck.ecos.uiserv.domain.action.dto.ExecForQueryConfig
 import ru.citeck.ecos.uiserv.domain.action.repo.ActionEntity
 import ru.citeck.ecos.uiserv.domain.evaluator.repo.EvaluatorEntity
 
@@ -43,6 +44,8 @@ class ActionEntityMapper(
         if (configJson != null) {
             action.config = mapper.convert(configJson, ObjectData::class.java)
         }
+        action.execForQueryConfig = mapper.convert(actionEntity.execForQueryConfig, ExecForQueryConfig::class.java)
+
         val evaluator = actionEntity.evaluator
         var evaluatorDto: RecordEvaluatorDto? = null
         if (evaluator != null) {
@@ -83,6 +86,7 @@ class ActionEntityMapper(
         actionEntity.features = mapper.toString(action.features)
         actionEntity.configJson = mapper.toString(action.config)
         actionEntity.predicate = mapper.toString(action.predicate)
+        actionEntity.execForQueryConfig = mapper.toString(action.execForQueryConfig)
 
         val evaluator = action.evaluator
         if (isValidEvaluator(evaluator)) {

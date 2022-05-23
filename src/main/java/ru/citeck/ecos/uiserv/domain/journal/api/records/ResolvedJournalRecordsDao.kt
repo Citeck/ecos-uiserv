@@ -26,6 +26,7 @@ import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeAttsUtils
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSearchConfig
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSortByDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedJournalDef
@@ -202,10 +203,11 @@ class ResolvedJournalRecordsDao(
         } else {
             journal.columns.map { it.copy() }
         }
-        return resolveEdgeMetaImpl(journal.metaRecord, columns, typeInfo)
+        return resolveEdgeMetaImpl(journal.searchConfig, journal.metaRecord, columns, typeInfo)
     }
 
-    private fun resolveEdgeMetaImpl(metaRecord: RecordRef,
+    private fun resolveEdgeMetaImpl(journalSearchConfig: JournalSearchConfig,
+                                    metaRecord: RecordRef,
                                     columns: List<JournalColumnDef.Builder>,
                                     typeInfo: EcosTypeInfo?): List<ResolvedColumnDef> {
 
@@ -336,6 +338,16 @@ class ResolvedJournalRecordsDao(
             columnEditorResolver.resolve(column, attType)
             columnFormatterResolver.resolve(column, attType)
             columnAttSchemaResolver.resolve(column, attType)
+        }
+
+        columns.forEach {
+            if (it.searchConfig.delimiters.isEmpty()) {
+                if (journalSearchConfig.delimiters.isNotEmpty()) {
+                    it.searchConfig = it.searchConfig.withDelimiters(journalSearchConfig.delimiters)
+                } else {
+                    it.searchConfig = it.searchConfig.withDelimiters(listOf(","))
+                }
+            }
         }
 
         return columns.map { ResolvedColumnDef(it.build()) }

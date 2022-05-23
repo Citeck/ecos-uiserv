@@ -37,7 +37,6 @@
       "Sort by": "Сортировка",
       "Case Type": "Тип кейса",
       "Source ID": "Идентификатор источника данных",
-      "Actions": "Действия",
       "ActionFromType": "Добавить действия из типа",
       "Attribute": "Атрибут",
       "Ascending": "По возрастанию",
@@ -49,7 +48,10 @@
       "Control": "Контрол",
       "Config": "Конфигурация",
       "columnFormatter": "Форматтер",
-      "tooltip.actionFromType": "empty (null) - если actions и actionsDef пустые, то добавляем действия из типа\ntrue - всегда добавляем действия из типа\nfalse - никогда не добавляем из типа"
+      "tooltip.actionFromType": "empty (null) - если actions и actionsDef пустые, то добавляем действия из типа\ntrue - всегда добавляем действия из типа\nfalse - никогда не добавляем из типа",
+      "Main": "Основные",
+      "Actions": "Действия",
+      "Advanced": "Расширенные"
     },
     "en": {
       "Load columns": "Load columns",
@@ -69,7 +71,6 @@
       "Groupable": "Is grouping allowed?",
       "Editable": "Is in-table editing allowed?",
       "Hidden": "Is attribute hidden for user?",
-      "Add columns": "Add columns",
       "Main tab": "Main",
       "Columns tab": "Columns",
       "Group Actions": "Group Actions",
@@ -80,7 +81,6 @@
       "Sort by": "Sort by",
       "Case Type": "Case Type",
       "Source ID": "Data source ID",
-      "Actions": "Actions",
       "ActionFromType": "Add actions form type",
       "Attribute": "Attribute",
       "Ascending": "Ascending",
@@ -92,7 +92,11 @@
       "Control": "Control",
       "Config": "Config",
       "columnFormatter": "Formatter",
-      "tooltip.actionFromType": "empty (null) - if `actions` and `actionsDef` is empty, then add actions from type\ntrue - always add actions from type\nfalse - never add actions from type"
+      "tooltip.actionFromType": "empty (null) - if `actions` and `actionsDef` is empty, then add actions from type\ntrue - always add actions from type\nfalse - never add actions from type",
+      "Main": "Main",
+      "Actions": "Actions",
+      "Advanced": "Advanced",
+      "Add columns": "Add columns"
     }
   },
   "definition": {
@@ -297,6 +301,8 @@
                           "en": "Data type"
                         },
                         "key": "panel",
+                        "customClass": "p-0",
+                        "refreshOn": [],
                         "type": "panel",
                         "input": false,
                         "components": [
@@ -306,6 +312,8 @@
                               "en": "Data type"
                             },
                             "hideLabel": true,
+                            "key": "type",
+                            "customClass": "m-0",
                             "data": {
                               "values": [
                                 {
@@ -355,9 +363,8 @@
                               ]
                             },
                             "valueProperty": "value",
-                            "refreshOn": [],
-                            "key": "type",
                             "defaultValue": "",
+                            "refreshOn": [],
                             "type": "select",
                             "input": true
                           }
@@ -370,6 +377,7 @@
                           "en": "Additional"
                         },
                         "key": "panel2",
+                        "refreshOn": [],
                         "type": "panel",
                         "input": false,
                         "components": [
@@ -378,12 +386,14 @@
                               "ru": "Дополнительно",
                               "en": "Additional"
                             },
+                            "key": "submit4",
                             "action": "custom",
                             "state": "",
                             "showValidations": false,
-                            "custom": "\nvar currentRow = row;\n\nCiteck.EcosFormUtils.getFormById('uiserv/form@journal-column-data-form', {\n    definition: 'definition?json'\n}).then(function(formConfig) {\n\n    var inputs = [\n        'attribute',\n        'editor',\n        'formatter',\n        'searchable',\n        'searchableByText',\n        'sortable',\n        'groupable',\n        'editable',\n        'visible',\n        'hidden',\n        'multiple',\n        'computed',\n        'properties'\n    ];\n\n    var formData = {};\n\n    for (var i = 0; i < inputs.length; i++) {\n        var att = inputs[i];\n        var value = currentRow[att];\n        if (value === undefined) {\n            value = null;\n        } else if (Array.isArray(value)) {\n            value = value.filter(function(it) { return !!it; });\n        }\n        formData[att] = value;\n    }\n\n    Citeck.Dialogs.showFormDialog({\n        title: 'Column additional config',\n        showDefaultButtons: true,\n        formDefinition: formConfig.definition,\n        formData: formData,\n        onSubmit: submission => {\n            var data = submission.data || {};\n            for (var i = 0; i < inputs.length; i++) {\n                var att = inputs[i];\n                currentRow[att] = data[att];\n            }\n        }\n    })\n});\n",
+                            "custom": "\nvar currentRow = row;\n\nCiteck.EcosFormUtils.getFormById('uiserv/form@journal-column-data-form', {\n    definition: 'definition?json'\n}).then(function(formConfig) {\n\n    var inputs = [\n        'attribute',\n        'editor',\n        'formatter',\n        'searchable',\n        'searchableByText',\n        'sortable',\n        'groupable',\n        'editable',\n        'visible',\n        'hidden',\n        'multiple',\n        'computed',\n        'properties',\n        'searchConfig'\n    ];\n\n    var formData = {};\n\n    for (var i = 0; i < inputs.length; i++) {\n        var att = inputs[i];\n        var value = currentRow[att];\n        if (value === undefined) {\n            value = null;\n        } else if (Array.isArray(value)) {\n            value = value.filter(function(it) { return !!it; });\n        }\n        formData[att] = value;\n    }\n\n    Citeck.Dialogs.showFormDialog({\n        title: 'Column additional config',\n        showDefaultButtons: true,\n        formDefinition: formConfig.definition,\n        formData: formData,\n        onSubmit: submission => {\n            var data = submission.data || {};\n            for (var i = 0; i < inputs.length; i++) {\n                var att = inputs[i];\n                currentRow[att] = data[att];\n            }\n        }\n    })\n});\n",
                             "block": true,
-                            "key": "submit4",
+                            "refreshOn": [],
+                            "optionalWhenDisabled": false,
                             "type": "button",
                             "input": true,
                             "row": "0-2"
@@ -393,6 +403,7 @@
                               "ru": "attribute"
                             },
                             "key": "attribute",
+                            "refreshOn": [],
                             "type": "hidden",
                             "input": true
                           },
@@ -486,6 +497,20 @@
                           },
                           {
                             "label": {
+                              "ru": "Конфигурация поиска",
+                              "en": "Search config"
+                            },
+                            "key": "searchConfig",
+                            "refreshOn": [],
+                            "optionalWhenDisabled": false,
+                            "properties": {
+                              "dataType": "json"
+                            },
+                            "type": "hidden",
+                            "input": true
+                          },
+                          {
+                            "label": {
                               "ru": "hidden"
                             },
                             "key": "hidden",
@@ -553,15 +578,21 @@
                 "components": [
                   {
                     "label": {
-                      "ru": "Actions Configuration"
+                      "ru": "Конфигурация",
+                      "en": "Configuration"
                     },
                     "multiple": true,
+                    "key": "actionsDef",
+                    "validate": {
+                      "minLength": "",
+                      "maxLength": ""
+                    },
                     "disableAddingRemovingRows": false,
                     "addAnother": "",
                     "addAnotherPosition": "bottom",
                     "removePlacement": "col",
                     "defaultOpen": false,
-                    "layoutFixed": false,
+                    "layoutFixed": true,
                     "enableRowGroups": false,
                     "reorder": false,
                     "defaultValue": [
@@ -599,31 +630,32 @@
                           "execForRecords": false,
                           "execForQuery": false
                         },
-                        "checkbox": false
+                        "checkbox": false,
+                        "url": "",
+                        "objectObject2": "",
+                        "horizontalLine": [],
+                        "execForQueryOptions": {
+                          "execAsForRecords": false
+                        }
                       }
                     ],
-                    "validate": {
-                      "minLength": "",
-                      "maxLength": ""
-                    },
-                    "key": "actionsDef",
+                    "refreshOn": [],
                     "type": "datagrid",
                     "input": true,
                     "components": [
                       {
-                        "label": {
-                          "ru": "Panel"
-                        },
                         "key": "panel5",
                         "type": "panel",
                         "input": false,
                         "components": [
                           {
                             "label": {
-                              "ru": "Id"
+                              "ru": "ID",
+                              "en": "ID"
                             },
-                            "defaultValue": "",
                             "key": "id",
+                            "defaultValue": "",
+                            "refreshOn": [],
                             "type": "textfield",
                             "input": true
                           },
@@ -635,6 +667,12 @@
                             "key": "name",
                             "type": "mlText",
                             "input": true
+                          },
+                          {
+                            "useNegativeIndents": false,
+                            "input": true,
+                            "key": "horizontalLine",
+                            "type": "horizontalLine"
                           },
                           {
                             "label": {
@@ -685,9 +723,6 @@
                         "row": "0-0"
                       },
                       {
-                        "label": {
-                          "ru": "Panel"
-                        },
                         "key": "panel6",
                         "type": "panel",
                         "input": false,
@@ -708,8 +743,8 @@
                               "ru": "Модуль предварительной обработки"
                             },
                             "tooltip": {
-                              "en": "link to a module, which contains JS code",
-                              "ru": "ссылка на модуль, содержащий JS код"
+                              "en": "Link to a module, which contains JS code",
+                              "ru": "Cсылка на модуль, содержащий JS код"
                             },
                             "key": "preActionModule",
                             "defaultValue": "",
@@ -741,7 +776,12 @@
                           },
                           {
                             "label": {
-                              "ru": "Features"
+                              "en": "Applicability",
+                              "ru": "Применимость"
+                            },
+                            "tooltip": {
+                              "ru": "Действие доступно для одной записи, нескольких или запрос",
+                              "en": "The action is available for a single entry, multiple entries, or a query"
                             },
                             "key": "features",
                             "refreshOn": [],
@@ -753,15 +793,16 @@
                                   "ru": "Columns"
                                 },
                                 "key": "objectObject",
+                                "inlineColumns": true,
                                 "columns": [
                                   {
                                     "components": [
                                       {
                                         "label": {
-                                          "ru": "For Record"
+                                          "en": "For Record",
+                                          "ru": "Для Записи"
                                         },
                                         "key": "execForRecord",
-                                        "labelPosition": "",
                                         "defaultValue": false,
                                         "refreshOn": [],
                                         "type": "checkbox",
@@ -783,10 +824,10 @@
                                     "components": [
                                       {
                                         "label": {
-                                          "ru": "For Records"
+                                          "ru": "Для Записей",
+                                          "en": "For Records"
                                         },
                                         "key": "execForRecords",
-                                        "labelPosition": "",
                                         "defaultValue": false,
                                         "refreshOn": [],
                                         "type": "checkbox",
@@ -803,7 +844,8 @@
                                     "components": [
                                       {
                                         "label": {
-                                          "ru": "For Query"
+                                          "ru": "Для Запроса",
+                                          "en": "For Query"
                                         },
                                         "key": "execForQuery",
                                         "defaultValue": false,
@@ -816,6 +858,36 @@
                                 ],
                                 "type": "columns",
                                 "input": false
+                              }
+                            ]
+                          },
+                          {
+                            "label": {
+                              "ru": "Параметры действия над отфильтрованными записями",
+                              "en": "Parameters of action upon filtered records"
+                            },
+                            "key": "execForQueryConfig",
+                            "conditional": {
+                              "show": "true",
+                              "when": "execForQuery",
+                              "eq": "true"
+                            },
+                            "refreshOn": [],
+                            "type": "container",
+                            "input": true,
+                            "components": [
+                              {
+                                "label": {
+                                  "ru": "Выполнить как Для Записей",
+                                  "en": "Execute As For Records"
+                                },
+                                "key": "execAsForRecords",
+                                "labelPosition": "",
+                                "defaultValue": false,
+                                "refreshOn": [],
+                                "type": "checkbox",
+                                "hasThreeStates": true,
+                                "input": true
                               }
                             ]
                           }
@@ -946,6 +1018,31 @@
                             "type": "checkbox",
                             "input": true,
                             "row": "0-1"
+                          }
+                        ]
+                      },
+                      {
+                        "label": {
+                          "ru": "Search Config"
+                        },
+                        "key": "searchConfig",
+                        "refreshOn": [],
+                        "optionalWhenDisabled": false,
+                        "type": "container",
+                        "input": true,
+                        "components": [
+                          {
+                            "label": {
+                              "ru": "Delimiters"
+                            },
+                            "key": "delimiters",
+                            "multiple": true,
+                            "defaultValue": "",
+                            "refreshOn": [],
+                            "optionalWhenDisabled": false,
+                            "type": "textfield",
+                            "input": true,
+                            "reorder": false
                           }
                         ]
                       }
