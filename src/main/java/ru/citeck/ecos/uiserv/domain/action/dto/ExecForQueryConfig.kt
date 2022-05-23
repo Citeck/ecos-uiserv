@@ -1,6 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.action.dto
 
-class ExecForQueryConfig(
+data class ExecForQueryConfig(
     val execAsForRecords: Boolean? = null
 ) {
     companion object {
