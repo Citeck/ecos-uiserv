@@ -329,7 +329,10 @@ class ResolvedJournalRecordsDao(
             columnAttSchemaResolver.resolve(column, attType)
         }
 
-        columns.forEach {
+        columns.filter {
+            it.type == AttributeType.TEXT
+            || it.type == AttributeType.MLTEXT
+        }.forEach {
             if (it.searchConfig.delimiters.isEmpty()) {
                 if (journalSearchConfig.delimiters.isNotEmpty()) {
                     it.searchConfig = it.searchConfig.withDelimiters(journalSearchConfig.delimiters)
