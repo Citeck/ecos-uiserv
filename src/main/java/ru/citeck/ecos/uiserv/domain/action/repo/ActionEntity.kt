@@ -37,6 +37,8 @@ class ActionEntity : AbstractAuditingEntity() {
     var pluralName: String? = null
     var predicate: String? = null
 
+    var execForQueryConfig: String? = null
+
     override fun equals(other: Any?): Boolean {
         if (this === other) {
             return true

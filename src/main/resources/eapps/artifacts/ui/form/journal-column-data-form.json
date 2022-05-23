@@ -7,7 +7,7 @@
   "description": {},
   "customModule": null,
   "typeRef": "",
-  "width": "default",
+  "width": null,
   "i18n": {},
   "definition": {
     "components": [
@@ -33,7 +33,6 @@
                   "ru": "Можно ли искать по атрибуту",
                   "en": "Is search allowed by attribute"
                 },
-                "labelPosition": "left-left",
                 "hasThreeStates": true,
                 "key": "searchable",
                 "type": "checkbox",
@@ -43,7 +42,6 @@
                 "label": {
                   "ru": "Можно ли искать в шапке колонки"
                 },
-                "labelPosition": "left-left",
                 "hasThreeStates": true,
                 "key": "searchableByText",
                 "type": "checkbox",
@@ -53,7 +51,6 @@
                 "label": {
                   "ru": "Можно ли сортировать"
                 },
-                "labelPosition": "left-left",
                 "hasThreeStates": true,
                 "key": "sortable",
                 "type": "checkbox",
@@ -75,7 +72,6 @@
                 "label": {
                   "ru": "Можно ли группировать"
                 },
-                "labelPosition": "left-left",
                 "hasThreeStates": true,
                 "key": "groupable",
                 "type": "checkbox",
@@ -85,7 +81,6 @@
                 "label": {
                   "ru": "Можно ли редактировать в таблице"
                 },
-                "labelPosition": "left-left",
                 "hasThreeStates": true,
                 "key": "editable",
                 "type": "checkbox",
@@ -95,7 +90,6 @@
                 "label": {
                   "ru": "Отображать по умолчанию"
                 },
-                "labelPosition": "left-left",
                 "hasThreeStates": true,
                 "key": "visible",
                 "type": "checkbox",
@@ -105,7 +99,6 @@
                 "label": {
                   "ru": "Скрытая колонка"
                 },
-                "labelPosition": "left-left",
                 "description": {
                   "ru": "Можно искать по колонке, но её нельзя вывести в таблицу"
                 },
@@ -118,7 +111,6 @@
                 "label": {
                   "ru": "Множественное значение"
                 },
-                "labelPosition": "left-left",
                 "hasThreeStates": true,
                 "key": "multiple",
                 "type": "checkbox",
@@ -212,6 +204,31 @@
         "key": "columns3",
         "type": "columns",
         "input": false
+      },
+      {
+        "label": {
+          "ru": "Search Config"
+        },
+        "key": "searchConfig",
+        "refreshOn": [],
+        "optionalWhenDisabled": false,
+        "type": "container",
+        "input": true,
+        "components": [
+          {
+            "label": {
+              "ru": "Delimiters"
+            },
+            "key": "delimiters",
+            "multiple": true,
+            "defaultValue": "",
+            "refreshOn": [],
+            "optionalWhenDisabled": false,
+            "type": "textfield",
+            "input": true,
+            "reorder": false
+          }
+        ]
       },
       {
         "label": {
