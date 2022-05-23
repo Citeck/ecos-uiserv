@@ -54,6 +54,8 @@ class JournalColumnDef(
 
     val searchableByText: Boolean?,
 
+    val searchConfig: JournalSearchConfig,
+
     /**
      * Is sorting allowed for this column?
      */
@@ -130,6 +132,7 @@ class JournalColumnDef(
         var formatter: ColumnFormatterDef = ColumnFormatterDef.EMPTY
         var searchable: Boolean? = null
         var searchableByText: Boolean? = null
+        var searchConfig: JournalSearchConfig = JournalSearchConfig.EMPTY
         var sortable: Boolean? = null
         var groupable: Boolean? = null
         var editable: Boolean? = null
@@ -149,6 +152,7 @@ class JournalColumnDef(
             formatter = base.formatter
             searchable = base.searchable
             searchableByText = base.searchableByText
+            searchConfig = base.searchConfig
             sortable = base.sortable
             groupable = base.groupable
             editable = base.editable
@@ -220,6 +224,11 @@ class JournalColumnDef(
             return this
         }
 
+        fun withSearchConfig(searchConfig: JournalSearchConfig?): Builder {
+            this.searchConfig = searchConfig ?: JournalSearchConfig.EMPTY
+            return this
+        }
+
         fun withSortable(sortable: Boolean?): Builder {
             this.sortable = sortable
             return this
@@ -272,6 +281,7 @@ class JournalColumnDef(
                 formatter,
                 searchable,
                 searchableByText,
+                searchConfig,
                 sortable,
                 groupable,
                 editable,

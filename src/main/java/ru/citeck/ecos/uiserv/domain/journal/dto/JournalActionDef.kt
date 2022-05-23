@@ -8,6 +8,7 @@ import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionConfirmDef
+import ru.citeck.ecos.uiserv.domain.action.dto.ExecForQueryConfig
 
 @IncludeNonDefault
 @JsonDeserialize(builder = JournalActionDef.Builder::class)
@@ -29,6 +30,9 @@ data class JournalActionDef(
 
     val execForRecordsBatchSize: Int,
     val execForRecordsParallelBatchesCount: Int,
+
+    val execForQueryConfig: ExecForQueryConfig,
+
     val timeoutErrorMessage: MLText,
 
     val predicate: Predicate
@@ -74,6 +78,7 @@ data class JournalActionDef(
         var features: Map<String, Boolean> = emptyMap()
         var execForRecordsBatchSize: Int = 0
         var execForRecordsParallelBatchesCount: Int = 1
+        var execForQueryConfig: ExecForQueryConfig = ExecForQueryConfig.EMPTY
         var timeoutErrorMessage: MLText = MLText.EMPTY
         var predicate: Predicate = VoidPredicate.INSTANCE
 
@@ -89,6 +94,7 @@ data class JournalActionDef(
             this.features = base.features
             this.execForRecordsBatchSize = base.execForRecordsBatchSize
             this.execForRecordsParallelBatchesCount = base.execForRecordsParallelBatchesCount
+            this.execForQueryConfig = base.execForQueryConfig
             this.timeoutErrorMessage = base.timeoutErrorMessage
             this.predicate = Json.mapper.copy(base.predicate) ?: VoidPredicate.INSTANCE
         }
@@ -154,6 +160,11 @@ data class JournalActionDef(
             return this
         }
 
+        fun withExecForQueryConfig(execForQueryConfig: ExecForQueryConfig?): Builder {
+            this.execForQueryConfig = execForQueryConfig ?: ExecForQueryConfig.EMPTY
+            return this
+        }
+
         fun withTimeoutErrorMessage(timeoutErrorMessage: MLText?): Builder {
             this.timeoutErrorMessage = timeoutErrorMessage ?: MLText.EMPTY
             return this
@@ -177,6 +188,7 @@ data class JournalActionDef(
                 features,
                 execForRecordsBatchSize,
                 execForRecordsParallelBatchesCount,
+                execForQueryConfig,
                 timeoutErrorMessage,
                 predicate
             )

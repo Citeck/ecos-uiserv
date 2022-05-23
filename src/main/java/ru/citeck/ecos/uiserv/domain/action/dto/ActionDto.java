@@ -41,6 +41,8 @@ public class ActionDto {
     private int execForRecordsParallelBatchesCount;
     private MLText timeoutErrorMessage;
 
+    private ExecForQueryConfig execForQueryConfig = ExecForQueryConfig.EMPTY;
+
     private Map<String, Boolean> features = new HashMap<>();
 
     public ActionDto() {
@@ -59,6 +61,7 @@ public class ActionDto {
         this.evaluator = other.evaluator;
         this.typeRef = other.typeRef;
         this.preActionModule = other.preActionModule;
+        setExecForQueryConfig(other.execForQueryConfig);
         this.execForRecordsBatchSize = other.execForRecordsBatchSize;
         this.execForRecordsParallelBatchesCount = other.execForRecordsParallelBatchesCount;
         this.timeoutErrorMessage = other.timeoutErrorMessage;
@@ -177,6 +180,17 @@ public class ActionDto {
 
     public void setExecForRecordsParallelBatchesCount(int execForRecordsParallelBatchesCount) {
         this.execForRecordsParallelBatchesCount = execForRecordsParallelBatchesCount;
+    }
+
+    public ExecForQueryConfig getExecForQueryConfig() {
+        return execForQueryConfig;
+    }
+
+    public void setExecForQueryConfig(ExecForQueryConfig execForQueryConfig) {
+        if (execForQueryConfig == null) {
+            execForQueryConfig = ExecForQueryConfig.EMPTY;
+        }
+        this.execForQueryConfig = execForQueryConfig;
     }
 
     public MLText getTimeoutErrorMessage() {
