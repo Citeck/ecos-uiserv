@@ -1,23 +1,24 @@
 package ru.citeck.ecos.uiserv.domain.ecostype.service
 
 import org.springframework.stereotype.Service
+import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.model.lib.type.dto.CreateVariantDef
 import ru.citeck.ecos.records2.RecordRef
-import ru.citeck.ecos.uiserv.app.common.service.AuthoritiesSupport
 import ru.citeck.ecos.uiserv.domain.ecostype.config.EcosTypesConfig
-import ru.citeck.ecos.uiserv.domain.ecostype.dto.EcosTypeInfo
+import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
+import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
 
 @Service
 class EcosTypeService(
     private val typesConfig: EcosTypesConfig,
-    private val authoritiesSupport: AuthoritiesSupport
+    private val ecsosTypesRegistry: EcosTypesRegistry
 ) {
 
     fun getTypeRefByForm(formRef: RecordRef?): RecordRef {
         if (formRef == null || RecordRef.isEmpty(formRef)) {
             return RecordRef.EMPTY
         }
-        val ref = RecordRef.create("uiserv", "form", formRef.id);
+        val ref = RecordRef.create("uiserv", "form", formRef.id)
         return typesConfig.getTypeRefByForm(ref)
     }
 
@@ -25,7 +26,7 @@ class EcosTypeService(
         if (boardId.isNullOrBlank()) {
             return RecordRef.EMPTY
         }
-        val ref = RecordRef.create("uiserv", "board", boardId);
+        val ref = RecordRef.create("uiserv", "board", boardId)
         return typesConfig.getTypeRefByBoard(ref)
     }
 
@@ -33,7 +34,7 @@ class EcosTypeService(
         if (journalRef == null || RecordRef.isEmpty(journalRef)) {
             return RecordRef.EMPTY
         }
-        val ref = RecordRef.create("uiserv", "journal", journalRef.id);
+        val ref = RecordRef.create("uiserv", "journal", journalRef.id)
         return typesConfig.getTypeRefByJournal(ref)
     }
 
@@ -47,7 +48,7 @@ class EcosTypeService(
         if (RecordRef.isNotEmpty(journalRef)) {
             return journalRef
         }
-        val parents = typesConfig.getTypeInfo(typeRef)?.parents ?: emptyList()
+        val parents = ecsosTypesRegistry.getParents(typeRef)
         for (parentRef in parents) {
             if (RecordRef.isNotEmpty(parentRef)) {
                 journalRef = typesConfig.getJournalRefByType(parentRef)
@@ -60,20 +61,20 @@ class EcosTypeService(
         return RecordRef.EMPTY
     }
 
-    fun getTypeInfo(typeRef: RecordRef?): EcosTypeInfo? {
+    fun getTypeInfo(typeRef: RecordRef?): TypeDef? {
         if (typeRef == null) {
             return null
         }
         val typeInfo = typesConfig.getTypeInfo(typeRef) ?: return null
 
-        val copy = EcosTypeInfo(typeInfo)
-        copy.inhCreateVariants = filterCreateVariants(copy.inhCreateVariants)
-        return copy
+        val copy = typeInfo.copy()
+        copy.withCreateVariants(filterCreateVariants(copy.createVariants))
+        return copy.build()
     }
 
     private fun filterCreateVariants(variants: List<CreateVariantDef>?): List<CreateVariantDef>? {
         variants ?: return null
-        val currentAuthorities = authoritiesSupport.currentUserAuthorities.toHashSet()
+        val currentAuthorities = AuthContext.getCurrentUserWithAuthorities().toHashSet()
         return variants.filter {
             it.allowedFor.isEmpty() || it.allowedFor.any { auth -> currentAuthorities.contains(auth) }
         }

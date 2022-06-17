@@ -83,7 +83,7 @@ class ResolvedMenuConfigsTest : MenuTestBase() {
             }
             expected.isObject() -> {
                 expected.forEach { k, v ->
-                    compare("$path/$k", v, actual.get(k))
+                    compare("$path/$k", v, actual[k])
                 }
             }
             else -> {
@@ -92,4 +92,3 @@ class ResolvedMenuConfigsTest : MenuTestBase() {
         }
     }
 }
-

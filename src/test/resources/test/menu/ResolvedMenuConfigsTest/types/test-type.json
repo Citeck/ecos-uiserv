@@ -1,7 +1,7 @@
 {
   "id": "test-type",
   "journalRef": "uiserv/journal@test-journal",
-  "inhCreateVariants": [
+  "createVariants": [
     {
       "id": "DEFAULT",
       "formRef": "uiserv/form@test-form",

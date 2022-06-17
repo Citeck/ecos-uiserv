@@ -1,43 +1,47 @@
 package ru.citeck.ecos.uiserv.domain.dashboard.api.records
 
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertNotNull
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.junit4.SpringRunner
 import ru.citeck.ecos.commons.data.ObjectData
-import ru.citeck.ecos.commons.utils.func.UncheckedSupplier
+import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.source.dao.local.RecordsDaoBuilder
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.record.atts.dto.RecordAtts
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.uiserv.Application
-import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils
 import ru.citeck.ecos.uiserv.domain.dashdoard.api.records.DashboardRecords
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto
+import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension
+import kotlin.collections.ArrayList
 
-@RunWith(SpringRunner::class)
+@ExtendWith(EcosSpringExtension::class)
 @SpringBootTest(classes = [Application::class])
-open class DashboardRecordsTest {
+class DashboardRecordsTest {
 
     @Autowired
     lateinit var recordsService: RecordsService
 
     val data = ArrayList<DashboardDto>()
 
-    @Before
+    @BeforeEach
     fun prepareData() {
 
-        recordsService.register(RecordsDaoBuilder.create("emodel/type")
-            .addRecord("test-type", ObjectData.create())
-            .build())
-        recordsService.register(RecordsDaoBuilder.create("alfresco/people")
-            .addRecord("admin", ObjectData.create("{\"isAdmin\":true}"))
-            .build())
+        recordsService.register(
+            RecordsDaoBuilder.create("emodel/type")
+                .addRecord("test-type", ObjectData.create())
+                .build()
+        )
+        recordsService.register(
+            RecordsDaoBuilder.create("alfresco/people")
+                .addRecord("admin", ObjectData.create("{\"isAdmin\":true}"))
+                .build()
+        )
 
         data.clear()
 
@@ -90,11 +94,9 @@ open class DashboardRecordsTest {
 
             data.add(newDashboard.getAtts().getAs(DashboardDto::class.java)!!)
 
-            SecurityUtils.doAsUser("admin", object : UncheckedSupplier<RecordRef> {
-                override fun get(): RecordRef {
-                    return recordsService.mutate(newDashboard)
-                }
-            })
+            AuthContext.runAs("admin") {
+                recordsService.mutate(newDashboard)
+            }
         }
     }
 
@@ -109,7 +111,7 @@ open class DashboardRecordsTest {
                 recordsService.getAtt(dashboardRef, "config?json")
             )
 
-            val recsQuery = DashboardRecords.Query();
+            val recsQuery = DashboardRecords.Query()
 
             if (RecordRef.isNotEmpty(config.appliedToRef)) {
                 recsQuery.recordRef = config.appliedToRef
@@ -133,7 +135,7 @@ open class DashboardRecordsTest {
             assertDto(config, dashboardRecord)
         }
 
-        val recsQuery1 = DashboardRecords.Query();
+        val recsQuery1 = DashboardRecords.Query()
         recsQuery1.authority = "admin"
         recsQuery1.typeRef = RecordRef.valueOf("emodel/type@test-type")
         recsQuery1.recordRef = RecordRef.valueOf("workspace://SpaceStore/123")
@@ -147,7 +149,7 @@ open class DashboardRecordsTest {
 
         assertDto(data.firstOrNull { it.id == "with-applied-to-ref-and-authority" }, queryRes1.getRecords()[0])
 
-        val recsQuery2 = DashboardRecords.Query();
+        val recsQuery2 = DashboardRecords.Query()
         recsQuery2.typeRef = RecordRef.valueOf("emodel/type@test-type")
         recsQuery2.recordRef = RecordRef.valueOf("workspace://SpaceStore/123")
 
@@ -160,7 +162,7 @@ open class DashboardRecordsTest {
 
         assertDto(data.firstOrNull { it.id == "with-applied-to-ref" }, queryRes2.getRecords()[0])
 
-        val recsQuery3 = DashboardRecords.Query();
+        val recsQuery3 = DashboardRecords.Query()
         recsQuery3.authority = "admin"
         recsQuery3.typeRef = RecordRef.valueOf("emodel/type@test-type")
 
@@ -173,7 +175,7 @@ open class DashboardRecordsTest {
 
         assertDto(data.firstOrNull { it.id == "with-type-and-authority" }, queryRes3.getRecords()[0])
 
-        val recsQuery4 = DashboardRecords.Query();
+        val recsQuery4 = DashboardRecords.Query()
         recsQuery4.typeRef = RecordRef.valueOf("emodel/type@test-type")
 
         val recordsQuery4 = RecordsQuery.create {
@@ -196,7 +198,7 @@ open class DashboardRecordsTest {
             expectedConfig.appliedToRef = expectedConfig.appliedToRef.addAppName("alfresco")
         }
         if (!expectedConfig.authority.isNullOrBlank()) {
-            expectedConfig.authority = expectedConfig.authority.toLowerCase()
+            expectedConfig.authority = expectedConfig.authority.lowercase()
         }
 
         assertEquals(expectedConfig, actual)

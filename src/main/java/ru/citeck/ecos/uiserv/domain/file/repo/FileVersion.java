@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 import ru.citeck.ecos.uiserv.domain.translation.repo.Translated;
 
 import javax.persistence.*;
@@ -33,7 +34,7 @@ public class FileVersion implements Serializable {
         considered existing since that version becomes active, like is't not in File table.
         For custom overrides, this means the same thing, but of course custom override
         can be reverted to latest standard version. */
-    @Lob
+    @Type(type="org.hibernate.type.BinaryType")
     @Column(name = "bytes")
     private byte[] bytes;
 

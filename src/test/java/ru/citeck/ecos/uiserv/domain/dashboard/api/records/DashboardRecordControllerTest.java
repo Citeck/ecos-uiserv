@@ -2,9 +2,9 @@ package ru.citeck.ecos.uiserv.domain.dashboard.api.records;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -18,13 +18,14 @@ import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.request.rest.RestHandler;
-import ru.citeck.ecos.records3.spring.config.RecordsServiceFactoryConfiguration;
-import ru.citeck.ecos.records3.spring.web.rest.RecordsRestApi;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
 import ru.citeck.ecos.uiserv.TestEntityRecordUtil;
 import ru.citeck.ecos.uiserv.TestUtil;
+import ru.citeck.ecos.webapp.lib.spring.context.api.rest.RecordsRestApi;
+import ru.citeck.ecos.webapp.lib.spring.context.records.RecordsServiceFactoryConfiguration;
+import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -33,7 +34,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -42,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author Roman Makarskiy
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(EcosSpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class DashboardRecordControllerTest {
@@ -67,7 +68,7 @@ public class DashboardRecordControllerTest {
     @MockBean
     private DashboardService mockDashboardService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         RecordsRestApi recordsApi = new RecordsRestApi(factoryConfig);
         this.mockRecordsApi = MockMvcBuilders

@@ -37,7 +37,7 @@ class ResolvedMenuTest : MenuTestBase() {
 
         val testType2 = TypeDto(
             "custom-test-type",
-            listOf(testType.inhCreateVariants[1])
+            listOf(testType.createVariants[1])
         )
         registerType(testType2)
 
@@ -49,29 +49,41 @@ class ResolvedMenuTest : MenuTestBase() {
             MenuItemDef.create()
                 .withId("1")
                 .withType("LINK-CREATE-CASE")
-                .withConfig(ObjectData.create(CreateCaseConfig(
-                    typeRef = RecordRef.valueOf("test-type-ref"),
-                    variantTypeRef = RecordRef.valueOf("emodel/type@test-type"),
-                    variantId = "DEFAULT"
-                )))
+                .withConfig(
+                    ObjectData.create(
+                        CreateCaseConfig(
+                            typeRef = RecordRef.valueOf("test-type-ref"),
+                            variantTypeRef = RecordRef.valueOf("emodel/type@test-type"),
+                            variantId = "DEFAULT"
+                        )
+                    )
+                )
                 .build(),
             MenuItemDef.create()
                 .withId("2")
                 .withType("LINK-CREATE-CASE")
-                .withConfig(ObjectData.create(CreateCaseConfig(
-                    typeRef = RecordRef.valueOf("test-type-ref"),
-                    variantTypeRef = RecordRef.valueOf("emodel/type@custom-test-type"),
-                    variantId = "DEFAULT"
-                )))
+                .withConfig(
+                    ObjectData.create(
+                        CreateCaseConfig(
+                            typeRef = RecordRef.valueOf("test-type-ref"),
+                            variantTypeRef = RecordRef.valueOf("emodel/type@custom-test-type"),
+                            variantId = "DEFAULT"
+                        )
+                    )
+                )
                 .build(),
             MenuItemDef.create()
                 .withId("3")
                 .withType("LINK-CREATE-CASE")
-                .withConfig(ObjectData.create(CreateCaseConfig(
-                    typeRef = RecordRef.valueOf("test-type-ref"),
-                    variantTypeRef = RecordRef.valueOf("emodel/type@unknown-type"),
-                    variantId = "DEFAULT"
-                )))
+                .withConfig(
+                    ObjectData.create(
+                        CreateCaseConfig(
+                            typeRef = RecordRef.valueOf("test-type-ref"),
+                            variantTypeRef = RecordRef.valueOf("emodel/type@unknown-type"),
+                            variantId = "DEFAULT"
+                        )
+                    )
+                )
                 .build(),
             MenuItemDef.create()
                 .withId("4")
@@ -95,11 +107,11 @@ class ResolvedMenuTest : MenuTestBase() {
 
         assertThat(
             resolvedSubMenu.items[0].config.get("variant").getAs(CreateVariantDef::class.java)
-        ).isEqualTo(testType.inhCreateVariants[0])
+        ).isEqualTo(testType.createVariants[0])
 
         assertThat(
             resolvedSubMenu.items[1].config.get("variant").getAs(CreateVariantDef::class.java)
-        ).isEqualTo(testType2.inhCreateVariants[0])
+        ).isEqualTo(testType2.createVariants[0])
     }
 
     class CreateCaseConfig(
@@ -110,7 +122,6 @@ class ResolvedMenuTest : MenuTestBase() {
 
     class TypeDto(
         val id: String,
-        val inhCreateVariants: List<CreateVariantDef>
+        val createVariants: List<CreateVariantDef>
     )
 }
-

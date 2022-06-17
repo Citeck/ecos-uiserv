@@ -10,10 +10,9 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.uiserv.app.application.constants.AppConstants;
-import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardEntity;
@@ -81,7 +80,7 @@ public class DashboardService {
         RecordRef userRef = RecordRef.valueOf("alfresco/people@" + currentUserLogin);
         String authority = dashboard.getAuthority();
 
-        if (AppConstants.SYSTEM_ACCOUNT.equals(currentUserLogin) || currentUserLogin.equals(authority)) {
+        if (AuthContext.isRunAsSystem() || currentUserLogin.equals(authority)) {
             return;
         }
 
@@ -102,7 +101,7 @@ public class DashboardService {
 
     @NotNull
     private String getCurrentUserLogin() {
-        String currentUserLogin = SecurityUtils.getCurrentUserLoginFromRequestContext();
+        String currentUserLogin = AuthContext.getCurrentUser();
         if (currentUserLogin == null) {
             throw new RuntimeException("User is not authenticated");
         }

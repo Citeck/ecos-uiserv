@@ -1,2 +1,0 @@
-
-:: STARTING ${AnsiColor.BRIGHT_MAGENTA}ECOS-UISERV${AnsiColor.DEFAULT} ::

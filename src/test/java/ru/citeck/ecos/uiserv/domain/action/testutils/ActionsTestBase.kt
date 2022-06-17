@@ -1,8 +1,8 @@
 package ru.citeck.ecos.uiserv.domain.action.testutils
 
 import org.junit.jupiter.api.BeforeEach
+import ru.citeck.ecos.commons.test.EcosWebAppContextMock
 import ru.citeck.ecos.model.lib.type.repo.DefaultTypesRepo
-import ru.citeck.ecos.records3.RecordsProperties
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.RecordsServiceFactory
 import ru.citeck.ecos.uiserv.domain.action.api.records.ActionRecords
@@ -10,6 +10,7 @@ import ru.citeck.ecos.uiserv.domain.action.dao.ActionDao
 import ru.citeck.ecos.uiserv.domain.action.service.ActionEntityMapper
 import ru.citeck.ecos.uiserv.domain.action.service.ActionService
 import ru.citeck.ecos.uiserv.domain.action.service.DaoActionsProvider
+import ru.citeck.ecos.webapp.api.context.EcosWebAppContext
 
 open class ActionsTestBase {
 
@@ -21,12 +22,11 @@ open class ActionsTestBase {
     @BeforeEach
     fun before() {
 
+        val webAppCtxMock = EcosWebAppContextMock("uiserv")
+
         val recordsServices = object : RecordsServiceFactory() {
-            override fun createProperties(): RecordsProperties {
-                val props = super.createProperties()
-                props.appName = "uiserv"
-                props.appInstanceId = props.appName + "-123456789"
-                return props
+            override fun getEcosWebAppContext(): EcosWebAppContext? {
+                return webAppCtxMock
             }
         }
 
@@ -43,10 +43,12 @@ open class ActionsTestBase {
         )
         actionService.setActionProviders(listOf(actionsDaoProvider))
 
-        recordsServices.recordsService.register(ActionRecords(
-            recordsServices.recordsService,
-            actionService,
-            DefaultTypesRepo()
-        ))
+        recordsServices.recordsService.register(
+            ActionRecords(
+                recordsServices.recordsService,
+                actionService,
+                DefaultTypesRepo()
+            )
+        )
     }
 }

@@ -22,12 +22,12 @@ data class ColumnEditorDef(
 
         constructor(base: ColumnEditorDef) : this() {
             this.type = base.type
-            this.config = ObjectData.deepCopyOrNew(base.config);
+            this.config = ObjectData.deepCopyOrNew(base.config)
         }
 
         fun withType(type: String?): Builder {
             this.type = type ?: ""
-            return this;
+            return this
         }
 
         fun withConfig(config: ObjectData?): Builder {

@@ -14,5 +14,4 @@ interface JournalSettingsPermissionsService {
     fun canWrite(entity: JournalSettingsEntity): Boolean
 
     fun canWriteNew(dto: JournalSettingsDto): Boolean
-
 }

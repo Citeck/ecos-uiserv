@@ -7,16 +7,16 @@ import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
-import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
+import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
-import ru.citeck.ecos.uiserv.domain.ecostype.dto.EcosTypeInfo
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeAttsUtils
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
 import ru.citeck.ecos.uiserv.domain.form.service.FormDefUtils
+import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 
 @Component
 class EcosResolvedFormRecordsDao(
@@ -58,7 +58,7 @@ class EcosResolvedFormRecordsDao(
 
     class ResolvedFormRecord(
         @AttName("...") val form: EcosFormRecord,
-        val typeInfo: EcosTypeInfo?,
+        val typeInfo: TypeDef?,
         val formService: EcosFormService
     ) {
         fun getDefinition(): ObjectData {
@@ -72,17 +72,17 @@ class EcosResolvedFormRecordsDao(
 
         private fun mapComponent(component: DataValue, attributes: Map<String, AttributeDef>): DataValue? {
 
-            if (component.get("type").asText() == "includeForm") {
-                val formRef = RecordRef.valueOf(component.get("formRef").asText())
+            if (component["type"].asText() == "includeForm") {
+                val formRef = RecordRef.valueOf(component["formRef"].asText())
                 if (formRef.id.isBlank()) {
                     return null
                 }
-                if (component.get("conditionalForm").asBoolean(false)) {
+                if (component["conditionalForm"].asBoolean(false)) {
                     return component
                 }
                 val formDef = formService.getFormById(formRef.id).orElse(null)
                 if (formDef != null && formDef.definition != null) {
-                    val components = formDef.definition.get("components")
+                    val components = formDef.definition["components"]
                     if (components.isArray()) {
                         return components
                     }
@@ -90,7 +90,7 @@ class EcosResolvedFormRecordsDao(
                 return null
             }
 
-            if (!component.get("input").asBoolean(false) || attributes.isEmpty()) {
+            if (!component["input"].asBoolean(false) || attributes.isEmpty()) {
                 return component
             }
 
@@ -105,7 +105,7 @@ class EcosResolvedFormRecordsDao(
         }
 
         private fun isLabelEmpty(component: DataValue, attribute: String): Boolean {
-            val label = component.get("label")
+            val label = component["label"]
             if (label.isNull()) {
                 return true
             }

@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.User
 
 object TestUtils {
 
-    fun <T : Any> runAsUser(username: String, authorities: List<String>, action: () -> T) : T {
+    fun <T : Any> runAsUser(username: String, authorities: List<String>, action: () -> T): T {
 
         val result: T
 
@@ -19,7 +19,6 @@ object TestUtils {
             SecurityContextHolder.getContext().authentication = auth
 
             result = action.invoke()
-
         } finally {
             SecurityContextHolder.getContext().authentication = null
         }

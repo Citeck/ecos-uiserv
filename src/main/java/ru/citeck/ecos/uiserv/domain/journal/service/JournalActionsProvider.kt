@@ -42,4 +42,3 @@ class JournalActionsProvider(
         val actionsDef: List<JournalActionDef>
     )
 }
-

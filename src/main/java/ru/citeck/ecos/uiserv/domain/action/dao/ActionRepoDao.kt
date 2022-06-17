@@ -62,8 +62,8 @@ class ActionRepoDao(
         val moduleId = predicateDto.moduleId
         if (!moduleId.isNullOrBlank()) {
             spec = Specification { root: Root<ActionEntity>,
-                                   query: CriteriaQuery<*>?,
-                                   builder: CriteriaBuilder ->
+                query: CriteriaQuery<*>?,
+                builder: CriteriaBuilder ->
 
                 builder.like(builder.lower(root.get("extId")), "%" + moduleId.toLowerCase() + "%")
             }
@@ -73,8 +73,8 @@ class ActionRepoDao(
         if (!name.isNullOrBlank()) {
 
             val nameSpec = Specification { root: Root<ActionEntity>,
-                                   query: CriteriaQuery<*>?,
-                                   builder: CriteriaBuilder ->
+                query: CriteriaQuery<*>?,
+                builder: CriteriaBuilder ->
 
                 builder.like(builder.lower(root.get("name")), "%" + name.toLowerCase() + "%")
             }

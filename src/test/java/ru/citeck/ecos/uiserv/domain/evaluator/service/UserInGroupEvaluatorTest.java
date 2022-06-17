@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
@@ -20,8 +20,8 @@ import ru.citeck.ecos.records3.record.request.RequestContext;
 
 import java.util.*;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UserInGroupEvaluatorTest extends LocalRecordsDao implements LocalRecordsMetaDao<Object> {
 
@@ -29,7 +29,7 @@ public class UserInGroupEvaluatorTest extends LocalRecordsDao implements LocalRe
     private RecordEvaluatorService evaluatorsService;
     private final RecordsServiceFactory factory = new RecordsServiceFactory();
 
-    @Before
+    @BeforeEach
     public void setup() {
         setId(ID);
 

@@ -5,27 +5,24 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.stereotype.Component;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
-import ru.citeck.ecos.records2.source.dao.local.RecordsDaoBuilder;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
-import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
 import ru.citeck.ecos.uiserv.domain.action.repo.ActionRepository;
+import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,10 +31,10 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ExtendWith(EcosSpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@ActiveProfiles("test")
 public class JournalRecordsDaoTest {
 
     public static final String JOURNAL_DAO_ID = "journal";
@@ -52,17 +49,10 @@ public class JournalRecordsDaoTest {
     @Autowired
     private ActionRepository actionRepository;
 
-    @Autowired
-    private RecordsService recordsService;
-
     @BeforeEach
     void setUp() {
         journalRepository.deleteAll();
         actionRepository.deleteAll();
-
-        recordsService.register(RecordsDaoBuilder.create("emodel/type")
-            .addRecord("journal", ObjectData.create())
-            .build());
     }
 
     //@Test

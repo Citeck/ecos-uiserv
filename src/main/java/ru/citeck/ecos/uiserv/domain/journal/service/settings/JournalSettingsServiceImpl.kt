@@ -9,9 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json
-import ru.citeck.ecos.uiserv.app.common.service.AuthoritiesSupport
-import ru.citeck.ecos.uiserv.app.security.constants.AuthoritiesConstants
-import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils
+import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType
 import ru.citeck.ecos.uiserv.domain.file.service.FileService
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSettingsDto
@@ -20,7 +18,6 @@ import ru.citeck.ecos.uiserv.domain.journal.repo.JournalSettingsRepository
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService
 import java.util.*
 import java.util.stream.Collectors
-import kotlin.collections.ArrayList
 
 @Service
 @Transactional(
@@ -29,7 +26,6 @@ import kotlin.collections.ArrayList
     propagation = Propagation.REQUIRED
 )
 class JournalSettingsServiceImpl(
-    private val authoritiesSupport: AuthoritiesSupport,
     private val repo: JournalSettingsRepository,
     private val permService: JournalSettingsPermissionsService,
     private val journalPrefService: JournalPrefService,
@@ -104,11 +100,11 @@ class JournalSettingsServiceImpl(
     }
 
     private fun composeSearchSpecification(journalId: String): Specification<JournalSettingsEntity> {
-        val currentUserAuthorities = fetchAllUserAuthorities()
+        val currentUserAuthorities = AuthContext.getCurrentUserWithAuthorities()
 
         var specification = JournalSettingsSpecification.journalEquals(journalId)
 
-        if (isAdmin()) {
+        if (AuthContext.isRunAsAdmin()) {
             specification = specification.and(
                 JournalSettingsSpecification.authorityIn(currentUserAuthorities)
                     .or(JournalSettingsSpecification.authorityNotEqualToCreator())
@@ -119,17 +115,6 @@ class JournalSettingsServiceImpl(
             )
         }
         return specification
-    }
-
-    private fun fetchAllUserAuthorities(): List<String> {
-        val username = getCurrentUsername()
-
-        var currentUserAuthorities = authoritiesSupport.currentUserAuthorities
-        if (!currentUserAuthorities.contains(username)) {
-            currentUserAuthorities = ArrayList(currentUserAuthorities)
-            currentUserAuthorities.add(username)
-        }
-        return currentUserAuthorities
     }
 
     private fun searchJournalPrefs(journalId: String): List<JournalSettingsDto> {
@@ -213,7 +198,7 @@ class JournalSettingsServiceImpl(
     }
 
     private fun getCurrentUsername(): String {
-        var username = SecurityUtils.getCurrentUserLoginFromRequestContext()
+        var username = AuthContext.getCurrentUser()
         require(!StringUtils.isBlank(username)) { "Username cannot be empty" }
         if (username.contains("people@")) {
             username = username.replaceFirst("people@".toRegex(), "")
@@ -222,10 +207,5 @@ class JournalSettingsServiceImpl(
             username = username.replaceFirst("alfresco/".toRegex(), "")
         }
         return username
-    }
-
-    private fun isAdmin(): Boolean {
-        return authoritiesSupport.currentUserAuthorities.stream()
-            .anyMatch { it == AuthoritiesConstants.ADMIN }
     }
 }

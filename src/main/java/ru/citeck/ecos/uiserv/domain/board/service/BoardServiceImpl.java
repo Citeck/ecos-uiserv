@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
-import ru.citeck.ecos.uiserv.app.application.constants.AppConstants;
+import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.repo.BoardEntity;
@@ -116,7 +116,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public List<BoardWithMeta> getBoardsForJournal(String journalLocalId) {
         Assert.notNull(journalLocalId, "To select boards journal local ID must not be null");
-        return getBoardsForJournal(RecordRef.create(AppConstants.APP_NAME, "journal", journalLocalId));
+        return getBoardsForJournal(RecordRef.create(Application.NAME, "journal", journalLocalId));
     }
 
     private Specification<BoardEntity> toSpecification(Predicate predicate) {

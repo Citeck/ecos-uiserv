@@ -2,9 +2,8 @@ package ru.citeck.ecos.uiserv.domain.evaluator.service;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
@@ -19,6 +18,9 @@ import ru.citeck.ecos.records3.record.request.RequestContext;
 
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRecordsMetaDao<Object> {
 
     private static final String ID = "userInRoleEvaluatorTest";
@@ -28,7 +30,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
     private RecordEvaluatorService evaluatorsService;
     private RecordsServiceFactory factory;
 
-    @Before
+    @BeforeEach
     public void setup() {
         setId(ID);
 
@@ -64,7 +66,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
             evaluatorsService.evaluate(recordRef, evaluatorDto));
 
         //  assert
-        Assert.assertTrue(result);
+        assertTrue(result);
     }
 
     @Test
@@ -91,7 +93,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
             evaluatorsService.evaluate(recordRef, evaluatorDto));
 
         //  assert
-        Assert.assertTrue(result);
+        assertTrue(result);
     }
 
     @Test
@@ -118,7 +120,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
             evaluatorsService.evaluate(recordRef, evaluatorDto));
 
         //  assert
-        Assert.assertFalse(result);
+        assertFalse(result);
     }
 
     @Test
@@ -145,7 +147,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
             evaluatorsService.evaluate(recordRef, evaluatorDto));
 
         //  assert
-        Assert.assertFalse(result);
+        assertFalse(result);
     }
 
     @Test
@@ -171,7 +173,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
             evaluatorsService.evaluate(recordRef, evaluatorDto));
 
         //  assert
-        Assert.assertFalse(result);
+        assertFalse(result);
     }
 
     @Override

@@ -14,5 +14,4 @@ interface JournalSettingsService {
 
     @Deprecated(message = "use searchSettings method instead of this")
     fun getSettings(authority: String?, journalId: String?): List<JournalSettingsDto>
-
 }

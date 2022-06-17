@@ -29,15 +29,18 @@ class ColumnEditorResolver(
             return
         }
 
-        val attOptions = emptyList<AttOptionDef>() //typeAtt?.options ?: emptyList()
+        val attOptions = emptyList<AttOptionDef>() // typeAtt?.options ?: emptyList()
         if (attOptions.isNotEmpty()) {
             val config = ObjectData.create()
-            config.set("options", attOptions.map {
-                val option = ObjectData.create()
-                option.set("label", MLText.getClosestValue(it.label, RequestContext.getLocale()))
-                option.set("value", it.value)
-                option
-            })
+            config.set(
+                "options",
+                attOptions.map {
+                    val option = ObjectData.create()
+                    option.set("label", MLText.getClosestValue(it.label, RequestContext.getLocale()))
+                    option.set("value", it.value)
+                    option
+                }
+            )
             column.withEditor(ColumnEditorDef("select", config))
         }
 
@@ -74,23 +77,23 @@ class ColumnEditorResolver(
         }
     }
 
-    private fun resolveEditorForContent() : ColumnEditorDef {
+    private fun resolveEditorForContent(): ColumnEditorDef {
         return ColumnEditorDef("content", ObjectData.create())
     }
 
-    private fun resolveEditorForBoolean() : ColumnEditorDef {
+    private fun resolveEditorForBoolean(): ColumnEditorDef {
         return ColumnEditorDef("boolean", ObjectData.create())
     }
 
-    private fun resolveEditorForNumber() : ColumnEditorDef {
+    private fun resolveEditorForNumber(): ColumnEditorDef {
         return ColumnEditorDef("number", ObjectData.create())
     }
 
-    private fun resolveEditorForMLText() : ColumnEditorDef {
+    private fun resolveEditorForMLText(): ColumnEditorDef {
         return ColumnEditorDef("text", ObjectData.create())
     }
 
-    private fun resolveEditorForDateTime(attType: AttributeType) : ColumnEditorDef {
+    private fun resolveEditorForDateTime(attType: AttributeType): ColumnEditorDef {
 
         val editorType = when (attType) {
             AttributeType.DATE -> "date"
@@ -100,21 +103,24 @@ class ColumnEditorResolver(
         return ColumnEditorDef(editorType, ObjectData.create())
     }
 
-    private fun resolveEditorForAuthority(attType: AttributeType) : ColumnEditorDef {
+    private fun resolveEditorForAuthority(attType: AttributeType): ColumnEditorDef {
 
         val config = ObjectData.create()
 
-        config.set("allowedAuthorityTypes", when (attType) {
-            AttributeType.PERSON -> "USER"
-            AttributeType.AUTHORITY_GROUP -> "GROUP"
-            else -> "USER,GROUP"
-        })
+        config.set(
+            "allowedAuthorityTypes",
+            when (attType) {
+                AttributeType.PERSON -> "USER"
+                AttributeType.AUTHORITY_GROUP -> "GROUP"
+                else -> "USER,GROUP"
+            }
+        )
 
         return ColumnEditorDef("orgstruct", config)
     }
 
-    private fun resolveEditorForText() : ColumnEditorDef {
-        return ColumnEditorDef("text", ObjectData.create());
+    private fun resolveEditorForText(): ColumnEditorDef {
+        return ColumnEditorDef("text", ObjectData.create())
     }
 
     private fun resolveEditorForAssoc(typeAtt: AttributeDef?): ColumnEditorDef {

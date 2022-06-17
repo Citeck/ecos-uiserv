@@ -3,19 +3,19 @@ package ru.citeck.ecos.uiserv.domain.journal.service.generator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import ru.citeck.ecos.commons.data.MLText;
-import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef;
+import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.journal.service.type.JournalByFormGenerator;
+import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(EcosSpringExtension.class)
+@SpringBootTest(classes = Application.class)
 public class JournalGeneratorTest {
 
     private static final String TEST_FORM_PATH = "src/test/resources/form/ecos-form.json";

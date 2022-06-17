@@ -13,8 +13,8 @@ import ru.citeck.ecos.events2.type.RecordEventsService
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.model.Predicate
-import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
+import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
 import ru.citeck.ecos.records3.record.dao.delete.DelStatus
 import ru.citeck.ecos.records3.record.dao.delete.RecordDeleteDao
@@ -78,7 +78,6 @@ class JournalRecordsDao(
                     result.addRecord(JournalRecord(dto))
                 }
             }
-
         } else {
 
             if (recsQuery.language == PredicateService.LANGUAGE_PREDICATE) {
@@ -91,8 +90,10 @@ class JournalRecordsDao(
                 result.setRecords(ArrayList(journals))
                 result.setTotalCount(journalService.getCount(predicate))
             } else {
-                result.setRecords(ArrayList(
-                    journalService.getAll(recsQuery.page.maxItems, recsQuery.page.skipCount))
+                result.setRecords(
+                    ArrayList(
+                        journalService.getAll(recsQuery.page.maxItems, recsQuery.page.skipCount)
+                    )
                 )
                 result.setTotalCount(journalService.count)
             }

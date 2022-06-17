@@ -1,17 +1,16 @@
 package ru.citeck.ecos.uiserv.domain.board.api.records;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import ru.citeck.ecos.commons.data.DataValue;
+import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.TestEntityRecordUtil;
@@ -20,12 +19,13 @@ import ru.citeck.ecos.uiserv.domain.board.BoardTestData;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.repo.BoardRepository;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
+import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(EcosSpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -50,11 +50,11 @@ public class BoardRecordsDaoTest {
 
     @Test
     public void queryByTypeRef_WithEmptyResult() throws Exception {
-        String jsonString = new JSONObject()
-            .put(QUERY,
-                new JSONObject().put("sourceId", BoardRecordsDao.ID)
-                    .put(LANGUAGE, BoardRecordsDao.LANG_BY_TYPE)
-                    .put(QUERY, new JSONObject().put("typeRef", BoardTestData.testTypeRef.toString()))).toString(2);
+        String jsonString = DataValue.createObj()
+            .set(QUERY,
+                DataValue.createObj().set("sourceId", BoardRecordsDao.ID)
+                    .set(LANGUAGE, BoardRecordsDao.LANG_BY_TYPE)
+                    .set(QUERY, DataValue.createObj().set("typeRef", BoardTestData.testTypeRef.toString()))).toString();
 
         final ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(TestEntityRecordUtil.URL_RECORDS_QUERY)
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -65,13 +65,13 @@ public class BoardRecordsDaoTest {
 
     @Test
     public void createRecord() throws Exception {
-        String jsonString = getJsonToSend(new JSONObject()
-            .put(RECORDS, new JSONArray().put(
-                new JSONObject().put(BoardTestData.PROP_ID, BoardTestData.getEmptyId())
-                    .put(ATTRIBUTES, new JSONObject()
-                        .put(BoardTestData.PROP_NAME, "TestBoard - Create")
-                        .put(BoardTestData.PROP_READ_ONLY, false))
-            )).toString(2));
+        String jsonString = getJsonToSend(DataValue.createObj()
+            .set(RECORDS, DataValue.createArr().add(
+                DataValue.createObj().set(BoardTestData.PROP_ID, BoardTestData.getEmptyId())
+                    .set(ATTRIBUTES, DataValue.createObj()
+                        .set(BoardTestData.PROP_NAME, "TestBoard - Create")
+                        .set(BoardTestData.PROP_READ_ONLY, false))
+            )).toString());
 
         final ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(TestEntityRecordUtil.URL_RECORDS_MUTATE)
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -85,18 +85,18 @@ public class BoardRecordsDaoTest {
         createTestBoardDef();
         String newName = "Updated TestBoard";
 
-        String jsonString = getJsonToSend(new JSONObject()
-            .put(RECORDS, new JSONArray().put(
-                new JSONObject().put(BoardTestData.PROP_ID, BoardTestData.getEmptyId() + BoardTestData.BOARD_ID)
-                    .put(ATTRIBUTES, new JSONObject()
-                        .put(BoardTestData.PROP_NAME, newName)
-                        .put(BoardTestData.PROP_COLUMNS, new JSONArray()
-                            .put(new JSONObject().put("id", "col-id1")
-                                .put("name", "First Column Name"))
-                            .put(new JSONObject().put("id", "col-id2")
-                                .put("name", "Second Column Name"))
+        String jsonString = getJsonToSend(DataValue.createObj()
+            .set(RECORDS, DataValue.createArr().add(
+                DataValue.createObj().set(BoardTestData.PROP_ID, BoardTestData.getEmptyId() + BoardTestData.BOARD_ID)
+                    .set(ATTRIBUTES, DataValue.createObj()
+                        .set(BoardTestData.PROP_NAME, newName)
+                        .set(BoardTestData.PROP_COLUMNS, DataValue.createArr()
+                            .add(DataValue.createObj().set("id", "col-id1")
+                                .set("name", "First Column Name"))
+                            .add(DataValue.createObj().set("id", "col-id2")
+                                .set("name", "Second Column Name"))
                         ))
-            )).toString(2));
+            )).toString());
 
         ResultActions resultActions = mockMvc.perform(
             MockMvcRequestBuilders.post(TestEntityRecordUtil.URL_RECORDS_MUTATE)
@@ -118,9 +118,9 @@ public class BoardRecordsDaoTest {
     @Test
     public void deleteRecord() throws Exception {
         createTestBoardDef();
-        String jsonString = getJsonToSend(new JSONObject()
-            .put(RECORDS, new JSONArray().put(BoardTestData.getEmptyId() + BoardTestData.BOARD_ID
-            )).toString(2));
+        String jsonString = getJsonToSend(DataValue.createObj()
+            .set(RECORDS, DataValue.createArr().add(BoardTestData.getEmptyId() + BoardTestData.BOARD_ID
+            )).toString());
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post(TestEntityRecordUtil.URL_RECORDS_DELETE)
@@ -184,14 +184,14 @@ public class BoardRecordsDaoTest {
         if (testBoardJson != null) {
             return testBoardJson;
         }
-        testBoardJson = getJsonToSend(new JSONObject()
-            .put(RECORDS, new JSONArray().put(BoardTestData.getEmptyId() + BoardTestData.BOARD_ID))
-            .put(ATTRIBUTES, new JSONArray()
-                .put(BoardTestData.PROP_ID + STR)
-                .put(BoardTestData.PROP_READ_ONLY)
-                .put(BoardTestData.PROP_NAME + STR)
-                .put(BoardTestData.PROP_COLUMNS + "[]" + STR))
-            .toString(2));
+        testBoardJson = getJsonToSend(DataValue.createObj()
+            .set(RECORDS, DataValue.createArr().add(BoardTestData.getEmptyId() + BoardTestData.BOARD_ID))
+            .set(ATTRIBUTES, DataValue.createArr()
+                .add(BoardTestData.PROP_ID + STR)
+                .add(BoardTestData.PROP_READ_ONLY)
+                .add(BoardTestData.PROP_NAME + STR)
+                .add(BoardTestData.PROP_COLUMNS + "[]" + STR))
+            .toString());
         return testBoardJson;
     }
 
@@ -199,19 +199,19 @@ public class BoardRecordsDaoTest {
         if (queryBoardJson != null) {
             return queryBoardJson;
         }
-        queryBoardJson = getJsonToSend(new JSONObject()
-            .put(QUERY,
-                new JSONObject().put("sourceId", BoardTestData.UISERV_APP_ID + "/" + BoardRecordsDao.ID)
-                    .put(LANGUAGE, PredicateService.LANGUAGE_PREDICATE)
-                    .put("page", new JSONObject().put("maxItems", 10))
-                    .put(QUERY, new JSONObject()
-                        .put("t", "eq")
-                        .put("att", BoardTestData.PROP_ID)
-                        .put("val", BoardTestData.BOARD_ID)
+        queryBoardJson = getJsonToSend(DataValue.createObj()
+            .set(QUERY,
+                DataValue.createObj().set("sourceId", BoardTestData.UISERV_APP_ID + "/" + BoardRecordsDao.ID)
+                    .set(LANGUAGE, PredicateService.LANGUAGE_PREDICATE)
+                    .set("page", DataValue.createObj().set("maxItems", 10))
+                    .set(QUERY, DataValue.createObj()
+                        .set("t", "eq")
+                        .set("att", BoardTestData.PROP_ID)
+                        .set("val", BoardTestData.BOARD_ID)
                     ))
-            .put(ATTRIBUTES, new JSONObject()
-                .put(BoardTestData.PROP_NAME, BoardTestData.PROP_NAME)
-                .put(BoardTestData.PROP_ID, BoardTestData.PROP_ID)).toString(2));
+            .set(ATTRIBUTES, DataValue.createObj()
+                .set(BoardTestData.PROP_NAME, BoardTestData.PROP_NAME)
+                .set(BoardTestData.PROP_ID, BoardTestData.PROP_ID)).toString());
         return queryBoardJson;
     }
 

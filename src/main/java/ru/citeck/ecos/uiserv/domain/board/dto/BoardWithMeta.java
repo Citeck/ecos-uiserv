@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
-import ru.citeck.ecos.uiserv.app.application.constants.AppConstants;
+import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.board.api.records.BoardRecordsDao;
 
 import java.time.Instant;
@@ -53,6 +53,6 @@ public class BoardWithMeta {
     }
 
     public RecordRef getRef() {
-        return RecordRef.create(AppConstants.APP_NAME, BoardRecordsDao.ID, getLocalId());
+        return RecordRef.create(Application.NAME, BoardRecordsDao.ID, getLocalId());
     }
 }

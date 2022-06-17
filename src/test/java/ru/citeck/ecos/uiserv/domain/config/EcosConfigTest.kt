@@ -1,16 +1,16 @@
 package ru.citeck.ecos.uiserv.domain.config
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.junit4.SpringRunner
 import ru.citeck.ecos.config.lib.consumer.bean.EcosConfig
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.uiserv.Application
+import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension
 
-@RunWith(SpringRunner::class)
+@ExtendWith(EcosSpringExtension::class)
 @SpringBootTest(classes = [Application::class])
 class EcosConfigTest {
 

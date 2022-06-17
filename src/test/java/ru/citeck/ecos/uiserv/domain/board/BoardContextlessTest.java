@@ -1,20 +1,21 @@
 package ru.citeck.ecos.uiserv.domain.board;
 
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.citeck.ecos.commons.data.MLText;
-import ru.citeck.ecos.records3.RecordsProperties;
+import ru.citeck.ecos.commons.test.EcosWebAppContextMock;
 import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.RecordsServiceFactory;
 import ru.citeck.ecos.records3.record.request.RequestContext;
-import ru.citeck.ecos.uiserv.app.application.constants.AppConstants;
+import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.board.api.records.BoardRecordsDao;
 import ru.citeck.ecos.uiserv.domain.board.api.records.ResolvedBoardRecordsDao;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.eapps.BoardArtifactHandler;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
+import ru.citeck.ecos.webapp.api.context.EcosWebAppContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -27,14 +28,13 @@ public class BoardContextlessTest {
 
     @BeforeEach
     private void init(){
+        EcosWebAppContext webAppContext = new EcosWebAppContextMock(Application.NAME);
+
         recordsServiceFactory = new RecordsServiceFactory(){
-            @NotNull
+            @Nullable
             @Override
-            protected RecordsProperties createProperties() {
-                RecordsProperties properties = super.createProperties();
-                properties.setAppInstanceId("102030");
-                properties.setAppName(AppConstants.APP_NAME);
-                return properties;
+            public EcosWebAppContext getEcosWebAppContext() {
+                return webAppContext;
             }
         };
         boardService = new BoardServiceMock(recordsServiceFactory);

@@ -4,16 +4,15 @@ import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.model.lib.type.dto.CreateVariantDef
 import ru.citeck.ecos.records2.RecordRef
-import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
+import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
-import ru.citeck.ecos.uiserv.app.common.service.AuthoritiesSupport
-import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDef
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
@@ -24,8 +23,7 @@ import kotlin.collections.HashSet
 @Component
 class ResolvedMenuRecords(
     private val menuRecords: MenuRecords,
-    private val ecosTypeService: EcosTypeService,
-    private val authoritiesSupport: AuthoritiesSupport
+    private val ecosTypeService: EcosTypeService
 ) : AbstractRecordsDao(), RecordAttsDao, RecordsQueryDao {
 
     companion object {
@@ -45,13 +43,15 @@ class ResolvedMenuRecords(
         val records = menuRecords.queryRecords(recsQuery)
         val result = RecsQueryRes<Any>()
 
-        result.setRecords(records.getRecords().map {
-            if (it is MenuRecords.MenuRecord) {
-                ResolvedMenu(it)
-            } else {
-                it
+        result.setRecords(
+            records.getRecords().map {
+                if (it is MenuRecords.MenuRecord) {
+                    ResolvedMenu(it)
+                } else {
+                    it
+                }
             }
-        })
+        )
         result.setTotalCount(records.getTotalCount())
         result.setHasMore(records.getHasMore())
 
@@ -73,9 +73,8 @@ class ResolvedMenuRecords(
         private val subMenus: Map<String, SubMenuDef>
 
         init {
-            val authorities = HashSet(ArrayList(authoritiesSupport.currentUserAuthorities))
-            SecurityUtils.getCurrentUserLogin().ifPresent { authorities.add(it) }
-            subMenus = processMenuItems(originalDef, authorities.map { it.toLowerCase() }.toSet())
+            val authorities = HashSet(ArrayList(AuthContext.getCurrentUserWithAuthorities()))
+            subMenus = processMenuItems(originalDef, authorities.map { it.lowercase() }.toSet())
         }
 
         fun getUser(): SubMenuDef {
@@ -95,7 +94,6 @@ class ResolvedMenuRecords(
                 val createMenu = SubMenuDef()
                 createMenu.items = emptyList()
                 createMenu
-
             } else {
 
                 val createMenu = SubMenuDef()
@@ -104,7 +102,7 @@ class ResolvedMenuRecords(
             }
         }
 
-        private fun preProcessSubMenuItems(items: List<MenuItemDef>) : List<MenuItemDef> {
+        private fun preProcessSubMenuItems(items: List<MenuItemDef>): List<MenuItemDef> {
 
             val resultItems = ArrayList<MenuItemDef>()
 
@@ -127,10 +125,11 @@ class ResolvedMenuRecords(
                     }
                 } else if (createMenuItem.type == "SECTION") {
 
-                    resultItems.add(createMenuItem.copy()
-                        .withItems(preProcessSubMenuItems(createMenuItem.items))
-                        .build())
-
+                    resultItems.add(
+                        createMenuItem.copy()
+                            .withItems(preProcessSubMenuItems(createMenuItem.items))
+                            .build()
+                    )
                 } else {
                     resultItems.add(createMenuItem)
                 }
@@ -168,7 +167,6 @@ class ResolvedMenuRecords(
                     sectionNameById[item0.id] = item0.label
                     val variantsRes = variants.computeIfAbsent(item0.id) { ArrayList() }
                     extractCreateVariantsFromItem(item0, variantsRes, visitedTypes)
-
                 } else if (item0.type == "JOURNAL") {
 
                     val variantsRes = variants.computeIfAbsent(section.id) { ArrayList() }
@@ -185,26 +183,28 @@ class ResolvedMenuRecords(
                 sectionItemDef.withLabel(sectionNameById[id] ?: MLText(sectionItemDef.id))
                 sectionItemDef.withType("SECTION")
 
-                sectionItemDef.withItems(variants.map {
+                sectionItemDef.withItems(
+                    variants.map {
 
-                    val cvItemDef = MenuItemDef.create()
-                    cvItemDef.withId("${it.typeRef}-${it.id}")
+                        val cvItemDef = MenuItemDef.create()
+                        cvItemDef.withId("${it.typeRef}-${it.id}")
 
-                    val config = ObjectData.create()
+                        val config = ObjectData.create()
 
-                    config.set("typeRef", it.typeRef.toString())
-                    config.set("variantId", it.id)
-                    config.set("recordRef", it.typeRef)
-                    config.set("variantTypeRef", it.typeRef)
+                        config.set("typeRef", it.typeRef.toString())
+                        config.set("variantId", it.id)
+                        config.set("recordRef", it.typeRef)
+                        config.set("variantTypeRef", it.typeRef)
 
-                    config.set("variant", it)
+                        config.set("variant", it)
 
-                    cvItemDef.withConfig(config)
+                        cvItemDef.withConfig(config)
 
-                    cvItemDef.withType("LINK-CREATE-CASE")
-                    cvItemDef.withLabel(it.name)
-                    cvItemDef.build()
-                })
+                        cvItemDef.withType("LINK-CREATE-CASE")
+                        cvItemDef.withLabel(it.name)
+                        cvItemDef.build()
+                    }
+                )
 
                 if (sectionItemDef.items.isNotEmpty()) {
                     result.add(sectionItemDef.build())
@@ -214,9 +214,11 @@ class ResolvedMenuRecords(
             return result
         }
 
-        private fun extractCreateVariantsFromItem(item: MenuItemDef,
-                                                  result: MutableList<CreateVariantDef>,
-                                                  visitedTypes: MutableSet<RecordRef>) {
+        private fun extractCreateVariantsFromItem(
+            item: MenuItemDef,
+            result: MutableList<CreateVariantDef>,
+            visitedTypes: MutableSet<RecordRef>
+        ) {
 
             if (item.type == "SECTION") {
                 item.items.forEach {
@@ -230,14 +232,16 @@ class ResolvedMenuRecords(
                     val typeRef = ecosTypeService.getTypeRefByJournal(RecordRef.valueOf(journalRef))
                     if (RecordRef.isNotEmpty(typeRef) && visitedTypes.add(typeRef)) {
                         val typeInfo = ecosTypeService.getTypeInfo(typeRef)
-                        result.addAll(typeInfo?.inhCreateVariants ?: emptyList())
+                        result.addAll(typeInfo?.createVariants ?: emptyList())
                     }
                 }
             }
         }
 
-        private fun processMenuItems(subMenu: Map<String, SubMenuDef>,
-                                     authorities: Set<String>):  Map<String, SubMenuDef> {
+        private fun processMenuItems(
+            subMenu: Map<String, SubMenuDef>,
+            authorities: Set<String>
+        ): Map<String, SubMenuDef> {
 
             val result = HashMap<String, SubMenuDef>()
             subMenu.forEach { (menuType, menu) ->
@@ -262,7 +266,7 @@ class ResolvedMenuRecords(
             if (item.hidden) {
                 return null
             }
-            if (item.allowedFor.isNotEmpty() && !item.allowedFor.any { authorities.contains(it.toLowerCase()) }) {
+            if (item.allowedFor.isNotEmpty() && !item.allowedFor.any { authorities.contains(it.lowercase()) }) {
                 return null
             }
 
@@ -277,12 +281,12 @@ class ResolvedMenuRecords(
                 val variantId = item.config.get("variantId").asText()
                 if (RecordRef.isNotEmpty(variantTypeRef)) {
                     val typeInfo = ecosTypeService.getTypeInfo(variantTypeRef)
-                    val variant = typeInfo?.inhCreateVariants?.find {
+                    val variant = typeInfo?.createVariants?.find {
                         it.id == variantId && it.typeRef == variantTypeRef
                     }
                     if (variant != null) {
                         val newConfig = ObjectData.deepCopyOrNew(item.config)
-                        newConfig.set("variant", variant)
+                        newConfig["variant"] = variant
                         newItem.withConfig(newConfig)
                         newItem.withLabel(variant.name)
                     }

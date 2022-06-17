@@ -14,7 +14,8 @@ class RecordsDaoTest : ActionsTestBase() {
     @Test
     fun test() {
 
-        val actionAtts = ObjectData.create("""
+        val actionAtts = ObjectData.create(
+            """
             {
                 "moduleId": "test-action",
                 "name": {
@@ -27,7 +28,8 @@ class RecordsDaoTest : ActionsTestBase() {
                     "val": "testVal"
                 }
             }
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         assertThat(actionDao.getCount()).isEqualTo(0)
 

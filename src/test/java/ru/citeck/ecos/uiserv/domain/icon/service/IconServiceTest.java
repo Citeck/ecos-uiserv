@@ -1,18 +1,17 @@
 package ru.citeck.ecos.uiserv.domain.icon.service;
 
 import org.apache.commons.lang3.RandomUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.icon.repo.IconEntity;
 import ru.citeck.ecos.uiserv.domain.icon.dto.IconDto;
 import ru.citeck.ecos.uiserv.domain.icon.repo.IconRepository;
-import ru.citeck.ecos.uiserv.domain.icon.service.IconService;
+import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -22,7 +21,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(EcosSpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class IconServiceTest {
@@ -31,7 +30,7 @@ public class IconServiceTest {
     @Autowired
     private IconService iconService;
 
-    @Before
+    @BeforeEach
     public void cleanRepo() {
         iconRepository.deleteAll();
     }

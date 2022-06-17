@@ -2,9 +2,8 @@ package ru.citeck.ecos.uiserv.domain.devtools.dto
 
 import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
 import mu.KotlinLogging
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize as JackJsonDeserialize
-
 import ru.citeck.ecos.commons.data.ObjectData
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize as JackJsonDeserialize
 
 @JsonDeserialize(builder = BuildInfo.Builder::class)
 @JackJsonDeserialize(builder = BuildInfo.Builder::class)

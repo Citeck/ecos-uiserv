@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.uiserv.domain.config.api.records.ConfigRecords;
 import ru.citeck.ecos.uiserv.domain.menu.dao.MenuDao;
 import ru.citeck.ecos.uiserv.domain.menu.repo.MenuEntity;
-import ru.citeck.ecos.uiserv.app.common.service.AuthoritiesSupport;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDeployArtifact;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef;
@@ -47,7 +47,6 @@ public class MenuService {
 
     private final MenuDao menuDao;
     private final MenuReaderService readerService;
-    private final AuthoritiesSupport authoritiesSupport;
 
     private final RecordsService recordsService;
 
@@ -157,7 +156,7 @@ public class MenuService {
         MenuDto menu = findFirstByAuthorities(userNameVariants, version)
             .orElseGet(() -> {
 
-                Set<String> authToRequest = new HashSet<>(authoritiesSupport.getCurrentUserAuthorities());
+                Set<String> authToRequest = new HashSet<>(AuthContext.getCurrentUserWithAuthorities());
 
                 authToRequest.removeAll(userNameVariants);
                 List<String> orderedAuthorities = getOrderedAuthorities(authToRequest).stream()

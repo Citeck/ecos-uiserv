@@ -1,29 +1,30 @@
 package ru.citeck.ecos.uiserv.domain.userconfig.service;
 
 import org.apache.commons.lang.StringUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.userconfig.dto.UserConfigurationDto;
 import ru.citeck.ecos.uiserv.domain.userconfig.repo.UserConfigurationEntity;
 import ru.citeck.ecos.uiserv.domain.userconfig.repo.UserConfigurationsRepository;
+import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
 
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(EcosSpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class UserConfigurationsServiceTest {
@@ -39,7 +40,7 @@ public class UserConfigurationsServiceTest {
     @Autowired
     private UserConfigurationsService userConfigurationsService;
 
-    @Before
+    @BeforeEach
     public void prepare() {
         userConfigurationsRepository.deleteAll();
         SecurityContextHolder.getContext().setAuthentication(
@@ -79,16 +80,19 @@ public class UserConfigurationsServiceTest {
         assertEquals(configuration.getData(), saved.getData());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void save_nullEntity() {
-        userConfigurationsService.save(null);
+        assertThrows(IllegalArgumentException.class, () -> {
+            userConfigurationsService.save(null);
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void save_entityWithNullData() {
         UserConfigurationDto configuration = new UserConfigurationDto();
-
-        userConfigurationsService.save(configuration);
+        assertThrows(IllegalArgumentException.class, () ->
+            userConfigurationsService.save(configuration)
+        );
     }
 
     @Test

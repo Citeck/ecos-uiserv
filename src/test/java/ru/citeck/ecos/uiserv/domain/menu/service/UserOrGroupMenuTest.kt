@@ -13,9 +13,11 @@ class UserOrGroupMenuTest : MenuTestBase() {
     @Test
     fun test() {
 
-        records.register(RecordsDaoBuilder.create(ConfigRecords.ID)
-            .addRecord("menu-group-priority", MenuGroupPriorityConfig(listOf("user-group")))
-            .build())
+        records.register(
+            RecordsDaoBuilder.create(ConfigRecords.ID)
+                .addRecord("menu-group-priority", MenuGroupPriorityConfig(listOf("user-group")))
+                .build()
+        )
 
         val userMenu = MenuDto("test-user-menu")
         userMenu.authorities = listOf("user")

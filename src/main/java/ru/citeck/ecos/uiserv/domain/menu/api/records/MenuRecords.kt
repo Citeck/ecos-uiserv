@@ -82,10 +82,12 @@ class MenuRecords(
             }
         }
         val result = RecsQueryRes<Any>()
-        result.setRecords(menuService.allMenus
-            .stream()
-            .map { model: MenuDto? -> MenuRecord(model) }
-            .collect(Collectors.toList()))
+        result.setRecords(
+            menuService.allMenus
+                .stream()
+                .map { model: MenuDto? -> MenuRecord(model) }
+                .collect(Collectors.toList())
+        )
         return result
     }
 

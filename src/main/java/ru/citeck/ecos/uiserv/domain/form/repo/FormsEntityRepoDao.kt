@@ -74,8 +74,8 @@ class FormsEntityRepoDao(
         return orSpec(
             spec0,
             Specification { root: Root<EcosFormEntity>,
-                            _: CriteriaQuery<*>,
-                            builder: CriteriaBuilder ->
+                _: CriteriaQuery<*>,
+                builder: CriteriaBuilder ->
 
                 builder.like(
                     builder.lower(root.get(field)),

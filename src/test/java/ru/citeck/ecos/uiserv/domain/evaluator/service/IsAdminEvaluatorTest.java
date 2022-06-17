@@ -1,9 +1,8 @@
 package ru.citeck.ecos.uiserv.domain.evaluator.service;
 
 import lombok.Data;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.RecordsServiceFactory;
 import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
@@ -19,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class IsAdminEvaluatorTest extends LocalRecordsDao implements LocalRecordsMetaDao<Object> {
 
     private static final String ID = "isAdminEvaluatorTest";
@@ -26,7 +27,7 @@ public class IsAdminEvaluatorTest extends LocalRecordsDao implements LocalRecord
     private RecordEvaluatorService evaluatorsService;
     private RecordsServiceFactory factory = new RecordsServiceFactory();
 
-    @Before
+    @BeforeEach
     public void setup() {
         setId(ID);
 
@@ -55,7 +56,7 @@ public class IsAdminEvaluatorTest extends LocalRecordsDao implements LocalRecord
             evaluatorsService.evaluate(recordRef, evaluatorDto));
 
         //  assert
-        Assert.assertTrue(result);
+        assertTrue(result);
     }
 
     @Override

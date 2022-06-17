@@ -1,14 +1,14 @@
 package ru.citeck.ecos.uiserv.domain.board;
 
 import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef;
@@ -17,14 +17,17 @@ import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.repo.BoardRepository;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardMapper;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
+import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(EcosSpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @DirtiesContext
 public class BoardServiceContextTest {
@@ -34,7 +37,7 @@ public class BoardServiceContextTest {
     @Autowired
     private BoardRepository repository;
 
-    @Before
+    @BeforeEach
     public void createTestBoard(){
         repository.save(BoardMapper.dtoToEntity(repository, BoardTestData.getTestBoard()));
     }

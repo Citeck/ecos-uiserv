@@ -4,13 +4,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.model.lib.status.dto.StatusDef;
-import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
-import ru.citeck.ecos.uiserv.domain.ecostype.dto.EcosTypeInfo;
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService;
+import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,7 +49,7 @@ public class ResolvedBoardRecord {
         if (!CollectionUtils.isEmpty(boardDef.getColumns())) {
             return Collections.unmodifiableList(boardDef.getColumns());
         }
-        EcosTypeInfo typeInfo = typeService.getTypeInfo(boardDef.getTypeRef());
+        TypeDef typeInfo = typeService.getTypeInfo(boardDef.getTypeRef());
         if (typeInfo != null && typeInfo.getModel() != null) {
             List<BoardColumnDef> columns = new ArrayList<>();
             for (StatusDef statusDef : typeInfo.getModel().getStatuses()) {
@@ -82,7 +81,7 @@ public class ResolvedBoardRecord {
         }
         RecordRef typeRef = getTypeRef();
         if (RecordRef.isNotEmpty(typeRef)) {
-            EcosTypeInfo typeInfo = typeService.getTypeInfo(typeRef);
+            TypeDef typeInfo = typeService.getTypeInfo(typeRef);
             if (typeInfo != null) {
                 return typeInfo.getJournalRef();
             }

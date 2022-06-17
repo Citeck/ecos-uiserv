@@ -13,9 +13,11 @@ class UserWithLowerCaseTest : MenuTestBase() {
     @Test
     fun test() {
 
-        records.register(RecordsDaoBuilder.create(ConfigRecords.ID)
-            .addRecord("menu-group-priority", MenuGroupPriorityConfig(listOf("user-group")))
-            .build())
+        records.register(
+            RecordsDaoBuilder.create(ConfigRecords.ID)
+                .addRecord("menu-group-priority", MenuGroupPriorityConfig(listOf("user-group")))
+                .build()
+        )
 
         testImpl(listOf("User"), "user", emptyList())
         testImpl(listOf("User"), "uSer", emptyList())

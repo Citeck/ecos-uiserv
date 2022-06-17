@@ -20,7 +20,6 @@ import ru.citeck.ecos.uiserv.domain.action.repo.ActionEntity
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
-import java.util.function.BiConsumer
 import java.util.function.Consumer
 
 @Service
@@ -141,8 +140,9 @@ class ActionService(
         val evaluators = actionArtifacts.map { actionDto ->
             var recordEvaluatorDto = actionDto.evaluator
 
-            if (recordEvaluatorDto == null && actionDto.predicate != null
-                && actionDto.predicate != VoidPredicate.INSTANCE) {
+            if (recordEvaluatorDto == null && actionDto.predicate != null &&
+                actionDto.predicate != VoidPredicate.INSTANCE
+            ) {
 
                 recordEvaluatorDto = RecordEvaluatorDto()
                 recordEvaluatorDto.type = PredicateEvaluator.TYPE
@@ -160,8 +160,10 @@ class ActionService(
                 recordEvaluatorDto.type = recordEvaluatorDto.id
             }
             if (recordEvaluatorDto.type == null) {
-                log.error("Evaluator type is null: '" + recordEvaluatorDto + "'. " +
-                    "Replace it with Always False Evaluator. Action: " + actionDto)
+                log.error(
+                    "Evaluator type is null: '" + recordEvaluatorDto + "'. " +
+                        "Replace it with Always False Evaluator. Action: " + actionDto
+                )
                 recordEvaluatorDto.type = AlwaysFalseEvaluator.TYPE
             }
             recordEvaluatorDto

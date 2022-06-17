@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.uiserv.app.common.service.AuthoritiesSupport;
-import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils;
+import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.uiserv.app.web.exception.JournalPrefsNotFoundException;
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType;
 import ru.citeck.ecos.uiserv.domain.file.service.FileService;
@@ -33,7 +32,6 @@ public class JournalPrefApi {
     private final JournalPrefService journalPrefService;
     private final FileService fileService;
     private final ObjectMapper objectMapper;
-    private final AuthoritiesSupport authoritiesSupport;
 
     private final JournalSettingsService journalSettingsService;
 
@@ -44,7 +42,7 @@ public class JournalPrefApi {
     @GetMapping
     public JsonNode getJournalPrefs(@RequestParam String id) {
 
-        String username = SecurityUtils.getCurrentUserLoginFromRequestContext();
+        String username = AuthContext.getCurrentUser();
         JournalSettingsDto settings = journalSettingsService.getById(id);
         if (settings != null) {
             if (!username.equals(settings.getAuthority())) {
@@ -71,7 +69,7 @@ public class JournalPrefApi {
             return;
         }
 
-        String username = SecurityUtils.getCurrentUserLoginFromRequestContext();
+        String username = AuthContext.getCurrentUser();
 
         if (!Objects.equals(username, dto.getAuthority())) {
             throw new RuntimeException("Access denied");
@@ -91,7 +89,7 @@ public class JournalPrefApi {
     @DeleteMapping("/id/{journalViewPrefsId}")
     public void deleteJournalPrefs(@PathVariable String journalViewPrefsId) {
 
-        String username = SecurityUtils.getCurrentUserLoginFromRequestContext();
+        String username = AuthContext.getCurrentUser();
 
         JournalSettingsDto settings = journalSettingsService.getById(journalViewPrefsId);
         if (settings != null) {
@@ -110,7 +108,7 @@ public class JournalPrefApi {
     public String postJournalPrefs(@RequestParam String journalId,
                                    @RequestBody byte[] bytes) {
 
-        String username = SecurityUtils.getCurrentUserLoginFromRequestContext();
+        String username = AuthContext.getCurrentUser();
 
         username = validateUsername(username);
         validateBody(bytes);

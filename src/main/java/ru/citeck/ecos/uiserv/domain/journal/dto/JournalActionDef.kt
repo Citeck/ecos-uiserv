@@ -100,9 +100,9 @@ data class JournalActionDef(
         }
 
         fun withConfigMap(map: Map<String, String>) {
-            val obj = ObjectData.create();
+            val obj = ObjectData.create()
             map.forEach { (k, v) -> obj.set(k, v) }
-            withConfig(obj);
+            withConfig(obj)
         }
 
         fun withId(id: String): Builder {

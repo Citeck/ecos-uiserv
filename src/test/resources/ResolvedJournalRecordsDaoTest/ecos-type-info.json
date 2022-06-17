@@ -8,15 +8,15 @@
   "formRef": "uiserv/form@simple-journal",
   "journalRef": "uiserv/journal@simple-journal",
   "metaRecord": null,
-  "inhSourceId": "alfresco/",
+  "sourceId": "alfresco/",
   "parents": [
     "emodel/type@simple-journal",
     "emodel/type@data-list",
     "emodel/type@user-base",
     "emodel/type@base"
   ],
-  "inhDashboardType": "case-details",
-  "inhCreateVariants": [
+  "dashboardType": "case-details",
+  "createVariants": [
     {
       "id": "DEFAULT",
       "name": {
@@ -60,7 +60,7 @@
       }
     ]
   },
-  "inhActions": [
+  "actions": [
     "uiserv/action@edit",
     "uiserv/action@delete"
   ],

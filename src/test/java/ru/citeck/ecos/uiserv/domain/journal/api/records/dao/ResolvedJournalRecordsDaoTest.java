@@ -4,28 +4,29 @@ import ecos.com.fasterxml.jackson210.databind.JsonNode;
 import org.apache.commons.lang3.LocaleUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.internal.util.reflection.FieldSetter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.source.dao.local.InMemRecordsDao;
 import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.record.atts.dto.RecordAtts;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.ecostype.dto.EcosTypeInfo;
 import ru.citeck.ecos.uiserv.domain.journal.api.records.ResolvedJournalRecordsDao;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef;
 import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedColumnDef;
 import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedJournalDef;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
+import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef;
+import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry;
+import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
 
 import java.io.File;
 import java.util.Arrays;
@@ -39,7 +40,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ActiveProfiles("test")
+@ExtendWith(EcosSpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class ResolvedJournalRecordsDaoTest {
@@ -51,7 +52,7 @@ public class ResolvedJournalRecordsDaoTest {
     private JournalRepository journalRepository;
 
     @Autowired
-    private InMemRecordsDao<EcosTypeInfo> typesSyncRecordsDao;
+    private EcosTypesRegistry typesRegistry;
 
     private JournalEntity journalEntity;
 
@@ -71,8 +72,8 @@ public class ResolvedJournalRecordsDaoTest {
 
     @BeforeEach
     private void setUp() {
-        EcosTypeInfo ecosTypeInfo = getSomethingFromFile(ECOS_TYPE_INFO_JSON, EcosTypeInfo.class);
-        typesSyncRecordsDao.setRecord(ecosTypeInfo.getId(), ecosTypeInfo);
+        TypeDef ecosTypeInfo = getSomethingFromFile(ECOS_TYPE_INFO_JSON, TypeDef.class);
+        typesRegistry.setValue(ecosTypeInfo.getId(), ecosTypeInfo);
         journalRepository.deleteAll();
 
         journalEntity = getSomethingFromFile(TEST_SIMPLE_JOURNAL_ENTITY_JSON, JournalEntity.class);

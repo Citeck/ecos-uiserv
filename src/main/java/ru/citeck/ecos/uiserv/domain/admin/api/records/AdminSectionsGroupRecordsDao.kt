@@ -30,9 +30,13 @@ class AdminSectionsGroupRecordsDao(
         }
         val listSecGroup = adminSectionsGroupService.findAll()
         return listSecGroup.map { group ->
-            PageSectionGroup(group.withSections(group.sections.map {
-                resolveSection(it)
-            }))
+            PageSectionGroup(
+                group.withSections(
+                    group.sections.map {
+                        resolveSection(it)
+                    }
+                )
+            )
         }
     }
 

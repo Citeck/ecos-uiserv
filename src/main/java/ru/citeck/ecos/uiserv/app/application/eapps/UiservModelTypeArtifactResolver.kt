@@ -17,9 +17,11 @@ class UiservModelTypeArtifactResolver(
 
         val result = mutableListOf<RecordRef>()
         val forms = formsService.getFormsForExactType(typeRef)
-        result.addAll(forms.map {
-            RecordRef.valueOf("uiserv/" + EcosFormRecordsDao.ID + "@" + it.id)
-        })
+        result.addAll(
+            forms.map {
+                RecordRef.valueOf("uiserv/" + EcosFormRecordsDao.ID + "@" + it.id)
+            }
+        )
 
         return result
     }

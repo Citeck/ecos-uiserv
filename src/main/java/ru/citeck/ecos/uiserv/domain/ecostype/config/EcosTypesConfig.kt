@@ -1,32 +1,22 @@
 package ru.citeck.ecos.uiserv.domain.ecostype.config
 
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.ApplicationListener
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.event.ContextRefreshedEvent
-import org.springframework.core.task.AsyncTaskExecutor
-import ru.citeck.ecos.commons.data.MLText
-import ru.citeck.ecos.model.lib.type.dto.TypeInfo
-import ru.citeck.ecos.model.lib.type.repo.TypesRepo
 import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
 import ru.citeck.ecos.records2.RecordRef
-import ru.citeck.ecos.records2.source.dao.local.InMemRecordsDao
-import ru.citeck.ecos.records2.source.dao.local.RemoteSyncRecordsDao
-import ru.citeck.ecos.uiserv.domain.ecostype.dto.EcosTypeInfo
+import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
+import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import javax.annotation.PostConstruct
 
 @Configuration
 class EcosTypesConfig(
-    @Qualifier("taskExecutor")
-    private val taskExecutor: AsyncTaskExecutor
-) : ApplicationListener<ContextRefreshedEvent> {
+    private val typesRegistry: EcosTypesRegistry
+) {
 
     private val parentByType = ConcurrentHashMap<RecordRef, RecordRef>()
     private val childrenByType = ConcurrentHashMap<RecordRef, MutableList<RecordRef>>()
-    private val typeInfoByTypeRef = ConcurrentHashMap<RecordRef, EcosTypeInfo>()
+    private val typeInfoByTypeRef = ConcurrentHashMap<RecordRef, TypeDef>()
 
     private val typeByJournal = ConcurrentHashMap<RecordRef, RecordRef>()
     private val journalByType = ConcurrentHashMap<RecordRef, RecordRef>()
@@ -37,23 +27,16 @@ class EcosTypesConfig(
     private val typeByBoard = ConcurrentHashMap<RecordRef, RecordRef>()
     private val boardByType = ConcurrentHashMap<RecordRef, RecordRef>()
 
-    private var typesSyncStarted = false
-
-    @Value("\${uiserv.ecos-types-sync.active}")
-    private var typesSyncEnabled: Boolean = false
-
-    @Bean(name = ["typesSyncRecordsDao"])
-    fun createRemoteTypesSyncRecordsDao(): InMemRecordsDao<EcosTypeInfo> {
-        val syncDao: InMemRecordsDao<EcosTypeInfo> = if (typesSyncEnabled) {
-            RemoteSyncRecordsDao("emodel/type", EcosTypeInfo::class.java)
-        } else {
-            InMemRecordsDao("emodel/type")
+    @PostConstruct
+    fun init() {
+        typesRegistry.listenEvents { _, _, after ->
+            if (after != null) {
+                onTypeChanged(after)
+            }
         }
-        syncDao.addOnChangeListener { onTypeChanged(it) }
-        return syncDao
     }
 
-    private fun onTypeChanged(type: EcosTypeInfo) {
+    private fun onTypeChanged(type: TypeDef) {
 
         val typeRef = TypeUtils.getTypeRef(type.id)
         typeInfoByTypeRef[typeRef] = type
@@ -96,8 +79,12 @@ class EcosTypesConfig(
         }
     }
 
-    fun addOnTypeChangedListener(listener: (EcosTypeInfo) -> Unit) {
-        createRemoteTypesSyncRecordsDao().addOnChangeListener { listener.invoke(it) }
+    fun addOnTypeChangedListener(listener: (TypeDef) -> Unit) {
+        typesRegistry.listenEvents { _, _, after ->
+            if (after != null) {
+                listener.invoke(after)
+            }
+        }
     }
 
     fun getJournalRefByType(journalRef: RecordRef): RecordRef {
@@ -116,41 +103,7 @@ class EcosTypesConfig(
         return typeByBoard[boardRef] ?: RecordRef.EMPTY
     }
 
-    fun getTypeInfo(typeRef: RecordRef): EcosTypeInfo? {
+    fun getTypeInfo(typeRef: RecordRef): TypeDef? {
         return typeInfoByTypeRef[typeRef]
-    }
-
-    @Bean
-    fun ecosTypesRepo(): TypesRepo {
-
-        val typesDao = createRemoteTypesSyncRecordsDao()
-
-        return object : TypesRepo {
-
-            override fun getChildren(typeRef: RecordRef): List<RecordRef> {
-                return childrenByType[typeRef] ?: emptyList()
-            }
-
-            override fun getTypeInfo(typeRef: RecordRef): TypeInfo? {
-                val typeInfo = typesDao.getRecord(typeRef.id).orElse(null) ?: return null
-                return TypeInfo.create {
-                    withId(typeInfo.id)
-                    withName(typeInfo.name ?: MLText.EMPTY)
-                    withSourceId(typeInfo.inhSourceId ?: "")
-                    withParentRef(typeInfo.parentRef)
-                    withModel(typeInfo.model)
-                }
-            }
-        }
-    }
-
-    override fun onApplicationEvent(event: ContextRefreshedEvent) {
-        if (!typesSyncStarted && typesSyncEnabled) {
-            taskExecutor.execute {
-                Thread.sleep(5_000)
-                createRemoteTypesSyncRecordsDao().getRecord("base")
-            }
-            typesSyncStarted = true
-        }
     }
 }

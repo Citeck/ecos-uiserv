@@ -21,7 +21,6 @@ import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
-import ru.citeck.ecos.uiserv.domain.ecostype.dto.EcosTypeInfo
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeAttsUtils
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
@@ -30,6 +29,7 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSearchConfig
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSortByDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedJournalDef
+import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -76,7 +76,7 @@ class ResolvedJournalRecordsDao(
 
         val typeRef = journalBuilder.typeRef
 
-        var typeInfo: EcosTypeInfo? = null
+        var typeInfo: TypeDef? = null
         if (RecordRef.isNotEmpty(typeRef)) {
             typeInfo = ecosTypeService.getTypeInfo(typeRef)
         }
@@ -90,14 +90,14 @@ class ResolvedJournalRecordsDao(
         return createResolvedDef(journal, journalBuilder, typeInfo)
     }
 
-    private fun resolveActionsFromType(journalBuilder: JournalDef.Builder, typeInfo: EcosTypeInfo?) {
+    private fun resolveActionsFromType(journalBuilder: JournalDef.Builder, typeInfo: TypeDef?) {
         val actions = ArrayList(journalBuilder.actions)
         val isInherit = journalBuilder.actionsFromType
         if (isInherit == false || isInherit == null && actions.size > 0) {
             return
         }
 
-        typeInfo?.inhActions?.map {
+        typeInfo?.actions?.map {
             if (it.id != "record-actions") {
                 actions.add(it)
             }
@@ -113,26 +113,29 @@ class ResolvedJournalRecordsDao(
         }
 
         val actions = ArrayList(journalBuilder.actions)
-        journalBuilder.withActionsDef(actionsDef.map {
-            val localId = if (it.id.isBlank()) {
-                val actionBytes = Json.mapper.toBytes(it) ?: ByteArray(0)
-                DigestUtils.md5DigestAsHex(actionBytes)
-            } else {
-                it.id
+        journalBuilder.withActionsDef(
+            actionsDef.map {
+                val localId = if (it.id.isBlank()) {
+                    val actionBytes = Json.mapper.toBytes(it) ?: ByteArray(0)
+                    DigestUtils.md5DigestAsHex(actionBytes)
+                } else {
+                    it.id
+                }
+                val action = it.copy()
+                action.withId("journal$${journalBuilder.id}$$localId")
+                actions.add(RecordRef.create("uiserv", "action", action.id))
+                action.build()
             }
-            val action = it.copy()
-            action.withId("journal$${journalBuilder.id}$$localId")
-            actions.add(RecordRef.create("uiserv", "action", action.id))
-            action.build()
-        })
+        )
 
         journalBuilder.withActions(actions)
     }
 
-    private fun createResolvedDef(journalRecord: JournalRecordsDao.JournalRecord,
-                                  journalBuilder: JournalDef.Builder,
-                                  typeInfo: EcosTypeInfo?): ResolvedJournalDef {
-
+    private fun createResolvedDef(
+        journalRecord: JournalRecordsDao.JournalRecord,
+        journalBuilder: JournalDef.Builder,
+        typeInfo: TypeDef?
+    ): ResolvedJournalDef {
 
         val newJournal = JournalRecordsDao.JournalRecord(journalRecord)
         newJournal.journalDef = journalBuilder.build()
@@ -140,7 +143,7 @@ class ResolvedJournalRecordsDao(
         val result = ResolvedJournalDef(newJournal) { resolveColumns(journalBuilder, typeInfo) }
 
         if (typeInfo != null) {
-            result.createVariants = typeInfo.inhCreateVariants ?: emptyList()
+            result.createVariants = typeInfo.createVariants ?: emptyList()
         }
 
         return result
@@ -164,7 +167,7 @@ class ResolvedJournalRecordsDao(
         }
     }
 
-    private fun resolveTypeJournalProps(journal: JournalDef.Builder, typeInfo: EcosTypeInfo?) {
+    private fun resolveTypeJournalProps(journal: JournalDef.Builder, typeInfo: TypeDef?) {
 
         if (MLText.isEmpty(journal.name)) {
             if (typeInfo != null) {
@@ -177,7 +180,7 @@ class ResolvedJournalRecordsDao(
 
         if (journal.sourceId.isBlank()) {
             if (typeInfo != null) {
-                journal.withSourceId(typeInfo.inhSourceId)
+                journal.withSourceId(typeInfo.sourceId)
             }
             if (journal.sourceId.isBlank()) {
                 journal.withSourceId("alfresco/")
@@ -194,7 +197,7 @@ class ResolvedJournalRecordsDao(
         }
     }
 
-    private fun resolveColumns(journal: JournalDef.Builder, typeInfo: EcosTypeInfo?): List<ResolvedColumnDef> {
+    private fun resolveColumns(journal: JournalDef.Builder, typeInfo: TypeDef?): List<ResolvedColumnDef> {
 
         val columns = if (journal.columns.isEmpty()) {
             typeInfo?.model?.attributes?.map {
@@ -206,10 +209,12 @@ class ResolvedJournalRecordsDao(
         return resolveEdgeMetaImpl(journal.searchConfig, journal.metaRecord, columns, typeInfo)
     }
 
-    private fun resolveEdgeMetaImpl(journalSearchConfig: JournalSearchConfig,
-                                    metaRecord: RecordRef,
-                                    columns: List<JournalColumnDef.Builder>,
-                                    typeInfo: EcosTypeInfo?): List<ResolvedColumnDef> {
+    private fun resolveEdgeMetaImpl(
+        journalSearchConfig: JournalSearchConfig,
+        metaRecord: RecordRef,
+        columns: List<JournalColumnDef.Builder>,
+        typeInfo: TypeDef?
+    ): List<ResolvedColumnDef> {
 
         val typeAtts: Map<String, AttributeDef> =
             typeInfo?.model?.getAllAttributes()?.associate { it.id to it } ?: emptyMap()
@@ -341,8 +346,8 @@ class ResolvedJournalRecordsDao(
         }
 
         columns.filter {
-            it.type == AttributeType.TEXT
-            || it.type == AttributeType.MLTEXT
+            it.type == AttributeType.TEXT ||
+                it.type == AttributeType.MLTEXT
         }.forEach {
             if (it.searchConfig.delimiters.isEmpty()) {
                 if (journalSearchConfig.delimiters.isNotEmpty()) {

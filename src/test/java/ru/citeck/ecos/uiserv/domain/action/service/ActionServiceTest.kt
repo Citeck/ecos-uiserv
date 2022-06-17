@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.action.service
 
-import junit.framework.Assert.assertEquals
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData

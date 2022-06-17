@@ -8,25 +8,25 @@ import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
 @IncludeNonDefault
 @JsonDeserialize(builder = JournalSettingsDto.Builder::class)
 open class JournalSettingsDto(
-        val id: String,
-        val name: MLText,
-        val authority: String,
-        val journalId: String,
-        val settings: ObjectData,
-        val creator: String
+    val id: String,
+    val name: MLText,
+    val authority: String,
+    val journalId: String,
+    val settings: ObjectData,
+    val creator: String
 ) {
     constructor(other: JournalSettingsDto) : this(
-            other.id,
-            other.name,
-            other.authority,
-            other.journalId,
-            other.settings,
-            other.creator)
-
-    constructor() : this(
-            "", MLText.EMPTY, "", "", ObjectData.create(), ""
+        other.id,
+        other.name,
+        other.authority,
+        other.journalId,
+        other.settings,
+        other.creator
     )
 
+    constructor() : this(
+        "", MLText.EMPTY, "", "", ObjectData.create(), ""
+    )
 
     companion object {
 
@@ -131,12 +131,12 @@ open class JournalSettingsDto(
 
         fun build(): JournalSettingsDto {
             return JournalSettingsDto(
-                    id,
-                    name,
-                    authority,
-                    journalId,
-                    settings,
-                    creator
+                id,
+                name,
+                authority,
+                journalId,
+                settings,
+                creator
             )
         }
     }

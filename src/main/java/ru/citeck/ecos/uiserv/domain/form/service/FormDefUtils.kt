@@ -10,9 +10,11 @@ object FormDefUtils {
     }
 
     @JvmStatic
-    fun mapComponents(component: DataValue,
-                      condition: (DataValue) -> Boolean?,
-                      action: (DataValue) -> DataValue?): DataValue? {
+    fun mapComponents(
+        component: DataValue,
+        condition: (DataValue) -> Boolean?,
+        action: (DataValue) -> DataValue?
+    ): DataValue? {
 
         val result = if (condition.invoke(component) == true) {
             action.invoke(component) ?: return null

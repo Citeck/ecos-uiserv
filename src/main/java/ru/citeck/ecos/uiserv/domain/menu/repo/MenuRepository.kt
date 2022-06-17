@@ -10,11 +10,13 @@ interface MenuRepository : JpaRepository<MenuEntity, Long> {
 
     fun findByExtId(extId: String): MenuEntity?
 
-    @Query("SELECT menu " +
-        "FROM MenuEntity menu " +
-        "JOIN menu.authorities authority " +
-        "WHERE lower(authority) = ?1 " +
-        "ORDER BY menu.priority DESC")
+    @Query(
+        "SELECT menu " +
+            "FROM MenuEntity menu " +
+            "JOIN menu.authorities authority " +
+            "WHERE lower(authority) = ?1 " +
+            "ORDER BY menu.priority DESC"
+    )
     fun findAllByAuthoritiesContains(authority: String): List<MenuEntity>
 
     fun deleteByExtId(extId: String)

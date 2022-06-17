@@ -3,17 +3,20 @@ package ru.citeck.ecos.uiserv.domain.journal.api.records
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
+import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnFormatterDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
+import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
 
 @Component
 class ColumnFormatterResolver(
-    val ecosTypeService: EcosTypeService
+    val ecosTypeService: EcosTypeService,
+    val ecosTypesRegistry: EcosTypesRegistry
 ) {
     companion object {
-        private val TYPE_CASE = RecordRef.valueOf("emodel/type@case")
+        private val TYPE_CASE = TypeUtils.getTypeRef("case")
     }
 
     fun resolve(column: JournalColumnDef.Builder, typeAtt: AttributeDef?) {
@@ -28,7 +31,7 @@ class ColumnFormatterResolver(
                 val typeRef = typeAtt?.config?.get("typeRef")?.asText() ?: ""
                 if (typeRef.isNotBlank()) {
                     val typeInfo = ecosTypeService.getTypeInfo(RecordRef.valueOf(typeRef))
-                    if (typeInfo?.parents?.contains(TYPE_CASE) == true) {
+                    if (ecosTypesRegistry.getParents(typeInfo).contains(TYPE_CASE)) {
                         column.withFormatter(ColumnFormatterDef.create { withType("assoc") })
                     }
                 }
@@ -40,7 +43,7 @@ class ColumnFormatterResolver(
                 column.withFormatter(ColumnFormatterDef.create { withType("datetime") })
             }
             else -> {
-                //do nothing
+                // do nothing
             }
         }
 

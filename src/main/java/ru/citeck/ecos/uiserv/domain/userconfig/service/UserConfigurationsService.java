@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.uiserv.domain.userconfig.repo.UserConfigurationEntity;
 import ru.citeck.ecos.uiserv.domain.userconfig.dto.UserConfigurationDto;
 import ru.citeck.ecos.uiserv.domain.userconfig.repo.UserConfigurationsRepository;
-import ru.citeck.ecos.uiserv.app.security.service.SecurityUtils;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -76,7 +76,7 @@ public class UserConfigurationsService {
         UserConfigurationEntity entity = new UserConfigurationEntity();
 
         entity.setExternalId(UUID.randomUUID().toString());
-        entity.setUserName(SecurityUtils.getCurrentUserLoginFromRequestContext());
+        entity.setUserName(AuthContext.getCurrentUser());
         entity.setCreationTime(Instant.now());
         entity.setData(Json.getMapper().toString(dto.getData()));
 
