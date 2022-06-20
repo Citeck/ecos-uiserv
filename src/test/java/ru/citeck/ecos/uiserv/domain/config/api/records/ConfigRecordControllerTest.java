@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ConfigRecordControllerTest {
 
     private static final String RECORD_ID = "config";
-    private static final String RECORD_ID_AT = RECORD_ID + "@";
+    private static final String RECORD_SOURCE_ID_PREFIX = Application.NAME + "/" + RECORD_ID + "@";
 
     private MockMvc mockRecordsApi;
 
@@ -76,7 +76,7 @@ public class ConfigRecordControllerTest {
     public void query() throws Exception {
         final String id = "some-test-config-with-large-json-value";
         String queryJson = "{\n" +
-            "  \"record\": \"" + RECORD_ID_AT + id + "\",\n" +
+            "  \"record\": \"" + RECORD_SOURCE_ID_PREFIX + id + "\",\n" +
             "  \"attributes\": {\n" +
             "    \"title\": \"title\",\n" +
             "    \"description\": \"description\",\n" +
@@ -92,7 +92,7 @@ public class ConfigRecordControllerTest {
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(queryJson))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id", is("uiserv/" + RECORD_ID_AT + id)))
+            .andExpect(jsonPath("$.id", is(RECORD_SOURCE_ID_PREFIX + id)))
             .andExpect(jsonPath("$.attributes.title", is("test-config-title")))
             .andExpect(jsonPath("$.attributes.description", is("test-config-description")))
             .andExpect(jsonPath("$.attributes.value.type", is("TOP")))
@@ -122,7 +122,7 @@ public class ConfigRecordControllerTest {
         String json = "{\n" +
             "  \"records\": [\n" +
             "    {\n" +
-            "      \"id\": \"" + RECORD_ID_AT + id + "\",\n" +
+            "      \"id\": \"" + RECORD_SOURCE_ID_PREFIX + id + "\",\n" +
             "      \"attributes\": {\n" +
             "        \"title\": \"" + title + "\",\n" +
             "        \"description\": \"" + description + "\"\n" +
@@ -143,7 +143,7 @@ public class ConfigRecordControllerTest {
 
         when(configEntityService.create(dto)).thenReturn(createdDto);
 
-        TestEntityRecordUtil.performMutateAndCheckResponseId(json, RECORD_ID_AT + id, mockRecordsApi);
+        TestEntityRecordUtil.performMutateAndCheckResponseId(json, RECORD_SOURCE_ID_PREFIX + id, mockRecordsApi);
     }
 
     @Test
@@ -154,7 +154,7 @@ public class ConfigRecordControllerTest {
         String json = "{\n" +
             "  \"records\": [\n" +
             "  \t\t{\n" +
-            "  \t\t\t\"id\": \"" + RECORD_ID_AT + id + "\",\n" +
+            "  \t\t\t\"id\": \"" + RECORD_SOURCE_ID_PREFIX + id + "\",\n" +
             "  \t\t\t\"attributes\": {\n" +
             "  \t\t\t\t\"title\": \"" + title + "\"\n" +
             "  \t\t\t}\n" +
@@ -171,7 +171,7 @@ public class ConfigRecordControllerTest {
         when(configEntityService.getById(id)).thenReturn(Optional.of(dto));
         when(configEntityService.update(dto)).thenReturn(createdDto);
 
-        TestEntityRecordUtil.performMutateAndCheckResponseId(json, RECORD_ID_AT + id, mockRecordsApi);
+        TestEntityRecordUtil.performMutateAndCheckResponseId(json, RECORD_SOURCE_ID_PREFIX + id, mockRecordsApi);
     }
 
     @Test
@@ -179,7 +179,7 @@ public class ConfigRecordControllerTest {
         final String id = UUID.randomUUID().toString();
         String json = "{\n" +
             "  \"records\": [\n" +
-            "  \t\t\"" + RECORD_ID_AT + id + "\"\n" +
+            "  \t\t\"" + RECORD_SOURCE_ID_PREFIX + id + "\"\n" +
             "  \t]\n" +
             "}";
 
@@ -189,7 +189,7 @@ public class ConfigRecordControllerTest {
                 .content(json))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.records[*]", hasSize(1)))
-            .andExpect(jsonPath("$.records[0].id", is(RECORD_ID_AT + id)));
+            .andExpect(jsonPath("$.records[0].id", is(RECORD_SOURCE_ID_PREFIX + id)));
     }
 
     @Test
@@ -216,7 +216,7 @@ public class ConfigRecordControllerTest {
         String json = "{\n" +
             "  \"records\": [\n" +
             "    {\n" +
-            "      \"id\": \"" + RECORD_ID_AT + "\",\n" +
+            "      \"id\": \"" + RECORD_SOURCE_ID_PREFIX + "\",\n" +
             "      \"attributes\": {\n" +
             "         \"title\": \"some-title\"\n" +
             "      }\n" +
