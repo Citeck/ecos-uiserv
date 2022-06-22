@@ -207,6 +207,45 @@
       },
       {
         "label": {
+          "ru": "Panel"
+        },
+        "key": "headerFilterEditorPanel",
+        "title": { "en": "Header Filter Configuration", "ru": "Конфигурация фильтра в заголовке"},
+        "collapsible": true,
+        "collapsed": true,
+        "refreshOn": [],
+        "optionalWhenDisabled": false,
+        "type": "panel",
+        "input": false,
+        "components": [
+          {
+            "label": {
+              "ru": "ContainerHeaderFilterEditor"
+            },
+            "hideLabel": true,
+            "key": "headerFilterEditor",
+            "refreshOn": [],
+            "type": "container",
+            "input": true,
+            "components": [
+              {
+                "label": {
+                  "ru": "Тип редактора",
+                  "en": "Editor type"
+                },
+                "key": "type",
+                "defaultValue": "",
+                "refreshOn": [],
+                "type": "textfield",
+                "optionalWhenDisabled": false,
+                "input": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": {
           "ru": "Search Config"
         },
         "key": "searchConfig",
