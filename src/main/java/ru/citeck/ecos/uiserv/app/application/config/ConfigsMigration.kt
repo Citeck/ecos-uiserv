@@ -9,7 +9,7 @@ import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.webapp.lib.patch.annotaion.EcosPatch
 
 @Component
-@EcosPatch("configs-migration", "2022-01-01T00:00:42Z")
+@EcosPatch("configs-migration", "2022-06-24T00:00:00Z")
 class ConfigsMigration(
     private val records: RecordsService,
     private val configService: EcosConfigService
