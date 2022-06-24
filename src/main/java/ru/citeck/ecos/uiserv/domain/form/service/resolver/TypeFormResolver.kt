@@ -8,6 +8,7 @@ import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.context.lib.i18n.I18nContext
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
+import ru.citeck.ecos.model.lib.attributes.dto.computed.ComputedAttType
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
@@ -94,9 +95,13 @@ class TypeFormResolver(
 
     private fun createComponent(attribute: AttributeDef): DataValue? {
 
+        if (attribute.computed.type != ComputedAttType.NONE) {
+            return null
+        }
+
         val simpleValueControl = DataValue.createObj()
             .set("label", attribute.name)
-            .set("key", "_value")
+            .set("key", attribute.id)
             .set("type", "textfield")
             .set("input", true)
             .set("multiple", attribute.multiple)
