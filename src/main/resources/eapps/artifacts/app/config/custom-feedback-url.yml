@@ -1,0 +1,6 @@
+---
+id: custom-feedback-url
+name:
+  ru: URL для обратной связи
+  en: URL for feedback
+value: 'https://www.citeck.ru/feedback'

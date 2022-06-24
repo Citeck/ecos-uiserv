@@ -7,7 +7,7 @@
   "description": {
     "en": "Form to edit other forms"
   },
-  "customModule": "js/citeck/modules/eform/ecos-form-custom",
+  "customModule": "",
   "typeRef": "",
   "width": "lg",
   "i18n": {
@@ -77,7 +77,7 @@
             "name": "Disable for system forms",
             "trigger": {
               "type": "javascript",
-              "javascript": "result = instance.parent.ecos.custom.isSystemForm();"
+              "javascript": "result = ['form@DEFAULT', 'form@ECOS_FORM'].indexOf(this.recordId) >= 0;"
             },
             "actions": [
               {
@@ -205,34 +205,14 @@
                 "action": "custom",
                 "state": "",
                 "showValidations": false,
-                "custom": "form.ecos.custom.showFormEditor()",
+                "custom": "Citeck.EcosFormBuilderUtils.showBuilderForRecord(instance.options.recordId)",
                 "block": true,
-                "disabled": true,
+                "disabled": false,
                 "type": "button",
                 "input": true,
                 "key": "editform",
                 "defaultValue": false,
-                "logic": [
-                  {
-                    "name": "Enable",
-                    "trigger": {
-                      "type": "javascript",
-                      "javascript": "result = !!_.get(instance, 'root.ecos.custom.showFormEditor');"
-                    },
-                    "actions": [
-                      {
-                        "name": "Enable",
-                        "type": "property",
-                        "property": {
-                          "label": "Disabled",
-                          "value": "disabled",
-                          "type": "boolean"
-                        },
-                        "state": "false"
-                      }
-                    ]
-                  }
-                ],
+                "logic": [],
                 "event": "",
                 "url": "",
                 "reorder": false
@@ -261,31 +241,11 @@
                 "action": "custom",
                 "state": "",
                 "showValidations": false,
-                "custom": "form.ecos.custom.showLocaleEditor()",
+                "custom": "Citeck.EcosFormBuilderUtils.showLocaleEditorForRecord(instance.options.recordId)",
                 "block": true,
-                "disabled": true,
+                "disabled": false,
                 "key": "localization",
-                "logic": [
-                  {
-                    "name": "Enable",
-                    "trigger": {
-                      "type": "javascript",
-                      "javascript": "result = !!_.get(instance, 'root.ecos.custom.showLocaleEditor');"
-                    },
-                    "actions": [
-                      {
-                        "name": "Enable",
-                        "type": "property",
-                        "property": {
-                          "label": "Disabled",
-                          "value": "disabled",
-                          "type": "boolean"
-                        },
-                        "state": "false"
-                      }
-                    ]
-                  }
-                ],
+                "logic": [],
                 "type": "button",
                 "input": true
               }

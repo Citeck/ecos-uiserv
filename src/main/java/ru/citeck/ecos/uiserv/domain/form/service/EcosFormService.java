@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.domain.form.service;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
+import ru.citeck.ecos.uiserv.domain.form.service.resolver.EcosFormResolver;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,4 +39,6 @@ public interface EcosFormService {
     void delete(String id);
 
     void addChangeListener(BiConsumer<EcosFormModel, EcosFormModel> listener);
+
+    void register(EcosFormResolver resolver);
 }

@@ -1,0 +1,6 @@
+---
+id: home-link-url
+name:
+  ru: Адрес домашней страницы
+  en: Home link URL
+value: /v2/dashboard

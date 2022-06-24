@@ -41,8 +41,20 @@ public class EcosFormModel {
         this.attributes = ObjectData.deepCopy(model.getAttributes());
     }
 
+    public String getWidth() {
+        return width;
+    }
+
+    public void setWidth(String width) {
+        this.width = width;
+    }
+
     public RecordRef getTypeRef() {
         return typeRef;
+    }
+
+    public void setDefinition(ObjectData definition) {
+        this.definition = definition;
     }
 
     public ObjectData getDefinition() {

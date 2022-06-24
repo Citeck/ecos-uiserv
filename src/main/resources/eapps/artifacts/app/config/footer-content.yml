@@ -1,0 +1,10 @@
+---
+id: footer-content
+name:
+  ru: Футер
+  en: Footer
+value: {}
+
+valueDef:
+  type: MLTEXT
+  formRef: 'uiserv/form@config-ml-textarea'

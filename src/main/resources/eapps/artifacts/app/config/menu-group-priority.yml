@@ -1,0 +1,9 @@
+---
+id: menu-group-priority
+name:
+  ru: Приоритет групп для ме22ню
+  en: Menu groups priority
+value: []
+valueDef:
+  type: JSON
+  multiple: true

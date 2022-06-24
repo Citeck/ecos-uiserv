@@ -1,0 +1,6 @@
+---
+id: login-page-redirect-url
+name:
+  ru: URL для редиректа со страницы входа
+  en: Login page redirect URL
+value: ''

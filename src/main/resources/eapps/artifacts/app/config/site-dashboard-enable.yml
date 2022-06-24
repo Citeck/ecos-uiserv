@@ -1,0 +1,6 @@
+---
+id: site-dashboard-enable
+name:
+  ru: Включит дашборд для сайтов
+  en: Enable site dashboard
+value: false

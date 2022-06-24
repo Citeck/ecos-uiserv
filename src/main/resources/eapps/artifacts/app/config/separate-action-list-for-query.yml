@@ -1,0 +1,6 @@
+---
+id: separate-action-list-for-query
+name:
+  ru: Разделить в журналах список действий для выбраных и отфильтрованных элементов
+  en: Separate group actions list for filtered and selected elements in journals
+value: false

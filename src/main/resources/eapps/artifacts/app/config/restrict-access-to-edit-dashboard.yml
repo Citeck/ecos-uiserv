@@ -1,0 +1,6 @@
+---
+id: restrict-access-to-edit-dashboard
+name:
+  ru: Редактирование дашборда доступно только администраторам
+  en: Dashboard editing allowed only for administrators
+value: false

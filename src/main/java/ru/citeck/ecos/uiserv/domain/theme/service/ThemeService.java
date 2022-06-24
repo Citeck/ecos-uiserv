@@ -24,7 +24,6 @@ import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
-import ru.citeck.ecos.uiserv.domain.config.api.records.ConfigRecords;
 import ru.citeck.ecos.uiserv.domain.icon.api.records.IconRecords;
 import ru.citeck.ecos.uiserv.domain.icon.dto.IconDto;
 import ru.citeck.ecos.uiserv.domain.icon.service.IconService;
@@ -90,9 +89,9 @@ public class ThemeService {
     private String getActiveThemeImpl() {
 
         String theme = recordsService.getAtt(
-            RecordRef.create(ConfigRecords.ID, CURRENT_THEME_CONFIG_KEY), "value?str").asText();
+            RecordRef.create("cfg", CURRENT_THEME_CONFIG_KEY), "value?str").asText();
 
-        if (StringUtils.isBlank(theme) || theme.equals("null")) {
+        if (StringUtils.isBlank(theme)) {
             theme = DEFAULT_THEME_ID;
         }
 
