@@ -2,8 +2,8 @@ package ru.citeck.ecos.uiserv.domain.menu.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.records2.source.dao.local.RecordsDaoBuilder
-import ru.citeck.ecos.uiserv.TestUtils
 import ru.citeck.ecos.uiserv.domain.config.api.records.ConfigRecords
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
 import ru.citeck.ecos.uiserv.domain.menu.service.testutils.MenuTestBase
@@ -41,7 +41,7 @@ class UserWithLowerCaseTest : MenuTestBase() {
 
         menuService.save(userMenu)
 
-        val userMenuFromService = TestUtils.runAsUser(searchUser, searchUserGroups) {
+        val userMenuFromService = AuthContext.runAs(searchUser, searchUserGroups) {
             menuService.getMenuForCurrentUser(1)
         }
 

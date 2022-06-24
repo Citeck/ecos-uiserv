@@ -3,15 +3,14 @@ package ru.citeck.ecos.uiserv.domain.menu.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.config.lib.records.CfgRecordsDao;
 import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.uiserv.domain.config.api.records.ConfigRecords;
 import ru.citeck.ecos.uiserv.domain.menu.dao.MenuDao;
 import ru.citeck.ecos.uiserv.domain.menu.repo.MenuEntity;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDeployArtifact;
@@ -150,7 +149,7 @@ public class MenuService {
 
     public MenuDto getMenuForCurrentUser(Integer version) {
 
-        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        String userName = AuthContext.getCurrentUser();
         List<String> userNameVariants = Collections.singletonList(userName.toLowerCase());
 
         MenuDto menu = findFirstByAuthorities(userNameVariants, version)
@@ -198,7 +197,7 @@ public class MenuService {
     private List<String> getOrderedAuthorities(Set<String> userAuthorities) {
 
         DataValue priorityArr = recordsService.getAtt(
-            RecordRef.create(ConfigRecords.ID, "menu-group-priority"), "value?json");
+            RecordRef.create(CfgRecordsDao.ID, "menu-group-priority"), "value[]?json");
 
         List<String> priority = new ArrayList<>();
         priorityArr.forEach(v -> {

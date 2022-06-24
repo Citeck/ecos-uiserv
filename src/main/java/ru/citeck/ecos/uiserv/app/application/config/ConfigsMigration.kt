@@ -4,7 +4,6 @@ import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.config.lib.dto.ConfigValueType
 import ru.citeck.ecos.config.lib.service.EcosConfigService
-import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.webapp.lib.patch.annotaion.EcosPatch
 

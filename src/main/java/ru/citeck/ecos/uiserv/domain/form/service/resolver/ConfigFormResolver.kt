@@ -20,44 +20,59 @@ class ConfigFormResolver(
     val ecosConfigService: EcosConfigService
 ) : EcosFormResolver {
 
-
     companion object {
         private val BUTTONS_CONFIG = DataValue.createObj()
             .set("type", "columns")
             .set("key", "buttons-columns")
-            .set("columns", DataValue.createArr()
-                .add(DataValue.createObj().set("md", 3).set("type", "column").set("input", false).set("index", 0))
-                .add(DataValue.createObj().set("md", 3).set("type", "column").set("input", false).set("index", 1))
-                .add(DataValue.createObj().set("md", 3).set("type", "column").set("input", false).set("index", 2)
-                    .set("components", DataValue.createArr()
-                        .add(DataValue.createObj()
-                            .set("type", "button")
-                            .set("key", "cancel")
-                            .set("label", MLText(
-                                I18nContext.RUSSIAN to "Отменить",
-                                I18nContext.ENGLISH to "Cancel"
-                            ))
-                            .set("action", "event")
-                            .set("event", "cancel")
-                            .set("block", true)
-                            .set("input", true)
-                        )
+            .set(
+                "columns",
+                DataValue.createArr()
+                    .add(DataValue.createObj().set("md", 3).set("type", "column").set("input", false).set("index", 0))
+                    .add(DataValue.createObj().set("md", 3).set("type", "column").set("input", false).set("index", 1))
+                    .add(
+                        DataValue.createObj().set("md", 3).set("type", "column").set("input", false).set("index", 2)
+                            .set(
+                                "components",
+                                DataValue.createArr()
+                                    .add(
+                                        DataValue.createObj()
+                                            .set("type", "button")
+                                            .set("key", "cancel")
+                                            .set(
+                                                "label",
+                                                MLText(
+                                                    I18nContext.RUSSIAN to "Отменить",
+                                                    I18nContext.ENGLISH to "Cancel"
+                                                )
+                                            )
+                                            .set("action", "event")
+                                            .set("event", "cancel")
+                                            .set("block", true)
+                                            .set("input", true)
+                                    )
+                            )
+                    ).add(
+                        DataValue.createObj().set("md", 3).set("type", "column").set("input", false).set("index", 3)
+                            .set(
+                                "components",
+                                DataValue.createArr()
+                                    .add(
+                                        DataValue.createObj()
+                                            .set("type", "button")
+                                            .set("theme", "primary")
+                                            .set("key", "submit")
+                                            .set(
+                                                "label",
+                                                MLText(
+                                                    I18nContext.RUSSIAN to "Сохранить",
+                                                    I18nContext.ENGLISH to "Save"
+                                                )
+                                            )
+                                            .set("block", true)
+                                            .set("input", true)
+                                    )
+                            )
                     )
-                ).add(DataValue.createObj().set("md", 3).set("type", "column").set("input", false).set("index", 3)
-                    .set("components", DataValue.createArr()
-                        .add(DataValue.createObj()
-                            .set("type", "button")
-                            .set("theme", "primary")
-                            .set("key", "submit")
-                            .set("label", MLText(
-                                I18nContext.RUSSIAN to "Сохранить",
-                                I18nContext.ENGLISH to "Save"
-                            ))
-                            .set("block", true)
-                            .set("input", true)
-                        )
-                    )
-                )
             )
 
         val log = KotlinLogging.logger {}
@@ -76,7 +91,7 @@ class ConfigFormResolver(
         val model = EcosFormModel()
         model.width = "sm"
         model.definition = ObjectData.create()
-            .set("components", createComponents(type,  config.valueDef.multiple))
+            .set("components", createComponents(type, config.valueDef.multiple))
 
         return model
     }
@@ -84,7 +99,8 @@ class ConfigFormResolver(
     private fun createComponents(type: ConfigValueType, multiple: Boolean): List<DataValue> {
 
         val simpleValueControl = DataValue.createObj()
-            .set("label",
+            .set(
+                "label",
                 MLText(
                     I18nContext.RUSSIAN to "Значение",
                     I18nContext.ENGLISH to "Value"

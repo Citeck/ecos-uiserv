@@ -21,7 +21,9 @@ import java.util.Optional;
 
 /**
  * @author Roman Makarskiy
+ * @deprecated Use EcosConfigService and CfgRecordsDao instead
  */
+@Deprecated
 @Component
 public class ConfigRecords extends AbstractEntityRecords<ConfigDto> {
 

@@ -2,9 +2,8 @@ package ru.citeck.ecos.uiserv.domain.menu.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import ru.citeck.ecos.records2.source.dao.local.RecordsDaoBuilder
-import ru.citeck.ecos.uiserv.TestUtils
-import ru.citeck.ecos.uiserv.domain.config.api.records.ConfigRecords
+import ru.citeck.ecos.commons.data.DataValue
+import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
 import ru.citeck.ecos.uiserv.domain.menu.service.testutils.MenuTestBase
 
@@ -13,11 +12,13 @@ class UserOrGroupMenuTest : MenuTestBase() {
     @Test
     fun test() {
 
+        configs.setConfig("menu-group-priority", listOf(DataValue.create("{\"id\":\"user-group\"}")))
+        /*
         records.register(
             RecordsDaoBuilder.create(ConfigRecords.ID)
                 .addRecord("menu-group-priority", MenuGroupPriorityConfig(listOf("user-group")))
                 .build()
-        )
+        )*/
 
         val userMenu = MenuDto("test-user-menu")
         userMenu.authorities = listOf("user")
@@ -25,7 +26,7 @@ class UserOrGroupMenuTest : MenuTestBase() {
 
         menuService.save(userMenu)
 
-        val userMenuFromService = TestUtils.runAsUser("user", listOf("user-group")) {
+        val userMenuFromService = AuthContext.runAs("user", listOf("user-group")) {
             menuService.getMenuForCurrentUser(1)
         }
 
@@ -37,13 +38,13 @@ class UserOrGroupMenuTest : MenuTestBase() {
 
         menuService.save(userGroupMenu)
 
-        val userGroupMenuFromService = TestUtils.runAsUser("user", listOf("user-group")) {
+        val userGroupMenuFromService = AuthContext.runAs("user", listOf("user-group")) {
             menuService.getMenuForCurrentUser(1)
         }
 
         assertThat(userGroupMenuFromService?.id).isEqualTo(userMenu.id)
 
-        val userGroupMenuFromService2 = TestUtils.runAsUser("user2", listOf("user-group")) {
+        val userGroupMenuFromService2 = AuthContext.runAs("user2", listOf("user-group")) {
             menuService.getMenuForCurrentUser(1)
         }
 

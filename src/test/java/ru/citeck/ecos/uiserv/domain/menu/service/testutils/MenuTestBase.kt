@@ -8,6 +8,9 @@ import ru.citeck.ecos.commons.io.file.EcosFile
 import ru.citeck.ecos.commons.io.file.std.EcosStdFile
 import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.commons.test.EcosWebAppContextMock
+import ru.citeck.ecos.config.lib.provider.InMemConfigProvider
+import ru.citeck.ecos.config.lib.records.CfgRecordsDao
+import ru.citeck.ecos.config.lib.service.EcosConfigServiceFactory
 import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records3.RecordsService
@@ -35,6 +38,8 @@ open class MenuTestBase {
 
     private val typesInfo = ConcurrentHashMap<String, TypeDef>()
 
+    lateinit var configs: InMemConfigProvider
+
     @BeforeEach
     fun before() {
 
@@ -50,6 +55,9 @@ open class MenuTestBase {
         }
 
         records = recordsServices.recordsServiceV1
+        val configServiceFactory = EcosConfigServiceFactory()
+        configs = configServiceFactory.inMemConfigProvider
+        records.register(CfgRecordsDao(configServiceFactory))
 
         menuService = MenuService(menuDao, menuReaderService, recordsServices.recordsService)
 
