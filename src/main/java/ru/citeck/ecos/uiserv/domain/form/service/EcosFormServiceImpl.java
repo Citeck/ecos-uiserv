@@ -18,7 +18,7 @@ import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.domain.form.repo.EcosFormEntity;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
-import ru.citeck.ecos.uiserv.domain.form.service.resolver.EcosFormResolver;
+import ru.citeck.ecos.uiserv.domain.form.service.provider.EcosFormsProvider;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +39,7 @@ public class EcosFormServiceImpl implements EcosFormService {
     private final FormsEntityDao formsEntityDao;
     private final RecordsService recordsService;
 
-    private final Map<String, EcosFormResolver> resolvers = new ConcurrentHashMap<>();
+    private final Map<String, EcosFormsProvider> resolvers = new ConcurrentHashMap<>();
 
     @Override
     public void addChangeListener(BiConsumer<EcosFormModel, EcosFormModel> listener) {
@@ -132,10 +132,10 @@ public class EcosFormServiceImpl implements EcosFormService {
         }
         if (id.contains("$")) {
             String resolverId = id.substring(0, id.indexOf('$'));
-            EcosFormResolver resolver = resolvers.get(resolverId);
+            EcosFormsProvider resolver = resolvers.get(resolverId);
             if (resolver != null) {
                 return Optional.ofNullable(
-                    resolver.getFormModel(id.substring(resolverId.length() + 1))
+                    resolver.getFormById(id.substring(resolverId.length() + 1))
                 ).map(model -> {
                     if (StringUtils.isBlank(model.getId())) {
                         model.setId(id);
@@ -265,7 +265,7 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
-    public void register(EcosFormResolver resolver) {
+    public void register(EcosFormsProvider resolver) {
         this.resolvers.put(resolver.getType(), resolver);
     }
 

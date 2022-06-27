@@ -3,12 +3,11 @@ package ru.citeck.ecos.uiserv.domain.form.service;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
-import ru.citeck.ecos.uiserv.domain.form.service.resolver.EcosFormResolver;
+import ru.citeck.ecos.uiserv.domain.form.service.provider.EcosFormsProvider;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public interface EcosFormService {
 
@@ -40,5 +39,5 @@ public interface EcosFormService {
 
     void addChangeListener(BiConsumer<EcosFormModel, EcosFormModel> listener);
 
-    void register(EcosFormResolver resolver);
+    void register(EcosFormsProvider resolver);
 }

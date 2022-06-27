@@ -1,29 +1,18 @@
-package ru.citeck.ecos.uiserv.domain.form.service.resolver
+package ru.citeck.ecos.uiserv.domain.form.builder
 
-import mu.KotlinLogging
-import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.context.lib.i18n.I18nContext
-import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
-import ru.citeck.ecos.model.lib.attributes.dto.computed.ComputedAttType
-import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel
-import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
-import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
-import javax.annotation.PostConstruct
 
-@Component
-class TypeFormResolver(
-    val recordsService: RecordsService,
-    val ecosFormService: EcosFormService,
-    val typesRegistry: EcosTypesRegistry
-) : EcosFormResolver {
+class EcosFormBuilderImpl(
+    val context: FormBuilderContext,
+) : EcosFormBuilder {
 
     companion object {
-        private val BUTTONS_CONFIG = DataValue.createObj()
+        private val CANCEL_AND_SUBMIT_BUTTONS = DataValue.createObj()
             .set("type", "columns")
             .set("key", "buttons-columns")
             .set(
@@ -76,83 +65,40 @@ class TypeFormResolver(
                             )
                     )
             )
-
-        val log = KotlinLogging.logger {}
     }
 
-    @PostConstruct
-    fun init() {
-        ecosFormService.register(this)
+    private val components = mutableListOf<DataValue>()
+    private val formModel = EcosFormModel()
+
+    override fun setId(id: String): EcosFormBuilder {
+        formModel.id = id
+        return this
     }
 
-    override fun getFormModel(key: String): EcosFormModel? {
-
-        val typeDef = typesRegistry.getValue(key) ?: return null
-
-        val model = EcosFormModel()
-        model.width = "m"
-        model.definition = ObjectData.create()
-            .set("components", createComponents(typeDef.model.attributes))
-
-        return model
+    override fun setWidth(width: EcosFormWidth): EcosFormBuilder {
+        formModel.width = width.key
+        return this
     }
 
-    private fun createComponents(attributes: List<AttributeDef>): List<DataValue> {
-        val result = mutableListOf<DataValue>()
-        attributes.mapNotNull {
-            createComponent(it)
-        }.forEach {
-            result.add(it)
+    override fun addInput(type: AttributeType, config: ObjectData): EcosFormInputBuilder {
+        return addInput(EcosFormInputType.getFromAttributeType(type), config)
+    }
+
+    override fun addInput(type: EcosFormInputType, config: ObjectData): EcosFormInputBuilder {
+        return EcosFormInputBuilderImpl(type, config, context) {
+            components.add(it)
+            this
         }
-        result.add(BUTTONS_CONFIG)
-        return result
     }
 
-    private fun createComponent(attribute: AttributeDef): DataValue? {
-
-        if (attribute.computed.type != ComputedAttType.NONE) {
-            return null
-        }
-
-        val simpleValueControl = DataValue.createObj()
-            .set("label", attribute.name)
-            .set("key", attribute.id)
-            .set("type", "textfield")
-            .set("input", true)
-            .set("multiple", attribute.multiple)
-
-        when (attribute.type) {
-            AttributeType.TEXT -> {
-                simpleValueControl["type"] = "textfield"
-            }
-            AttributeType.MLTEXT -> {
-                simpleValueControl["type"] = "mlText"
-            }
-            AttributeType.NUMBER -> {
-                simpleValueControl["type"] = "number"
-            }
-            AttributeType.BOOLEAN -> {
-                simpleValueControl["type"] = "checkbox"
-                simpleValueControl["label"] = MLText(
-                    I18nContext.RUSSIAN to "Включить",
-                    I18nContext.ENGLISH to "Enable"
-                )
-            }
-            AttributeType.DATE -> {
-                simpleValueControl["type"] = "datetime"
-                simpleValueControl["enableTime"] = false
-            }
-            AttributeType.DATETIME -> {
-                simpleValueControl["type"] = "datetime"
-                simpleValueControl["enableTime"] = true
-            }
-            else -> return null
-        }
-
-        return simpleValueControl
+    override fun addCancelAndSubmitButtons(): EcosFormBuilder {
+        components.add(CANCEL_AND_SUBMIT_BUTTONS)
+        return this
     }
 
-    override fun getType(): String {
-        return "type"
+    override fun build(): EcosFormModel {
+        formModel.definition = ObjectData.create()
+            .set("components", components)
+        return formModel
     }
 }

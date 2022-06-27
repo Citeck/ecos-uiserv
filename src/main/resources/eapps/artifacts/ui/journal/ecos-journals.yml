@@ -15,7 +15,7 @@ actions:
 
 columns:
 
-  - id: localId
+  - id: _localId
     name: { ru: Идентификатор, en: Id }
     type: TEXT
 

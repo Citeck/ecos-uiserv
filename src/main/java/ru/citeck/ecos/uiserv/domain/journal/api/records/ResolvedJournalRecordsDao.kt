@@ -29,6 +29,7 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSearchConfig
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSortByDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedJournalDef
+import ru.citeck.ecos.webapp.api.apps.EcosWebAppsApi
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import java.util.*
 import kotlin.collections.ArrayList
@@ -39,7 +40,8 @@ class ResolvedJournalRecordsDao(
     private val ecosTypeService: EcosTypeService,
     private val columnEditorResolver: ColumnEditorResolver,
     private val columnFormatterResolver: ColumnFormatterResolver,
-    private val columnAttSchemaResolver: ColumnAttSchemaResolver
+    private val columnAttSchemaResolver: ColumnAttSchemaResolver,
+    private val ecosWebAppsApi: EcosWebAppsApi
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordAttsDao {
@@ -271,32 +273,26 @@ class ResolvedJournalRecordsDao(
         if (!RecordRef.isEmpty(metaRecord) && attributeEdges.isNotEmpty()) {
 
             try {
-                val attributes = if (metaRecord.appName == "alfresco") {
-                    try {
-                        recordsService.getAtts(metaRecord, attributeEdges)
-                    } catch (e: Exception) {
-                        // todo: solution should be more elegant
-                        log.warn { "Exception while metaRecord edge atts request: $metaRecord atts: $attributeEdges" }
-                        RecordAtts(metaRecord)
-                    }
-                } else {
+                val attributes = if (ecosWebAppsApi.isAppAvailable(metaRecord.appName)) {
                     recordsService.getAtts(metaRecord, attributeEdges)
+                } else {
+                    RecordAtts(metaRecord)
                 }
                 attributes.forEach { name: String, value: DataValue ->
                     val columnIdx = columnIdxByName[name]
                     if (columnIdx != null) {
                         val column = columns[columnIdx]
                         if (value.has("type")) {
-                            column.withType(value.get("type").asText())
+                            column.withType(value["type"].asText())
                         }
                         if (value.has("protected")) {
-                            column.withEditable(!value.get("protected").asBoolean())
+                            column.withEditable(!value["protected"].asBoolean())
                         }
                         if (value.has("title")) {
-                            column.withName(MLText(value.get("title").asText()))
+                            column.withName(MLText(value["title"].asText()))
                         }
                         if (value.has("multiple")) {
-                            column.withMultiple(value.get("multiple").asBoolean())
+                            column.withMultiple(value["multiple"].asBoolean())
                         }
                     }
                 }

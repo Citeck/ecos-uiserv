@@ -12,7 +12,6 @@ import ru.citeck.ecos.commons.json.YamlUtils
 import ru.citeck.ecos.events2.type.RecordEventsService
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.predicate.PredicateService
-import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
@@ -27,6 +26,7 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalActionDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
+import ru.citeck.ecos.uiserv.domain.journal.registry.JournalsConfiguration
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -81,14 +81,15 @@ class JournalRecordsDao(
         } else {
 
             if (recsQuery.language == PredicateService.LANGUAGE_PREDICATE) {
-                val predicate = recsQuery.getQuery(Predicate::class.java)
-                var max: Int = recsQuery.page.maxItems
-                if (max <= 0) {
-                    max = 10000
-                }
-                val journals = journalService.getAll(max, recsQuery.page.skipCount, predicate)
+
+                val registryQuery = recsQuery.copy()
+                    .withSourceId(JournalsConfiguration.JOURNALS_REGISTRY_SOURCE_ID)
+                    .build()
+                val queryRes = recordsService.query(registryQuery)
+
+                val journals = journalService.getAll(queryRes.getRecords().map { it.id }.toSet())
                 result.setRecords(ArrayList(journals))
-                result.setTotalCount(journalService.getCount(predicate))
+                result.setTotalCount(queryRes.getTotalCount())
             } else {
                 result.setRecords(
                     ArrayList(
@@ -110,7 +111,7 @@ class JournalRecordsDao(
         val dto = if (recordId.isEmpty()) {
             JournalWithMeta(false)
         } else {
-            journalService.getById(recordId) ?: JournalWithMeta(false)
+            journalService.getJournalById(recordId) ?: JournalWithMeta(false)
         }
         return JournalRecord(dto)
     }
