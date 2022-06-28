@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.domain.journal.api.records
 
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
@@ -11,12 +12,14 @@ import ru.citeck.ecos.records3.record.dao.query.dto.query.Consistency
 import ru.citeck.ecos.records3.record.dao.query.dto.query.QueryPage
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.mixin.AttMixin
+import ru.citeck.ecos.webapp.api.context.EcosWebAppContext
 import javax.annotation.PostConstruct
 
 @Component
 class JournalsTotalCountMixin(
     val recordsService: RecordsService,
-    val resolvedJournalRecordsDao: ResolvedJournalRecordsDao
+    val resolvedJournalRecordsDao: ResolvedJournalRecordsDao,
+    val ecosWebAppContext: EcosWebAppContext
 ) : AttMixin {
 
     companion object {
@@ -40,6 +43,10 @@ class JournalsTotalCountMixin(
         val queryData = value.getAtt("queryData").asObjectData()
         val sourceId = value.getAtt("sourceId").asText()
 
+        if (!ecosWebAppContext.getWebAppsApi().isAppAvailable(getAppName(sourceId))) {
+            return null
+        }
+
         val qBuilder = RecordsQuery.create()
             .withSourceId(sourceId)
 
@@ -48,8 +55,8 @@ class JournalsTotalCountMixin(
             qBuilder.withLanguage(PredicateService.LANGUAGE_PREDICATE + "-with-data")
 
             val query = ObjectData.create()
-            query.set("data", queryData)
-            query.set("predicate", predicate)
+            query["data"] = queryData
+            query["predicate"] = predicate
 
             qBuilder.withQuery(query)
         } else {
@@ -65,4 +72,11 @@ class JournalsTotalCountMixin(
     }
 
     override fun getProvidedAtts() = PROVIDED_ATTS
+
+    private fun getAppName(sourceId: String): String {
+        if (sourceId.indexOf(RecordRef.APP_NAME_DELIMITER) == -1) {
+            return "alfresco"
+        }
+        return sourceId.substringBefore(RecordRef.APP_NAME_DELIMITER)
+    }
 }
