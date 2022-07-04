@@ -74,6 +74,7 @@ class ColumnEditorResolver(
             AttributeType.MLTEXT -> {
                 column.withEditor(resolveEditorForMLText())
             }
+            else -> {}
         }
     }
 
