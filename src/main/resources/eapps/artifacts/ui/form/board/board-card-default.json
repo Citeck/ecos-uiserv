@@ -25,11 +25,11 @@
       },
       {
         "label": {
-          "en": "Creation date",
-          "ru": "Дата создания"
+          "en": "Created",
+          "ru": "Создан"
         },
         "key": "_created",
-        "format": "dd-MM-yyyy HH:mm",
+        "format": "dd.MM.yyyy HH:mm",
         "datePicker": {
           "minDate": "",
           "maxDate": ""
