@@ -44,22 +44,24 @@ public class RecordActionsRecords extends LocalRecordsDao implements LocalRecord
         }
         RecordsActionsDto actionsForRecords = actionService.getActionsForRecords(targetRefs, queryActions);
 
-        int actionsSize = actionsForRecords.getRecordActions().size();
-        Long[] recordsActions = new Long[actionsSize];
-
         List<ActionDto> actions = actionsForRecords.getActions();
         List<String> actionIds = new ArrayList<>();
         actions.forEach(a -> actionIds.add(a.getId()));
 
-        actionsForRecords.getRecordActions().forEach((ref, refActions) -> {
+        Long[] recordsActionsMask = new Long[targetRefs.size()];
+
+        Map<RecordRef, Set<String>> recordActions = actionsForRecords.getRecordActions();
+        for (int idx = 0; idx < targetRefs.size(); idx++) {
+            RecordRef ref = targetRefs.get(idx);
+            Set<String> refActions = recordActions.get(ref);
             long flags = 0;
             for (String actionId : refActions) {
-                flags |= 1 << actionIds.indexOf(actionId);
+                flags |= 1L << actionIds.indexOf(actionId);
             }
-            recordsActions[targetRefs.indexOf(ref)] = flags;
-        });
+            recordsActionsMask[idx] = flags;
+        }
 
-        return RecordsQueryResult.of(new ActionsResponse(actions, Arrays.asList(recordsActions)));
+        return RecordsQueryResult.of(new ActionsResponse(actions, Arrays.asList(recordsActionsMask)));
     }
 
     @Data

@@ -148,7 +148,7 @@ class ActionService(
                 recordEvaluatorDto.type = PredicateEvaluator.TYPE
 
                 val config = ObjectData.create()
-                config.set("predicate", actionDto.predicate)
+                config["predicate"] = actionDto.predicate
                 recordEvaluatorDto.config = config
             }
 
