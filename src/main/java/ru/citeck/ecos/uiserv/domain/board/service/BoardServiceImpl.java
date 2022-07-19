@@ -24,13 +24,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
+
+    private static final Pattern VALID_ID_PATTERN = Pattern.compile("^[\\w-]+$");
 
     private final BoardRepository repository;
     private final List<BiConsumer<BoardDef, BoardDef>> changeListeners = new CopyOnWriteArrayList<>();
@@ -48,7 +50,13 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public BoardWithMeta save(BoardDef boardDef) {
+
         Assert.notNull(boardDef, "Board must not be null");
+        if (!StringUtils.isEmpty(boardDef.getId())) {
+            if (!VALID_ID_PATTERN.matcher(boardDef.getId()).matches()) {
+                throw new IllegalArgumentException("Invalid ID: '" + boardDef.getId() + "'");
+            }
+        }
 
         BoardDef beforeBoardDef = Optional.ofNullable(getBoardById(boardDef.getId()))
             .map(BoardWithMeta::getBoardDef)
