@@ -9,3 +9,5 @@ source-id: "board"
 
 controller:
   type: json
+  config:
+    format: yaml

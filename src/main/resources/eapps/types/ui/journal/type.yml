@@ -9,3 +9,5 @@ source-id: "journal"
 
 controller:
   type: json
+  config:
+    format: yaml
