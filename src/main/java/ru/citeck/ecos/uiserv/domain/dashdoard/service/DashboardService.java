@@ -21,7 +21,6 @@ import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardRepository;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,15 +76,9 @@ public class DashboardService {
     private void updateAuthority(DashboardDto dashboard) {
 
         String currentUserLogin = getCurrentUserLogin();
-        RecordRef userRef = RecordRef.valueOf("alfresco/people@" + currentUserLogin);
         String authority = dashboard.getAuthority();
 
-        if (AuthContext.isRunAsSystem() || currentUserLogin.equals(authority)) {
-            return;
-        }
-
-        boolean isAdmin = recordsService.getAtt(userRef, "isAdmin?bool").asBoolean(false);
-        if (isAdmin) {
+        if (AuthContext.isRunAsSystem() || AuthContext.isRunAsAdmin() || currentUserLogin.equals(authority)) {
             return;
         }
 
@@ -102,7 +95,7 @@ public class DashboardService {
     @NotNull
     private String getCurrentUserLogin() {
         String currentUserLogin = AuthContext.getCurrentUser();
-        if (currentUserLogin == null) {
+        if (currentUserLogin.isEmpty()) {
             throw new RuntimeException("User is not authenticated");
         }
         return currentUserLogin;
