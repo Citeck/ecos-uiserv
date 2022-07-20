@@ -1,5 +1,6 @@
 {
   "id": "board-form",
+  "formKey": "",
   "title": {
     "en": "Kanban board config"
   },
@@ -66,8 +67,6 @@
                   "en": "Is it possible to move entities between states"
                 },
                 "key": "readOnly",
-                "labelPosition": "left-left",
-                "defaultValue": false,
                 "refreshOn": [],
                 "type": "checkbox",
                 "input": true
@@ -164,14 +163,21 @@
         "reorder": true,
         "defaultValue": [
           {
-            "name": "",
+            "name": {
+              "ru": "",
+              "en": ""
+            },
             "type": "",
             "id": "",
             "submit4": false,
             "computed": [
               null
             ],
-            "status": ""
+            "status": "",
+            "objectObject2": {
+              "ru": "",
+              "en": ""
+            }
           }
         ],
         "refreshOn": [],
@@ -180,37 +186,12 @@
         "components": [
           {
             "label": {
-              "ru": "Системное имя"
-            },
-            "key": "id",
-            "defaultValue": "",
-            "refreshOn": [],
-            "calculateValue": "const statusId = _.get(row, 'status');\n\nif (!statusId) {\n  return;\n}\n\nvalue = statusId;",
-            "allowCalculateOverride": true,
-            "type": "textfield",
-            "input": true,
-            "row": "0-0"
-          },
-          {
-            "label": {
-              "ru": "Название колонки",
-              "en": "Column name"
-            },
-            "key": "name",
-            "refreshOn": [],
-            "calculateValue": "const statusId = _.get(row, 'status');\n\nif (!statusId) {\n  return;\n}\n\nconst statuses = _.get(data, 'recordAsyncData.statuses');\n\nif (_.isEmpty(statuses)) {\n  return;\n}\n\nvalue = _.get(statuses.find(item => item.id === statusId), 'name');",
-            "allowCalculateOverride": true,
-            "type": "mlText",
-            "input": true,
-            "row": "0-1"
-          },
-          {
-            "label": {
               "ru": "Статус",
               "en": "Status"
             },
             "key": "panel",
             "refreshOn": [],
+            "optionalWhenDisabled": false,
             "type": "panel",
             "input": false,
             "components": [
@@ -219,53 +200,42 @@
                   "en": "Data type",
                   "ru": "Статус"
                 },
-                "key": "status",
+                "key": "id",
                 "hideLabel": true,
                 "customClass": "mt-n3 pt-1",
                 "dataSrc": "custom",
                 "data": {
-                  "custom": "let statuses = _.get(data, 'typeRef') ? _.get(data, 'statusesAsyncData.values', []) : [];\n\nif (_.get(instance, 'options.formMode') === 'CREATE') {\n  statuses = _.get(instance, 'options.statuses', [])\n}\n\nif (!Array.isArray(statuses)) {\n  statuses = [statuses];\n}\n\nvalues = (statuses || []).map(item => ({\n  label: item.name || item.id,\n  value: item.id\n}));"
+                  "custom": "let statuses = _.get(data, 'typeRef') ? _.get(data, 'statusesAsyncData.values', []) : [];\n\nif (_.get(instance, 'options.formMode') === 'CREATE') {\n  let statusesFromOptions = _.get(instance, 'options.statuses', []);\n  if (statusesFromOptions && statusesFromOptions.length) {\n    statuses = statusesFromOptions;\n  }\n}\n\nvalues = (statuses || []).map(item => ({\n  label: item.name || item.id,\n  value: item.id\n}));"
                 },
+                "dataPreProcessingCode": "",
                 "valueProperty": "value",
+                "unavailableItems": {
+                  "code": "",
+                  "isActive": false
+                },
                 "defaultValue": "",
                 "refreshOn": [
-                  "recordAsyncData"
+                  "statusesAsyncData"
                 ],
-                "logic": [
-                  {
-                    "name": "Reset value if typeRef was removed",
-                    "trigger": {
-                      "type": "javascript",
-                      "javascript": "result = _.isEmpty(_.get(data, 'typeRef')) && !_.isEmpty(_.get(row, 'status'));"
-                    },
-                    "actions": [
-                      {
-                        "name": "Reset value",
-                        "type": "value",
-                        "value": "if (result) {\n  value = '';  \n}\n"
-                      }
-                    ]
-                  },
-                  {
-                    "name": "Reset value if statuses list was changed",
-                    "trigger": {
-                      "type": "javascript",
-                      "javascript": "const statuses = _.get(data, 'statusesAsyncData.values');\nconst typeRef = _.get(data, 'typeRef');\nconst statusName = _.get(row, 'status');\n\nresult = !_.isEmpty(statuses) && !_.isEmpty(typeRef) && !_.isEmpty(statusName) && !_.find(statuses, ['id', statusName]);"
-                    },
-                    "actions": [
-                      {
-                        "name": "clear",
-                        "type": "value",
-                        "value": "if (result) {\n  value = '';\n}"
-                      }
-                    ]
-                  }
-                ],
+                "optionalWhenDisabled": false,
                 "type": "select",
                 "input": true
               }
             ],
-            "row": "0-2"
+            "row": "0-0"
+          },
+          {
+            "label": {
+              "ru": "Имя",
+              "en": "Name"
+            },
+            "key": "name",
+            "refreshOn": [],
+            "optionalWhenDisabled": false,
+            "type": "mlText",
+            "input": true,
+            "addAnother": "ecos.forms.btn.add-another",
+            "row": "0-1"
           }
         ]
       },
@@ -302,15 +272,15 @@
                 "source": {
                   "type": "recordsScript",
                   "recordsScript": {
+                    "script": "value = _.get(data, 'typeRef');",
                     "attributes": {
                       "values": "model.statuses{id,name}[]"
-                    },
-                    "script": "value = _.get(data, 'typeRef');"
+                    }
                   },
                   "forceLoad": false
                 },
                 "update": {
-                  "type": "disabled"
+                  "type": "any-change"
                 },
                 "refreshOn": [
                   {
@@ -318,7 +288,6 @@
                     "value": "typeRef"
                   }
                 ],
-                "executionCondition": "// value = !_.isEmpty(_.get(data, 'typeRef'));\n\nvalue = _.isEmpty(_.get(data, 'statusesAsyncData.values')) || _.get(data, 'typeRef');",
                 "key": "statusesAsyncData",
                 "type": "asyncData",
                 "input": true
