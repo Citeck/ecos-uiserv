@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.context.lib.auth.AuthContext
+import ru.citeck.ecos.context.lib.auth.AuthRole
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.source.dao.local.RecordsDaoBuilder
 import ru.citeck.ecos.records3.RecordsService
@@ -94,7 +95,7 @@ class DashboardRecordsTest {
 
             data.add(newDashboard.getAtts().getAs(DashboardDto::class.java)!!)
 
-            AuthContext.runAs("admin") {
+            AuthContext.runAs("admin", listOf(AuthRole.ADMIN)) {
                 recordsService.mutate(newDashboard)
             }
         }
