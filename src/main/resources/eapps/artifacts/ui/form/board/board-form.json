@@ -205,7 +205,7 @@
                 "customClass": "mt-n3 pt-1",
                 "dataSrc": "custom",
                 "data": {
-                  "custom": "let statuses = _.get(data, 'typeRef') ? _.get(data, 'statusesAsyncData.values', []) : [];\n\nif (_.get(instance, 'options.formMode') === 'CREATE') {\n  let statusesFromOptions = _.get(instance, 'options.statuses', []);\n  if (statusesFromOptions && statusesFromOptions.length) {\n    statuses = statusesFromOptions;\n  }\n}\n\nvalues = (statuses || []).map(item => ({\n  label: item.name || item.id,\n  value: item.id\n}));"
+                  "custom": "let statuses = _.get(data, 'typeRef') ? _.get(data, 'statusesAsyncData.values', []) : [];\n\nif (_.get(instance, 'options.formMode') === 'CREATE') {\n  let statusesFromOptions = _.get(instance, 'options.statuses', []);\n  if (statusesFromOptions && statusesFromOptions.length) {\n    statuses = statusesFromOptions;\n  }\n}\nstatuses = [...(statuses || [])];\nstatuses.unshift({id: \"EMPTY\", name: {ru: \"Пустой статус\", en: \"Empty status\"}});\n\n\nvalues = statuses.map(item => ({\n  label: item.name || item.id,\n  value: item.id\n}));"
                 },
                 "dataPreProcessingCode": "",
                 "valueProperty": "value",
