@@ -96,7 +96,9 @@ class JournalColumnDef(
      * Custom properties for temporal or very specific
      * parameters which can't be added as field for this DTO
      */
-    val properties: ObjectData = ObjectData.create()
+    val properties: ObjectData = ObjectData.create(),
+
+    val headerFilterEditor: ColumnEditorDef
 ) {
     companion object {
 
@@ -141,6 +143,7 @@ class JournalColumnDef(
         var multiple: Boolean? = null
         var computed: List<JournalComputedDef> = emptyList()
         var properties: ObjectData = ObjectData.create()
+        var headerFilterEditor: ColumnEditorDef = ColumnEditorDef.EMPTY
 
         constructor(base: JournalColumnDef) : this() {
             id = base.id
@@ -161,6 +164,7 @@ class JournalColumnDef(
             multiple = base.multiple
             computed = base.computed.toList()
             properties = ObjectData.deepCopyOrNew(base.properties)
+            headerFilterEditor = base.headerFilterEditor
         }
 
         fun withId(id: String?): Builder {
@@ -269,6 +273,11 @@ class JournalColumnDef(
             return this
         }
 
+        fun withHeaderFilterEditor(headerFilterEditor: ColumnEditorDef): Builder {
+            this.headerFilterEditor = headerFilterEditor ?: ColumnEditorDef.EMPTY
+            return this
+        }
+
         fun build(): JournalColumnDef {
 
             return JournalColumnDef(
@@ -289,7 +298,8 @@ class JournalColumnDef(
                 hidden,
                 multiple,
                 computed,
-                properties
+                properties,
+                headerFilterEditor
             )
         }
     }
