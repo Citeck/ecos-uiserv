@@ -68,6 +68,8 @@ public class BoardMapper {
 
         if (RecordRef.isNotEmpty(board.getCardFormRef())) {
             entity.setCardFormRef(RecordRef.toString(board.getCardFormRef()));
+        } else {
+            entity.setCardFormRef(null);
         }
         entity.setActions(Json.getMapper().toString(board.getActions()));
         entity.setColumns(Json.getMapper().toString(board.getColumns()));

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.citeck.ecos.commons.data.MLText;
+import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
@@ -73,6 +74,19 @@ public class BoardServiceContextTest {
         assertThat(service.getBoardById(BoardTestData.BOARD_ID).getBoardDef(), boardDefMatcher);
 
         boardDef.setReadOnly(true);
+        service.save(boardDef);
+        assertThat(service.getBoardById(BoardTestData.BOARD_ID).getBoardDef(), boardDefMatcher);
+    }
+
+    @Test
+    public void modifyTestSetCardFormRefToNull() {
+        BoardDef boardDef = BoardTestData.getTestBoard();
+        boardDef.setCardFormRef(RecordRef.valueOf("uiserv/form@some-form-id"));
+        service.save(boardDef);
+        Matcher<BoardDef> boardDefMatcher = is(boardDef);
+        assertThat(service.getBoardById(BoardTestData.BOARD_ID).getBoardDef(), boardDefMatcher);
+
+        boardDef.setCardFormRef(null);
         service.save(boardDef);
         assertThat(service.getBoardById(BoardTestData.BOARD_ID).getBoardDef(), boardDefMatcher);
     }
