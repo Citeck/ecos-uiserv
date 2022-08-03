@@ -4,12 +4,10 @@
     "en": "Form editor for JSON config",
     "ru": "Форма редактирования JSON конфигурации"
   },
-  "description": {
-    "en": ""
-  },
+  "description": {},
   "customModule": null,
   "typeRef": "emodel/type@base",
-  "width": "default",
+  "width": "lg",
   "i18n": {},
   "definition": {
     "components": [
@@ -127,12 +125,10 @@
       {
         "label": "getJson",
         "source": {
-          "type": "record",
-          "record": {
-            "id": "{{recordId}}",
-            "attributes": {
-              "_config": ".json"
-            }
+          "type": "custom",
+          "custom": {
+            "syncData": "let contentAtt = instance.options.contentAttribute || '?json';\nif (contentAtt.indexOf('?') === -1) {\n  contentAtt += \"?json\";\n}\nvalue = {\n  recId: instance.options.recordId,\n  contentAtt: contentAtt\n}\n",
+            "asyncData": "console.log('Request:', data);\nvalue = Citeck.Records.get(data.recId).load({\"_config\": data.contentAtt});"
           },
           "forceLoad": false
         },
