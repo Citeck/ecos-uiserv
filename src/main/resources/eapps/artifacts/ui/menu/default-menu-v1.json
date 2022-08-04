@@ -21,7 +21,7 @@
     "left": {
       "items": [
         {
-          "id": "ea691bc9-07e2-4fce-808d-494e382d685b",
+          "id": "tasks",
           "label": {
             "ru": "Задачи"
           },
@@ -65,7 +65,7 @@
           "items": []
         },
         {
-          "id": "6c4a1fee-22e5-448f-aa06-201d9bb012b1",
+          "id": "admin-tools",
           "label": {
             "ru": "Инструменты администратора"
           },
