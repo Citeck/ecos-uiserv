@@ -5,10 +5,10 @@ import org.apache.commons.lang3.LocaleUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.internal.util.reflection.FieldSetter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.util.ReflectionUtils;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
@@ -29,6 +29,7 @@ import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry;
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -71,7 +72,7 @@ public class ResolvedJournalRecordsDaoTest {
     }
 
     @BeforeEach
-    private void setUp() {
+    public void setUp() {
         TypeDef ecosTypeInfo = getSomethingFromFile(ECOS_TYPE_INFO_JSON, TypeDef.class);
         typesRegistry.setValue(ecosTypeInfo.getId(), ecosTypeInfo);
         journalRepository.deleteAll();
@@ -237,7 +238,10 @@ public class ResolvedJournalRecordsDaoTest {
             .thenReturn(colsAtts);
 
         // Set recordsServiceMock in testDao
-        FieldSetter.setField(testDao, AbstractRecordsDao.class.getDeclaredField("recordsService") ,recordsServiceMock);
+        // todo: remove it :/
+        Field field = AbstractRecordsDao.class.getDeclaredField("recordsService");
+        field.setAccessible(true);
+        ReflectionUtils.setField(field, testDao, recordsServiceMock);
 
         ResolvedJournalDef recordAtts = (ResolvedJournalDef) testDao.getRecordAtts(journalEntity.getExtId());
         List<ResolvedColumnDef> invoke = recordAtts.getColumnsEval().invoke();

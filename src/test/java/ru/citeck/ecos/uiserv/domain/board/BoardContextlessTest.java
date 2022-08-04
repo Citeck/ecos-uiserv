@@ -27,7 +27,7 @@ public class BoardContextlessTest {
     private RecordsService recordsService;
 
     @BeforeEach
-    private void init(){
+    public void init(){
         EcosWebAppContext webAppContext = new EcosWebAppContextMock(Application.NAME);
 
         recordsServiceFactory = new RecordsServiceFactory(){
