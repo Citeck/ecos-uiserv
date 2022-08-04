@@ -52,7 +52,30 @@
           "hidden": false,
           "type": "SECTION",
           "config": {},
-          "items": []
+          "items": [
+            {
+              "id": "meetings-section",
+              "label": {
+                "ru": "Совещания"
+              },
+              "icon": "ui/icon@i-leftmenu-meetings",
+              "type": "SECTION",
+              "items": [
+                {
+                  "id": "bd6c8ee5-4518-4805-9fbf-0ee71382aa1f",
+                  "label": {
+                    "en": "Совещания"
+                  },
+                  "type": "JOURNAL",
+                  "config": {
+                    "recordRef": "uiserv/journal@meetings"
+                  },
+                  "items": [],
+                  "allowedFor": []
+                }
+              ]
+            }
+          ]
         },
         {
           "id": "data-lists",
