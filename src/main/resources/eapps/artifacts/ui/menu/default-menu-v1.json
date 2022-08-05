@@ -38,7 +38,7 @@
               "hidden": false,
               "type": "JOURNAL",
               "config": {
-                "recordRef": "uiserv/journal@active-tasks",
+                "recordRef": "uiserv/journal@bpmn-active-tasks",
                 "displayCount": true
               }
             }
