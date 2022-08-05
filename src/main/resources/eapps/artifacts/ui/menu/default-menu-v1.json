@@ -74,6 +74,41 @@
                   "allowedFor": []
                 }
               ]
+            },
+            {
+              "id": "order-passes-section",
+              "label": {
+                "ru": "Пропуска"
+              },
+              "icon": "ui/icon@i-leftmenu-pass",
+              "hidden": false,
+              "type": "SECTION",
+              "config": {},
+              "action": {
+                "type": "",
+                "config": {}
+              },
+              "items": [
+                {
+                  "id": "272aa970-c181-447e-b565-1a8a9294d2be",
+                  "label": {
+                    "en": "Пропуска"
+                  },
+                  "icon": "",
+                  "hidden": false,
+                  "type": "JOURNAL",
+                  "config": {
+                    "recordRef": "uiserv/journal@order-passes"
+                  },
+                  "action": {
+                    "type": "",
+                    "config": {}
+                  },
+                  "items": [],
+                  "allowedFor": []
+                }
+              ],
+              "allowedFor": []
             }
           ]
         },
@@ -92,7 +127,9 @@
           "label": {
             "ru": "Инструменты администратора"
           },
-          "allowedFor": ["GROUP_ECOS_ADMINISTRATORS"],
+          "allowedFor": [
+            "GROUP_ECOS_ADMINISTRATORS"
+          ],
           "hidden": false,
           "type": "SECTION",
           "config": {},
