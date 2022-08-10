@@ -12,6 +12,7 @@ import ru.citeck.ecos.records3.record.dao.query.dto.query.Consistency
 import ru.citeck.ecos.records3.record.dao.query.dto.query.QueryPage
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.mixin.AttMixin
+import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.context.EcosWebAppContext
 import javax.annotation.PostConstruct
 
@@ -33,15 +34,12 @@ class JournalsTotalCountMixin(
     }
 
     override fun getAtt(path: String, value: AttValueCtx): Any? {
-
         val predicate = value.getAtt("predicate").getAs(Predicate::class.java)
+        val sourceId = value.getAtt("sourceId").asText()
 
-        if (predicate == null || predicate == VoidPredicate.INSTANCE) {
+        if (isAlfrescoNodeSourceIdWithEmptyPredicate(sourceId, predicate)) {
             return 0
         }
-
-        val queryData = value.getAtt("queryData").asObjectData()
-        val sourceId = value.getAtt("sourceId").asText()
 
         if (!ecosWebAppContext.getWebAppsApi().isAppAvailable(getAppName(sourceId))) {
             return null
@@ -49,6 +47,7 @@ class JournalsTotalCountMixin(
 
         val qBuilder = RecordsQuery.create()
             .withSourceId(sourceId)
+        val queryData = value.getAtt("queryData").asObjectData()
 
         if (queryData.size() > 0) {
 
@@ -75,8 +74,13 @@ class JournalsTotalCountMixin(
 
     private fun getAppName(sourceId: String): String {
         if (sourceId.indexOf(RecordRef.APP_NAME_DELIMITER) == -1) {
-            return "alfresco"
+            return AppName.ALFRESCO
         }
         return sourceId.substringBefore(RecordRef.APP_NAME_DELIMITER)
+    }
+
+    private fun isAlfrescoNodeSourceIdWithEmptyPredicate(sourceId: String, predicate: Predicate?): Boolean {
+        return sourceId == AppName.ALFRESCO + RecordRef.APP_NAME_DELIMITER
+            && (predicate == null || predicate == VoidPredicate.INSTANCE)
     }
 }
