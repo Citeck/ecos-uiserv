@@ -27,24 +27,10 @@
                     "version": "v2",
                     "v2": {
                       "customJournalMode": false,
-                      "journalsListIds": [
-                        "uiserv/journal@active-tasks"
-                      ],
-                      "journalId": "active-tasks",
+                      "journalId": "bpmn-active-tasks",
                       "customJournal": ""
                     }
                   }
-                },
-                "description": "Вкладка"
-              },
-              {
-                "dndId": "bc555479-8f14-4f9f-8d34-b2ee7ecf2e24",
-                "name": "birthdays",
-                "label": "dashboard-settings.widget.birthdays",
-                "id": "eb35eb7b-d877-463a-807f-c31a45bbcffc",
-                "props": {
-                  "id": "eb35eb7b-d877-463a-807f-c31a45bbcffc",
-                  "config": {}
                 },
                 "description": "Вкладка"
               }
@@ -75,10 +61,7 @@
                     "version": "v2",
                     "v2": {
                       "customJournalMode": false,
-                      "journalsListIds": [
-                        "uiserv/journal@active-tasks"
-                      ],
-                      "journalId": "active-tasks",
+                      "journalId": "bpmn-active-tasks",
                       "customJournal": ""
                     }
                   }
