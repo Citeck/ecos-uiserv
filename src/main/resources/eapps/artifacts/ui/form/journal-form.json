@@ -802,9 +802,6 @@
                                   "en": "Title"
                                 },
                                 "key": "title",
-                                "validate": {
-                                  "custom": "console.log(data);\nconsole.log(value);"
-                                },
                                 "refreshOn": [],
                                 "validateOn": "blur",
                                 "type": "mlText",
@@ -816,9 +813,6 @@
                                   "en": "Message"
                                 },
                                 "key": "message",
-                                "validate": {
-                                  "custom": "console.log(data);\nconsole.log(value);"
-                                },
                                 "refreshOn": [],
                                 "validateOn": "blur",
                                 "type": "mlText",
