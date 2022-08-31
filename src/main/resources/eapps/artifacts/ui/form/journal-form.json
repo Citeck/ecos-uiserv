@@ -787,6 +787,76 @@
                           },
                           {
                             "label": {
+                              "ru": "Форма подтверждения",
+                              "en": "Config form config"
+                            },
+                            "key": "confirm",
+                            "clearOnHide": false,
+                            "refreshOn": [],
+                            "type": "container",
+                            "input": true,
+                            "components": [
+                              {
+                                "label": {
+                                  "ru": "Название",
+                                  "en": "Title"
+                                },
+                                "key": "title",
+                                "refreshOn": [],
+                                "validateOn": "blur",
+                                "type": "mlText",
+                                "input": true
+                              },
+                              {
+                                "label": {
+                                  "ru": "Текст подтверждения",
+                                  "en": "Message"
+                                },
+                                "key": "message",
+                                "refreshOn": [],
+                                "validateOn": "blur",
+                                "type": "mlText",
+                                "input": true
+                              },
+                              {
+                                "label": {
+                                  "ru": "Форма",
+                                  "en": "Form ref"
+                                },
+                                "key": "formRef",
+                                "journalId": "ecos-forms",
+                                "queryData": "",
+                                "refreshOn": [],
+                                "type": "selectJournal",
+                                "input": true
+                              },
+                              {
+                                "label": {
+                                  "ru": "Параметры формы подтверждения",
+                                  "en": "Config form config"
+                                },
+                                "key": "attributesMapping",
+                                "keyLabel": "",
+                                "clearOnHide": false,
+                                "refreshOn": [],
+                                "type": "datamap",
+                                "input": true,
+                                "valueComponent": {
+                                  "label": {
+                                    "ru": "Значение",
+                                    "en": "Value"
+                                  },
+                                  "key": "value",
+                                  "defaultValue": "Value",
+                                  "refreshOn": [],
+                                  "type": "textfield",
+                                  "input": true
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "label": {
                               "en": "Applicability",
                               "ru": "Применимость"
                             },
