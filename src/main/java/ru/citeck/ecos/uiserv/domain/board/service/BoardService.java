@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Sort;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 
@@ -24,7 +25,7 @@ public interface BoardService {
 
     long getCount(Predicate predicate);
 
-    List<BoardWithMeta> getAll(int maxItems, int skipCount, Predicate predicate, Sort sort);
+    List<BoardWithMeta> getAll(Predicate predicate, int maxItems, int skipCount, List<SortBy> sort);
 
     void onBoardChanged(BiConsumer<BoardDef, BoardDef> listener);
 

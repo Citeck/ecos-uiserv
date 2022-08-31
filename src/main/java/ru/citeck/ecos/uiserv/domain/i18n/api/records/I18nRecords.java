@@ -28,6 +28,7 @@ import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.domain.i18n.dto.I18nDto;
 import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService;
+import ru.citeck.ecos.uiserv.domain.utils.LegacyRecordsUtils;
 
 import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
@@ -61,12 +62,12 @@ public class I18nRecords extends LocalRecordsDao implements LocalRecordsQueryWit
 
             Predicate predicate = recordsQuery.getQuery(Predicate.class);
 
-            int max = recordsQuery.getMaxItems();
-            if (max <= 0) {
-                max = 10000;
-            }
-
-            List<I18nDto> i18nDtos = i18nService.getAll(max, recordsQuery.getSkipCount(), predicate);
+            List<I18nDto> i18nDtos = i18nService.getAll(
+                predicate,
+                recordsQuery.getMaxItems(),
+                recordsQuery.getSkipCount(),
+                LegacyRecordsUtils.mapLegacySortBy(recordsQuery.getSortBy())
+            );
 
             result.setRecords(new ArrayList<>(i18nDtos));
             result.setTotalCount(i18nService.getCount(predicate));

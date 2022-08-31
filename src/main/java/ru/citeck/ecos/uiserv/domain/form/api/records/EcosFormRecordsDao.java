@@ -149,13 +149,18 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
                 predicate = recordsQuery.getQuery(Predicate.class);
             }
 
-            List<EcosFormRecord> forms = ecosFormService.getAllForms(predicate, max, skipCount)
+            List<EcosFormRecord> forms = ecosFormService.getAllForms(
+                    predicate,
+                    max,
+                    skipCount,
+                    recordsQuery.getSortBy()
+                )
                 .stream()
                 .map(this::toRecord)
                 .collect(Collectors.toList());
 
             result.setRecords(forms);
-            result.setTotalCount(ecosFormService.getCount());
+            result.setTotalCount(ecosFormService.getCount(predicate));
             return result;
         }
 

@@ -6,11 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
-import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
@@ -18,7 +17,10 @@ import ru.citeck.ecos.uiserv.domain.journal.service.mapper.JournalMapper;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
 import ru.citeck.ecos.uiserv.domain.journal.service.provider.JournalsProvider;
 import ru.citeck.ecos.uiserv.domain.menu.service.resolving.resolvers.JournalsResolver;
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter;
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory;
 
+import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,9 +41,17 @@ public class JournalServiceImpl implements JournalService {
     private final JournalRepository journalRepository;
     private final JournalMapper journalMapper;
 
+    private final JpaSearchConverterFactory jpaSearchConverterFactory;
+    private JpaSearchConverter<JournalEntity> searchConv;
+
     private final List<BiConsumer<JournalWithMeta, JournalWithMeta>> changeListeners = new CopyOnWriteArrayList<>();
 
     private final Map<String, JournalsProvider> providers = new ConcurrentHashMap<>();
+
+    @PostConstruct
+    public void init() {
+        searchConv = jpaSearchConverterFactory.createConverter(JournalEntity.class).build();
+    }
 
     public long getLastModifiedTimeMs() {
         return journalRepository.getLastModifiedTime()
@@ -78,19 +88,8 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
-    public List<JournalWithMeta> getAll(int max, int skipCount, Predicate predicate) {
-
-        if (max == 0) {
-            return Collections.emptyList();
-        }
-
-        PageRequest page = PageRequest.of(
-            skipCount / max,
-            max,
-            Sort.by(Sort.Direction.DESC, "id")
-        );
-
-        return journalRepository.findAll(toSpec(predicate), page)
+    public List<JournalWithMeta> getAll(Predicate predicate, int max, int skip, List<SortBy> sort) {
+        return searchConv.findAll(journalRepository, predicate, max, skip, sort)
             .stream()
             .map(journalMapper::entityToDto)
             .collect(Collectors.toList());
@@ -156,8 +155,7 @@ public class JournalServiceImpl implements JournalService {
 
     @Override
     public long getCount(Predicate predicate) {
-        Specification<JournalEntity> spec = toSpec(predicate);
-        return spec != null ? (int) journalRepository.count(spec) : getCount();
+        return searchConv.getCount(journalRepository, predicate);
     }
 
     @Override
@@ -228,29 +226,5 @@ public class JournalServiceImpl implements JournalService {
     @Override
     public void registerProvider(JournalsProvider provider) {
         this.providers.put(provider.getType(), provider);
-    }
-
-    private Specification<JournalEntity> toSpec(Predicate predicate) {
-
-        PredicateDto predicateDto = PredicateUtils.convertToDto(predicate, PredicateDto.class);
-        Specification<JournalEntity> spec = null;
-
-        if (StringUtils.isNotBlank(predicateDto.name)) {
-            spec = (root, query, builder) ->
-                builder.like(builder.lower(root.get("name")), "%" + predicateDto.name.toLowerCase() + "%");
-        }
-        if (StringUtils.isNotBlank(predicateDto.localId)) {
-            Specification<JournalEntity> idSpec = (root, query, builder) ->
-                builder.like(builder.lower(root.get("extId")), "%" + predicateDto.localId.toLowerCase() + "%");
-            spec = spec != null ? spec.or(idSpec) : idSpec;
-        }
-
-        return spec;
-    }
-
-    @Data
-    public static class PredicateDto {
-        private String name;
-        private String localId;
     }
 }

@@ -1,5 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.menu.dao
 
+import ru.citeck.ecos.records2.predicate.model.Predicate
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
 import ru.citeck.ecos.uiserv.domain.menu.repo.MenuEntity
 import java.time.Instant
 
@@ -20,4 +22,8 @@ interface MenuDao {
     fun save(entity: MenuEntity): MenuEntity
 
     fun findAll(): List<MenuEntity>
+
+    fun getCount(predicate: Predicate): Long
+
+    fun findAll(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<MenuEntity>
 }

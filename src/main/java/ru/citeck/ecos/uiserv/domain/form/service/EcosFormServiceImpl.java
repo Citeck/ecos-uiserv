@@ -16,6 +16,7 @@ import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.form.repo.EcosFormEntity;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
 import ru.citeck.ecos.uiserv.domain.form.service.provider.EcosFormsProvider;
@@ -52,6 +53,11 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
+    public int getCount(Predicate predicate) {
+        return (int) formsEntityDao.count(predicate);
+    }
+
+    @Override
     public void updateFormType(String formId, RecordRef typeRef) {
 
         if (RecordRef.isEmpty(typeRef)) {
@@ -66,15 +72,8 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
-    public List<EcosFormModel> getAllForms(Predicate predicate, int max, int skip) {
-
-        if (max == 0) {
-            return Collections.emptyList();
-        }
-        if (predicate == null) {
-            predicate = VoidPredicate.INSTANCE;
-        }
-        return formsEntityDao.findAll(predicate, max, skip).stream()
+    public List<EcosFormModel> getAllForms(Predicate predicate, int max, int skip, List<SortBy> sort) {
+        return formsEntityDao.findAll(predicate, max, skip, sort).stream()
             .map(this::mapToDto)
             .collect(Collectors.toList());
     }
@@ -82,7 +81,7 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     @Override
     public List<EcosFormModel> getAllForms(int max, int skip) {
-        return getAllForms(VoidPredicate.INSTANCE, max, skip);
+        return getAllForms(VoidPredicate.INSTANCE, max, skip, Collections.emptyList());
     }
 
     @Override

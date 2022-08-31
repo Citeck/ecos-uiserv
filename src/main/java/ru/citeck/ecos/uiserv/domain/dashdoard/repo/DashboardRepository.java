@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.domain.dashdoard.repo;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -10,7 +11,8 @@ import java.util.Optional;
 
 @SuppressWarnings("unused")
 @Repository
-public interface DashboardRepository extends JpaRepository<DashboardEntity, Long> {
+public interface DashboardRepository extends JpaRepository<DashboardEntity, Long>,
+    JpaSpecificationExecutor<DashboardEntity> {
 
     @Query("SELECT dashboard FROM DashboardEntity dashboard " +
            "WHERE dashboard.typeRef = ?1 AND dashboard.authority IN ?2 " +

@@ -14,6 +14,8 @@ import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.json.YamlUtils;
 import ru.citeck.ecos.events2.type.RecordEventsService;
 import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.records2.predicate.PredicateService;
+import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.commons.data.DataValue;
@@ -97,6 +99,26 @@ public class DashboardRecords extends AbstractRecordsDao
     @Nullable
     @Override
     public RecsQueryRes<?> queryRecords(@NotNull RecordsQuery recordsQuery) {
+
+        if (recordsQuery.getLanguage().equals(PredicateService.LANGUAGE_PREDICATE)) {
+
+            Predicate predicate = recordsQuery.getQuery(Predicate.class);
+
+            List<DashboardRecord> records = dashboardService.findAll(
+                predicate,
+                recordsQuery.getPage().getMaxItems(),
+                recordsQuery.getPage().getSkipCount(),
+                recordsQuery.getSortBy()
+            ).stream()
+                .map(DashboardRecord::new)
+                .collect(Collectors.toList());
+
+            RecsQueryRes<DashboardRecord> result = new RecsQueryRes<>();
+            result.setRecords(records);
+            result.setTotalCount(dashboardService.getCount(predicate));
+
+            return result;
+        }
 
         Query query = recordsQuery.getQueryOrNull(Query.class);
 

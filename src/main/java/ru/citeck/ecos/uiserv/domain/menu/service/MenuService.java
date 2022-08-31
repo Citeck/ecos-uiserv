@@ -11,6 +11,8 @@ import ru.citeck.ecos.config.lib.records.CfgRecordsDao;
 import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
+import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.menu.dao.MenuDao;
 import ru.citeck.ecos.uiserv.domain.menu.repo.MenuEntity;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDeployArtifact;
@@ -91,6 +93,16 @@ public class MenuService {
 
     public Set<String> getAllAuthoritiesWithMenu() {
         return menuDao.getAllAuthoritiesWithMenu();
+    }
+
+    public long getCount(Predicate predicate) {
+        return menuDao.getCount(predicate);
+    }
+
+    public List<MenuDto> findAll(Predicate predicate, int max, int skip, List<SortBy> sort) {
+        return menuDao.findAll(predicate, max, skip, sort).stream()
+            .map(this::mapToDto)
+            .collect(Collectors.toList());
     }
 
     public List<MenuDto> getAllMenus() {

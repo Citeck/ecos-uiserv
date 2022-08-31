@@ -13,11 +13,16 @@ import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
+import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardEntity;
 import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardRepository;
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter;
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
@@ -29,8 +34,26 @@ public class DashboardService {
 
     private final DashboardRepository repo;
     private final RecordsService recordsService;
+    private final JpaSearchConverterFactory jpaSearchConverterFactory;
+
+    private JpaSearchConverter<DashboardEntity> searchConv;
 
     private final List<BiConsumer<DashboardDto, DashboardDto>> changeListeners = new CopyOnWriteArrayList<>();
+
+    @PostConstruct
+    public void init() {
+        searchConv = jpaSearchConverterFactory.createConverter(DashboardEntity.class).build();
+    }
+
+    public long getCount(Predicate predicate) {
+        return searchConv.getCount(repo, predicate);
+    }
+
+    public List<DashboardDto> findAll(Predicate predicate, int max, int skip, List<SortBy> sort) {
+        return searchConv.findAll(repo, predicate, max, skip, sort).stream()
+            .map(this::mapToDto)
+            .collect(Collectors.toList());
+    }
 
     public List<DashboardDto> getAllDashboards() {
         return repo.findAll()

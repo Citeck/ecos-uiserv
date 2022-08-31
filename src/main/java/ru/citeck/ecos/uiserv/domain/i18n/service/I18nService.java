@@ -15,10 +15,15 @@ import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.utils.MandatoryParam;
 import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.i18n.repo.I18nEntity;
 import ru.citeck.ecos.uiserv.domain.i18n.dto.I18nDto;
 import ru.citeck.ecos.uiserv.domain.i18n.repo.I18nRepository;
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter;
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory;
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactoryImpl;
 
+import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,10 +41,18 @@ public class I18nService implements MessageResolver {
     private final Map<String, Map<String, String>> messagesByLocale = new ConcurrentHashMap<>();
     private Map<String, String> defaultMessages = Collections.emptyMap();
 
+    private final JpaSearchConverterFactory jpaSearchConverterFactory;
+    private JpaSearchConverter<I18nEntity> searchConv;
+
     private final AtomicBoolean initialized = new AtomicBoolean();
     private String cacheKey;
 
-    private List<BiConsumer<I18nDto, I18nDto>> listeners = new CopyOnWriteArrayList<>();
+    private final List<BiConsumer<I18nDto, I18nDto>> listeners = new CopyOnWriteArrayList<>();
+
+    @PostConstruct
+    public void init() {
+        searchConv = jpaSearchConverterFactory.createConverter(I18nEntity.class).build();
+    }
 
     @Nullable
     public I18nDto getById(String id) {
@@ -74,26 +87,15 @@ public class I18nService implements MessageResolver {
         return repo.count();
     }
 
-    public List<I18nDto> getAll(int max, int skipCount, Predicate predicate) {
-
-        if (max == 0) {
-            return Collections.emptyList();
-        }
-
-        PageRequest page = PageRequest.of(
-            skipCount / max,
-            max,
-            Sort.by(Sort.Direction.DESC, "id")
-        );
-
-        return repo.findAll(toSpec(predicate), page)
+    public List<I18nDto> getAll(Predicate predicate, int max, int skip, List<SortBy> sort) {
+        return searchConv.findAll(repo, predicate, max, skip, sort)
             .stream()
             .map(this::toDto)
             .collect(Collectors.toList());
     }
 
     public long getCount(Predicate predicate) {
-        return repo.count(toSpec(predicate));
+        return searchConv.getCount(repo, predicate);
     }
 
     public I18nDto upload(I18nDto dto) {
@@ -253,19 +255,6 @@ public class I18nService implements MessageResolver {
         return dto;
     }
 
-    private Specification<I18nEntity> toSpec(Predicate predicate) {
-
-        PredicateDto predicateDto = PredicateUtils.convertToDto(predicate, PredicateDto.class);
-        Specification<I18nEntity> spec = null;
-
-        if (StringUtils.isNotBlank(predicateDto.moduleId)) {
-            spec = (root, query, builder) ->
-                builder.like(builder.lower(root.get("extId")), "%" + predicateDto.moduleId.toLowerCase() + "%");
-        }
-
-        return spec;
-    }
-
     public void addListener(BiConsumer<I18nDto, I18nDto> listener) {
         listeners.add(listener);
     }
@@ -274,10 +263,5 @@ public class I18nService implements MessageResolver {
     }
 
     public static class StrToStrListMap extends HashMap<String, List<String>> {
-    }
-
-    @Data
-    public static class PredicateDto {
-        private String moduleId;
     }
 }

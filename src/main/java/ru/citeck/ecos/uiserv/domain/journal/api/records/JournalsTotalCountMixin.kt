@@ -80,7 +80,7 @@ class JournalsTotalCountMixin(
     }
 
     private fun isAlfrescoNodeSourceIdWithEmptyPredicate(sourceId: String, predicate: Predicate?): Boolean {
-        return sourceId == AppName.ALFRESCO + RecordRef.APP_NAME_DELIMITER
-            && (predicate == null || predicate == VoidPredicate.INSTANCE)
+        return sourceId == AppName.ALFRESCO + RecordRef.APP_NAME_DELIMITER &&
+            (predicate == null || predicate == VoidPredicate.INSTANCE)
     }
 }

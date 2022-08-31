@@ -5,12 +5,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.journal.service.mapper.JournalMapper;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
-import ru.citeck.ecos.uiserv.domain.journal.service.JournalServiceImpl;
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactoryImpl;
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
 
 @ExtendWith(EcosSpringExtension.class)
@@ -30,7 +29,7 @@ public class JournalServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        journalService = new JournalServiceImpl(journalRepository, journalMapper);
+        journalService = new JournalServiceImpl(journalRepository, journalMapper, new JpaSearchConverterFactoryImpl());
     }
 
     /*@Test

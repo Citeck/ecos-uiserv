@@ -23,7 +23,8 @@ class JournalsConfiguration(
     @Bean
     fun createJournalsRegistry(initializer: JournalsRegistryInitializer): EcosRegistry<JournalRegistryValue> {
         return EcosRegistryImpl(
-            "journals", JournalRegistryValue::class.java,
+            "journals",
+            JournalRegistryValue::class.java,
             listOf(
                 initializer,
                 ZkRegistryInitializer(

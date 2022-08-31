@@ -6,6 +6,7 @@ import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.RecordsServiceFactory;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.repo.BoardEntity;
@@ -54,7 +55,7 @@ public class BoardServiceMock implements BoardService {
     }
 
     @Override
-    public List<BoardWithMeta> getAll(int maxItems, int skipCount, Predicate predicate, Sort sort) {
+    public List<BoardWithMeta> getAll(Predicate predicate, int maxItems, int skipCount, List<SortBy> sort) {
         return predicateService.filter(data.values(), predicate)
             .stream().map(BoardMapper::entityToDto).collect(Collectors.toList());
     }
@@ -69,7 +70,7 @@ public class BoardServiceMock implements BoardService {
 
     @Override
     public long getCount(Predicate predicate) {
-        return this.getAll(0, 0, predicate, null).size();
+        return this.getAll(predicate, 0, 0, null).size();
     }
 
     @Override

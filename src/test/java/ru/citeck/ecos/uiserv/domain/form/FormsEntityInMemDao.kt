@@ -5,6 +5,7 @@ import ru.citeck.ecos.records2.predicate.PredicateUtils
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.ValuePredicate
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
 import ru.citeck.ecos.uiserv.domain.form.repo.EcosFormEntity
 import ru.citeck.ecos.uiserv.domain.form.service.FormsEntityDao
 
@@ -18,6 +19,10 @@ class FormsEntityInMemDao(
         return entities.size.toLong()
     }
 
+    override fun count(predicate: Predicate): Long {
+        return count()
+    }
+
     override fun findByExtId(formId: String): EcosFormEntity? {
         return entities[formId]
     }
@@ -27,7 +32,7 @@ class FormsEntityInMemDao(
         return entity
     }
 
-    override fun findAll(predicate: Predicate, max: Int, skip: Int): List<EcosFormEntity> {
+    override fun findAll(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<EcosFormEntity> {
         if (max == 0) {
             return emptyList()
         }

@@ -67,17 +67,15 @@ class ActionService(
         return actionDao.getCount(predicate)
     }
 
-    fun getActions(max: Int, skip: Int, predicate: Predicate): List<ActionDto> {
-        if (max == 0) {
-            return emptyList()
-        }
-        return getActionEntities(max, skip, predicate).mapNotNull { actionEntityMapper.toDto(it) }
+    fun getActions(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<ActionDto> {
+        return getActionEntities(predicate, max, skip, sort).mapNotNull { actionEntityMapper.toDto(it) }
+    }
+
+    fun getActions(predicate: Predicate, max: Int, skip: Int): List<ActionDto> {
+        return getActionEntities(predicate, max, skip).mapNotNull { actionEntityMapper.toDto(it) }
     }
 
     fun getActions(max: Int, skip: Int): List<ActionDto> {
-        if (max == 0) {
-            return emptyList()
-        }
         return getActionEntities(max, skip).mapNotNull { actionEntityMapper.toDto(it) }
     }
 
@@ -190,12 +188,16 @@ class ActionService(
         return recordsActions
     }
 
-    private fun getActionEntities(max: Int, skip: Int, predicate: Predicate): List<ActionEntity> {
-        return actionDao.getActions(max, skip, predicate, SortBy("id", false))
+    private fun getActionEntities(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<ActionEntity> {
+        return actionDao.getActions(predicate, max, skip, sort)
+    }
+
+    private fun getActionEntities(predicate: Predicate, max: Int, skip: Int): List<ActionEntity> {
+        return actionDao.getActions(predicate, max, skip, emptyList())
     }
 
     private fun getActionEntities(max: Int, skip: Int): List<ActionEntity> {
-        return actionDao.getActions(max, skip, VoidPredicate.INSTANCE, SortBy("id", false))
+        return actionDao.getActions(VoidPredicate.INSTANCE, max, skip, emptyList())
     }
 
     fun addActionProvider(provider: ActionsProvider) {

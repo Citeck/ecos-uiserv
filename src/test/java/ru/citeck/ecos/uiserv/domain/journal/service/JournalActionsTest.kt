@@ -20,6 +20,7 @@ class JournalActionsTest {
 
     @Autowired
     lateinit var journalsService: JournalService
+
     @Autowired
     lateinit var recordsService: RecordsService
 

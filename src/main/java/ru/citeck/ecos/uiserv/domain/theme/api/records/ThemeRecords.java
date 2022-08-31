@@ -28,6 +28,7 @@ import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.uiserv.domain.theme.dto.ThemeDto;
 import ru.citeck.ecos.uiserv.domain.theme.eapps.ThemeArtifactHandler;
 import ru.citeck.ecos.uiserv.domain.theme.service.ThemeService;
+import ru.citeck.ecos.uiserv.domain.utils.LegacyRecordsUtils;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -52,12 +53,12 @@ public class ThemeRecords extends LocalRecordsDao implements LocalRecordsQueryWi
 
             Predicate predicate = recordsQuery.getQuery(Predicate.class);
 
-            int max = recordsQuery.getMaxItems();
-            if (max <= 0) {
-                max = 10000;
-            }
-
-            List<ThemeDto> themeDtos = themeService.getAll(max, recordsQuery.getSkipCount(), predicate);
+            List<ThemeDto> themeDtos = themeService.getAll(
+                predicate,
+                recordsQuery.getMaxItems(),
+                recordsQuery.getSkipCount(),
+                LegacyRecordsUtils.mapLegacySortBy(recordsQuery.getSortBy())
+            );
 
             result.setRecords(new ArrayList<>(themeDtos));
             result.setTotalCount(themeService.getCount(predicate));

@@ -13,7 +13,7 @@ class ActionInMemDao(private val predicateService: PredicateService) : ActionDao
 
     private val data: MutableMap<String, ActionEntity> = mutableMapOf()
 
-    override fun getActions(max: Int, skip: Int, predicate: Predicate, sort: SortBy): List<ActionEntity> {
+    override fun getActions(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<ActionEntity> {
 
         val mappedFilter = PredicateUtils.mapValuePredicates(predicate) {
             if (it.getAttribute() == "moduleId") {

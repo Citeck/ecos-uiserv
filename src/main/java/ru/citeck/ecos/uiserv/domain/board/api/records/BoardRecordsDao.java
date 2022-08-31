@@ -110,11 +110,11 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
             result.setTotalCount(boards.size());
         } else {
             final QueryPage page = recordsQuery.getPage();
-            int maxItemsCount = page.getMaxItems() <= 0 ? 10000 : page.getMaxItems();
+            int maxItems = page.getMaxItems();
             int skipCount = page.getSkipCount();
             if (PredicateService.LANGUAGE_PREDICATE.equals(recordsQuery.getLanguage())) {
                 Predicate predicate = recordsQuery.getQuery(Predicate.class);
-                result.setRecords(boardService.getAll(maxItemsCount, skipCount, predicate, sort)
+                result.setRecords(boardService.getAll(predicate, maxItems, skipCount, recordsQuery.getSortBy())
                     .stream()
                     .map(BoardRecord::new)
                     .collect(Collectors.toList()));

@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.journal.service;
 
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.domain.journal.service.provider.JournalsProvider;
@@ -16,7 +17,7 @@ public interface JournalService {
 
     JournalWithMeta getJournalById(String id);
 
-    List<JournalWithMeta> getAll(int max, int skipCount, Predicate predicate);
+    List<JournalWithMeta> getAll(Predicate predicate, int max, int skip, List<SortBy> sort);
 
     Set<JournalWithMeta> getAll(int maxItems, int skipCount);
 

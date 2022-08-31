@@ -11,6 +11,8 @@ import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.commons.json.YamlUtils.toNonDefaultString
 import ru.citeck.ecos.events2.type.RecordEventsService
+import ru.citeck.ecos.records2.predicate.PredicateService
+import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.atts.value.AttValue
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
@@ -58,8 +60,8 @@ class MenuRecords(
 
     override fun getId() = ID
 
-    override fun getRecordAtts(record: String): MenuRecord {
-        val menuDto = menuService.getMenu(record).orElseGet { MenuDto("") }
+    override fun getRecordAtts(recordId: String): MenuRecord {
+        val menuDto = menuService.getMenu(recordId).orElseGet { MenuDto("") }
         return MenuRecord(menuDto)
     }
 
@@ -67,20 +69,34 @@ class MenuRecords(
         return getRecordAtts(recordId)
     }
 
-    override fun queryRecords(recordsQuery: RecordsQuery): RecsQueryRes<Any> {
+    override fun queryRecords(recsQuery: RecordsQuery): RecsQueryRes<Any> {
 
-        if (AUTHORITIES_QUERY_LANG == recordsQuery.language) {
+        if (AUTHORITIES_QUERY_LANG == recsQuery.language) {
             return RecsQueryRes(ArrayList<Any>(menuService.allAuthoritiesWithMenu))
         }
-        if ("predicate" != recordsQuery.language && "criteria" != recordsQuery.language) {
+        if (recsQuery.language == PredicateService.LANGUAGE_PREDICATE) {
+            val predicate = recsQuery.getQuery(Predicate::class.java)
+            val records = menuService.findAll(
+                predicate,
+                recsQuery.page.maxItems,
+                recsQuery.page.skipCount,
+                recsQuery.sortBy
+            ).map { MenuRecord(it) }
+            val result = RecsQueryRes<Any>()
+            result.setRecords(records)
+            result.setTotalCount(menuService.getCount(predicate))
+            return result
+        }
+        if ("criteria" != recsQuery.language) {
 
-            val menuQuery = recordsQuery.getQueryOrNull(MenuQuery::class.java)
+            val menuQuery = recsQuery.getQueryOrNull(MenuQuery::class.java)
 
             if (menuQuery != null && StringUtils.isNotBlank(menuQuery.user)) {
                 val menuDto = menuService.getMenuForCurrentUser(/*menuQuery.user, */menuQuery.version)
                 return RecsQueryRes.of(MenuRecord(menuDto))
             }
         }
+
         val result = RecsQueryRes<Any>()
         result.setRecords(
             menuService.allMenus

@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
@@ -22,8 +21,8 @@ import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.utils.ZipUtils;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.icon.api.records.IconRecords;
 import ru.citeck.ecos.uiserv.domain.icon.dto.IconDto;
 import ru.citeck.ecos.uiserv.domain.icon.service.IconService;
@@ -31,6 +30,8 @@ import ru.citeck.ecos.uiserv.domain.theme.dto.ResourceData;
 import ru.citeck.ecos.uiserv.domain.theme.dto.ThemeDto;
 import ru.citeck.ecos.uiserv.domain.theme.repo.ThemeEntity;
 import ru.citeck.ecos.uiserv.domain.theme.repo.ThemeRepository;
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter;
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory;
 
 import javax.annotation.PostConstruct;
 import java.time.Instant;
@@ -61,12 +62,16 @@ public class ThemeService {
     private final RecordsService recordsService;
     private final IconService iconService;
 
+    private final JpaSearchConverterFactory jpaSearchConverterFactory;
+    private JpaSearchConverter<ThemeEntity> searchConv;
+
     private LoadingCache<ResourceKey, ResourceData> resourcesCache;
     private LoadingCache<String, String> activeThemeCache;
     private String prevActiveTheme = null;
 
     @PostConstruct
     public void init() {
+
         resourcesCache = CacheBuilder.newBuilder()
             .maximumSize(20)
             .expireAfterWrite(5, TimeUnit.MINUTES)
@@ -75,6 +80,8 @@ public class ThemeService {
             .maximumSize(1)
             .expireAfterWrite(10, TimeUnit.SECONDS)
             .build(CacheLoader.from(this::getActiveThemeImpl));
+
+        searchConv = jpaSearchConverterFactory.createConverter(ThemeEntity.class).build();
     }
 
     public String getActiveTheme() {
@@ -120,26 +127,15 @@ public class ThemeService {
         return themeRepo.count();
     }
 
-    public List<ThemeDto> getAll(int max, int skipCount, Predicate predicate) {
-
-        if (max == 0) {
-            return Collections.emptyList();
-        }
-
-        PageRequest page = PageRequest.of(
-            skipCount / max,
-            max,
-            Sort.by(Sort.Direction.DESC, "id")
-        );
-
-        return themeRepo.findAll(toSpec(predicate), page)
+    public List<ThemeDto> getAll(Predicate predicate, int max, int skip, List<SortBy> sort) {
+        return searchConv.findAll(themeRepo, predicate, max, skip, sort)
             .stream()
             .map(this::toDto)
             .collect(Collectors.toList());
     }
 
     public long getCount(Predicate predicate) {
-        return themeRepo.count(toSpec(predicate));
+        return searchConv.getCount(themeRepo, predicate);
     }
 
     public ThemeDto deploy(ThemeDto themeDto) {
@@ -344,24 +340,6 @@ public class ThemeService {
         }
 
         return entity;
-    }
-
-    private Specification<ThemeEntity> toSpec(Predicate predicate) {
-
-        PredicateDto predicateDto = PredicateUtils.convertToDto(predicate, PredicateDto.class);
-        Specification<ThemeEntity> spec = null;
-
-        if (StringUtils.isNotBlank(predicateDto.moduleId)) {
-            spec = (root, query, builder) ->
-                builder.like(builder.lower(root.get("extId")), "%" + predicateDto.moduleId.toLowerCase() + "%");
-        }
-
-        return spec;
-    }
-
-    @Data
-    public static class PredicateDto {
-        private String moduleId;
     }
 
     @Data

@@ -38,6 +38,7 @@ import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.records3.record.request.RequestContext;
 import ru.citeck.ecos.uiserv.domain.action.service.ActionService;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto;
+import ru.citeck.ecos.uiserv.domain.utils.LegacyRecordsUtils;
 
 import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
@@ -60,7 +61,7 @@ public class ActionRecords extends LocalRecordsDao
     private final RecordsService recordsService;
     private final ActionService actionService;
     private RecordEventsService recordEventsService;
-    private TypesRepo typesRepo;
+    private final TypesRepo typesRepo;
 
     @Autowired
     public ActionRecords(RecordsService recordsService, ActionService actionService, TypesRepo typesRepo) {
@@ -138,7 +139,13 @@ public class ActionRecords extends LocalRecordsDao
             if (PredicateService.LANGUAGE_PREDICATE.equals(recordsQuery.getLanguage())) {
 
                 Predicate predicate = recordsQuery.getQuery(Predicate.class);
-                actions = actionService.getActions(max, skip, predicate);
+
+                actions = actionService.getActions(
+                    predicate,
+                    max,
+                    skip,
+                    LegacyRecordsUtils.mapLegacySortBy(recordsQuery.getSortBy())
+                );
                 result.setTotalCount(actionService.getCount(predicate));
 
             } else {

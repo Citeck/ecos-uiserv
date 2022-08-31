@@ -6,7 +6,7 @@ import ru.citeck.ecos.uiserv.domain.action.repo.ActionEntity
 
 interface ActionDao {
 
-    fun getActions(max: Int, skip: Int, predicate: Predicate, sort: SortBy): List<ActionEntity>
+    fun getActions(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<ActionEntity>
 
     fun getCount(): Long
 
