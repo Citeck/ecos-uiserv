@@ -105,10 +105,11 @@
         "label": {
           "ru": "Tabs"
         },
+        "key": "tabs2",
         "components": [
           {
             "label": "Main",
-            "key": "tab2",
+            "key": "main",
             "components": [
               {
                 "label": {
@@ -132,8 +133,12 @@
                               "en": "Journal ID"
                             },
                             "key": "localId",
+                            "validate": {
+                              "required": true
+                            },
                             "defaultValue": "",
                             "refreshOn": [],
+                            "optionalWhenDisabled": false,
                             "logic": [
                               {
                                 "name": "disabled",
@@ -172,7 +177,6 @@
                               "ru": "Разрешить редактирование значений в ячейках",
                               "en": "Allow to edit values in cells"
                             },
-                            "labelPosition": "left-left",
                             "key": "editable",
                             "type": "checkbox",
                             "input": true
@@ -205,7 +209,6 @@
                         "components": [
                           {
                             "label": "ActionFromType",
-                            "labelPosition": "left-left",
                             "tooltip": "tooltip.actionFromType",
                             "hasThreeStates": true,
                             "key": "actionFromType",
@@ -240,10 +243,7 @@
                     "input": false
                   },
                   {
-                    "label": {
-                      "ru": "Колонки",
-                      "en": "Columns"
-                    },
+                    "label": "Свойства столбца",
                     "disableAddingRemovingRows": false,
                     "addAnother": "",
                     "addAnotherPosition": "bottom",
@@ -647,6 +647,22 @@
                         "horizontalLine": [],
                         "execForQueryOptions": {
                           "execAsForRecords": false
+                        },
+                        "confirm": {
+                          "title": {
+                            "ru": "",
+                            "en": ""
+                          },
+                          "message": {
+                            "ru": "",
+                            "en": ""
+                          },
+                          "formRef": "",
+                          "value": "Value",
+                          "attributesMapping": {}
+                        },
+                        "execForQueryConfig": {
+                          "execAsForRecords": false
                         }
                       }
                     ],
@@ -884,7 +900,6 @@
                                           "ru": "Для Записи"
                                         },
                                         "key": "execForRecord",
-                                        "defaultValue": false,
                                         "refreshOn": [],
                                         "type": "checkbox",
                                         "input": true
@@ -909,7 +924,6 @@
                                           "en": "For Records"
                                         },
                                         "key": "execForRecords",
-                                        "defaultValue": false,
                                         "refreshOn": [],
                                         "type": "checkbox",
                                         "input": true
@@ -929,7 +943,6 @@
                                           "en": "For Query"
                                         },
                                         "key": "execForQuery",
-                                        "defaultValue": false,
                                         "refreshOn": [],
                                         "type": "checkbox",
                                         "input": true
@@ -964,7 +977,6 @@
                                 },
                                 "key": "execAsForRecords",
                                 "labelPosition": "",
-                                "defaultValue": false,
                                 "refreshOn": [],
                                 "type": "checkbox",
                                 "hasThreeStates": true,
@@ -977,7 +989,8 @@
                       }
                     ]
                   }
-                ]
+                ],
+                "tab": 1
               }
             ]
           },
@@ -1138,7 +1151,6 @@
             ]
           }
         ],
-        "key": "tabs2",
         "type": "tabs",
         "input": false
       },
