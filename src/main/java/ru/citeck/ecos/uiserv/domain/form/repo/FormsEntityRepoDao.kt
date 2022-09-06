@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
 import ru.citeck.ecos.uiserv.domain.form.service.FormsEntityDao
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaEntityFieldType
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory
 import javax.annotation.PostConstruct
@@ -18,7 +19,9 @@ class FormsEntityRepoDao(
 
     @PostConstruct
     fun init() {
-        searchConv = jpaSearchConverterFactory.createConverter(EcosFormEntity::class.java).build()
+        searchConv = jpaSearchConverterFactory.createConverter(EcosFormEntity::class.java)
+            .withFieldType("title", JpaEntityFieldType.MLTEXT)
+            .build()
     }
 
     override fun count(predicate: Predicate): Long {
