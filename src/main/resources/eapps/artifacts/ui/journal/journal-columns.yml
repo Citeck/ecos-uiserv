@@ -4,6 +4,8 @@ name:
   ru: Выбор колонок
   en: Select columns
 
+properties: {}
+
 system: true
 
 columns:

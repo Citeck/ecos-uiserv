@@ -21,6 +21,7 @@ public class EcosFormEntity extends AbstractAuditingEntity {
     @Column(name = "type_ref")
     private String typeRef;
 
+    private Boolean system;
     private String title;
     private String description;
     @Column(name = "form_key")

@@ -8,6 +8,7 @@
     "en": "Form to edit other forms"
   },
   "customModule": "",
+  "system": true,
   "typeRef": "",
   "width": "lg",
   "i18n": {

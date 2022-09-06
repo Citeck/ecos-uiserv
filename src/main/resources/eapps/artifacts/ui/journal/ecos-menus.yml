@@ -4,6 +4,8 @@ name:
   ru: Меню
   en: Menu
 
+properties: {}
+
 system: true
 
 actions:

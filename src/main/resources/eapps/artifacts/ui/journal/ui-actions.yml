@@ -4,6 +4,8 @@ name:
   ru: Действия
   en: Actions
 
+properties: {}
+
 system: true
 
 actions:
@@ -28,4 +30,3 @@ columns:
 
   - id: key
     name: { ru: Ключ, en: Key }
-

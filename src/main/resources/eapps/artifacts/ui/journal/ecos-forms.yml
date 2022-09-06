@@ -5,6 +5,8 @@ name:
   en: Forms
 
 system: true
+defaultFilters:
+  - { t: eq, att: system, val: false }
 
 actions:
   - uiserv/action@debug-form
@@ -30,3 +32,8 @@ columns:
 
   - id: description
     name: { ru: Описание, en: Description }
+
+  - id: system
+    type: BOOLEAN
+    name: { ru: Системная форма, en: System form }
+    visible: false

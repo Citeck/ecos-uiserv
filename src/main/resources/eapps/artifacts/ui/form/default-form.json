@@ -6,7 +6,6 @@
   },
   "system": true,
   "formKey": "DEFAULT",
-  "formMode": null,
   "customModule": null,
   "definition": {
     "display": "form",

@@ -3,9 +3,8 @@
   "title": "Download Action Form",
   "system": true,
   "formKey": "action_download",
-  "description": "",
   "customModule": null,
-  "i18n": null,
+  "i18n": {},
   "definition": {
     "display": "form",
     "components": [

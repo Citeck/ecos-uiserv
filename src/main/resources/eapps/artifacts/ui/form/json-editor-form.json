@@ -5,6 +5,7 @@
     "ru": "Форма редактирования JSON конфигурации"
   },
   "description": {},
+  "system": true,
   "customModule": null,
   "typeRef": "emodel/type@base",
   "width": "lg",

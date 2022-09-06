@@ -8,6 +8,7 @@
   "customModule": null,
   "typeRef": "emodel/type@base",
   "width": "default",
+  "system": true,
   "i18n": {},
   "definition": {
     "components": [

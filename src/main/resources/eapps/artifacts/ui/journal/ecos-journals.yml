@@ -5,6 +5,8 @@ name:
   en: Journals
 
 system: true
+defaultFilters:
+  - { t: eq, att: system, val: false }
 
 actions:
   - uiserv/action@download-base64-data-yml
@@ -25,3 +27,8 @@ columns:
   - id: name
     name: { ru: Название, en: Name }
     type: TEXT
+
+  - id: system
+    type: BOOLEAN
+    name: { ru: Системный журнал, en: System journal }
+    visible: false

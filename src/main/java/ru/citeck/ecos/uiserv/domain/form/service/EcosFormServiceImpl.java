@@ -229,6 +229,7 @@ public class EcosFormServiceImpl implements EcosFormService {
         model.setI18n(Json.getMapper().read(entity.getI18n(), ObjectData.class));
         model.setAttributes(Json.getMapper().read(entity.getAttributes(), ObjectData.class));
         model.setDefinition(Json.getMapper().read(entity.getDefinition(), ObjectData.class));
+        model.setSystem(entity.getSystem());
 
         return model;
     }
@@ -259,6 +260,7 @@ public class EcosFormServiceImpl implements EcosFormService {
         entity.setI18n(Json.getMapper().toString(model.getI18n()));
         entity.setDefinition(Json.getMapper().toString(model.getDefinition()));
         entity.setAttributes(Json.getMapper().toString(model.getAttributes()));
+        entity.setSystem(model.getSystem());
 
         return entity;
     }

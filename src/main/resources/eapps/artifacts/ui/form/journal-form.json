@@ -5,6 +5,7 @@
     "en": "Journal form"
   },
   "description": {},
+  "system": true,
   "customModule": null,
   "typeRef": "emodel/type@journal",
   "width": "lg",

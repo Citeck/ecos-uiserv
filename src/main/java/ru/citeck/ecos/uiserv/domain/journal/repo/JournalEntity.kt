@@ -34,4 +34,6 @@ class JournalEntity : AbstractAuditingEntity() {
     var actions: String? = null
     var actionsDef: String? = null
     var computed: String? = null
+
+    var system: Boolean? = null
 }

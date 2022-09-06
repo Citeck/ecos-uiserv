@@ -4,6 +4,8 @@ name:
   ru: Темы
   en: Themes
 
+properties: {}
+
 system: true
 
 actions:

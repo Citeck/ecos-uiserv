@@ -40,6 +40,7 @@ class JournalMapper(
             .withDefaultSortBy(mapper.readList(entity.sortBy, JournalSortByDef::class.java))
             .withComputed(mapper.readList(entity.computed, JournalComputedDef::class.java))
             .withColumns(mapper.readList(entity.columns, JournalColumnDef::class.java))
+            .withSystem(entity.system)
             .build()
 
         dto.modified = entity.lastModifiedDate
@@ -75,6 +76,7 @@ class JournalMapper(
         entity.groupBy = mapper.toString(journal.groupBy)
         entity.sortBy = mapper.toString(journal.defaultSortBy)
         entity.computed = mapper.toString(journal.computed)
+        entity.system = journal.system
 
         return entity
     }

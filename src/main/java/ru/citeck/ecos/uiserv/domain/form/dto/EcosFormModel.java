@@ -17,6 +17,7 @@ public class EcosFormModel {
     private String customModule;
     private RecordRef typeRef = RecordRef.EMPTY;
     private String width;
+    private boolean system;
 
     private ObjectData i18n = ObjectData.create();
     private ObjectData definition = ObjectData.create();
@@ -35,10 +36,23 @@ public class EcosFormModel {
         this.typeRef = model.getTypeRef();
         this.description = model.getDescription();
         this.customModule = model.getCustomModule();
+        setSystem(model.system);
 
         this.i18n = ObjectData.deepCopy(model.getI18n());
         this.definition = ObjectData.deepCopy(model.getDefinition());
         this.attributes = ObjectData.deepCopy(model.getAttributes());
+    }
+
+    public boolean getSystem() {
+        return system;
+    }
+
+    public void setSystem(Boolean system) {
+        if (system == null) {
+            this.system = false;
+        } else {
+            this.system = system;
+        }
     }
 
     public String getWidth() {
@@ -69,4 +83,3 @@ public class EcosFormModel {
         this.id = id;
     }
 }
-

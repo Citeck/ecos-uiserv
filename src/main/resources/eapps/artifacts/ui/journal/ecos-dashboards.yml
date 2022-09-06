@@ -4,6 +4,8 @@ name:
   ru: Дашборды
   en: Dashboards
 
+properties: {}
+
 system: true
 
 actions:

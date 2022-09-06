@@ -4,6 +4,8 @@ name:
   ru: Локализация
   en: Localization
 
+properties: {}
+
 system: true
 
 actions:
@@ -21,5 +23,3 @@ columns:
   - id: order
     name: { ru: Порядок, en: Order }
     type: TEXT
-
-

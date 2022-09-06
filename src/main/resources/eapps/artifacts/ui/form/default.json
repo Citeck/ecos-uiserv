@@ -2,7 +2,9 @@
   "id": "DEFAULT",
   "title": "Default form",
   "system": true,
-  "description": "Template for other forms",
+  "description": {
+    "en": "Template for other forms"
+  },
   "formKey": "DEFAULT",
   "formMode": null,
   "customModule": null,

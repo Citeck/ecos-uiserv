@@ -4,6 +4,8 @@ name:
   ru: Канбан доски
   en: Kanban boards
 
+properties: {}
+
 system: true
 
 actions:

@@ -4,6 +4,8 @@ name:
   ru: Настройки журналов
   en: Journal settings
 
+properties: {}
+
 system: true
 
 actions:

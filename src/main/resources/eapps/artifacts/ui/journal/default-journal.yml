@@ -4,3 +4,5 @@ name:
   ru: Журнал по умолчанию
   en: Default journal
 system: true
+
+properties: {}
