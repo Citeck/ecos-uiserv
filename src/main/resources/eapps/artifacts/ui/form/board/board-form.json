@@ -8,7 +8,6 @@
   "customModule": null,
   "typeRef": "",
   "width": "lg",
-  "system": true,
   "i18n": {},
   "definition": {
     "components": [
@@ -24,27 +23,29 @@
                   "ru": "Идентификатор доски",
                   "en": "Kanban ID"
                 },
-                "disabled": true,
-                "key": "localId",
+                "key": "id",
+                "protected": true,
                 "defaultValue": "",
                 "refreshOn": [],
+                "optionalWhenDisabled": false,
+                "customConditional": "\n",
                 "logic": [
                   {
                     "name": "Disable",
                     "trigger": {
                       "type": "javascript",
-                      "javascript": "result = _.get(instance, 'options.formMode') === 'CREATE';"
+                      "javascript": "result = _.get(instance, 'options.formMode') !== 'CREATE';"
                     },
                     "actions": [
                       {
-                        "name": "take off",
+                        "name": "Disable field",
                         "type": "property",
                         "property": {
                           "label": "Disabled",
                           "value": "disabled",
                           "type": "boolean"
                         },
-                        "state": "false"
+                        "state": "true"
                       }
                     ]
                   }
@@ -58,7 +59,15 @@
                   "ru": "Имя канбан-доски"
                 },
                 "key": "name",
+                "validate": {
+                  "required": true
+                },
+                "defaultValue": {
+                  "ru": "Доска ",
+                  "en": "Board "
+                },
                 "refreshOn": [],
+                "optionalWhenDisabled": false,
                 "type": "mlText",
                 "input": true
               },
@@ -86,15 +95,20 @@
             "components": [
               {
                 "label": {
-                  "ru": "Тип",
-                  "en": "Type"
+                  "ru": "Тип данных",
+                  "en": "Data type"
                 },
                 "key": "typeRef",
+                "validate": {
+                  "required": true
+                },
+                "modalTitle": "",
                 "journalId": "ecos-types",
                 "queryData": "",
                 "refreshOn": [],
-                "calculateValue": "const formMode = _.get(instance, 'options.formMode');\n\nvalue = formMode === 'CREATE' ? _.get(instance, 'options.typeRef') : _.get(data, 'recordAsyncData.typeRef')\n",
+                "calculateValue": "const formMode = _.get(instance, 'options.formMode');\n\nvalue = formMode === 'CREATE' ? '' : _.get(data, 'recordAsyncData.typeRef')\n",
                 "allowCalculateOverride": true,
+                "optionalWhenDisabled": false,
                 "type": "selectJournal",
                 "input": true
               },
@@ -210,10 +224,6 @@
                 },
                 "dataPreProcessingCode": "",
                 "valueProperty": "value",
-                "unavailableItems": {
-                  "code": "",
-                  "isActive": false
-                },
                 "defaultValue": "",
                 "refreshOn": [
                   "statusesAsyncData"
