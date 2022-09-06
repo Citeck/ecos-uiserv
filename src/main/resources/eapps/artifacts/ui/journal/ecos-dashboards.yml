@@ -23,9 +23,11 @@ columns:
 
   - id: typeRef
     name: { ru: Тип ECOS, en: ECOS Type }
+    searchable: false
 
   - id: appliedToRef
     name: { ru: Запись, en: Record }
+    searchable: false
 
   - id: authority
     name: { ru: Человек или группа, en: User or group }
