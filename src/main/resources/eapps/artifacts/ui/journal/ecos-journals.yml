@@ -23,6 +23,7 @@ columns:
 
   - id: typeRef
     name: { ru: Тип ECOS, en: ECOS Type }
+    searchable: false
 
   - id: name
     name: { ru: Название, en: Name }
