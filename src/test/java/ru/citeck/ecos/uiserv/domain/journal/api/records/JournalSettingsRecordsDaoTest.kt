@@ -27,15 +27,16 @@ import ru.citeck.ecos.uiserv.Application
 import ru.citeck.ecos.uiserv.domain.file.repo.FileRepository
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType
 import ru.citeck.ecos.uiserv.domain.file.service.FileService
+import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService
+import ru.citeck.ecos.uiserv.domain.journalsettings.api.records.JournalSettingsRecordsDao
 import ru.citeck.ecos.uiserv.domain.journalsettings.dto.JournalSettingsDto
 import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsEntity
 import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsRepository
-import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService
-import ru.citeck.ecos.uiserv.domain.journalsettings.api.records.JournalSettingsRecordsDao
 import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsPermissionsService
 import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsPermissionsServiceImpl
 import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsService
 import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsServiceImpl
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactoryImpl
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension
 
 @ExtendWith(EcosSpringExtension::class)
@@ -90,7 +91,7 @@ internal class JournalSettingsRecordsDaoTest {
     fun getId() {
         val permService = JournalSettingsPermissionsServiceImpl()
         val dao = JournalSettingsRecordsDao(
-            JournalSettingsServiceImpl(repo, permService, journalPrefService, fileService),
+            JournalSettingsServiceImpl(repo, permService, journalPrefService, fileService, JpaSearchConverterFactoryImpl()),
             permService
         )
         assertEquals("journal-settings", dao.getId())

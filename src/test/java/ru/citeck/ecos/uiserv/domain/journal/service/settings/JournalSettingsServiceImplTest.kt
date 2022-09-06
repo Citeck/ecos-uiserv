@@ -23,13 +23,14 @@ import ru.citeck.ecos.uiserv.Application
 import ru.citeck.ecos.uiserv.domain.file.repo.FileRepository
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType
 import ru.citeck.ecos.uiserv.domain.file.service.FileService
+import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService
 import ru.citeck.ecos.uiserv.domain.journalsettings.dto.JournalSettingsDto
 import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsEntity
 import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsRepository
-import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService
 import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsPermissionsService
 import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsPermissionsServiceImpl
 import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsServiceImpl
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactoryImpl
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension
 
 @ExtendWith(EcosSpringExtension::class)
@@ -79,7 +80,13 @@ internal class JournalSettingsServiceImplTest {
 
     @Test
     fun getByIdTest() {
-        val service = JournalSettingsServiceImpl(repo, permService, journalPrefService, fileService)
+        val service = JournalSettingsServiceImpl(
+            repo,
+            permService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
 
         AuthContext.runAs("user-1") {
             val journalSettingsEntity = JournalSettingsEntity()
@@ -111,7 +118,13 @@ internal class JournalSettingsServiceImplTest {
 
     @Test
     fun getByIdLegacyTest() {
-        val service = JournalSettingsServiceImpl(repo, permService, journalPrefService, fileService)
+        val service = JournalSettingsServiceImpl(
+            repo,
+            permService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
 
         setContext("user1")
         val readFully = IOUtils.readAsBytes(
@@ -140,7 +153,13 @@ internal class JournalSettingsServiceImplTest {
     @Test
     fun saveTest() {
         val spyPermService = Mockito.spy(permService)
-        val service = JournalSettingsServiceImpl(repo, spyPermService, journalPrefService, fileService)
+        val service = JournalSettingsServiceImpl(
+            repo,
+            spyPermService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
 
         AuthContext.runAs("some-authority") {
             val createdDto = service.save(
@@ -188,7 +207,13 @@ internal class JournalSettingsServiceImplTest {
     @Test
     fun saveByAnotherUserTest() {
         val spyPermService = Mockito.spy(JournalSettingsPermissionsServiceImpl())
-        val service = JournalSettingsServiceImpl(repo, spyPermService, journalPrefService, fileService)
+        val service = JournalSettingsServiceImpl(
+            repo,
+            spyPermService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
 
         AuthContext.runAs("some-authority", listOf("some-authority", "GROUP_all", "ROLE_USER")) {
             val createdDto = service.save(
@@ -300,7 +325,13 @@ internal class JournalSettingsServiceImplTest {
     @Test
     fun deleteTest() {
         val spyPermService = Mockito.spy(permService)
-        val service = JournalSettingsServiceImpl(repo, spyPermService, journalPrefService, fileService)
+        val service = JournalSettingsServiceImpl(
+            repo,
+            spyPermService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
 
         AuthContext.runAs("some-authority") {
             service.save(
@@ -329,7 +360,13 @@ internal class JournalSettingsServiceImplTest {
 
     @Test
     fun deleteLegacyRecordTest() {
-        val service = JournalSettingsServiceImpl(repo, permService, journalPrefService, fileService)
+        val service = JournalSettingsServiceImpl(
+            repo,
+            permService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
 
         setContext("user1")
         val readFully = IOUtils.readAsBytes(
@@ -354,7 +391,13 @@ internal class JournalSettingsServiceImplTest {
     fun deleteByAnotherUserTest() {
 
         val spyPermService = Mockito.spy(JournalSettingsPermissionsServiceImpl())
-        val service = JournalSettingsServiceImpl(repo, spyPermService, journalPrefService, fileService)
+        val service = JournalSettingsServiceImpl(
+            repo,
+            spyPermService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
 
         AuthContext.runAs("some-authority", listOf("some-authority", "GROUP_all", "ROLE_USER")) {
 
@@ -393,7 +436,13 @@ internal class JournalSettingsServiceImplTest {
 
     @Test
     fun searchSettings() {
-        val service = JournalSettingsServiceImpl(repo, permService, journalPrefService, fileService)
+        val service = JournalSettingsServiceImpl(
+            repo,
+            permService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
 
         setContext("admin")
         repo.save(
@@ -446,16 +495,16 @@ internal class JournalSettingsServiceImplTest {
         setContext("user1")
         val foundResult1 = service.searchSettings("journal-1")
         assertEquals(3, foundResult1.size)
-        assertTrue(foundResult1.stream().anyMatch({ it.id == "id-1" }))
-        assertTrue(foundResult1.stream().anyMatch({ it.id == "id-2" }))
-        assertTrue(foundResult1.stream().anyMatch({ it.id == "id-5" }))
+        assertTrue(foundResult1.stream().anyMatch { it.id == "id-1" })
+        assertTrue(foundResult1.stream().anyMatch { it.id == "id-2" })
+        assertTrue(foundResult1.stream().anyMatch { it.id == "id-5" })
         clearContext()
 
         setContext("user2")
         val foundResult2 = service.searchSettings("journal-1")
         assertEquals(2, foundResult2.size)
-        assertTrue(foundResult2.stream().anyMatch({ it.id == "id-3" }))
-        assertTrue(foundResult2.stream().anyMatch({ it.id == "id-5" }))
+        assertTrue(foundResult2.stream().anyMatch { it.id == "id-3" })
+        assertTrue(foundResult2.stream().anyMatch { it.id == "id-5" })
         clearContext()
 
         setContext("user1")
@@ -472,7 +521,13 @@ internal class JournalSettingsServiceImplTest {
 
     @Test
     fun searchUserSettingsByAdmin() {
-        val service = JournalSettingsServiceImpl(repo, permService, journalPrefService, fileService)
+        val service = JournalSettingsServiceImpl(
+            repo,
+            permService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
 
         setContext("admin")
         repo.save(
@@ -565,7 +620,13 @@ internal class JournalSettingsServiceImplTest {
 
     @Test
     fun searchSettingsWithLegacyPreferences() {
-        val service = JournalSettingsServiceImpl(repo, permService, journalPrefService, fileService)
+        val service = JournalSettingsServiceImpl(
+            repo,
+            permService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
 
         setContext("admin")
         repo.save(
@@ -622,7 +683,13 @@ internal class JournalSettingsServiceImplTest {
 
     @Test
     fun searchSettingsWithLegacyPreferencesWithCollision() {
-        val service = JournalSettingsServiceImpl(repo, permService, journalPrefService, fileService)
+        val service = JournalSettingsServiceImpl(
+            repo,
+            permService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
 
         setContext("admin")
         repo.save(
@@ -662,7 +729,13 @@ internal class JournalSettingsServiceImplTest {
 
     @Test
     fun getSettingsByAuthorityAndJournalId() {
-        val service = JournalSettingsServiceImpl(repo, permService, journalPrefService, fileService)
+        val service = JournalSettingsServiceImpl(
+            repo,
+            permService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
 
         AuthContext.runAs("auth-1") {
             service.save(
