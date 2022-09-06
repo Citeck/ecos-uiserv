@@ -4,7 +4,7 @@ name:
   ru: Действия
   en: Actions
 
-properties: {}
+properties: {upd: true}
 
 system: true
 

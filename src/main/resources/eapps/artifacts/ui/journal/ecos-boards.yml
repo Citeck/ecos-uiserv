@@ -4,9 +4,9 @@ name:
   ru: Канбан доски
   en: Kanban boards
 
-properties: {}
-
 system: true
+
+properties: {upd: true}
 
 actions:
   - uiserv/action@download-base64-data-yml

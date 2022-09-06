@@ -5,4 +5,4 @@ name:
   en: Default journal
 system: true
 
-properties: {}
+properties: {upd: true}

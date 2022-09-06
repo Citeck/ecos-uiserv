@@ -4,7 +4,7 @@ name:
   ru: Настройки журналов
   en: Journal settings
 
-properties: {}
+properties: {upd: true}
 
 system: true
 

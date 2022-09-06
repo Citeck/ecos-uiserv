@@ -4,7 +4,7 @@ name:
   ru: Дашборды
   en: Dashboards
 
-properties: {}
+properties: {upd: true}
 
 system: true
 

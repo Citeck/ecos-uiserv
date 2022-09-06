@@ -12,7 +12,8 @@ predicate:
   val: emodel/type@case
 
 properties:
-  full-search-predicate: '{ "t": "contains", "att": "ALL", "val": "$INPUT"  }'
+  full-search-predicate: '{ "t": "contains", "att": "ALL", "val": "$INPUT" }'
+  upd: true
 
 actions:
   - uiserv/action@delete

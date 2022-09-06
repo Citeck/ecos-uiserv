@@ -4,7 +4,7 @@ name:
   ru: Темы
   en: Themes
 
-properties: {}
+properties: {upd: true}
 
 system: true
 
