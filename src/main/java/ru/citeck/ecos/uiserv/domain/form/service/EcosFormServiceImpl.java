@@ -253,9 +253,7 @@ public class EcosFormServiceImpl implements EcosFormService {
         entity.setWidth(model.getWidth());
         entity.setDescription(Json.getMapper().toString(model.getDescription()));
         entity.setFormKey(model.getFormKey());
-        if (RecordRef.isNotEmpty(model.getTypeRef())) {
-            entity.setTypeRef(RecordRef.toString(model.getTypeRef()));
-        }
+        entity.setTypeRef(RecordRef.toString(model.getTypeRef()));
         entity.setCustomModule(model.getCustomModule());
         entity.setI18n(Json.getMapper().toString(model.getI18n()));
         entity.setDefinition(Json.getMapper().toString(model.getDefinition()));
