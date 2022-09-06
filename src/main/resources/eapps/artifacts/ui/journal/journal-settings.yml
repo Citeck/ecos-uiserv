@@ -1,0 +1,24 @@
+---
+id: journal-settings
+name:
+  ru: Настройки журналов
+  en: Journal settings
+
+system: true
+
+actions:
+  - uiserv/action@download-base64-data-yml
+  - uiserv/action@delete
+  # - uiserv/action@edit
+  - uiserv/action@module-copy
+
+columns:
+
+  - id: id
+    name: { ru: Идентификатор, en: Id }
+    type: TEXT
+
+  - id: name
+    name: { ru: Название, en: Name }
+  - id: authority
+  - id: journalId

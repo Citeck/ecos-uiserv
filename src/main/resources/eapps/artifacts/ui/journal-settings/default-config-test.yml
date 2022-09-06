@@ -1,0 +1,34 @@
+---
+id: default-config-test
+name:
+  ru: non-system111
+  en: non-system111
+authority: GROUP_EVERYONE
+journalId: ecos-types-def
+settings:
+  sortBy:
+    - attribute: _created
+      ascending: false
+  groupBy: []
+  predicate:
+    t: or
+    val:
+      - t: or
+        val:
+          - t: and
+            val:
+              - att: moduleId
+                t: contains
+                val: order
+              - att: name
+                t: contains
+                val: ''
+              - att: description
+                t: contains
+                val: ''
+              - att: _modified
+                t: ge
+                val: ''
+              - att: _modifier
+                t: contains
+                val: ''

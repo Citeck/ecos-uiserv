@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.journal.api.records
+package ru.citeck.ecos.uiserv.domain.journalsettings.api.records
 
 import ecos.com.fasterxml.jackson210.annotation.JsonValue
 import org.apache.commons.lang3.StringUtils
@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.commons.json.YamlUtils
+import ru.citeck.ecos.records2.predicate.PredicateService
+import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.atts.value.AttValue
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
@@ -16,9 +18,9 @@ import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSettingsDto
-import ru.citeck.ecos.uiserv.domain.journal.service.settings.JournalSettingsPermissionsService
-import ru.citeck.ecos.uiserv.domain.journal.service.settings.JournalSettingsService
+import ru.citeck.ecos.uiserv.domain.journalsettings.dto.JournalSettingsDto
+import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsPermissionsService
+import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsService
 import java.nio.charset.StandardCharsets
 
 @Component
@@ -36,18 +38,35 @@ class JournalSettingsRecordsDao(
 
     @Override
     override fun getRecordAtts(recordId: String): JournalSettingsRecord {
-        val dto = journalSettingsService.getById(recordId) ?: JournalSettingsDto.create { withId(recordId) }
+        val dto = journalSettingsService.getById(recordId)
+            ?: JournalSettingsDto.create { withId(recordId) }
         return JournalSettingsRecord(dto)
     }
 
     @Override
     override fun queryRecords(recsQuery: RecordsQuery): RecsQueryRes<JournalSettingsRecord> {
+
+        if (recsQuery.language == PredicateService.LANGUAGE_PREDICATE) {
+
+            val predicate = recsQuery.getQuery(Predicate::class.java)
+            val settingsDto = journalSettingsService.findAll(
+                predicate,
+                recsQuery.page.maxItems,
+                recsQuery.page.skipCount,
+                recsQuery.sortBy
+            )
+            val result = RecsQueryRes<JournalSettingsRecord>()
+            result.setRecords(settingsDto.map { JournalSettingsRecord(it) })
+            result.setTotalCount(journalSettingsService.getCount(predicate))
+
+            return result
+        }
+
         val query = recsQuery.getQuery(RequestPredicate::class.java)
         val journalId = query.journalId ?: ""
         if (StringUtils.isBlank(journalId)) {
             return RecsQueryRes()
         }
-
         val searchResult = journalSettingsService.searchSettings(journalId)
         return RecsQueryRes<JournalSettingsRecord>().apply {
             setTotalCount(searchResult.size.toLong())
@@ -76,7 +95,7 @@ class JournalSettingsRecordsDao(
         }
     }
 
-    inner class JournalSettingsRecord(other: JournalSettingsDto) : JournalSettingsDto.Builder(other) {
+    inner class JournalSettingsRecord(private val originalDto: JournalSettingsDto) : JournalSettingsDto.Builder(originalDto) {
 
         fun getModuleId(): String {
             return id
@@ -90,7 +109,7 @@ class JournalSettingsRecordsDao(
         @JsonValue
         @com.fasterxml.jackson.annotation.JsonValue
         fun toNonDefaultJson(): Any {
-            return Json.mapper.toNonDefaultJson(this)
+            return Json.mapper.toNonDefaultJson(originalDto)
         }
 
         fun getData(): ByteArray {
@@ -106,12 +125,10 @@ class JournalSettingsRecordsDao(
         private val record: JournalSettingsRecord
     ) : AttValue {
         override fun has(name: String): Boolean {
-            return if ("Write" == name) {
-                permService.canWrite(record.build())
-            } else if ("Read" == name) {
-                permService.canRead(record.build())
-            } else {
-                false
+            return when (name) {
+                "Write" -> permService.canWrite(record.build())
+                "Read" -> permService.canRead(record.build())
+                else -> false
             }
         }
     }

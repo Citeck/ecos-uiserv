@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.journal.dto
+package ru.citeck.ecos.uiserv.domain.journalsettings.dto
 
 import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
 import ru.citeck.ecos.commons.data.MLText

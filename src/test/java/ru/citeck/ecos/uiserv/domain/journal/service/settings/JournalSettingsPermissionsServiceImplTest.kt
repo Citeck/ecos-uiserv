@@ -3,8 +3,9 @@ package ru.citeck.ecos.uiserv.domain.journal.service.settings
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import ru.citeck.ecos.context.lib.auth.AuthContext
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSettingsDto
-import ru.citeck.ecos.uiserv.domain.journal.repo.JournalSettingsEntity
+import ru.citeck.ecos.uiserv.domain.journalsettings.dto.JournalSettingsDto
+import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsEntity
+import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsPermissionsServiceImpl
 
 internal class JournalSettingsPermissionsServiceImplTest {
 

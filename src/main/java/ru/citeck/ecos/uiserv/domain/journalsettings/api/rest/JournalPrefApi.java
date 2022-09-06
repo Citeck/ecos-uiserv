@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.journal.api.rest;
+package ru.citeck.ecos.uiserv.domain.journalsettings.api.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,15 +13,15 @@ import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.uiserv.app.web.exception.JournalPrefsNotFoundException;
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType;
 import ru.citeck.ecos.uiserv.domain.file.service.FileService;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSettingsDto;
+import ru.citeck.ecos.uiserv.domain.journalsettings.dto.JournalSettingsDto;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService;
-import ru.citeck.ecos.uiserv.domain.journal.service.settings.JournalSettingsService;
+import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsService;
 
 import java.io.IOException;
 import java.util.*;
 
 /**
- * @deprecated use ru.citeck.ecos.uiserv.domain.journal.api.records.JournalSettingsRecordsDao
+ * @deprecated use ru.citeck.ecos.uiserv.domain.journalsettings.api.records.JournalSettingsRecordsDao
  */
 @RestController
 @RequestMapping("/api/journalprefs")

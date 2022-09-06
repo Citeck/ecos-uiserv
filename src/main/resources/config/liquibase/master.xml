@@ -54,4 +54,6 @@
     <include file="changelog/20210727000000_create_board_table.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20210817000000_update_dahsboards.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20220523000000_update_journals_and_actions.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20220902000000_add_default_filters.xml" relativeToChangelogFile="true"/>
+
 </databaseChangeLog>

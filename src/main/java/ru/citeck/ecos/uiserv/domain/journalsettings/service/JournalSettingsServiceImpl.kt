@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.journal.service.settings
+package ru.citeck.ecos.uiserv.domain.journalsettings.service
 
 import org.apache.commons.lang.StringUtils
 import org.springframework.data.jpa.domain.Specification
@@ -10,14 +10,20 @@ import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.context.lib.auth.AuthContext
+import ru.citeck.ecos.records2.predicate.model.Predicate
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType
 import ru.citeck.ecos.uiserv.domain.file.service.FileService
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSettingsDto
-import ru.citeck.ecos.uiserv.domain.journal.repo.JournalSettingsEntity
-import ru.citeck.ecos.uiserv.domain.journal.repo.JournalSettingsRepository
+import ru.citeck.ecos.uiserv.domain.journalsettings.dto.JournalSettingsDto
+import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsEntity
+import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsRepository
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory
 import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.stream.Collectors
+import javax.annotation.PostConstruct
 
 @Service
 @Transactional(
@@ -29,11 +35,22 @@ class JournalSettingsServiceImpl(
     private val repo: JournalSettingsRepository,
     private val permService: JournalSettingsPermissionsService,
     private val journalPrefService: JournalPrefService,
-    private val fileService: FileService
+    private val fileService: FileService,
+    private val jpaSearchConverterFactory: JpaSearchConverterFactory
 ) : JournalSettingsService {
+
+    private val listeners = CopyOnWriteArrayList<(JournalSettingsDto?, JournalSettingsDto?) -> Unit>()
+
+    private lateinit var searchConv: JpaSearchConverter<JournalSettingsEntity>
+
+    @PostConstruct
+    fun init() {
+        searchConv = jpaSearchConverterFactory.createConverter(JournalSettingsEntity::class.java).build()
+    }
 
     @Override
     override fun save(settings: JournalSettingsDto): JournalSettingsDto {
+
         var (entity, isNew) = toEntity(settings)
 
         val canWrite = if (isNew) {
@@ -46,7 +63,12 @@ class JournalSettingsServiceImpl(
         }
 
         entity = repo.save(entity)
-        return toDto(entity)
+        val newDto =  toDto(entity)
+
+        listeners.forEach {
+            it.invoke(settings, newDto)
+        }
+        return newDto
     }
 
     @Override
@@ -85,6 +107,22 @@ class JournalSettingsServiceImpl(
         }
 
         return false
+    }
+
+    override fun getCount(predicate: Predicate): Long {
+        return if (AuthContext.isRunAsAdmin() || AuthContext.isRunAsSystem()) {
+            searchConv.getCount(repo, predicate)
+        } else {
+            0L
+        }
+    }
+
+    override fun findAll(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<JournalSettingsDto> {
+        return if (AuthContext.isRunAsAdmin() || AuthContext.isRunAsSystem()) {
+            searchConv.findAll(repo, predicate, max, skip, sort).map { toDto(it) }
+        } else {
+            emptyList()
+        }
     }
 
     @Override
@@ -129,8 +167,8 @@ class JournalSettingsServiceImpl(
 
     private fun mergeSettingsAndPrefs(settings: List<JournalSettingsDto>, prefs: List<JournalSettingsDto>): List<JournalSettingsDto> {
         val result = mutableListOf<JournalSettingsDto>()
-        val prefsMap = prefs.map { it.id to it }.toMap()
-        val settingsMap = settings.map { it.id to it }.toMap()
+        val prefsMap = prefs.associateBy { it.id }
+        val settingsMap = settings.associateBy { it.id }
         prefsMap.forEach { id, dto ->
             if (!settingsMap.containsKey(id)) {
                 result.add(dto)
@@ -146,6 +184,10 @@ class JournalSettingsServiceImpl(
         return configs.stream()
             .map { entity: JournalSettingsEntity -> toDto(entity) }
             .collect(Collectors.toList())
+    }
+
+    override fun listenChanges(listener: (JournalSettingsDto?, JournalSettingsDto?) -> Unit) {
+        this.listeners.add(listener)
     }
 
     private fun toEntity(dto: JournalSettingsDto): Pair<JournalSettingsEntity, Boolean> {
@@ -189,7 +231,7 @@ class JournalSettingsServiceImpl(
         val prefSettings = ObjectData.create(pref.data)
         return JournalSettingsDto.create {
             withId(pref.fileId)
-            withName(Json.mapper.read(prefSettings.get("title").asText(), MLText::class.java))
+            withName(Json.mapper.read(prefSettings["title"].asText(), MLText::class.java))
             withAuthority(currentUsername)
             withJournalId(journalId)
             withSettings(prefSettings)
@@ -198,14 +240,8 @@ class JournalSettingsServiceImpl(
     }
 
     private fun getCurrentUsername(): String {
-        var username = AuthContext.getCurrentUser()
+        val username = AuthContext.getCurrentUser()
         require(!StringUtils.isBlank(username)) { "Username cannot be empty" }
-        if (username.contains("people@")) {
-            username = username.replaceFirst("people@".toRegex(), "")
-        }
-        if (username.contains("alfresco/")) {
-            username = username.replaceFirst("alfresco/".toRegex(), "")
-        }
         return username
     }
 }

@@ -29,6 +29,7 @@ class JournalMapper(
             .withName(mapper.read(entity.name, MLText::class.java))
             .withTypeRef(RecordRef.valueOf(entity.typeRef))
             .withPredicate(mapper.read(entity.predicate, Predicate::class.java))
+            .withDefaultFilters(mapper.readList(entity.defaultFilters, Predicate::class.java))
             .withQueryData(mapper.read(entity.queryData, ObjectData::class.java))
             .withSearchConfig(mapper.read(entity.searchConfig, JournalSearchConfig::class.java))
             .withActionsFromType(entity.actionsFromType)
@@ -36,7 +37,7 @@ class JournalMapper(
             .withActionsDef(mapper.readList(entity.actionsDef, JournalActionDef::class.java))
             .withProperties(mapper.read(entity.attributes, ObjectData::class.java))
             .withGroupBy(mapper.readList(entity.groupBy, String::class.java))
-            .withSortBy(mapper.readList(entity.sortBy, JournalSortByDef::class.java))
+            .withDefaultSortBy(mapper.readList(entity.sortBy, JournalSortByDef::class.java))
             .withComputed(mapper.readList(entity.computed, JournalComputedDef::class.java))
             .withColumns(mapper.readList(entity.columns, JournalColumnDef::class.java))
             .build()
@@ -64,6 +65,7 @@ class JournalMapper(
         entity.name = mapper.toString(journal.name)
         entity.typeRef = RecordRef.toString(journal.typeRef)
         entity.predicate = mapper.toString(journal.predicate)
+        entity.defaultFilters = mapper.toString(journal.defaultFilters)
         entity.queryData = mapper.toString(journal.queryData)
         entity.searchConfig = mapper.toString(journal.searchConfig)
         entity.actionsFromType = journal.actionsFromType
@@ -71,7 +73,7 @@ class JournalMapper(
         entity.actionsDef = mapper.toString(journal.actionsDef)
         entity.attributes = mapper.toString(journal.properties)
         entity.groupBy = mapper.toString(journal.groupBy)
-        entity.sortBy = mapper.toString(journal.sortBy)
+        entity.sortBy = mapper.toString(journal.defaultSortBy)
         entity.computed = mapper.toString(journal.computed)
 
         return entity

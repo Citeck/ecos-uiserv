@@ -1,0 +1,13 @@
+---
+id: edit-form
+name:
+  ru: Редактировать форму
+  en: Edit form
+type: edit
+config:
+  recordsToReset:
+    - uiserv/rform@${?localId}
+evaluator:
+  type: has-permission
+  config:
+    permission: Write

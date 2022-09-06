@@ -23,10 +23,13 @@ import ru.citeck.ecos.uiserv.Application
 import ru.citeck.ecos.uiserv.domain.file.repo.FileRepository
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType
 import ru.citeck.ecos.uiserv.domain.file.service.FileService
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSettingsDto
-import ru.citeck.ecos.uiserv.domain.journal.repo.JournalSettingsEntity
-import ru.citeck.ecos.uiserv.domain.journal.repo.JournalSettingsRepository
+import ru.citeck.ecos.uiserv.domain.journalsettings.dto.JournalSettingsDto
+import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsEntity
+import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsRepository
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService
+import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsPermissionsService
+import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsPermissionsServiceImpl
+import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsServiceImpl
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension
 
 @ExtendWith(EcosSpringExtension::class)

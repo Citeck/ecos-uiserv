@@ -1,0 +1,13 @@
+
+modelVersion: "1.0"
+
+name:
+  ru: Настройки журнала
+  en: Journal settings
+
+source-id: "journal-settings"
+
+controller:
+  type: json
+  config:
+    format: yaml

@@ -1,0 +1,26 @@
+---
+id: journal-settings
+name:
+  en: Journal settings
+  ru: Настройки журнала
+
+system: true
+
+sourceId: uiserv/journal-settings
+
+#formRef: uiserv/form@journal-settings
+journalRef: uiserv/journal@journal-settings
+
+model:
+  attributes:
+    - id: name
+      type: MLTEXT
+    - id: authority
+      name: { ru: "Человек или группа", en: "User or group" }
+    - id: journalId
+      name: { ru: "Идентификатор журнала", en: "Journal ID" }
+    - id: settings
+      type: JSON
+  systemAttributes:
+    - id: system
+      type: BOOLEAN

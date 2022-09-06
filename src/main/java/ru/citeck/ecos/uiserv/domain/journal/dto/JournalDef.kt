@@ -34,6 +34,8 @@ data class JournalDef(
      */
     val predicate: Predicate,
 
+    val defaultFilters: List<Predicate>,
+
     val queryData: ObjectData,
 
     val searchConfig: JournalSearchConfig,
@@ -51,7 +53,7 @@ data class JournalDef(
     /**
      * Default sorting.
      */
-    val sortBy: List<JournalSortByDef>,
+    val defaultSortBy: List<JournalSortByDef>,
 
     /**
      * Include actions from typeDef
@@ -126,11 +128,12 @@ data class JournalDef(
         var sourceId: String = ""
         var metaRecord: RecordRef = RecordRef.EMPTY
         var predicate: Predicate = VoidPredicate.INSTANCE
+        var defaultFilters: List<Predicate> = emptyList()
         var queryData: ObjectData = ObjectData.create()
         var searchConfig: JournalSearchConfig = JournalSearchConfig.EMPTY
         var typeRef: RecordRef = RecordRef.EMPTY
         var groupBy: List<String> = emptyList()
-        var sortBy: List<JournalSortByDef> = emptyList()
+        var defaultSortBy: List<JournalSortByDef> = emptyList()
         var actionsFromType: Boolean? = null
         var actions: List<RecordRef> = emptyList()
         var actionsDef: List<JournalActionDef> = emptyList()
@@ -146,11 +149,12 @@ data class JournalDef(
             sourceId = base.sourceId
             metaRecord = base.metaRecord
             predicate = base.predicate.copy()
+            withDefaultFilters(base.defaultFilters)
             queryData = ObjectData.deepCopyOrNew(base.queryData)
             searchConfig = base.searchConfig
             typeRef = base.typeRef
             groupBy = base.groupBy.let { DataValue.create(it).asStrList() }
-            sortBy = base.sortBy.let { DataValue.create(it).asList(JournalSortByDef::class.java) }
+            withDefaultSortBy(base.defaultSortBy)
             actionsFromType = base.actionsFromType
             actions = base.actions.let { DataValue.create(it).asList(RecordRef::class.java) }
             actionsDef = base.actionsDef.let { DataValue.create(it).asList(JournalActionDef::class.java) }
@@ -206,8 +210,23 @@ data class JournalDef(
             return this
         }
 
+        @Deprecated("withDefaultSortBy", ReplaceWith("withDefaultSortBy(sortBy)"))
+        fun setSortBy(sortBy: List<JournalSortByDef>?): Builder {
+            return withDefaultSortBy(sortBy)
+        }
+
+        @Deprecated("withDefaultSortBy", ReplaceWith("withDefaultSortBy(sortBy)"))
         fun withSortBy(sortBy: List<JournalSortByDef>?): Builder {
-            this.sortBy = sortBy?.filter { it.attribute.isNotBlank() } ?: emptyList()
+            return withDefaultSortBy(sortBy)
+        }
+
+        fun withDefaultSortBy(defaultSortBy: List<JournalSortByDef>?): Builder {
+            this.defaultSortBy = defaultSortBy?.filter { it.attribute.isNotBlank() } ?: emptyList()
+            return this
+        }
+
+        fun withDefaultFilters(defaultFilters: List<Predicate>?): Builder {
+            this.defaultFilters = defaultFilters?.filter { it !is VoidPredicate } ?: emptyList()
             return this
         }
 
@@ -254,24 +273,25 @@ data class JournalDef(
         fun build(): JournalDef {
 
             return JournalDef(
-                id,
-                name,
-                sourceId,
-                metaRecord,
-                predicate,
-                queryData,
-                searchConfig,
-                typeRef,
-                groupBy,
-                sortBy,
-                actionsFromType,
-                actions,
-                actionsDef,
-                editable,
-                columns,
-                computed,
-                system,
-                properties
+                id = id,
+                name = name,
+                sourceId = sourceId,
+                metaRecord = metaRecord,
+                predicate = predicate,
+                defaultFilters = defaultFilters,
+                queryData = queryData,
+                searchConfig = searchConfig,
+                typeRef = typeRef,
+                groupBy = groupBy,
+                defaultSortBy = defaultSortBy,
+                actionsFromType = actionsFromType,
+                actions = actions,
+                actionsDef = actionsDef,
+                editable = editable,
+                columns = columns,
+                computed = computed,
+                system = system,
+                properties = properties
             )
         }
     }

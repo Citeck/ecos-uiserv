@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.journal.repo;
+package ru.citeck.ecos.uiserv.domain.journalsettings.repo;
 
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.journal.api.rest;
+package ru.citeck.ecos.uiserv.domain.journalsettings.api.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService;
 import java.util.Optional;
 
 /**
- * @deprecated use ru.citeck.ecos.uiserv.domain.journal.api.records.JournalSettingsRecordsDao
+ * @deprecated use ru.citeck.ecos.uiserv.domain.journalsettings.api.records.JournalSettingsRecordsDao
  */
 @RestController
 @RequestMapping("/api/journalprefs")

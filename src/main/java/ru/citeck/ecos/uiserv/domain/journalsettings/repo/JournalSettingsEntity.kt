@@ -1,4 +1,4 @@
-package ru.citeck.ecos.uiserv.domain.journal.repo
+package ru.citeck.ecos.uiserv.domain.journalsettings.repo
 
 import ru.citeck.ecos.uiserv.app.common.repo.AbstractAuditingEntity
 import javax.persistence.*

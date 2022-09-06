@@ -1020,10 +1020,12 @@
                       },
                       {
                         "label": {
-                          "ru": "Предикат"
+                          "ru": "Предикат",
+                          "en": "Predicate"
                         },
                         "description": {
-                          "ru": "Дополнительные условия поиска записей в журнале"
+                          "ru": "Дополнительные условия поиска записей в журнале",
+                          "en": "Additional conditions to search records in journal"
                         },
                         "editor": "ace",
                         "defaultValue": "",
@@ -1034,12 +1036,28 @@
                       },
                       {
                         "label": {
-                          "ru": "Дополнительные свойства"
+                          "ru": "Дополнительные свойства",
+                          "en": "Additional settings"
                         },
                         "keyLabel": "",
                         "key": "properties",
                         "type": "datamap",
                         "input": true
+                      },
+                      {
+                        "label": {
+                          "en": "Default filters",
+                          "ru": "Фильтры по умолчанию"
+                        },
+                        "key": "defaultFilters",
+                        "multiple": true,
+                        "defaultValue": "",
+                        "refreshOn": [],
+                        "optionalWhenDisabled": false,
+                        "type": "textfield",
+                        "input": true,
+                        "addAnother": "btn.add-another",
+                        "reorder": false
                       }
                     ],
                     "type": "column",
@@ -1055,7 +1073,8 @@
                     "components": [
                       {
                         "label": {
-                          "ru": "Группировать по"
+                          "ru": "Группировать по",
+                          "en": "Group by"
                         },
                         "multiple": true,
                         "reorder": true,
@@ -1068,7 +1087,8 @@
                       },
                       {
                         "label": {
-                          "ru": "Сортировать по"
+                          "ru": "Сортировка по умолчанию",
+                          "en": "Default sort by"
                         },
                         "disableAddingRemovingRows": false,
                         "addAnother": "",
@@ -1089,13 +1109,14 @@
                           "minLength": "",
                           "maxLength": ""
                         },
-                        "key": "sortBy",
+                        "key": "defaultSortBy",
                         "type": "datagrid",
                         "input": true,
                         "components": [
                           {
                             "label": {
-                              "ru": "Атрибут"
+                              "ru": "Атрибут",
+                              "en": "Attribute"
                             },
                             "defaultValue": "",
                             "key": "attribute",
@@ -1105,7 +1126,8 @@
                           },
                           {
                             "label": {
-                              "ru": "По возрастанию"
+                              "ru": "По возрастанию",
+                              "en": "Ascending"
                             },
                             "labelPosition": "",
                             "key": "ascending",

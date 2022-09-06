@@ -164,8 +164,8 @@ class ResolvedJournalRecordsDao(
     }
 
     private fun resolveSorting(journal: JournalDef.Builder) {
-        if (journal.sortBy.isEmpty()) {
-            journal.withSortBy(listOf(JournalSortByDef(RecordConstants.ATT_CREATED, false)))
+        if (journal.defaultSortBy.isEmpty()) {
+            journal.withDefaultSortBy(listOf(JournalSortByDef(RecordConstants.ATT_CREATED, false)))
         }
     }
 

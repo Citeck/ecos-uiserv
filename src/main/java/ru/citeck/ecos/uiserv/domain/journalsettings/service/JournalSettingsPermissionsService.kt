@@ -1,7 +1,7 @@
-package ru.citeck.ecos.uiserv.domain.journal.service.settings
+package ru.citeck.ecos.uiserv.domain.journalsettings.service
 
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSettingsDto
-import ru.citeck.ecos.uiserv.domain.journal.repo.JournalSettingsEntity
+import ru.citeck.ecos.uiserv.domain.journalsettings.dto.JournalSettingsDto
+import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsEntity
 
 interface JournalSettingsPermissionsService {
 
