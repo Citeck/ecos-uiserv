@@ -200,23 +200,17 @@
             "components": [
               {
                 "label": {
-                  "ru": "Редактировать форму",
-                  "en": "Edit form"
+                  "en": "Localization",
+                  "ru": "Локализация"
                 },
                 "action": "custom",
                 "state": "",
                 "showValidations": false,
-                "custom": "Citeck.EcosFormBuilderUtils.showBuilderForRecord(instance.options.recordId)",
+                "custom": "Citeck.EcosFormBuilderUtils.showLocaleEditorForRecord(instance.options.recordId)",
                 "block": true,
-                "disabled": false,
+                "key": "localization",
                 "type": "button",
-                "input": true,
-                "key": "editform",
-                "defaultValue": false,
-                "logic": [],
-                "event": "",
-                "url": "",
-                "reorder": false
+                "input": true
               }
             ],
             "width": 3,
@@ -236,19 +230,21 @@
             "components": [
               {
                 "label": {
-                  "en": "Localization",
-                  "ru": "Локализация"
+                  "ru": "Редактировать форму",
+                  "en": "Edit form"
                 },
                 "action": "custom",
                 "state": "",
                 "showValidations": false,
-                "custom": "Citeck.EcosFormBuilderUtils.showLocaleEditorForRecord(instance.options.recordId)",
+                "custom": "Citeck.EcosFormBuilderUtils.showBuilderForRecord(instance.options.recordId)",
                 "block": true,
-                "disabled": false,
-                "key": "localization",
-                "logic": [],
                 "type": "button",
-                "input": true
+                "input": true,
+                "key": "editform",
+                "defaultValue": false,
+                "event": "",
+                "url": "",
+                "reorder": false
               }
             ],
             "width": 3,
@@ -274,20 +270,18 @@
             "components": [
               {
                 "label": {
-                  "ru": "Отправить",
+                  "ru": "Сохранить",
                   "en": "Submit"
                 },
+                "key": "submit",
                 "state": "",
                 "theme": "primary",
                 "block": true,
                 "disableOnInvalid": true,
+                "refreshOn": [],
+                "optionalWhenDisabled": false,
                 "type": "button",
-                "key": "submit",
-                "input": true,
-                "conditional": {
-                  "show": null,
-                  "when": null
-                }
+                "input": true
               }
             ],
             "clearOnHide": true,
