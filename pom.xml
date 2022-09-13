@@ -9,11 +9,12 @@
     <parent>
         <groupId>ru.citeck.ecos.webapp</groupId>
         <artifactId>ecos-webapp-spring-hibernate-parent</artifactId>
-        <version>1.8.11</version>
+        <version>1.8.12</version>
     </parent>
 
     <properties>
-        <test.maven.spring-test-context-cache.maxSize>8</test.maven.spring-test-context-cache.maxSize>
+        <surefire-plugin.spring-context-cache.maxSize>8</surefire-plugin.spring-context-cache.maxSize>
+        <failsafe-plugin.spring-context-cache.maxSize>8</failsafe-plugin.spring-context-cache.maxSize>
     </properties>
 
     <repositories>
