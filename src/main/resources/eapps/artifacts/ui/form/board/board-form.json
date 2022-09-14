@@ -8,6 +8,7 @@
   "customModule": null,
   "typeRef": "",
   "width": "lg",
+  "system": true,
   "i18n": {},
   "definition": {
     "components": [
@@ -178,10 +179,7 @@
         "reorder": true,
         "defaultValue": [
           {
-            "name": {
-              "ru": "",
-              "en": ""
-            },
+            "name": "",
             "type": "",
             "id": "",
             "submit4": false,
@@ -224,6 +222,10 @@
                 },
                 "dataPreProcessingCode": "",
                 "valueProperty": "value",
+                "unavailableItems": {
+                  "isActive": true,
+                  "code": "value = _.get(data, 'columns', []).map(column => column.id);"
+                },
                 "defaultValue": "",
                 "refreshOn": [
                   "statusesAsyncData"
@@ -242,6 +244,8 @@
             },
             "key": "name",
             "refreshOn": [],
+            "calculateValue": "let statuses = _.get(data, 'typeRef') ? _.get(data, 'statusesAsyncData.values', []) : [];\n\nif (_.get(instance, 'options.formMode') === 'CREATE') {\n  let statusesFromOptions = _.get(instance, 'options.statuses', []);\n  \n  if (statusesFromOptions && statusesFromOptions.length) {\n    statuses = statusesFromOptions;\n  }\n}\n\nconst selectedStatus = (statuses || []).find(item => item.id === row.id);\n\nvalue = _.get(selectedStatus, 'name') || row.id;",
+            "allowCalculateOverride": true,
             "optionalWhenDisabled": false,
             "type": "mlText",
             "input": true,
