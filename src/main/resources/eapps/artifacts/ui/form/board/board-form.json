@@ -179,7 +179,9 @@
         "reorder": true,
         "defaultValue": [
           {
-            "name": "",
+            "name": {
+              "ru": ""
+            },
             "type": "",
             "id": "",
             "submit4": false,
@@ -244,7 +246,7 @@
             },
             "key": "name",
             "refreshOn": [],
-            "calculateValue": "let statuses = _.get(data, 'typeRef') ? _.get(data, 'statusesAsyncData.values', []) : [];\n\nif (_.get(instance, 'options.formMode') === 'CREATE') {\n  let statusesFromOptions = _.get(instance, 'options.statuses', []);\n  \n  if (statusesFromOptions && statusesFromOptions.length) {\n    statuses = statusesFromOptions;\n  }\n}\n\nconst selectedStatus = (statuses || []).find(item => item.id === row.id);\n\nvalue = _.get(selectedStatus, 'name') || row.id;",
+            "calculateValue": "const { name } = row || {};\nlet statuses = _.get(data, 'typeRef') ? _.get(data, 'statusesAsyncData.values', []) : [];\n\nif (_.get(instance, 'options.formMode') === 'CREATE') {\n  let statusesFromOptions = _.get(instance, 'options.statuses', []);\n  \n  if (statusesFromOptions && statusesFromOptions.length) {\n    statuses = statusesFromOptions;\n  }\n}\n\nconst selectedStatus = (statuses || []).find(item => item.id === row.id);\nconst statusMlName = _.get(selectedStatus, 'mlName') || {};\nconst result = {\n  ...(_.isObject(name) ? name : {}),\n  ...statusMlName\n};\n\nif (_.isEmpty(statusMlName)) {\n  result[utils.getCurrentLocale()] = row.id;\n}\n\nvalue = { ...result };",
             "allowCalculateOverride": true,
             "optionalWhenDisabled": false,
             "type": "mlText",
@@ -289,7 +291,7 @@
                   "recordsScript": {
                     "script": "value = _.get(data, 'typeRef');",
                     "attributes": {
-                      "values": "model.statuses{id,name}[]"
+                      "values": "model.statuses{id,name,mlName:name?json}[]"
                     }
                   },
                   "forceLoad": false
