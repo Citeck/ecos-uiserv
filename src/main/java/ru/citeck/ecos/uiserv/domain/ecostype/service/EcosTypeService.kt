@@ -5,6 +5,7 @@ import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.model.lib.type.dto.CreateVariantDef
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.uiserv.domain.ecostype.config.EcosTypesConfig
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
 
@@ -40,19 +41,19 @@ class EcosTypeService(
 
     fun getJournalRefByTypeRef(typeRef: RecordRef): RecordRef {
 
-        if (RecordRef.isEmpty(typeRef)) {
+        if (EntityRef.isEmpty(typeRef)) {
             return RecordRef.EMPTY
         }
 
         var journalRef = typesConfig.getJournalRefByType(typeRef)
-        if (RecordRef.isNotEmpty(journalRef)) {
+        if (EntityRef.isNotEmpty(journalRef)) {
             return journalRef
         }
         val parents = ecsosTypesRegistry.getParents(typeRef)
         for (parentRef in parents) {
-            if (RecordRef.isNotEmpty(parentRef)) {
+            if (EntityRef.isNotEmpty(parentRef)) {
                 journalRef = typesConfig.getJournalRefByType(parentRef)
-                if (RecordRef.isNotEmpty(journalRef)) {
+                if (EntityRef.isNotEmpty(journalRef)) {
                     return journalRef
                 }
             }
