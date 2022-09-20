@@ -12,6 +12,11 @@
         <version>1.9.3</version>
     </parent>
 
+    <properties>
+        <surefire-plugin.spring-context-cache.maxSize>8</surefire-plugin.spring-context-cache.maxSize>
+        <failsafe-plugin.spring-context-cache.maxSize>8</failsafe-plugin.spring-context-cache.maxSize>
+    </properties>
+
     <repositories>
         <repository>
             <id>citeck-public</id>

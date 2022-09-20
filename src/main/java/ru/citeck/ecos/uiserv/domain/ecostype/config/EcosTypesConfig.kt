@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.domain.ecostype.config
 import org.springframework.context.annotation.Configuration
 import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
 import ru.citeck.ecos.records2.RecordRef
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
 import java.util.concurrent.ConcurrentHashMap
@@ -87,23 +88,23 @@ class EcosTypesConfig(
         }
     }
 
-    fun getJournalRefByType(journalRef: RecordRef): RecordRef {
+    fun getJournalRefByType(journalRef: EntityRef): RecordRef {
         return journalByType[journalRef] ?: RecordRef.EMPTY
     }
 
-    fun getTypeRefByJournal(journalRef: RecordRef): RecordRef {
+    fun getTypeRefByJournal(journalRef: EntityRef): RecordRef {
         return typeByJournal[journalRef] ?: RecordRef.EMPTY
     }
 
-    fun getTypeRefByForm(formRef: RecordRef): RecordRef {
+    fun getTypeRefByForm(formRef: EntityRef): RecordRef {
         return typeByForm[formRef] ?: RecordRef.EMPTY
     }
 
-    fun getTypeRefByBoard(boardRef: RecordRef): RecordRef {
+    fun getTypeRefByBoard(boardRef: EntityRef): RecordRef {
         return typeByBoard[boardRef] ?: RecordRef.EMPTY
     }
 
-    fun getTypeInfo(typeRef: RecordRef): TypeDef? {
+    fun getTypeInfo(typeRef: EntityRef): TypeDef? {
         return typeInfoByTypeRef[typeRef]
     }
 }
