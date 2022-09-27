@@ -649,6 +649,13 @@
                         "execForQueryOptions": {
                           "execAsForRecords": false
                         },
+                        "textArea": "",
+                        "predicate2": "",
+                        "actionsDef": {
+                          "predicate": ""
+                        },
+                        "predicate": "",
+                        "predicate:json": "",
                         "confirm": {
                           "title": {
                             "ru": "",
@@ -746,6 +753,23 @@
                             "refreshOn": [],
                             "type": "mlText",
                             "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "Предикат",
+                              "en": "Action Predicate"
+                            },
+                            "key": "predicate",
+                            "editor": "ace",
+                            "defaultValue": "",
+                            "inputFormat": "raw",
+                            "refreshOn": [],
+                            "properties": {
+                              "dataType": "json"
+                            },
+                            "as": "json",
+                            "type": "textarea",
+                            "input": true
                           }
                         ],
                         "row": "0-0"
@@ -772,7 +796,7 @@
                             },
                             "tooltip": {
                               "en": "Link to a module, which contains JS code",
-                              "ru": "Cсылка на модуль, содержащий JS код"
+                              "ru": "Ссылка на модуль, содержащий JS код"
                             },
                             "key": "preActionModule",
                             "defaultValue": "",
