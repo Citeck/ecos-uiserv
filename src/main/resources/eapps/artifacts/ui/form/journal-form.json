@@ -95,8 +95,7 @@
       "tooltip.actionFromType": "empty (null) - if `actions` and `actionsDef` is empty, then add actions from type\ntrue - always add actions from type\nfalse - never add actions from type",
       "Main": "Main",
       "Actions": "Actions",
-      "Advanced": "Advanced",
-      "Add columns": "Add columns"
+      "Advanced": "Advanced"
     }
   },
   "definition": {
@@ -636,7 +635,14 @@
                         "horizontalLine": [],
                         "execForQueryOptions": {
                           "execAsForRecords": false
-                        }
+                        },
+                        "textArea": "",
+                        "predicate2": "",
+                        "actionsDef": {
+                          "predicate": ""
+                        },
+                        "predicate": "",
+                        "predicate:json": ""
                       }
                     ],
                     "refreshOn": [],
@@ -718,6 +724,23 @@
                             "refreshOn": [],
                             "type": "mlText",
                             "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "Предикат",
+                              "en": "Action Predicate"
+                            },
+                            "key": "predicate",
+                            "editor": "ace",
+                            "defaultValue": "",
+                            "inputFormat": "raw",
+                            "refreshOn": [],
+                            "properties": {
+                              "dataType": "json"
+                            },
+                            "as": "json",
+                            "type": "textarea",
+                            "input": true
                           }
                         ],
                         "row": "0-0"
@@ -744,7 +767,7 @@
                             },
                             "tooltip": {
                               "en": "Link to a module, which contains JS code",
-                              "ru": "Cсылка на модуль, содержащий JS код"
+                              "ru": "Ссылка на модуль, содержащий JS код"
                             },
                             "key": "preActionModule",
                             "defaultValue": "",
