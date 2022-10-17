@@ -273,12 +273,12 @@ class ResolvedMenuRecords(
             val newItem = item.copy()
 
             if (item.type == "LINK-CREATE-CASE") {
-                val typeRef = RecordRef.valueOf(item.config.get("typeRef").asText())
-                var variantTypeRef = RecordRef.valueOf(item.config.get("variantTypeRef").asText())
+                val typeRef = RecordRef.valueOf(item.config["typeRef"].asText())
+                var variantTypeRef = RecordRef.valueOf(item.config["variantTypeRef"].asText())
                 if (RecordRef.isEmpty(variantTypeRef)) {
                     variantTypeRef = typeRef
                 }
-                val variantId = item.config.get("variantId").asText()
+                val variantId = item.config["variantId"].asText()
                 if (RecordRef.isNotEmpty(variantTypeRef)) {
                     val typeInfo = ecosTypeService.getTypeInfo(variantTypeRef)
                     val variant = typeInfo?.createVariants?.find {
@@ -288,7 +288,9 @@ class ResolvedMenuRecords(
                         val newConfig = ObjectData.deepCopyOrNew(item.config)
                         newConfig["variant"] = variant
                         newItem.withConfig(newConfig)
-                        newItem.withLabel(variant.name)
+                        if (MLText.isEmpty(newItem.label)) {
+                            newItem.withLabel(variant.name)
+                        }
                     }
                 }
             }
