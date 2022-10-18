@@ -5,6 +5,7 @@ import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
+import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
@@ -16,6 +17,8 @@ import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeAttsUtils
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
 import ru.citeck.ecos.uiserv.domain.form.service.FormDefUtils
+import ru.citeck.ecos.webapp.api.entity.EntityRef
+import ru.citeck.ecos.webapp.api.entity.ifEmpty
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 
 @Component
@@ -61,6 +64,11 @@ class EcosResolvedFormRecordsDao(
         val typeInfo: TypeDef?,
         val formService: EcosFormService
     ) {
+
+        fun getTypeRef(): EntityRef {
+            return form.typeRef.ifEmpty { TypeUtils.getTypeRef(typeInfo?.id ?: "base") }
+        }
+
         fun getDefinition(): ObjectData {
             val definition: ObjectData = form.definition
             val attributes = typeInfo?.model?.getAllAttributes()?.associateBy { it.id } ?: emptyMap()
