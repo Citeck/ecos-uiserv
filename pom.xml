@@ -11,6 +11,7 @@
         <artifactId>ecos-micro-base</artifactId>
         <version>3.43.3</version>
     </parent>
+
     <repositories>
         <repository>
             <id>nexus-citeck-enterprise</id>
