@@ -1,0 +1,10 @@
+---
+id: orgstructure-person-dashboard
+
+name:
+  en: 'Orgstructure: Person dashboard'
+  ru: 'Оргструктура: Дашборд пользователя'
+
+system: true
+
+dashboardType: orgstructure-person-dashboard
