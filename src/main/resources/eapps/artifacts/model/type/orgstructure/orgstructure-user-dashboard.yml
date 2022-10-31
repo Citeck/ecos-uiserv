@@ -1,0 +1,10 @@
+---
+id: orgstructure-user-dashboard
+
+name:
+  en: 'Orgstructure: User dashboard'
+  ru: 'Оргструктура: Дашборд пользователя'
+
+system: true
+
+dashboardType: orgstructure-user-dashboard
