@@ -6,9 +6,8 @@ name:
 
 system: true
 
-properties: {upd: true}
-
 actions:
+  - uiserv/action@view-dashboard
   - uiserv/action@download-base64-data-yml
   - uiserv/action@delete
   - uiserv/action@edit
