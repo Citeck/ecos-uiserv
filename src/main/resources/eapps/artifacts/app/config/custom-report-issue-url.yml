@@ -3,14 +3,14 @@ id: custom-report-issue-url
 name:
   ru: URL для отчета о проблеме
   en: URL for issue report
-version: 1
+version: 2
 value:
   ru: >
     mailto:support@citeck.ru?subject=Ошибка в работе Citeck Ecos: <пожалуйста, кратко опишите проблему>
     &body=%0ADescription:%0A<Пожалуйста, опишите пошагово действия, которые привели к возникновению ошибки.
     Укажите ожидаемый результат, приложите скриншот и ссылку на проблемный объект.>
   en: >
-    mailto:support@citeck.ru?subject=Error in Citek Ecos: <please briefly describe the problem>
+    mailto:support@citeck.ru?subject=Error in Citeck Ecos: <please briefly describe the problem>
     &body=%0ADescription:%0A<Could you please describe step by step what you do, and what happens next
     before the problem occurs? Also, please specify the expected result. Attach a screenshot that
     describes the problem and a link to the problematic object.>

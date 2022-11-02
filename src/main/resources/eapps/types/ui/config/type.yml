@@ -1,4 +1,4 @@
-
+# Deprecated. Use app/config instead
 modelVersion: "1.0"
 
 name:
@@ -13,4 +13,3 @@ controller:
   type: json
   config:
     format: yaml
-
