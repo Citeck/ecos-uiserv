@@ -210,7 +210,10 @@
           "ru": "Panel"
         },
         "key": "headerFilterEditorPanel",
-        "title": { "en": "Header Filter Configuration", "ru": "Конфигурация фильтра в заголовке"},
+        "title": {
+          "en": "Header Filter Configuration",
+          "ru": "Конфигурация фильтра в заголовке"
+        },
         "collapsible": true,
         "collapsed": true,
         "refreshOn": [],
@@ -246,26 +249,135 @@
       },
       {
         "label": {
-          "ru": "Search Config"
+          "ru": "Panel"
         },
-        "key": "searchConfig",
+        "key": "searchConfigPanel",
+        "title": "Search Config",
+        "collapsible": true,
+        "collapsed": true,
         "refreshOn": [],
         "optionalWhenDisabled": false,
-        "type": "container",
-        "input": true,
+        "type": "panel",
+        "input": false,
         "components": [
           {
             "label": {
-              "ru": "Delimiters"
+              "ru": "Search Config"
             },
-            "key": "delimiters",
-            "multiple": true,
-            "defaultValue": "",
+            "hideLabel": true,
+            "key": "searchConfig",
             "refreshOn": [],
             "optionalWhenDisabled": false,
-            "type": "textfield",
+            "type": "container",
             "input": true,
-            "reorder": false
+            "components": [
+              {
+                "label": {
+                  "en": "1. Delimiters",
+                  "ru": "1. Разделители"
+                },
+                "key": "delimiters",
+                "multiple": true,
+                "defaultValue": "",
+                "refreshOn": [],
+                "optionalWhenDisabled": false,
+                "type": "textfield",
+                "input": true,
+                "reorder": false
+              },
+              {
+                "label": {
+                  "en": "2. Search by text",
+                  "ru": "2. Поиск по текстовому полю"
+                },
+                "key": "searchByText",
+                "refreshOn": [],
+                "optionalWhenDisabled": false,
+                "type": "container",
+                "input": true,
+                "components": [
+                  {
+                    "label": {
+                      "en": "2.1. Inner query",
+                      "ru": "2.1. Подзапрос"
+                    },
+                    "key": "innerQuery",
+                    "refreshOn": [],
+                    "optionalWhenDisabled": false,
+                    "type": "container",
+                    "input": true,
+                    "components": [
+                      {
+                        "label": {
+                          "en": "2.1.1. Source ID (empty by default)",
+                          "ru": "2.1.1. Идентификатор источника данных (по умолчанию пустой)"
+                        },
+                        "defaultValue": "",
+                        "key": "sourceId",
+                        "type": "textfield",
+                        "input": true
+                      },
+                      {
+                        "label": {
+                          "en": "2.1.2. Query",
+                          "ru": "2.1.2. Запрос"
+                        },
+                        "description": {
+                          "en": "Example: {\"t\":\"and\", \"val\":[{\"att\":\"TYPE\", \"val\":\"a:b\", \"t\":\"eq\"}, {\"att\":\"c:d\", \"val\":\"$TEXT\", \"t\":\"$PREDICATE_TYPE\"}]}",
+                          "ru": "Пример: {\"t\":\"and\", \"val\":[{\"att\":\"TYPE\", \"val\":\"a:b\", \"t\":\"eq\"}, {\"att\":\"c:d\", \"val\":\"$TEXT\", \"t\":\"$PREDICATE_TYPE\"}]}"
+                        },
+                        "editor": "ace",
+                        "defaultValue": "",
+                        "key": "query",
+                        "as": "json",
+                        "type": "textarea",
+                        "input": true
+                      },
+                      {
+                        "label": {
+                          "en": "2.1.3. Paginate",
+                          "ru": "2.1.3. Пейджинг"
+                        },
+                        "key": "page",
+                        "hideLabel": true,
+                        "refreshOn": [],
+                        "type": "container",
+                        "input": true,
+                        "components": [
+                          {
+                            "label": {
+                              "en": "2.1.3. Number of inner query records",
+                              "ru": "2.1.3. Количество записей подзапроса"
+                            },
+                            "key": "maxItems",
+                            "validate": {
+                              "integer": false
+                            },
+                            "clearOnHide": false,
+                            "isBigNumber": false,
+                            "delimiterValue": "",
+                            "refreshOn": [],
+                            "defaultValue": "",
+                            "type": "number",
+                            "input": true
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "label": {
+                      "en": "2.2. Custom attribute (empty by default)",
+                      "ru": "2.2. Настраиваемый атрибут (по умолчанию пустой)"
+                    },
+                    "defaultValue": "",
+                    "key": "innerQueryAttribute",
+                    "type": "textfield",
+                    "input": true
+                  }
+                ]
+              }
+            ]
           }
         ]
       },
