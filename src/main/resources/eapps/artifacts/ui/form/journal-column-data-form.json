@@ -357,7 +357,7 @@
                             "isBigNumber": false,
                             "delimiterValue": "",
                             "refreshOn": [],
-                            "defaultValue": "",
+                            "defaultValue": 20,
                             "type": "number",
                             "input": true
                           }
