@@ -1,0 +1,11 @@
+{
+  "id": "open-localization-action-form",
+  "name": {
+    "ru": "Локализация",
+    "en": "Localization"
+  },
+  "type": "script",
+  "config": {
+    "fn": "Citeck.EcosFormBuilderUtils.showLocaleEditorForRecord(record)"
+  }
+}

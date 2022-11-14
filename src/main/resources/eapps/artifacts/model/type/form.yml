@@ -8,6 +8,10 @@ sourceId: uiserv/form
 
 system: true
 
+actions:
+  - uiserv/action@open-localization-action-form
+  - uiserv/action@open-form-builder
+
 formRef: uiserv/form@ECOS_FORM
 journalRef: uiserv/journal@ecos-forms
 
