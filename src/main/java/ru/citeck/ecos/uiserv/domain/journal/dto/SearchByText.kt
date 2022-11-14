@@ -36,7 +36,7 @@ data class SearchByText(
         var innerQueryAttribute: String = ""
 
         constructor(base: SearchByText) : this() {
-            this.innerQuery = ObjectData.deepCopyOrNew(base.innerQuery)
+            this.innerQuery = base.innerQuery.deepCopy()
             this.innerQueryAttribute = base.innerQueryAttribute
         }
 
