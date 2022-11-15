@@ -4,9 +4,10 @@ import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
 
 @IncludeNonDefault
-@JsonDeserialize(builder = JournalSearchConfig.Builder::class)
-data class JournalSearchConfig(
-    val delimiters: List<String> = emptyList()
+@JsonDeserialize(builder = ColumnSearchConfig.Builder::class)
+data class ColumnSearchConfig(
+    val delimiters: List<String> = emptyList(),
+    val searchByText: SearchByText
 ) {
 
     companion object {
@@ -17,18 +18,22 @@ data class JournalSearchConfig(
             return Builder()
         }
 
-        fun create(builder: Builder.() -> Unit): JournalSearchConfig {
+        fun create(builder: Builder.() -> Unit): ColumnSearchConfig {
             val builderObj = Builder()
             builder.invoke(builderObj)
             return builderObj.build()
         }
     }
 
+    fun withDelimiters(delimiters: List<String>): ColumnSearchConfig {
+        return copy().withDelimiters(delimiters).build()
+    }
+
     fun copy(): Builder {
         return Builder(this)
     }
 
-    fun copy(builder: Builder.() -> Unit): JournalSearchConfig {
+    fun copy(builder: Builder.() -> Unit): ColumnSearchConfig {
         val builderObj = Builder(this)
         builder.invoke(builderObj)
         return builderObj.build()
@@ -37,9 +42,11 @@ data class JournalSearchConfig(
     class Builder() {
 
         var delimiters: List<String> = emptyList()
+        var searchByText: SearchByText = SearchByText.EMPTY
 
-        constructor(base: JournalSearchConfig) : this() {
+        constructor(base: ColumnSearchConfig) : this() {
             withDelimiters(base.delimiters)
+            searchByText = base.searchByText
         }
 
         fun withDelimiters(delimiters: List<String>?): Builder {
@@ -47,8 +54,13 @@ data class JournalSearchConfig(
             return this
         }
 
-        fun build(): JournalSearchConfig {
-            return JournalSearchConfig(delimiters)
+        fun withSearchByText(searchByText: SearchByText?): Builder {
+            this.searchByText = searchByText ?: SearchByText.EMPTY
+            return this
+        }
+
+        fun build(): ColumnSearchConfig {
+            return ColumnSearchConfig(delimiters, searchByText)
         }
     }
 }
