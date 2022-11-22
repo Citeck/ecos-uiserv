@@ -15,6 +15,7 @@ actions:
   - uiserv/action@edit-form
   - uiserv/action@edit-json
   - uiserv/action@module-copy
+  - uiserv/action@view-dashboard
 
 columns:
 
