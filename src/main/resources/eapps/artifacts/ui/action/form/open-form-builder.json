@@ -6,6 +6,6 @@
   },
   "type": "script",
   "config": {
-    "fn": "Citeck.EcosFormBuilderUtils.showBuilderForRecord(record)"
+    "fn": "Citeck.EcosFormBuilderUtils.showBuilderForRecord(record, context.mode === 'dashboard')"
   }
 }
