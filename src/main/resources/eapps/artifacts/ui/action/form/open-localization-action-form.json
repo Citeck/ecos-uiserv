@@ -6,6 +6,6 @@
   },
   "type": "script",
   "config": {
-    "fn": "Citeck.EcosFormBuilderUtils.showLocaleEditorForRecord(record, mode === 'dashboard')"
+    "fn": "Citeck.EcosFormBuilderUtils.showLocaleEditorForRecord(record)"
   }
 }
