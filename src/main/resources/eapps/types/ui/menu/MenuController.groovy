@@ -9,6 +9,9 @@ import org.w3c.dom.Document
 import org.xml.sax.SAXException
 import ru.citeck.ecos.apps.artifact.ArtifactMeta
 import ru.citeck.ecos.apps.artifact.controller.ArtifactController
+import ru.citeck.ecos.apps.artifact.controller.patch.ArtifactPatch
+import ru.citeck.ecos.apps.artifact.controller.patch.ArtifactPatchController
+import ru.citeck.ecos.apps.artifact.controller.type.JsonArtifactController
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.io.file.EcosFile
 import ru.citeck.ecos.commons.json.Json
@@ -19,9 +22,44 @@ import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.ParserConfigurationException
 import java.util.stream.Collectors
 
-return new ArtifactController<Artifact, Unit>() {
+interface MenuControllerInterface<T> extends ArtifactController<T, Unit>, ArtifactPatchController<T, Unit> {}
+
+return new MenuControllerInterface<Artifact>() {
 
     private static final Logger log = LoggerFactory.getLogger(ArtifactController.class)
+    private static final Set<String> JSON_EXTENSIONS = Arrays.asList(".json", ".yml", ".yaml")
+
+    @Override
+    Artifact applyPatch(Artifact artifact, Unit config, ArtifactPatch patch) {
+        try {
+            JsonArtifactController.class.getMethod("applyPatch", ObjectData.class, ArtifactPatch.class)
+        } catch (Throwable ignored) {
+            println("Method JsonArtifactController.applyPatch doesn't found")
+            return artifact
+        }
+        boolean isJsonExt = false
+        for (String extension in JSON_EXTENSIONS) {
+            if (!artifact.filename.endsWith(extension)) {
+                isJsonExt = true
+                break
+            }
+        }
+        if (!isJsonExt) {
+            log.warn("Patches allowed only for json-like artifacts")
+            return artifact
+        }
+        def jsonData = Json.mapper.readData(artifact.data)
+        ObjectData patchResult = JsonArtifactController.applyPatch(jsonData.asObjectData(), patch)
+
+        def newArtifact = new Artifact(artifact)
+        newArtifact.data = Json.mapper.toBytesNotNull(patchResult)
+        def fileName = artifact.filename
+        if (!fileName.endsWith(".json")) {
+            fileName = fileName.substring(0, fileName.lastIndexOf('.')) + ".json"
+        }
+        newArtifact.filename = fileName
+        return newArtifact
+    }
 
     @Override
     List<Artifact> read(@NotNull EcosFile root, Unit config) {
@@ -90,5 +128,13 @@ return new ArtifactController<Artifact, Unit>() {
         String id
         String filename
         byte[] data
+
+        Artifact() {}
+
+        Artifact(Artifact other) {
+            this.id = other.id
+            this.filename = other.filename
+            this.data = other.data
+        }
     }
 }
