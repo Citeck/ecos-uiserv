@@ -1,8 +1,9 @@
 {
   "id": "orgstructure-person-dashboard",
-  "typeRef": "emodel/type@orgstructure-person-dashboard",
+  "typeRef": "emodel/type@person",
   "appliedToRef": "",
   "authority": null,
+  "scope": "orgstructure",
   "priority": 0,
   "config": {
     "layouts": [

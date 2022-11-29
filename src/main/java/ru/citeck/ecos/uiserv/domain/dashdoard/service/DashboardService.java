@@ -236,6 +236,7 @@ public class DashboardService {
         dto.setAuthority(entity.getAuthority());
         dto.setConfig(Json.getMapper().read(entity.getConfig(), ObjectData.class));
         dto.setPriority(entity.getPriority());
+        dto.setScope(StringUtils.defaultString(entity.getScope()));
         dto.setTypeRef(RecordRef.valueOf(entity.getTypeRef()));
         dto.setAppliedToRef(RecordRef.valueOf(entity.getAppliedToRef()));
 
