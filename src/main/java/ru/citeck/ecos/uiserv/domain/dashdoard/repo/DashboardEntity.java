@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.domain.dashdoard.repo;
 
 import lombok.Data;
 import org.hibernate.annotations.ColumnTransformer;
+import org.jetbrains.annotations.NotNull;
 import ru.citeck.ecos.uiserv.app.common.repo.AbstractAuditingEntity;
 
 import javax.persistence.*;
@@ -22,6 +23,8 @@ public class DashboardEntity extends AbstractAuditingEntity {
     @ColumnTransformer(write = "LOWER(?)")
     private String authority;
     private String appliedToRef;
+    @NotNull
+    private String scope = "";
     private float priority;
     private byte[] config;
 

@@ -73,10 +73,18 @@ public class DashboardService {
     public Optional<DashboardDto> getForAuthority(RecordRef recordRef,
                                                   RecordRef type,
                                                   String user,
+                                                  String scope,
                                                   boolean expandType,
                                                   boolean includeForAll) {
 
-        return getEntityForUser(recordRef, type, user, expandType, includeForAll).map(this::mapToDto);
+        return getEntityForUser(
+            recordRef,
+            type,
+            user,
+            StringUtils.defaultString(scope),
+            expandType,
+            includeForAll
+        ).map(this::mapToDto);
     }
 
     public DashboardDto saveDashboard(DashboardDto dashboard) {
@@ -131,6 +139,7 @@ public class DashboardService {
     private Optional<DashboardEntity> getEntityForUser(RecordRef recordRef,
                                                        RecordRef type,
                                                        String user,
+                                                       @NotNull String scope,
                                                        boolean expandType,
                                                        boolean includeForAll) {
 
@@ -148,13 +157,13 @@ public class DashboardService {
                 recordRef = recordRef.addAppName("alfresco");
             }
 
-            dashboards = findDashboardsByRecordRef(recordRef.toString(), authorities, includeForAll);
+            dashboards = findDashboardsByRecordRef(recordRef.toString(), authorities, scope, includeForAll);
             if (!dashboards.isEmpty()) {
                 return dashboards.stream().findFirst();
             }
         }
 
-        dashboards = findDashboardsByType(type.toString(), authorities, includeForAll);
+        dashboards = findDashboardsByType(type.toString(), authorities, scope, includeForAll);
 
         if (dashboards.isEmpty() && expandType) {
 
@@ -163,7 +172,7 @@ public class DashboardService {
                 if (!Objects.equals(parent.inhDashboardType, typeMeta.inhDashboardType)) {
                     return Optional.empty();
                 }
-                dashboards = findDashboardsByType(parent.id, authorities, includeForAll);
+                dashboards = findDashboardsByType(parent.id, authorities, scope, includeForAll);
                 if (!dashboards.isEmpty()) {
                     break;
                 }
@@ -175,14 +184,15 @@ public class DashboardService {
 
     private List<DashboardEntity> findDashboardsByRecordRef(String recordRef,
                                                             List<String> authorities,
+                                                            @NotNull String scope,
                                                             boolean includeForAll) {
 
         if (!authorities.isEmpty()) {
 
             PageRequest page = PageRequest.of(0, 1);
-            List<DashboardEntity> dashboards = repo.findForRefAndAuthorities(recordRef, authorities, page);
+            List<DashboardEntity> dashboards = repo.findForRefAndAuthorities(recordRef, authorities, scope, page);
             if (dashboards.isEmpty() && includeForAll) {
-                dashboards = repo.findByRecordRefForAll(recordRef)
+                dashboards = repo.findByRecordRefForAll(recordRef, scope)
                     .map(Collections::singletonList)
                     .orElse(Collections.emptyList());
             }
@@ -190,19 +200,22 @@ public class DashboardService {
 
         } else {
 
-            Optional<DashboardEntity> entity = repo.findByRecordRefForAll(recordRef);
+            Optional<DashboardEntity> entity = repo.findByRecordRefForAll(recordRef, scope);
             return entity.map(Collections::singletonList).orElse(Collections.emptyList());
         }
     }
 
-    private List<DashboardEntity> findDashboardsByType(String type, List<String> authorities, boolean includeForAll) {
+    private List<DashboardEntity> findDashboardsByType(String type,
+                                                       List<String> authorities,
+                                                       @NotNull String scope,
+                                                       boolean includeForAll) {
 
         if (!authorities.isEmpty()) {
 
             PageRequest page = PageRequest.of(0, 1);
-            List<DashboardEntity> dashboards = repo.findForAuthorities(type, authorities, page);
+            List<DashboardEntity> dashboards = repo.findForAuthorities(type, authorities, scope, page);
             if (dashboards.isEmpty() && includeForAll) {
-                dashboards = repo.findByTypeRefForAll(type)
+                dashboards = repo.findByTypeRefForAll(type, scope)
                     .map(Collections::singletonList)
                     .orElse(Collections.emptyList());
             }
@@ -210,7 +223,7 @@ public class DashboardService {
 
         } else {
 
-            Optional<DashboardEntity> entity = repo.findByTypeRefForAll(type);
+            Optional<DashboardEntity> entity = repo.findByTypeRefForAll(type, scope);
             return entity.map(Collections::singletonList).orElse(Collections.emptyList());
         }
     }
@@ -243,18 +256,19 @@ public class DashboardService {
         if (RecordRef.isEmpty(dto.getTypeRef()) && RecordRef.isEmpty(dto.getAppliedToRef())) {
             throw new IllegalArgumentException("One of typeRef or appliedToRef should be specified");
         }
+        String scope = StringUtils.defaultString(dto.getScope());
 
         if (authority == null) {
             if (RecordRef.isEmpty(recordRef)) {
-                optEntity = repo.findByTypeRefForAll(dto.getTypeRef().toString());
+                optEntity = repo.findByTypeRefForAll(dto.getTypeRef().toString(), scope);
             } else {
-                optEntity = repo.findByRecordRefForAll(recordRef.toString());
+                optEntity = repo.findByRecordRefForAll(recordRef.toString(), scope);
             }
         } else {
             if (RecordRef.isEmpty(recordRef)) {
-                optEntity = repo.findByAuthorityAndTypeRef(authority, dto.getTypeRef().toString());
+                optEntity = repo.findByAuthorityAndTypeRefAndScope(authority, dto.getTypeRef().toString(), scope);
             } else {
-                optEntity = repo.findByAuthorityAndAppliedToRef(authority, recordRef.toString());
+                optEntity = repo.findByAuthorityAndAppliedToRefAndScope(authority, recordRef.toString(), scope);
             }
         }
 
@@ -303,6 +317,7 @@ public class DashboardService {
             if (RecordRef.isNotEmpty(appliedToRef)) {
                 newDashboard.setAppliedToRef(RecordRef.toString(appliedToRef));
             }
+            newDashboard.setScope(StringUtils.defaultString(dto.getScope()));
             entity = newDashboard;
         }
 

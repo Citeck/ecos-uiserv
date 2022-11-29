@@ -15,26 +15,29 @@ public interface DashboardRepository extends JpaRepository<DashboardEntity, Long
     JpaSpecificationExecutor<DashboardEntity> {
 
     @Query("SELECT dashboard FROM DashboardEntity dashboard " +
-           "WHERE dashboard.typeRef = ?1 AND dashboard.authority IN ?2 " +
+           "WHERE dashboard.typeRef = ?1 AND dashboard.authority IN ?2 AND dashboard.scope = ?3 " +
            "ORDER BY dashboard.priority desc")
-    List<DashboardEntity> findForAuthorities(String typeRef, List<String> authorities, PageRequest page);
+    List<DashboardEntity> findForAuthorities(String typeRef, List<String> authorities, String scope, PageRequest page);
 
     @Query("SELECT dashboard FROM DashboardEntity dashboard " +
-           "WHERE dashboard.appliedToRef = ?1 AND dashboard.authority IN ?2 " +
+           "WHERE dashboard.appliedToRef = ?1 AND dashboard.authority IN ?2 AND dashboard.scope = ?3 " +
            "ORDER BY dashboard.priority desc")
-    List<DashboardEntity> findForRefAndAuthorities(String nodeRef, List<String> authorities, PageRequest page);
+    List<DashboardEntity> findForRefAndAuthorities(String nodeRef,
+                                                   List<String> authorities,
+                                                   String scope,
+                                                   PageRequest page);
 
     @Query("SELECT dashboard FROM DashboardEntity dashboard " +
-        "WHERE dashboard.typeRef = ?1 AND dashboard.authority IS NULL")
-    Optional<DashboardEntity> findByTypeRefForAll(String typeRef);
+        "WHERE dashboard.typeRef = ?1 AND dashboard.authority IS NULL AND dashboard.scope = ?2 ")
+    Optional<DashboardEntity> findByTypeRefForAll(String typeRef, String scope);
 
     @Query("SELECT dashboard FROM DashboardEntity dashboard " +
-        "WHERE dashboard.appliedToRef = ?1 AND dashboard.authority IS NULL")
-    Optional<DashboardEntity> findByRecordRefForAll(String typeRef);
+        "WHERE dashboard.appliedToRef = ?1 AND dashboard.authority IS NULL AND dashboard.scope = ?2 ")
+    Optional<DashboardEntity> findByRecordRefForAll(String recordRef, String scope);
 
-    Optional<DashboardEntity> findByAuthorityAndTypeRef(String authority, String typeRef);
+    Optional<DashboardEntity> findByAuthorityAndTypeRefAndScope(String authority, String typeRef, String scope);
 
-    Optional<DashboardEntity> findByAuthorityAndAppliedToRef(String authority, String recordRef);
+    Optional<DashboardEntity> findByAuthorityAndAppliedToRefAndScope(String authority, String recordRef, String scope);
 
     Optional<DashboardEntity> findByExtId(String extId);
 }
