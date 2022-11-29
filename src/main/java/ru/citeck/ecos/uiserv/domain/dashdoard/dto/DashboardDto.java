@@ -15,7 +15,7 @@ public class DashboardDto {
     private RecordRef typeRef;
     private RecordRef appliedToRef;
     private String authority;
-    private String scope;
+    private String scope = "";
     private float priority;
 
     private ObjectData config = ObjectData.create();
