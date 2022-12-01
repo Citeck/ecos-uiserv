@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.domain.form.service.provider
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
+import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.context.lib.i18n.I18nContext
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.attributes.dto.computed.ComputedAttType
@@ -28,8 +29,8 @@ class TypeFormsProvider(
         val log = KotlinLogging.logger {}
 
         private val NAME_PREFIXES = mapOf(
-            I18nContext.RUSSIAN to "Форма для ",
-            I18nContext.ENGLISH to "Form for ",
+            I18nContext.RUSSIAN to "Форма по умолчанию для ",
+            I18nContext.ENGLISH to "Default form for ",
         )
     }
 
@@ -38,32 +39,36 @@ class TypeFormsProvider(
         ecosFormService.register(this)
     }
 
-    override fun getFormById(id: String): EcosFormDef? {
-        val typeDef = typesRegistry.getValue(id) ?: return null
-        return createFormDef(typeDef, true)
+    override fun getFormById(id: String): EntityWithMeta<EcosFormDef>? {
+        return getFormById(id, true)
     }
 
-    fun createFormDef(typeDef: TypeDef, withDefinition: Boolean): EcosFormDef {
+    fun getFormById(id: String, withDefinition: Boolean): EntityWithMeta<EcosFormDef>? {
+        val typeDef = typesRegistry.getValueWithMeta(id) ?: return null
+        return createFormDef(typeDef, withDefinition)
+    }
+
+    private fun createFormDef(typeDef: EntityWithMeta<TypeDef>, withDefinition: Boolean): EntityWithMeta<EcosFormDef> {
 
         val name = MLText(
-            typeDef.name.getValues().entries.associate {
+            typeDef.entity.name.getValues().entries.associate {
                 it.key to ((NAME_PREFIXES[it.key] ?: "") + it.value)
             }
         )
 
         val formBuilder = formBuilderFactory.createBuilder()
-        formBuilder.withId("${getType()}$${typeDef.id}")
+        formBuilder.withId("${getType()}$${typeDef.entity.id}")
             .withWidth(EcosFormWidth.MEDIUM)
             .withTitle(name)
 
         if (withDefinition) {
-            typeDef.model.attributes.forEach {
+            typeDef.entity.model.attributes.forEach {
                 createInput(formBuilder, it)
             }
             formBuilder.addCancelAndSubmitButtons()
         }
 
-        return formBuilder.build()
+        return EntityWithMeta(formBuilder.build(), typeDef.meta)
     }
 
     private fun createInput(formBuilder: EcosFormBuilder, attribute: AttributeDef) {

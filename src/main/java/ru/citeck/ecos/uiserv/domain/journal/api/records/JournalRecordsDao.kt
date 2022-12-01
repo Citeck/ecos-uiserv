@@ -27,7 +27,7 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalActionDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
-import ru.citeck.ecos.uiserv.domain.journal.registry.JournalsConfiguration
+import ru.citeck.ecos.uiserv.domain.journal.registry.JournalsRegistryConfiguration
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalServiceImpl
 import java.nio.charset.StandardCharsets
@@ -85,7 +85,7 @@ class JournalRecordsDao(
             if (recsQuery.language == PredicateService.LANGUAGE_PREDICATE) {
 
                 val registryQuery = recsQuery.copy()
-                    .withSourceId(JournalsConfiguration.JOURNALS_REGISTRY_SOURCE_ID)
+                    .withSourceId(JournalsRegistryConfiguration.JOURNALS_REGISTRY_SOURCE_ID)
                     .build()
                 val queryRes = recordsService.query(registryQuery)
 

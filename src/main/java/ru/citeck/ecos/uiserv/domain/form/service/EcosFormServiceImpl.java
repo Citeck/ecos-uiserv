@@ -211,11 +211,11 @@ public class EcosFormServiceImpl implements EcosFormService {
             if (resolver != null) {
                 return Optional.ofNullable(
                     resolver.getFormById(id.substring(resolverId.length() + 1))
-                ).map(model -> {
-                    if (StringUtils.isBlank(model.getId())) {
-                        return model.copy().withId(id).build();
+                ).map(formDefWithMeta -> {
+                    if (StringUtils.isBlank(formDefWithMeta.getEntity().getId())) {
+                        return formDefWithMeta.getEntity().copy().withId(id).build();
                     }
-                    return model;
+                    return formDefWithMeta.getEntity();
                 });
             }
         }

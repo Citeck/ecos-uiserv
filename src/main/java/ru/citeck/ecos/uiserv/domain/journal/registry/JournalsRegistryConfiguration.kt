@@ -19,7 +19,7 @@ import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
 import java.time.Duration
 
 @Configuration
-class JournalsConfiguration(
+class JournalsRegistryConfiguration(
     private val hazelcast: HazelcastInstance,
     private val appLockService: EcosLockService,
     private val journalsService: JournalService,
@@ -37,43 +37,43 @@ class JournalsConfiguration(
     @Bean
     fun journalsRegistryRecordsDao(): RecordsDao {
 
-        val replicatedMap =
+        val registry =
             hazelcast.getReplicatedMap<String, EntityWithMeta<JournalRegistryValue>>(JOURNALS_REGISTRY_SOURCE_ID)
 
         appLockService.doInSync("journals-registry-initializer", Duration.ofMinutes(10)) {
-            initDataFromDb(replicatedMap)
+            initDataFromDb(registry)
             journalsService.onJournalWithMetaChanged { before, after ->
                 var id = after?.journalDef?.id ?: ""
                 if (id.isBlank()) {
                     id = before.journalDef.id
                 }
                 if (id.isNotBlank()) {
-                    replicatedMap[id] = createRegistryValue(after)
+                    setRegistryValue(registry, id, createRegistryValue(after))
                 }
             }
             journalsService.onJournalDeleted {
-                replicatedMap.remove(it.journalDef.id)
+                registry.remove(it.journalDef.id)
             }
             typesRegistry.initializationPromise().get()
             typesRegistry.listenEventsWithMeta { _, before, after ->
                 val idBefore = before?.entity?.journalRef?.id ?: ""
                 val idAfter = after?.entity?.journalRef?.id ?: ""
-                if (idBefore != idAfter) {
+                if (idBefore != idAfter || before?.entity?.name != after?.entity?.name) {
                     if (after != null && idAfter.startsWith(TYPE_AUTO_JOURNAL_PREFIX)) {
-                        replicatedMap[idAfter] = createRegistryValue(after)
+                        setRegistryValue(registry, idAfter, createRegistryValue(after))
                     } else if (idBefore.isNotBlank()) {
-                        replicatedMap.remove(idBefore)
+                        registry.remove(idBefore)
                     }
                 }
             }
             typesRegistry.getAllValues().values.filter {
                 it.entity.journalRef.id.startsWith(TYPE_AUTO_JOURNAL_PREFIX)
             }.forEach { value ->
-                replicatedMap[value.entity.journalRef.id] = createRegistryValue(value)
+                setRegistryValue(registry, value.entity.journalRef.id, createRegistryValue(value))
             }
         }
 
-        val config = ExtStorageRecordsDaoConfig.create(ReadOnlyMapExtStorage(replicatedMap))
+        val config = ExtStorageRecordsDaoConfig.create(ReadOnlyMapExtStorage(registry))
             .withSourceId(JOURNALS_REGISTRY_SOURCE_ID)
             .withEcosType("journal")
             .build()
@@ -86,24 +86,35 @@ class JournalsConfiguration(
         var journals = journalsService.getAll(100, 0)
         while (journals.isNotEmpty()) {
             journals.forEach {
-                registry[it.journalDef.id] = createRegistryValue(it)
+                setRegistryValue(registry, it.journalDef.id, createRegistryValue(it))
             }
             skipCount += journals.size
             journals = journalsService.getAll(100, skipCount)
         }
     }
 
-    private fun createRegistryValue(typeDef: EntityWithMeta<TypeDef>): EntityWithMeta<JournalRegistryValue> {
-        val def = typeJournalsProvider.createJournalDef(typeDef.entity)
+    private fun setRegistryValue(registry: ReplicatedMap<String, EntityWithMeta<JournalRegistryValue>>,
+                                 key: String,
+                                 value: EntityWithMeta<JournalRegistryValue>?) {
+        if (value != null) {
+            registry[key] = value
+        } else {
+            registry.remove(key)
+        }
+    }
+
+    private fun createRegistryValue(typeDef: EntityWithMeta<TypeDef>): EntityWithMeta<JournalRegistryValue>? {
+        val journalId = typeDef.entity.journalRef.getLocalId().substringAfter('$')
+        val def = typeJournalsProvider.getJournalById(journalId) ?: return null
         return EntityWithMeta(
             JournalRegistryValue(
-                def.id,
-                def.name,
-                def.sourceId,
-                def.typeRef,
-                def.system
+                def.entity.id,
+                def.entity.name,
+                def.entity.sourceId,
+                def.entity.typeRef,
+                def.entity.system
             ),
-            typeDef.meta
+            def.meta
         )
     }
 

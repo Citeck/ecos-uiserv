@@ -20,8 +20,8 @@ class TypeJournalsProvider(
 
     companion object {
         private val NAME_PREFIXES = mapOf(
-            I18nContext.RUSSIAN to "Журнал для ",
-            I18nContext.ENGLISH to "Journal for ",
+            I18nContext.RUSSIAN to "Журнал по умолчанию для ",
+            I18nContext.ENGLISH to "Default journal for ",
         )
     }
 
@@ -38,7 +38,7 @@ class TypeJournalsProvider(
         )
     }
 
-    fun createJournalDef(typeDef: TypeDef): JournalDef {
+    private fun createJournalDef(typeDef: TypeDef): JournalDef {
 
         val name = MLText(
             typeDef.name.getValues().entries.associate {

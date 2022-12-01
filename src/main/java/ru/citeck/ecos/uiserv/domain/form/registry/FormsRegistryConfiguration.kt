@@ -36,43 +36,43 @@ class FormsRegistryConfiguration(
     @Bean
     fun formsRegistryRecordsDao(): RecordsDao {
 
-        val replicatedMap =
+        val registry =
             hazelcast.getReplicatedMap<String, EntityWithMeta<FormRegistryValue>>(FORMS_REGISTRY_SOURCE_ID)
 
         appLockService.doInSync("forms-registry-initializer", Duration.ofMinutes(10)) {
-            initDataFromDb(replicatedMap)
+            initDataFromDb(registry)
             formsService.addChangeWithMetaListener { before, after ->
                 var id = after?.entity?.id
                 if (id.isNullOrBlank()) {
                     id = before?.entity?.id
                 }
                 if (!id.isNullOrBlank()) {
-                    replicatedMap[id] = createFormModelRegistryValue(after)
+                    setRegistryValue(registry, id, createFormModelRegistryValue(after))
                 }
             }
             formsService.addDeleteListener {
-                replicatedMap.remove(it.entity.id)
+                registry.remove(it.entity.id)
             }
             typesRegistry.initializationPromise().get()
             typesRegistry.listenEventsWithMeta { _, before, after ->
                 val idBefore = before?.entity?.formRef?.id ?: ""
                 val idAfter = after?.entity?.formRef?.id ?: ""
-                if (idBefore != idAfter) {
+                if (idBefore != idAfter || before?.entity?.name != after?.entity?.name) {
                     if (after != null && idAfter.startsWith(TYPE_AUTO_FORM_PREFIX)) {
-                        replicatedMap[idAfter] = createRegistryValue(after)
+                        setRegistryValue(registry, idAfter, createRegistryValue(after))
                     } else if (idBefore.isNotBlank()) {
-                        replicatedMap.remove(idBefore)
+                        registry.remove(idBefore)
                     }
                 }
             }
             typesRegistry.getAllValues().values.filter {
                 it.entity.formRef.id.startsWith(TYPE_AUTO_FORM_PREFIX)
             }.forEach { value ->
-                replicatedMap[value.entity.formRef.id] = createRegistryValue(value)
+                setRegistryValue(registry, value.entity.formRef.id, createRegistryValue(value))
             }
         }
 
-        val config = ExtStorageRecordsDaoConfig.create(ReadOnlyMapExtStorage(replicatedMap))
+        val config = ExtStorageRecordsDaoConfig.create(ReadOnlyMapExtStorage(registry))
             .withSourceId(FORMS_REGISTRY_SOURCE_ID)
             .withEcosType("form")
             .build()
@@ -85,25 +85,36 @@ class FormsRegistryConfiguration(
         var forms = formsService.getAllFormsWithMeta(100, 0)
         while (forms.isNotEmpty()) {
             forms.forEach {
-                registry[it.entity.id] = createFormModelRegistryValue(it)
+                setRegistryValue(registry, it.entity.id, createFormModelRegistryValue(it))
             }
             skipCount += forms.size
             forms = formsService.getAllFormsWithMeta(100, skipCount)
         }
     }
 
-    private fun createRegistryValue(typeDef: EntityWithMeta<TypeDef>): EntityWithMeta<FormRegistryValue> {
-        val formDef = typeFormsProvider.createFormDef(typeDef.entity, false)
+    private fun setRegistryValue(registry: ReplicatedMap<String, EntityWithMeta<FormRegistryValue>>,
+                                 key: String,
+                                 value: EntityWithMeta<FormRegistryValue>?) {
+        if (value != null) {
+            registry[key] = value
+        } else {
+            registry.remove(key)
+        }
+    }
+
+    private fun createRegistryValue(typeDef: EntityWithMeta<TypeDef>): EntityWithMeta<FormRegistryValue>? {
+        val formId = typeDef.entity.formRef.getLocalId().substringAfter('$')
+        val formDef = typeFormsProvider.getFormById(formId, false) ?: return null
         return EntityWithMeta(
             FormRegistryValue(
-                formDef.id,
-                formDef.title,
-                formDef.description,
-                formDef.formKey,
-                formDef.typeRef,
-                formDef.system
+                formDef.entity.id,
+                formDef.entity.title,
+                formDef.entity.description,
+                formDef.entity.formKey,
+                formDef.entity.typeRef,
+                formDef.entity.system
             ),
-            typeDef.meta
+            formDef.meta
         )
     }
 
