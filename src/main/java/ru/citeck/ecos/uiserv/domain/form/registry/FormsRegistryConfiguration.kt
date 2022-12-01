@@ -92,9 +92,11 @@ class FormsRegistryConfiguration(
         }
     }
 
-    private fun setRegistryValue(registry: ReplicatedMap<String, EntityWithMeta<FormRegistryValue>>,
-                                 key: String,
-                                 value: EntityWithMeta<FormRegistryValue>?) {
+    private fun setRegistryValue(
+        registry: ReplicatedMap<String, EntityWithMeta<FormRegistryValue>>,
+        key: String,
+        value: EntityWithMeta<FormRegistryValue>?
+    ) {
         if (value != null) {
             registry[key] = value
         } else {

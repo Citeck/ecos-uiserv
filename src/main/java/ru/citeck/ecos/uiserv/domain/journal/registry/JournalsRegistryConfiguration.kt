@@ -93,9 +93,11 @@ class JournalsRegistryConfiguration(
         }
     }
 
-    private fun setRegistryValue(registry: ReplicatedMap<String, EntityWithMeta<JournalRegistryValue>>,
-                                 key: String,
-                                 value: EntityWithMeta<JournalRegistryValue>?) {
+    private fun setRegistryValue(
+        registry: ReplicatedMap<String, EntityWithMeta<JournalRegistryValue>>,
+        key: String,
+        value: EntityWithMeta<JournalRegistryValue>?
+    ) {
         if (value != null) {
             registry[key] = value
         } else {

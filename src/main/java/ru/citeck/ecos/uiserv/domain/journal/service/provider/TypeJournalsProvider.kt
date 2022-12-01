@@ -41,8 +41,8 @@ class TypeJournalsProvider(
     private fun createJournalDef(typeDef: TypeDef): JournalDef {
 
         val name = MLText(
-            typeDef.name.getValues().entries.associate {
-                it.key to ((NAME_PREFIXES[it.key] ?: "") + it.value)
+            NAME_PREFIXES.entries.associate { (locale, name) ->
+                locale to (name + typeDef.name.getClosest(locale).ifBlank { typeDef.id })
             }
         )
 

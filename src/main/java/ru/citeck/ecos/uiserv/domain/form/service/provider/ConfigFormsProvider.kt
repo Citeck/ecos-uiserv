@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.domain.form.service.provider
 
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
+import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.config.lib.dto.ConfigValueDef
 import ru.citeck.ecos.config.lib.dto.ConfigValueType
 import ru.citeck.ecos.config.lib.service.EcosConfigService
@@ -28,7 +29,7 @@ class ConfigFormsProvider(
         ecosFormService.register(this)
     }
 
-    override fun getFormById(id: String): EcosFormDef? {
+    override fun getFormById(id: String): EntityWithMeta<EcosFormDef>? {
 
         val config = ecosConfigService.getConfig(id)
         val formBuilder = formBuilderFactory.createBuilder()
@@ -37,7 +38,7 @@ class ConfigFormsProvider(
         addInput(formBuilder, config.valueDef)
         formBuilder.addCancelAndSubmitButtons()
 
-        return formBuilder.build()
+        return EntityWithMeta(formBuilder.build())
     }
 
     private fun addInput(formBuilder: EcosFormBuilder, valueDef: ConfigValueDef) {

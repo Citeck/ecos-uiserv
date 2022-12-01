@@ -51,8 +51,8 @@ class TypeFormsProvider(
     private fun createFormDef(typeDef: EntityWithMeta<TypeDef>, withDefinition: Boolean): EntityWithMeta<EcosFormDef> {
 
         val name = MLText(
-            typeDef.entity.name.getValues().entries.associate {
-                it.key to ((NAME_PREFIXES[it.key] ?: "") + it.value)
+            NAME_PREFIXES.entries.associate { (locale, name) ->
+                locale to (name + typeDef.entity.name.getClosest(locale).ifBlank { typeDef.entity.id })
             }
         )
 
