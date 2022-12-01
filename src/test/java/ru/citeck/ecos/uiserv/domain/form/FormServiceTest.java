@@ -8,7 +8,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
+import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
 
@@ -32,10 +32,11 @@ public class FormServiceTest {
 
         String id = "test";
 
-        EcosFormModel model = new EcosFormModel();
-        model.setId(id);
-        model.setTitle(new MLText("test"));
-        model.setDefinition(ObjectData.create());
+        EcosFormDef model = EcosFormDef.create()
+            .withId(id)
+            .withTitle(new MLText("test"))
+            .withDefinition(ObjectData.create())
+            .build();
 
         formService.save(model);
 
@@ -52,24 +53,26 @@ public class FormServiceTest {
 
     @Test
     public void testMetaOverwrite() {
-        EcosFormModel modelA = new EcosFormModel();
-        modelA.setId("TEST_FORM_A");
-        modelA.setDescription(new MLText("Test form"));
-        modelA.setTitle(new MLText("Test Form"));
-        modelA.setDefinition(ObjectData.create());
-        modelA.setFormKey("A");
+
+        EcosFormDef modelA = EcosFormDef.create()
+            .withId("TEST_FORM_A")
+            .withDescription(new MLText("Test form"))
+            .withTitle(new MLText("Test Form"))
+            .withDefinition(ObjectData.create())
+            .withFormKey("A")
+            .build();
 
         formService.save(modelA);
 
         assertThat(formService.getFormById("TEST_FORM_A"), is(Optional.of(modelA)));
 
-        modelA.setFormKey("B");
+        modelA = modelA.copy().withFormKey("B").build();
         formService.save(modelA);
 
-        Optional<EcosFormModel> modelA_ = formService.getFormById("TEST_FORM_A");
+        Optional<EcosFormDef> modelA_ = formService.getFormById("TEST_FORM_A");
         assertThat(modelA_.get().getFormKey(), is("B"));
 
-        modelA.setFormKey("C");
+        modelA = modelA.copy().withFormKey("C").build();
         formService.save(modelA);
 
         modelA_ = formService.getFormById("TEST_FORM_A");
@@ -78,24 +81,29 @@ public class FormServiceTest {
 
     @Test
     public void testFormModeSearch() {
-        EcosFormModel modelA = new EcosFormModel();
-        modelA.setId("TEST_FORM_A");
-        modelA.setDescription(new MLText("Test form"));
-        modelA.setTitle(new MLText("Test Form"));
-        modelA.setDefinition(ObjectData.create());
-        modelA.setFormKey("K");
 
-        EcosFormModel modelB = new EcosFormModel(modelA);
-        modelB.setId("TEST_FORM_B");
-        modelB.setFormKey("K");
+        EcosFormDef modelA = EcosFormDef.create()
+            .withId("TEST_FORM_A")
+            .withDescription(new MLText("Test form"))
+            .withTitle(new MLText("Test Form"))
+            .withDefinition(ObjectData.create())
+            .withFormKey("K")
+            .build();
 
-        EcosFormModel modelC = new EcosFormModel(modelA);
-        modelC.setId("TEST_FORM_C");
-        modelC.setFormKey("K");
+        EcosFormDef modelB = new EcosFormDef.Builder(modelA)
+            .withId("TEST_FORM_B")
+            .withFormKey("K")
+            .build();
 
-        EcosFormModel modelD = new EcosFormModel(modelA);
-        modelD.setId("TEST_FORM_D");
-        modelD.setFormKey("L");
+        EcosFormDef modelC = new EcosFormDef.Builder(modelA)
+            .withId("TEST_FORM_C")
+            .withFormKey("K")
+            .build();
+
+        EcosFormDef modelD = new EcosFormDef.Builder(modelA)
+            .withId("TEST_FORM_D")
+            .withFormKey("L")
+            .build();
 
         formService.save(modelA);
         formService.save(modelB);

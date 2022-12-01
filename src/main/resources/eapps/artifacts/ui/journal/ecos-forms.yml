@@ -29,10 +29,13 @@ columns:
 
   - id: title
     name: { ru: Название, en: Name }
-    type: TEXT
+    type: MLTEXT
+    sortable: false
 
   - id: description
     name: { ru: Описание, en: Description }
+    type: MLTEXT
+    sortable: false
 
   - id: system
     type: BOOLEAN

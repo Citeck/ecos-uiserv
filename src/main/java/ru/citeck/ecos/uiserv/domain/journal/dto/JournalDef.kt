@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.journal.dto
 
 import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
+import ecos.com.fasterxml.jackson210.databind.annotation.JsonPOJOBuilder
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
@@ -121,6 +122,7 @@ data class JournalDef(
         return builderObj.build()
     }
 
+    @JsonPOJOBuilder
     open class Builder() {
 
         var id: String = ""

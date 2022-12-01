@@ -22,7 +22,7 @@ createVariants:
 
   - id: upload-form
     name: { ru: Загрузить форму, en: Upload form }
-    formRef: uiserv/form@ecos-module-upload
+    formRef: 'uiserv/form@ecos-artifact-upload'
 
 model:
   attributes:

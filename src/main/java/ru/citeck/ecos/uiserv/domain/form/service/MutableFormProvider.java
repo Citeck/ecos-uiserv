@@ -1,11 +1,11 @@
 package ru.citeck.ecos.uiserv.domain.form.service;
 
-import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
+import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 
 public interface MutableFormProvider {
-    void save(EcosFormModel model);
+    void save(EcosFormDef model);
 
-    void create(EcosFormModel model);
+    void create(EcosFormDef model);
 
     void delete(String formId);
 }

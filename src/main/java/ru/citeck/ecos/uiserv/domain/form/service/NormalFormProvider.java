@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.utils.StringUtils;
 import ru.citeck.ecos.uiserv.domain.file.repo.File;
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType;
-import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
+import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 import ru.citeck.ecos.uiserv.domain.file.service.FileService;
 
 import java.io.ByteArrayOutputStream;
@@ -30,14 +30,14 @@ public class NormalFormProvider implements FormProvider, MutableFormProvider {
         return fileService.getCount(FileType.FORM);
     }
 
-    public List<EcosFormModel> getAllForms(int max, int skip) {
+    public List<EcosFormDef> getAllForms(int max, int skip) {
         return fileService.findByType(FileType.FORM, max, skip)
             .stream()
             .map(f -> {
                 try {
                     return Optional.ofNullable(fromJson(f));
                 } catch (Exception e) {
-                    return Optional.<EcosFormModel>empty();
+                    return Optional.<EcosFormDef>empty();
                 }
             })
             .filter(Optional::isPresent)
@@ -46,7 +46,7 @@ public class NormalFormProvider implements FormProvider, MutableFormProvider {
     }
 
     @Override
-    public EcosFormModel getFormByKey(String formKey) {
+    public EcosFormDef getFormByKey(String formKey) {
         List<File> found = fileService.find("formKey", Collections.singletonList(formKey));
         if (found.isEmpty()) {
             return null;
@@ -73,7 +73,7 @@ public class NormalFormProvider implements FormProvider, MutableFormProvider {
     }
 
     @Override
-    public EcosFormModel getFormByKeyAndMode(String formKey, String formMode) {
+    public EcosFormDef getFormByKeyAndMode(String formKey, String formMode) {
         List<File> found = fileService.find("formKey", Collections.singletonList(formKey));
 
         Predicate<File> formModeFilter = StringUtils.isBlank(formMode) ?
@@ -97,7 +97,7 @@ public class NormalFormProvider implements FormProvider, MutableFormProvider {
 
     private String getFormId(File file) {
         try {
-            EcosFormModel model = fromJson(file);
+            EcosFormDef model = fromJson(file);
             return model.getId();
         } catch (Exception e) {
             log.warn("Form parsing error", e);
@@ -106,7 +106,7 @@ public class NormalFormProvider implements FormProvider, MutableFormProvider {
     }
 
     @Override
-    public EcosFormModel getFormById(String id) {
+    public EcosFormDef getFormById(String id) {
         return fileService.loadFile(FileType.FORM, id)
             .map(this::fromJson)
             .orElse(null);
@@ -117,15 +117,15 @@ public class NormalFormProvider implements FormProvider, MutableFormProvider {
         return 0;
     }
 
-    private EcosFormModel fromJson(File file) {
+    private EcosFormDef fromJson(File file) {
         try {
-            return objectMapper.readValue(file.getFileVersion().getBytes(), EcosFormModel.class);
+            return objectMapper.readValue(file.getFileVersion().getBytes(), EcosFormDef.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private byte[] toJson(EcosFormModel form) {
+    private byte[] toJson(EcosFormDef form) {
         try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             objectMapper.writeValue(output, form);
             return output.toByteArray();
@@ -135,7 +135,7 @@ public class NormalFormProvider implements FormProvider, MutableFormProvider {
     }
 
     @Override
-    public void save(EcosFormModel model) {
+    public void save(EcosFormDef model) {
         Map<String, String> modelMeta = new HashMap<>();
         modelMeta.put("formKey", model.getFormKey());
 
@@ -144,7 +144,7 @@ public class NormalFormProvider implements FormProvider, MutableFormProvider {
     }
 
     @Override
-    public void create(EcosFormModel model) {
+    public void create(EcosFormDef model) {
         save(model);
     }
 

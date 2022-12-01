@@ -1,14 +1,16 @@
 package ru.citeck.ecos.uiserv.domain.form.service;
 
+import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
-import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
+import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 import ru.citeck.ecos.uiserv.domain.form.service.provider.EcosFormsProvider;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public interface EcosFormService {
 
@@ -18,29 +20,37 @@ public interface EcosFormService {
 
     void updateFormType(String formId, RecordRef typeRef);
 
-    List<EcosFormModel> getAllForms(Predicate predicate, int max, int skip, List<SortBy> sort);
+    List<EcosFormDef> getAllForms(Predicate predicate, int max, int skip, List<SortBy> sort);
 
-    List<EcosFormModel> getAllForms(int max, int skip);
+    List<EcosFormDef> getAllForms(int max, int skip);
 
-    Optional<EcosFormModel> getFormByKey(String formKey);
+    List<EntityWithMeta<EcosFormDef>> getFormsByIds(List<String> ids);
 
-    Optional<EcosFormModel> getFormByKey(List<String> formKeys);
+    List<EntityWithMeta<EcosFormDef>> getAllFormsWithMeta(int max, int skip);
 
-    List<EcosFormModel> getFormsByKeys(List<String> formKeys);
+    Optional<EcosFormDef> getFormByKey(String formKey);
 
-    Optional<EcosFormModel> getFormById(String id);
+    Optional<EcosFormDef> getFormByKey(List<String> formKeys);
 
-    List<EcosFormModel> getFormsForExactType(RecordRef typeRef);
+    List<EcosFormDef> getFormsByKeys(List<String> formKeys);
 
-    List<EcosFormModel> getAllFormsForType(RecordRef typeRef);
+    Optional<EcosFormDef> getFormById(String id);
 
-    String save(EcosFormModel model);
+    List<EcosFormDef> getFormsForExactType(RecordRef typeRef);
 
-    EcosFormModel getDefault();
+    List<EcosFormDef> getAllFormsForType(RecordRef typeRef);
+
+    String save(EcosFormDef model);
+
+    EcosFormDef getDefault();
 
     void delete(String id);
 
-    void addChangeListener(BiConsumer<EcosFormModel, EcosFormModel> listener);
+    void addDeleteListener(Consumer<EntityWithMeta<EcosFormDef>> listener);
+
+    void addChangeListener(BiConsumer<EcosFormDef, EcosFormDef> listener);
+
+    void addChangeWithMetaListener(BiConsumer<EntityWithMeta<EcosFormDef>, EntityWithMeta<EcosFormDef>> listener);
 
     void register(EcosFormsProvider resolver);
 }

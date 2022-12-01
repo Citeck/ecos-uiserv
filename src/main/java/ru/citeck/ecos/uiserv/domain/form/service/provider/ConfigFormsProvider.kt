@@ -11,7 +11,7 @@ import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormBuilder
 import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormBuilderFactory
 import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormInputType
 import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormWidth
-import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel
+import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
 import javax.annotation.PostConstruct
 
@@ -28,12 +28,12 @@ class ConfigFormsProvider(
         ecosFormService.register(this)
     }
 
-    override fun getFormById(id: String): EcosFormModel? {
+    override fun getFormById(id: String): EcosFormDef? {
 
         val config = ecosConfigService.getConfig(id)
         val formBuilder = formBuilderFactory.createBuilder()
 
-        formBuilder.setWidth(EcosFormWidth.SMALL)
+        formBuilder.withWidth(EcosFormWidth.SMALL)
         addInput(formBuilder, config.valueDef)
         formBuilder.addCancelAndSubmitButtons()
 

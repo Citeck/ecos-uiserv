@@ -1,7 +1,9 @@
 package ru.citeck.ecos.uiserv.domain.journal.service.provider
 
 import org.springframework.stereotype.Component
+import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta
+import ru.citeck.ecos.context.lib.i18n.I18nContext
 import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
@@ -16,6 +18,13 @@ class TypeJournalsProvider(
     val journalService: JournalService
 ) : JournalsProvider {
 
+    companion object {
+        private val NAME_PREFIXES = mapOf(
+            I18nContext.RUSSIAN to "Журнал для ",
+            I18nContext.ENGLISH to "Journal for ",
+        )
+    }
+
     @PostConstruct
     fun init() {
         journalService.registerProvider(this)
@@ -29,19 +38,23 @@ class TypeJournalsProvider(
         )
     }
 
-    private fun createJournalDef(typeDef: TypeDef): JournalDef {
+    fun createJournalDef(typeDef: TypeDef): JournalDef {
 
-        // if (!typeDef.journalRef.id.startsWith())
+        val name = MLText(
+            typeDef.name.getValues().entries.associate {
+                it.key to ((NAME_PREFIXES[it.key] ?: "") + it.value)
+            }
+        )
 
         return JournalDef.create {
-            withName(typeDef.name)
+            withName(name)
             withTypeRef(TypeUtils.getTypeRef(typeDef.id))
             withColumns(
                 typeDef.model.attributes.map {
                     JournalColumnDef.create()
                         .withId(it.id)
                         .withType(it.type)
-                        .withName(it.name)
+                        .withName(name)
                         .build()
                 }
             )

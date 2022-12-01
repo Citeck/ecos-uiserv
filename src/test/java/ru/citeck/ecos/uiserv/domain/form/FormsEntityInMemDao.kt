@@ -8,6 +8,8 @@ import ru.citeck.ecos.records2.predicate.model.VoidPredicate
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
 import ru.citeck.ecos.uiserv.domain.form.repo.EcosFormEntity
 import ru.citeck.ecos.uiserv.domain.form.service.FormsEntityDao
+import java.util.*
+import kotlin.collections.HashMap
 
 class FormsEntityInMemDao(
     private val predicateService: PredicateService
@@ -25,6 +27,14 @@ class FormsEntityInMemDao(
 
     override fun findByExtId(formId: String): EcosFormEntity? {
         return entities[formId]
+    }
+
+    override fun findAllByExtIdIn(ids: Set<String>): Set<EcosFormEntity> {
+        val result = TreeSet<EcosFormEntity>()
+        for (id in ids) {
+            entities[id]?.let { result.add(it) }
+        }
+        return result
     }
 
     override fun save(entity: EcosFormEntity): EcosFormEntity {

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings("unused")
 @Repository
@@ -15,6 +16,8 @@ public interface EcosFormsRepository extends JpaRepository<EcosFormEntity, Long>
     List<EcosFormEntity> findAllByTypeRef(String type);
 
     List<EcosFormEntity> findAllByTypeRefIn(List<String> types);
+
+    Set<EcosFormEntity> findAllByExtIdIn(Set<String> ids);
 
     @Nullable
     EcosFormEntity findByExtId(String extId);

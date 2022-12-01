@@ -36,6 +36,10 @@ class FormsEntityRepoDao(
         return repo.findByExtId(formId)
     }
 
+    override fun findAllByExtIdIn(ids: Set<String>): Set<EcosFormEntity> {
+        return repo.findAllByExtIdIn(ids)
+    }
+
     override fun save(entity: EcosFormEntity): EcosFormEntity {
         return repo.save(entity)
     }

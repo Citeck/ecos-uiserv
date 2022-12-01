@@ -5,7 +5,7 @@ import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.context.lib.i18n.I18nContext
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
-import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel
+import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
 
 class EcosFormBuilderImpl(
     val context: FormBuilderContext,
@@ -68,15 +68,20 @@ class EcosFormBuilderImpl(
     }
 
     private val components = mutableListOf<DataValue>()
-    private val formModel = EcosFormModel()
+    private val formModel = EcosFormDef.create()
 
-    override fun setId(id: String): EcosFormBuilder {
-        formModel.id = id
+    override fun withId(id: String): EcosFormBuilder {
+        formModel.withId(id)
         return this
     }
 
-    override fun setWidth(width: EcosFormWidth): EcosFormBuilder {
-        formModel.width = width.key
+    override fun withWidth(width: EcosFormWidth): EcosFormBuilder {
+        formModel.withWidth(width.key)
+        return this
+    }
+
+    override fun withTitle(title: MLText): EcosFormBuilder {
+        formModel.withTitle(title)
         return this
     }
 
@@ -96,9 +101,9 @@ class EcosFormBuilderImpl(
         return this
     }
 
-    override fun build(): EcosFormModel {
+    override fun build(): EcosFormDef {
         formModel.definition = ObjectData.create()
             .set("components", components)
-        return formModel
+        return formModel.build()
     }
 }

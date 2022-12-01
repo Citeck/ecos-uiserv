@@ -47,9 +47,9 @@ class EcosResolvedFormRecordsDao(
     }
 
     private fun mapToResolvedRecord(form: EcosFormRecord): ResolvedFormRecord {
-        var typeRef = form.typeRef
+        var typeRef = form.def.typeRef
         if (RecordRef.isEmpty(typeRef)) {
-            typeRef = ecosTypeService.getTypeRefByForm(RecordRef.create("uiserv", "form", form.id))
+            typeRef = ecosTypeService.getTypeRefByForm(RecordRef.create("uiserv", "form", form.def.id))
         }
         val typeInfo = ecosTypeService.getTypeInfo(typeRef)
         return ResolvedFormRecord(form, typeInfo, formService)
@@ -66,11 +66,11 @@ class EcosResolvedFormRecordsDao(
     ) {
 
         fun getTypeRef(): EntityRef {
-            return form.typeRef.ifEmpty { TypeUtils.getTypeRef(typeInfo?.id ?: "base") }
+            return form.def.typeRef.ifEmpty { TypeUtils.getTypeRef(typeInfo?.id ?: "base") }
         }
 
         fun getDefinition(): ObjectData {
-            val definition: ObjectData = form.definition
+            val definition: ObjectData = form.def.definition
             val attributes = typeInfo?.model?.getAllAttributes()?.associateBy { it.id } ?: emptyMap()
             val mappedDef = FormDefUtils.mapComponents(definition.getData().copy(), { true }) {
                 mapComponent(it, attributes)
@@ -89,7 +89,7 @@ class EcosResolvedFormRecordsDao(
                     return component
                 }
                 val formDef = formService.getFormById(formRef.id).orElse(null)
-                if (formDef != null && formDef.definition != null) {
+                if (formDef?.definition != null) {
                     val components = formDef.definition["components"]
                     if (components.isArray()) {
                         return components

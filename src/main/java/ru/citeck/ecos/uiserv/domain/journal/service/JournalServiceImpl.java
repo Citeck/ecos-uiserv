@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
+import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
@@ -16,7 +17,6 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.domain.journal.service.mapper.JournalMapper;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
 import ru.citeck.ecos.uiserv.domain.journal.service.provider.JournalsProvider;
-import ru.citeck.ecos.uiserv.domain.menu.service.resolving.resolvers.JournalsResolver;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory;
 
@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -34,6 +35,15 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class JournalServiceImpl implements JournalService {
+
+    private static final String DEFAULT_AUTO_JOURNAL_FOR_TYPE = "DEFAULT_JOURNAL";
+
+    public static Set<String> SYSTEM_JOURNALS = Collections.singleton(
+        DEFAULT_AUTO_JOURNAL_FOR_TYPE
+    );
+
+    private static final String VALID_ID_PATTERN_TXT = "^[\\w/.-]+\\w$";
+    private static final Pattern VALID_ID_PATTERN = Pattern.compile(VALID_ID_PATTERN_TXT);
 
     private final Pattern VALID_COLUMN_NAME_PATTERN = Pattern.compile("^\\d?[a-zA-Z_][$\\da-zA-Z:_-]*$");
     private final Pattern VALID_COLUMN_ATT_PATTERN = Pattern.compile("^[a-zA-Z_][$.\\da-zA-Z:_-]*$");
@@ -45,6 +55,7 @@ public class JournalServiceImpl implements JournalService {
     private JpaSearchConverter<JournalEntity> searchConv;
 
     private final List<BiConsumer<JournalWithMeta, JournalWithMeta>> changeListeners = new CopyOnWriteArrayList<>();
+    private final List<Consumer<JournalWithMeta>> deleteListeners = new CopyOnWriteArrayList<>();
 
     private final Map<String, JournalsProvider> providers = new ConcurrentHashMap<>();
 
@@ -159,6 +170,11 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
+    public void onJournalDeleted(Consumer<JournalWithMeta> consumer) {
+        deleteListeners.add(consumer);
+    }
+
+    @Override
     public void onJournalWithMetaChanged(BiConsumer<JournalWithMeta, JournalWithMeta> consumer) {
         changeListeners.add(consumer);
     }
@@ -181,8 +197,15 @@ public class JournalServiceImpl implements JournalService {
     @Override
     public JournalWithMeta save(JournalDef dto) {
 
-        if (dto.getId().isEmpty() || dto.getId().contains("$")) {
+        if (dto.getId().isEmpty()) {
             throw new IllegalArgumentException("Journal without id: " + dto);
+        }
+        if (dto.getId().contains("$")) {
+            throw new IllegalArgumentException("You can't change generated journal: " + dto.getId());
+        }
+
+        if (SYSTEM_JOURNALS.contains(dto.getId()) && !AuthContext.isRunAsSystem()) {
+            throw new RuntimeException("You can't change system journal: " + dto.getId());
         }
 
         // preprocess config with builder
@@ -207,6 +230,12 @@ public class JournalServiceImpl implements JournalService {
             .map(journalMapper::entityToDto)
             .orElse(null);
 
+        if (valueBefore == null) {
+            if (!VALID_ID_PATTERN.matcher(dto.getId()).matches()) {
+                throw new RuntimeException("Invalid id: " + dto.getId());
+            }
+        }
+
         JournalEntity journalEntity = journalMapper.dtoToEntity(dto);
         JournalEntity storedJournalEntity = journalRepository.save(journalEntity);
 
@@ -220,7 +249,14 @@ public class JournalServiceImpl implements JournalService {
 
     @Override
     public void delete(String id) {
-        journalRepository.findByExtId(id).ifPresent(journalRepository::delete);
+        Optional<JournalEntity> before = journalRepository.findByExtId(id);
+        if (before.isPresent()) {
+            JournalWithMeta beforeDto = journalMapper.entityToDto(before.get());
+            journalRepository.delete(before.get());
+            for (Consumer<JournalWithMeta> listener : deleteListeners) {
+                listener.accept(beforeDto);
+            }
+        }
     }
 
     @Override
