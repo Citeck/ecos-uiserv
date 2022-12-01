@@ -37,7 +37,7 @@
           "en": "Form identifier",
           "ru": "Идентификатор формы"
         },
-        "key": "moduleId",
+        "key": "id",
         "validate": {
           "required": true
         },

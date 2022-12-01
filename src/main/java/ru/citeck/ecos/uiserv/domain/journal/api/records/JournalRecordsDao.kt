@@ -30,6 +30,7 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
 import ru.citeck.ecos.uiserv.domain.journal.registry.JournalsRegistryConfiguration
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalServiceImpl
+import ru.citeck.ecos.uiserv.domain.journal.service.provider.TypeJournalsProvider
 import java.nio.charset.StandardCharsets
 import java.util.*
 import javax.annotation.PostConstruct
@@ -39,7 +40,8 @@ import javax.annotation.PostConstruct
 class JournalRecordsDao(
     private val journalService: JournalService,
     private val ecosTypeService: EcosTypeService,
-    private val recordEventsService: RecordEventsService
+    private val recordEventsService: RecordEventsService,
+    private val typeJournalsProvider: TypeJournalsProvider
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordAttsDao,
@@ -129,9 +131,8 @@ class JournalRecordsDao(
     }
 
     override fun saveMutatedRec(record: JournalMutateRec): String {
-        val localId = record.localId
-        if (!localId.isNullOrBlank()) {
-            record.withId(localId)
+        if (record.originalId.startsWith("type$") && !record.id.contains("$")) {
+            record.withName(typeJournalsProvider.getNameForCopyOfTypeJournal(record.name))
         }
         return journalService.save(record.build()).journalDef.id
     }
@@ -227,14 +228,10 @@ class JournalRecordsDao(
 
     class JournalMutateRec(base: JournalDef) : JournalDef.Builder(base) {
 
-        var localId: String? = null
+        val originalId = base.id
 
-        init {
-            localId = base.id
-        }
-
-        fun withModuleId(moduleId: String) {
-            this.localId = moduleId
+        fun withModuleId(id: String) {
+            withId(id)
         }
     }
 }

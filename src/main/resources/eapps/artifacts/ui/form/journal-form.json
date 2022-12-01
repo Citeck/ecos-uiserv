@@ -130,7 +130,7 @@
                               "ru": "Идентификатор журнала",
                               "en": "Journal ID"
                             },
-                            "key": "localId",
+                            "key": "id",
                             "validate": {
                               "required": true
                             },

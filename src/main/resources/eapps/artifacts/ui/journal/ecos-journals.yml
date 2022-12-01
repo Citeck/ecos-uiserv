@@ -13,7 +13,7 @@ actions:
   - uiserv/action@delete
   - uiserv/action@edit
   - uiserv/action@edit-json
-  - uiserv/action@module-copy
+  - uiserv/action@record-copy
   - uiserv/action@view-dashboard
 
 columns:

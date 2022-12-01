@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
 import ru.citeck.ecos.context.lib.auth.AuthRole;
 import ru.citeck.ecos.events2.type.RecordEventsService;
@@ -32,6 +33,9 @@ import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 import ru.citeck.ecos.uiserv.domain.form.registry.FormsRegistryConfiguration;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
+import ru.citeck.ecos.uiserv.domain.form.service.provider.TypeFormsProvider;
+import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef;
+import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -70,6 +74,8 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
     }
 
     private final EcosFormService ecosFormService;
+    private final TypeFormsProvider typeFormsProvider;
+
     private RecordEventsService recordEventsService;
 
     @PostConstruct
@@ -107,6 +113,9 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
     @NotNull
     @Override
     public String saveMutatedRec(EcosFormMutRecord record) {
+        if (record.getOriginalId().startsWith("type$") && !record.getId().contains("$")) {
+            record.withTitle(typeFormsProvider.getNameForCopyOfTypeForm(record.getTitle()));
+        }
         return ecosFormService.save(record.build());
     }
 

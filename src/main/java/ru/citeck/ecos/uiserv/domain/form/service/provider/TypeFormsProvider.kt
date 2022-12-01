@@ -28,9 +28,13 @@ class TypeFormsProvider(
     companion object {
         val log = KotlinLogging.logger {}
 
-        private val NAME_PREFIXES = mapOf(
+        private val DEFAULT_NAME_PREFIXES = mapOf(
             I18nContext.RUSSIAN to "Форма по умолчанию для ",
             I18nContext.ENGLISH to "Default form for ",
+        )
+        private val NAME_REPLACEMENTS_FOR_DEFAULT_FORM_COPY = mapOf(
+            (DEFAULT_NAME_PREFIXES[I18nContext.RUSSIAN] ?: "") to "Форма для ",
+            (DEFAULT_NAME_PREFIXES[I18nContext.ENGLISH] ?: "") to "Form for ",
         )
     }
 
@@ -48,10 +52,22 @@ class TypeFormsProvider(
         return createFormDef(typeDef, withDefinition)
     }
 
+    fun getNameForCopyOfTypeForm(formName: MLText): MLText {
+        return MLText(formName.getValues().entries.associate {
+            var newValue = it.value
+            NAME_REPLACEMENTS_FOR_DEFAULT_FORM_COPY.forEach { replacement ->
+                if (newValue.contains(replacement.key)) {
+                    newValue = newValue.replace(replacement.key, replacement.value)
+                }
+            }
+            it.key to newValue
+        })
+    }
+
     private fun createFormDef(typeDef: EntityWithMeta<TypeDef>, withDefinition: Boolean): EntityWithMeta<EcosFormDef> {
 
         val name = MLText(
-            NAME_PREFIXES.entries.associate { (locale, name) ->
+            DEFAULT_NAME_PREFIXES.entries.associate { (locale, name) ->
                 locale to (name + typeDef.entity.name.getClosest(locale).ifBlank { typeDef.entity.id })
             }
         )
