@@ -43,15 +43,17 @@ class TypeJournalsProvider(
     }
 
     fun getNameForCopyOfTypeJournal(journalName: MLText): MLText {
-        return MLText(journalName.getValues().entries.associate {
-            var newValue = it.value
-            NAME_REPLACEMENTS_FOR_DEFAULT_FORM_COPY.forEach { replacement ->
-                if (newValue.contains(replacement.key)) {
-                    newValue = newValue.replace(replacement.key, replacement.value)
+        return MLText(
+            journalName.getValues().entries.associate {
+                var newValue = it.value
+                NAME_REPLACEMENTS_FOR_DEFAULT_FORM_COPY.forEach { replacement ->
+                    if (newValue.contains(replacement.key)) {
+                        newValue = newValue.replace(replacement.key, replacement.value)
+                    }
                 }
+                it.key to newValue
             }
-            it.key to newValue
-        })
+        )
     }
 
     private fun createJournalDef(typeDef: TypeDef): JournalDef {
