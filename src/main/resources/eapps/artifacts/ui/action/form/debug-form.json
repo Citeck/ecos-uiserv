@@ -24,5 +24,11 @@
       "options.useNarrowButtons": "useNarrowButtons"
     }
   },
-  "type": "debug-form"
+  "type": "debug-form",
+  "predicate": {
+    "t": "and",
+    "val": [
+      { "t": "not-eq", "a": "?localId", "v": "DEFAULT_FORM" }
+    ]
+  }
 }
