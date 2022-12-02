@@ -30,7 +30,6 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
 import ru.citeck.ecos.uiserv.domain.journal.registry.JournalsRegistryConfiguration
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalServiceImpl
-import ru.citeck.ecos.uiserv.domain.journal.service.provider.TypeJournalsProvider
 import java.nio.charset.StandardCharsets
 import java.util.*
 import javax.annotation.PostConstruct
@@ -40,8 +39,7 @@ import javax.annotation.PostConstruct
 class JournalRecordsDao(
     private val journalService: JournalService,
     private val ecosTypeService: EcosTypeService,
-    private val recordEventsService: RecordEventsService,
-    private val typeJournalsProvider: TypeJournalsProvider
+    private val recordEventsService: RecordEventsService
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordAttsDao,
@@ -131,9 +129,6 @@ class JournalRecordsDao(
     }
 
     override fun saveMutatedRec(record: JournalMutateRec): String {
-        if (record.originalId.startsWith("type$") && !record.id.contains("$")) {
-            record.withName(typeJournalsProvider.getNameForCopyOfTypeJournal(record.name))
-        }
         return journalService.save(record.build()).journalDef.id
     }
 

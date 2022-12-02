@@ -111,9 +111,6 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
     @NotNull
     @Override
     public String saveMutatedRec(EcosFormMutRecord record) {
-        if (typeFormsProvider != null && record.getOriginalId().startsWith("type$") && !record.getId().contains("$")) {
-            record.withTitle(typeFormsProvider.getNameForCopyOfTypeForm(record.getTitle()));
-        }
         return ecosFormService.save(record.build());
     }
 

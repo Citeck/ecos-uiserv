@@ -4,7 +4,6 @@ import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta
-import ru.citeck.ecos.context.lib.i18n.I18nContext
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.attributes.dto.computed.ComputedAttType
 import ru.citeck.ecos.records3.RecordsService
@@ -27,15 +26,6 @@ class TypeFormsProvider(
 
     companion object {
         val log = KotlinLogging.logger {}
-
-        private val DEFAULT_NAME_PREFIXES = mapOf(
-            I18nContext.RUSSIAN to "Форма по умолчанию для ",
-            I18nContext.ENGLISH to "Default form for ",
-        )
-        private val NAME_REPLACEMENTS_FOR_DEFAULT_FORM_COPY = mapOf(
-            (DEFAULT_NAME_PREFIXES[I18nContext.RUSSIAN] ?: "") to "Форма для ",
-            (DEFAULT_NAME_PREFIXES[I18nContext.ENGLISH] ?: "") to "Form for ",
-        )
     }
 
     @PostConstruct
@@ -52,32 +42,12 @@ class TypeFormsProvider(
         return createFormDef(typeDef, withDefinition)
     }
 
-    fun getNameForCopyOfTypeForm(formName: MLText): MLText {
-        return MLText(
-            formName.getValues().entries.associate {
-                var newValue = it.value
-                NAME_REPLACEMENTS_FOR_DEFAULT_FORM_COPY.forEach { replacement ->
-                    if (newValue.contains(replacement.key)) {
-                        newValue = newValue.replace(replacement.key, replacement.value)
-                    }
-                }
-                it.key to newValue
-            }
-        )
-    }
-
     private fun createFormDef(typeDef: EntityWithMeta<TypeDef>, withDefinition: Boolean): EntityWithMeta<EcosFormDef> {
-
-        val name = MLText(
-            DEFAULT_NAME_PREFIXES.entries.associate { (locale, name) ->
-                locale to (name + typeDef.entity.name.getClosest(locale).ifBlank { typeDef.entity.id })
-            }
-        )
 
         val formBuilder = formBuilderFactory.createBuilder()
         formBuilder.withId("${getType()}$${typeDef.entity.id}")
             .withWidth(EcosFormWidth.MEDIUM)
-            .withTitle(name)
+            .withTitle(typeDef.entity.name)
 
         if (withDefinition) {
             typeDef.entity.model.attributes.forEach {
