@@ -72,7 +72,7 @@ class TypeJournalsProvider(
                     JournalColumnDef.create()
                         .withId(it.id)
                         .withType(it.type)
-                        .withName(name)
+                        .withName(it.name)
                         .build()
                 }
             )
