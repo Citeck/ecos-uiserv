@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class EcosFormServiceImpl implements EcosFormService {
 
-    private static final String VALID_ID_PATTERN_TXT = "^[\\w/.-]+\\w$";
+    private static final String VALID_ID_PATTERN_TXT = "^[\\w/.-:]+\\w$";
     private static final Pattern VALID_ID_PATTERN = Pattern.compile(VALID_ID_PATTERN_TXT);
 
     private static final String DEFAULT_KEY = "DEFAULT";
