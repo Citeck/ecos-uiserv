@@ -5,10 +5,10 @@
     "en": "Journal form"
   },
   "description": {},
-  "system": true,
   "customModule": null,
   "typeRef": "emodel/type@journal",
   "width": "lg",
+  "system": true,
   "i18n": {
     "ru": {
       "Load columns": "Загрузить колонки",
@@ -49,10 +49,7 @@
       "Control": "Контрол",
       "Config": "Конфигурация",
       "columnFormatter": "Форматтер",
-      "tooltip.actionFromType": "empty (null) - если actions и actionsDef пустые, то добавляем действия из типа\ntrue - всегда добавляем действия из типа\nfalse - никогда не добавляем из типа",
-      "Main": "Основные",
-      "Actions": "Действия",
-      "Advanced": "Расширенные"
+      "tooltip.actionFromType": "empty (null) - если actions и actionsDef пустые, то добавляем действия из типа\ntrue - всегда добавляем действия из типа\nfalse - никогда не добавляем из типа"
     },
     "en": {
       "Load columns": "Load columns",
@@ -94,9 +91,6 @@
       "Config": "Config",
       "columnFormatter": "Formatter",
       "tooltip.actionFromType": "empty (null) - if `actions` and `actionsDef` is empty, then add actions from type\ntrue - always add actions from type\nfalse - never add actions from type",
-      "Main": "Main",
-      "Actions": "Actions",
-      "Advanced": "Advanced",
       "Add columns": "Add columns"
     }
   },
@@ -109,7 +103,10 @@
         "key": "tabs2",
         "components": [
           {
-            "label": "Main",
+            "label": {
+              "en": "Main",
+              "ru": "Основные"
+            },
             "key": "main",
             "components": [
               {
@@ -133,7 +130,7 @@
                               "ru": "Идентификатор журнала",
                               "en": "Journal ID"
                             },
-                            "key": "localId",
+                            "key": "id",
                             "validate": {
                               "required": true
                             },
@@ -170,6 +167,11 @@
                               "en": "Journal name"
                             },
                             "key": "name",
+                            "validate": {
+                              "required": true
+                            },
+                            "refreshOn": [],
+                            "optionalWhenDisabled": false,
                             "type": "mlText",
                             "input": true
                           },
@@ -577,7 +579,10 @@
             ]
           },
           {
-            "label": "Actions",
+            "label": {
+              "ru": "Действия",
+              "en": "Actions"
+            },
             "key": "actions",
             "components": [
               {
@@ -649,6 +654,13 @@
                         "execForQueryOptions": {
                           "execAsForRecords": false
                         },
+                        "textArea": "",
+                        "predicate2": "",
+                        "actionsDef": {
+                          "predicate": ""
+                        },
+                        "predicate": "",
+                        "predicate:json": "",
                         "confirm": {
                           "title": {
                             "ru": "",
@@ -746,6 +758,23 @@
                             "refreshOn": [],
                             "type": "mlText",
                             "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "Предикат",
+                              "en": "Action Predicate"
+                            },
+                            "key": "predicate",
+                            "editor": "ace",
+                            "defaultValue": "",
+                            "inputFormat": "raw",
+                            "refreshOn": [],
+                            "properties": {
+                              "dataType": "json"
+                            },
+                            "as": "json",
+                            "type": "textarea",
+                            "input": true
                           }
                         ],
                         "row": "0-0"
@@ -772,7 +801,7 @@
                             },
                             "tooltip": {
                               "en": "Link to a module, which contains JS code",
-                              "ru": "Cсылка на модуль, содержащий JS код"
+                              "ru": "Ссылка на модуль, содержащий JS код"
                             },
                             "key": "preActionModule",
                             "defaultValue": "",
@@ -996,7 +1025,10 @@
             ]
           },
           {
-            "label": "Advanced",
+            "label": {
+              "en": "Advanced",
+              "ru": "Расширенные настройки"
+            },
             "key": "advanced",
             "components": [
               {

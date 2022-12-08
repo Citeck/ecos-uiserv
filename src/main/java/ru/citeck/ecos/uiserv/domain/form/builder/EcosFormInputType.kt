@@ -9,7 +9,12 @@ enum class EcosFormInputType(val typeId: String) {
     NUMBER("number"),
     CHECKBOX("checkbox"),
     JOURNAL("selectJournal"),
+    ORGSTRUCT_AUTHORITY("selectOrgstruct"),
+    ORGSTRUCT_PERSON("selectOrgstruct"),
+    ORGSTRUCT_GROUP("selectOrgstruct"),
     DATETIME("datetime"),
+    JSON("textarea"),
+    FILE("file"),
     DATE("datetime");
 
     companion object {
@@ -23,6 +28,11 @@ enum class EcosFormInputType(val typeId: String) {
                 AttributeType.DATE -> DATE
                 AttributeType.DATETIME -> DATETIME
                 AttributeType.ASSOC -> JOURNAL
+                AttributeType.AUTHORITY -> ORGSTRUCT_AUTHORITY
+                AttributeType.AUTHORITY_GROUP -> ORGSTRUCT_GROUP
+                AttributeType.PERSON -> ORGSTRUCT_PERSON
+                AttributeType.JSON -> JSON
+                AttributeType.CONTENT -> FILE
                 else -> return TEXT_FIELD
             }
         }

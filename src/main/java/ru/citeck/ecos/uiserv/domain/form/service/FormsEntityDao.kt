@@ -12,6 +12,8 @@ interface FormsEntityDao {
 
     fun findByExtId(formId: String): EcosFormEntity?
 
+    fun findAllByExtIdIn(ids: Set<String>): Set<EcosFormEntity>
+
     fun save(entity: EcosFormEntity): EcosFormEntity
 
     fun findAll(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<EcosFormEntity>

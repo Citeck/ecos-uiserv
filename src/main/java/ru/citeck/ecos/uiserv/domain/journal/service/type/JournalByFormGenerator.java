@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef;
-import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
+import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JournalByFormGenerator {
 
-    public void fillData(JournalDef journal, EcosFormModel form) {
+    public void fillData(JournalDef journal, EcosFormDef form) {
         //journal.setLabel(form.getTitle());
         //journal.setColumns(readColumns(form.getDefinition().get("components"), new ArrayList<>()));
     }

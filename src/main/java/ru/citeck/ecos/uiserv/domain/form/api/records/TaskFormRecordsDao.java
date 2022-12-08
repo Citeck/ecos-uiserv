@@ -17,7 +17,7 @@ import ru.citeck.ecos.records2.request.query.RecordsQuery;
 import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
-import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
+import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
 import ru.citeck.ecos.uiserv.domain.form.service.FormDefUtils;
 
@@ -62,22 +62,22 @@ public class TaskFormRecordsDao extends LocalRecordsDao
     }
 
     @NotNull
-    private EcosFormModel queryForm(FormQuery formQuery) {
+    private EcosFormDef queryForm(FormQuery formQuery) {
 
         if (formQuery == null || RecordRef.isEmpty(formQuery.formRef)) {
-            return new EcosFormModel();
+            return EcosFormDef.create().build();
         }
 
-        EcosFormModel formById = formService.getFormById(formQuery.getFormRef().getId()).orElse(null);
+        EcosFormDef formById = formService.getFormById(formQuery.getFormRef().getId()).orElse(null);
         if (formById == null) {
-            return new EcosFormModel();
+            return EcosFormDef.create().build();
         }
 
-        EcosFormModel result = new EcosFormModel(formById);
+        EcosFormDef.Builder result = formById.copy();
         DataValue newDef = removeOutcomes(result.getDefinition().getData());
-        result.setDefinition(newDef.isNotNull() ? newDef.asObjectData() : ObjectData.create());
+        result.withDefinition(newDef.isNotNull() ? newDef.asObjectData() : ObjectData.create());
 
-        return result;
+        return result.build();
     }
 
     private List<RecordTaskActionsInfo> queryTasks(ActionsQuery actionsQuery) {
@@ -86,9 +86,9 @@ public class TaskFormRecordsDao extends LocalRecordsDao
             return Collections.emptyList();
         }
 
-        return actionsQuery.getRecordRefs().stream().map(ref -> {
-            return new RecordTaskActionsInfo(ref, queryTasks(ref));
-        }).collect(Collectors.toList());
+        return actionsQuery.getRecordRefs().stream().map(ref ->
+            new RecordTaskActionsInfo(ref, queryTasks(ref))
+        ).collect(Collectors.toList());
     }
 
     private List<TaskActionsInfo> queryTasks(RecordRef recordRef) {
@@ -118,15 +118,13 @@ public class TaskFormRecordsDao extends LocalRecordsDao
 
         for (TaskInfo task : currentTasks) {
 
-            EcosFormModel form = formService.getFormByKey(task.getFormKey()).orElse(null);
-            if (form == null || form.getDefinition() == null) {
+            EcosFormDef form = formService.getFormByKey(task.getFormKey()).orElse(null);
+            if (form == null || form.getDefinition().isEmpty()) {
                 continue;
             }
 
             ObjectData i18n = form.getI18n();
-            if (i18n == null) {
-                i18n = ObjectData.create();
-            } else {
+            if (i18n.isNotEmpty()) {
                 Locale locale = QueryContext.getCurrent().getLocale();
                 DataValue messages = i18n.get(locale.getLanguage());
                 if (messages.isNotNull()) {

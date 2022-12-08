@@ -8,6 +8,7 @@
   "customModule": null,
   "typeRef": "",
   "width": "lg",
+  "system": true,
   "i18n": {},
   "definition": {
     "components": [
@@ -179,8 +180,7 @@
         "defaultValue": [
           {
             "name": {
-              "ru": "",
-              "en": ""
+              "ru": ""
             },
             "type": "",
             "id": "",
@@ -224,6 +224,10 @@
                 },
                 "dataPreProcessingCode": "",
                 "valueProperty": "value",
+                "unavailableItems": {
+                  "isActive": true,
+                  "code": "value = _.get(data, 'columns', []).map(column => column.id);"
+                },
                 "defaultValue": "",
                 "refreshOn": [
                   "statusesAsyncData"
@@ -242,6 +246,8 @@
             },
             "key": "name",
             "refreshOn": [],
+            "calculateValue": "const { name } = row || {};\nlet statuses = _.get(data, 'typeRef') ? _.get(data, 'statusesAsyncData.values', []) : [];\n\nif (_.get(instance, 'options.formMode') === 'CREATE') {\n  let statusesFromOptions = _.get(instance, 'options.statuses', []);\n  \n  if (statusesFromOptions && statusesFromOptions.length) {\n    statuses = statusesFromOptions;\n  }\n}\n\nconst selectedStatus = (statuses || []).find(item => item.id === row.id);\nconst statusMlName = _.get(selectedStatus, 'mlName') || {};\nconst result = {\n  ...(_.isObject(name) ? name : {}),\n  ...statusMlName\n};\n\nif (_.isEmpty(statusMlName)) {\n  result[utils.getCurrentLocale()] = row.id;\n}\n\nvalue = { ...result };",
+            "allowCalculateOverride": true,
             "optionalWhenDisabled": false,
             "type": "mlText",
             "input": true,
@@ -285,7 +291,7 @@
                   "recordsScript": {
                     "script": "value = _.get(data, 'typeRef');",
                     "attributes": {
-                      "values": "model.statuses{id,name}[]"
+                      "values": "model.statuses{id,name,mlName:name?json}[]"
                     }
                   },
                   "forceLoad": false

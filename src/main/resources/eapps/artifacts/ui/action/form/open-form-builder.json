@@ -1,0 +1,11 @@
+{
+  "id": "open-form-builder",
+  "name": {
+    "ru": "Редактировать форму",
+    "en": "Edit form"
+  },
+  "type": "script",
+  "config": {
+    "fn": "Citeck.EcosFormBuilderUtils.showBuilderForRecord(record, context.mode === 'dashboard')"
+  }
+}

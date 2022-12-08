@@ -24,10 +24,6 @@ data class JournalSearchConfig(
         }
     }
 
-    fun withDelimiters(delimiters: List<String>): JournalSearchConfig {
-        return copy().withDelimiters(delimiters).build()
-    }
-
     fun copy(): Builder {
         return Builder(this)
     }

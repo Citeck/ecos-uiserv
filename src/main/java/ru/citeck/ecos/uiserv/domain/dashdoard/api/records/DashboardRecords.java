@@ -151,6 +151,7 @@ public class DashboardRecords extends AbstractRecordsDao
             query.getRecordRef(),
             query.getTypeRef(),
             query.getAuthority(),
+            query.scope,
             query.expandType,
             query.includeForAll
         ).map(DashboardRecord::new);
@@ -211,6 +212,7 @@ public class DashboardRecords extends AbstractRecordsDao
         private RecordRef recordRef;
         private RecordRef typeRef;
         private String authority;
+        private String scope;
         private boolean expandType = true;
         private boolean includeForAll = true;
     }

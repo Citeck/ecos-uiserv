@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.form.service;
 
+import kotlin.Pair;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.commons.data.entity.EntityMeta;
+import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.RecordsService;
@@ -18,7 +21,7 @@ import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.form.repo.EcosFormEntity;
-import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
+import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 import ru.citeck.ecos.uiserv.domain.form.service.provider.EcosFormsProvider;
 
 import java.util.*;
@@ -26,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,17 +37,41 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class EcosFormServiceImpl implements EcosFormService {
 
+    private static final String VALID_ID_PATTERN_TXT = "^[\\w/.:-]+\\w$";
+    private static final Pattern VALID_ID_PATTERN = Pattern.compile(VALID_ID_PATTERN_TXT);
+
     private static final String DEFAULT_KEY = "DEFAULT";
 
-    private final List<BiConsumer<EcosFormModel, EcosFormModel>> listeners = new CopyOnWriteArrayList<>();
+    private final List<BiConsumer<EntityWithMeta<EcosFormDef>, EntityWithMeta<EcosFormDef>>> listeners = new CopyOnWriteArrayList<>();
+    private final List<Consumer<EntityWithMeta<EcosFormDef>>> deleteListeners = new CopyOnWriteArrayList<>();
 
     private final FormsEntityDao formsEntityDao;
     private final RecordsService recordsService;
 
-    private final Map<String, EcosFormsProvider> resolvers = new ConcurrentHashMap<>();
+    private final Map<String, EcosFormsProvider> providers = new ConcurrentHashMap<>();
 
     @Override
-    public void addChangeListener(BiConsumer<EcosFormModel, EcosFormModel> listener) {
+    public void addDeleteListener(Consumer<EntityWithMeta<EcosFormDef>> listener) {
+        deleteListeners.add(listener);
+    }
+
+    @Override
+    public void addChangeListener(BiConsumer<EcosFormDef, EcosFormDef> listener) {
+        listeners.add((before, after) -> {
+            EcosFormDef beforeDef = null;
+            if (before != null) {
+                beforeDef = before.getEntity();
+            }
+            EcosFormDef afterDef = null;
+            if (after != null) {
+                afterDef = after.getEntity();
+            }
+            listener.accept(beforeDef, afterDef);
+        });
+    }
+
+    @Override
+    public void addChangeWithMetaListener(BiConsumer<EntityWithMeta<EcosFormDef>, EntityWithMeta<EcosFormDef>> listener) {
         listeners.add(listener);
     }
 
@@ -72,31 +100,79 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
-    public List<EcosFormModel> getAllForms(Predicate predicate, int max, int skip, List<SortBy> sort) {
+    public List<EcosFormDef> getAllForms(Predicate predicate, int max, int skip, List<SortBy> sort) {
+        return formsEntityDao.findAll(predicate, max, skip, sort).stream()
+            .map(this::mapToDto)
+            .map(EntityWithMeta::getEntity)
+            .collect(Collectors.toList());
+    }
+
+    private List<EntityWithMeta<EcosFormDef>> getAllFormsWithMeta(
+        Predicate predicate, int max, int skip, List<SortBy> sort) {
         return formsEntityDao.findAll(predicate, max, skip, sort).stream()
             .map(this::mapToDto)
             .collect(Collectors.toList());
     }
 
+    @Override
+    public List<EntityWithMeta<EcosFormDef>> getFormsByIds(List<String> ids) {
+
+        Map<String, Integer> idsToRequestFromDb = new HashMap<>();
+        List<Pair<EntityWithMeta<EcosFormDef>, Integer>> result = new ArrayList<>();
+        int idx = 0;
+        for (String id : ids) {
+            if (id.contains("$")) {
+                String providerId = id.substring(0, id.indexOf('$'));
+                if (providers.containsKey(providerId)) {
+                    Optional<EcosFormDef> formById = getFormById(id);
+                    if (formById.isPresent()) {
+                        result.add(new Pair<>(new EntityWithMeta<>(formById.get(), EntityMeta.EMPTY), idx));
+                    }
+                } else {
+                    idsToRequestFromDb.put(id, idx);
+                }
+            } else {
+                idsToRequestFromDb.put(id, idx);
+            }
+            idx++;
+        }
+
+        formsEntityDao.findAllByExtIdIn(idsToRequestFromDb.keySet()).stream()
+            .map(this::mapToDto)
+            .forEach(v ->
+                result.add(new Pair<>(v, idsToRequestFromDb.getOrDefault(v.getEntity().getId(), 0))));
+
+        result.sort(Comparator.comparing(Pair<EntityWithMeta<EcosFormDef>, Integer>::getSecond));
+
+        return result.stream()
+            .map(Pair::getFirst)
+            .collect(Collectors.toList());
+    }
 
     @Override
-    public List<EcosFormModel> getAllForms(int max, int skip) {
+    public List<EcosFormDef> getAllForms(int max, int skip) {
         return getAllForms(VoidPredicate.INSTANCE, max, skip, Collections.emptyList());
     }
 
     @Override
-    public EcosFormModel getDefault() {
+    public List<EntityWithMeta<EcosFormDef>> getAllFormsWithMeta(int max, int skip) {
+        return getAllFormsWithMeta(VoidPredicate.INSTANCE, max, skip, Collections.emptyList());
+    }
+
+    @Override
+    public EcosFormDef getDefault() {
         return getFormByKey(DEFAULT_KEY).orElseThrow(() -> new IllegalStateException("Default form is not found!"));
     }
 
     @Override
-    public Optional<EcosFormModel> getFormByKey(String formKey) {
+    public Optional<EcosFormDef> getFormByKey(String formKey) {
         return Optional.ofNullable(formsEntityDao.findFirstByFormKey(formKey))
-            .map(this::mapToDto);
+            .map(this::mapToDto)
+            .map(EntityWithMeta::getEntity);
     }
 
     @Override
-    public Optional<EcosFormModel> getFormByKey(List<String> formKeys) {
+    public Optional<EcosFormDef> getFormByKey(List<String> formKeys) {
 
         if (CollectionUtils.isEmpty(formKeys)) {
             return Optional.empty();
@@ -110,7 +186,7 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
-    public List<EcosFormModel> getFormsByKeys(List<String> formKeys) {
+    public List<EcosFormDef> getFormsByKeys(List<String> formKeys) {
 
         if (CollectionUtils.isEmpty(formKeys)) {
             return new ArrayList<>();
@@ -125,63 +201,79 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
-    public Optional<EcosFormModel> getFormById(String id) {
+    public Optional<EcosFormDef> getFormById(String id) {
         if (StringUtils.isBlank(id)) {
             return Optional.empty();
         }
         if (id.contains("$")) {
             String resolverId = id.substring(0, id.indexOf('$'));
-            EcosFormsProvider resolver = resolvers.get(resolverId);
+            EcosFormsProvider resolver = providers.get(resolverId);
             if (resolver != null) {
                 return Optional.ofNullable(
                     resolver.getFormById(id.substring(resolverId.length() + 1))
-                ).map(model -> {
-                    if (StringUtils.isBlank(model.getId())) {
-                        model.setId(id);
+                ).map(formDefWithMeta -> {
+                    if (StringUtils.isBlank(formDefWithMeta.getEntity().getId())) {
+                        return formDefWithMeta.getEntity().copy().withId(id).build();
                     }
-                    return model;
+                    return formDefWithMeta.getEntity();
                 });
             }
         }
         return Optional.ofNullable(formsEntityDao.findByExtId(id))
-            .map(this::mapToDto);
+            .map(this::mapToDto)
+            .map(EntityWithMeta::getEntity);
     }
 
     @Override
-    public String save(EcosFormModel model) {
+    public String save(EcosFormDef model) {
+
+        if (model.getId().contains("$")) {
+            throw new RuntimeException("You can't change generated form: '" + model.getId() + "'");
+        }
 
         EcosFormEntity entityBefore = formsEntityDao.findByExtId(model.getId());
-        EcosFormModel formDtoBefore = null;
+        EntityWithMeta<EcosFormDef> formDtoBefore = null;
         if (entityBefore != null) {
             formDtoBefore = mapToDto(entityBefore);
+        } else {
+            if (!VALID_ID_PATTERN.matcher(model.getId()).matches()) {
+                throw new IllegalArgumentException("Invalid id: '" + model.getId() + "'");
+            }
         }
 
         EcosFormEntity entity = formsEntityDao.save(mapToEntity(model));
-        EcosFormModel result = mapToDto(entity);
+        EntityWithMeta<EcosFormDef> result = mapToDto(entity);
 
-        for (BiConsumer<EcosFormModel, EcosFormModel> listener : listeners) {
+        for (BiConsumer<EntityWithMeta<EcosFormDef>, EntityWithMeta<EcosFormDef>> listener : listeners) {
             listener.accept(formDtoBefore, result);
         }
 
-        return result.getId();
+        return result.getEntity().getId();
     }
 
     @Override
     public void delete(String id) {
-        Optional.ofNullable(formsEntityDao.findByExtId(id))
-            .ifPresent(formsEntityDao::delete);
+        EcosFormEntity entity = formsEntityDao.findByExtId(id);
+        if (entity != null) {
+            EntityWithMeta<EcosFormDef> dtoBefore = mapToDto(entity);
+            formsEntityDao.delete(entity);
+            for (Consumer<EntityWithMeta<EcosFormDef>> listener : deleteListeners) {
+                listener.accept(dtoBefore);
+            }
+        }
     }
 
     @Override
-    public List<EcosFormModel> getFormsForExactType(RecordRef typeRef) {
+    public List<EcosFormDef> getFormsForExactType(RecordRef typeRef) {
         List<EcosFormEntity> forms = formsEntityDao.findAllByTypeRef(typeRef.toString());
         return forms.stream()
             .map(this::mapToDto)
+            .map(EntityWithMeta::getEntity)
             .collect(Collectors.toList());
     }
 
     @Override
-    public List<EcosFormModel> getAllFormsForType(RecordRef typeRef) {
+    public List<EcosFormDef> getAllFormsForType(RecordRef typeRef) {
 
         List<EcosFormEntity> forms = new ArrayList<>();
         Set<String> formIds = new HashSet<>();
@@ -210,31 +302,39 @@ public class EcosFormServiceImpl implements EcosFormService {
             log.error("Parents forms can't be received", e);
         }
 
-        return forms.stream().map(this::mapToDto).collect(Collectors.toList());
+        return forms.stream()
+            .map(this::mapToDto)
+            .map(EntityWithMeta::getEntity)
+            .collect(Collectors.toList());
     }
 
-    private EcosFormModel mapToDto(EcosFormEntity entity) {
+    private EntityWithMeta<EcosFormDef> mapToDto(EcosFormEntity entity) {
 
-        EcosFormModel model = new EcosFormModel();
+        EcosFormDef model = EcosFormDef.create()
+            .withId(entity.getExtId())
+            .withTitle(Json.getMapper().read(entity.getTitle(), MLText.class))
+            .withDescription(Json.getMapper().read(entity.getDescription(), MLText.class))
+            .withWidth(entity.getWidth())
+            .withFormKey(entity.getFormKey())
+            .withTypeRef(RecordRef.valueOf(entity.getTypeRef()))
+            .withCustomModule(entity.getCustomModule())
+            .withI18n(Json.getMapper().read(entity.getI18n(), ObjectData.class))
+            .withAttributes(Json.getMapper().read(entity.getAttributes(), ObjectData.class))
+            .withDefinition(Json.getMapper().read(entity.getDefinition(), ObjectData.class))
+            .withSystem(entity.getSystem())
+            .build();
 
-        model.setId(entity.getExtId());
-        model.setTitle(Json.getMapper().read(entity.getTitle(), MLText.class));
-        model.setDescription(Json.getMapper().read(entity.getDescription(), MLText.class));
+        EntityMeta meta = EntityMeta.create()
+            .withCreated(entity.getCreatedDate())
+            .withCreator(entity.getCreatedBy())
+            .withModified(entity.getLastModifiedDate())
+            .withModifier(entity.getLastModifiedBy())
+            .build();
 
-        model.setWidth(entity.getWidth());
-        model.setFormKey(entity.getFormKey());
-        model.setTypeRef(RecordRef.valueOf(entity.getTypeRef()));
-        model.setCustomModule(entity.getCustomModule());
-
-        model.setI18n(Json.getMapper().read(entity.getI18n(), ObjectData.class));
-        model.setAttributes(Json.getMapper().read(entity.getAttributes(), ObjectData.class));
-        model.setDefinition(Json.getMapper().read(entity.getDefinition(), ObjectData.class));
-        model.setSystem(entity.getSystem());
-
-        return model;
+        return new EntityWithMeta<>(model, meta);
     }
 
-    private EcosFormEntity mapToEntity(EcosFormModel model) {
+    private EcosFormEntity mapToEntity(EcosFormDef model) {
 
         EcosFormEntity entity = null;
         if (!StringUtils.isBlank(model.getId())) {
@@ -265,7 +365,7 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     @Override
     public void register(EcosFormsProvider resolver) {
-        this.resolvers.put(resolver.getType(), resolver);
+        this.providers.put(resolver.getType(), resolver);
     }
 
     @Data

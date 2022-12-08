@@ -14,7 +14,8 @@ actions:
   - uiserv/action@delete
   - uiserv/action@edit-form
   - uiserv/action@edit-json
-  - uiserv/action@module-copy
+  - uiserv/action@record-copy
+  - uiserv/action@view-dashboard
 
 columns:
 
@@ -28,10 +29,13 @@ columns:
 
   - id: title
     name: { ru: Название, en: Name }
-    type: TEXT
+    type: MLTEXT
+    sortable: false
 
   - id: description
     name: { ru: Описание, en: Description }
+    type: MLTEXT
+    sortable: false
 
   - id: system
     type: BOOLEAN

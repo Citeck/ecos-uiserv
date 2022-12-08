@@ -4,8 +4,7 @@
     "en": "Default form",
     "ru": "Форма по умолчанию"
   },
-  "system": true,
-  "formKey": "DEFAULT",
+  "system": false,
   "customModule": null,
   "definition": {
     "display": "form",

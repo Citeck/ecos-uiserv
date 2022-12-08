@@ -29,6 +29,7 @@ class ConfigsMigration(
             "menu-group-priority",
             "orgstruct-allUsers-group-shortName",
             "orgstruct-search-user-extra-fields",
+            "orgstruct-search-user-middle-name",
             "restrict-access-to-edit-dashboard",
             "separate-action-list-for-query",
             "site-dashboard-enable",

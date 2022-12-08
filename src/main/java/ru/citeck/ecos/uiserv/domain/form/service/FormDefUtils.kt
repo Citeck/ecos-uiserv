@@ -6,7 +6,7 @@ object FormDefUtils {
 
     @JvmStatic
     fun mapInputComponents(component: DataValue, action: (DataValue) -> DataValue?): DataValue? {
-        return mapComponents(component, { it.get("input").asBoolean(false) }, action)
+        return mapComponents(component, { it["input"].asBoolean(false) }, action)
     }
 
     @JvmStatic
@@ -23,7 +23,7 @@ object FormDefUtils {
         }
 
         val innerKey = getInnerComponentsKey(result)
-        val inner = result.get(innerKey)
+        val inner = result[innerKey]
         if (inner.isArray()) {
             val mappedInner = DataValue.createArr()
             for (value in inner) {
@@ -36,7 +36,7 @@ object FormDefUtils {
                     mappedInner.add(mappedValue)
                 }
             }
-            result.set(innerKey, mappedInner)
+            result[innerKey] = mappedInner
         }
 
         return result
@@ -48,17 +48,17 @@ object FormDefUtils {
         if (attribute.isNotBlank()) {
             return attribute
         }
-        return component.get("key").asText()
+        return component["key"].asText()
     }
 
     @JvmStatic
     fun getInnerComponents(component: DataValue): DataValue {
-        return component.get(getInnerComponentsKey(component))
+        return component[getInnerComponentsKey(component)]
     }
 
     @JvmStatic
     fun getInnerComponentsKey(component: DataValue): String {
-        return if (component.get("type").asText() == "columns") {
+        return if (component["type"].asText() == "columns") {
             "columns"
         } else {
             "components"

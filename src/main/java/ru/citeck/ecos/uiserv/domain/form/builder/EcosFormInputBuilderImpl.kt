@@ -23,6 +23,7 @@ open class EcosFormInputBuilderImpl(
 
         private const val JOURNAL_ID = "journalId"
         private const val TYPE_REF = "typeRef"
+        private const val ALLOWED_AUTHORITY_TYPE = "allowedAuthorityType"
     }
 
     private val data = DataValue.createObj()
@@ -32,24 +33,28 @@ open class EcosFormInputBuilderImpl(
         data[INPUT] = true
         data[MULTIPLE] = false
 
-        if (type == EcosFormInputType.DATE) {
-            data[ENABLE_TIME] = false
-        } else if (type == EcosFormInputType.DATETIME) {
-            data[ENABLE_TIME] = true
-        }
-
-        if (type == EcosFormInputType.JOURNAL) {
-            if (config.has(TYPE_REF)) {
-                val journalRef = context.getJournalRefByType(
-                    config[TYPE_REF].getAs(RecordRef::class.java) ?: RecordRef.EMPTY
-                )
-                if (RecordRef.isNotEmpty(journalRef)) {
-                    data[JOURNAL_ID] = journalRef.id
+        when (type) {
+            EcosFormInputType.DATE -> data[ENABLE_TIME] = false
+            EcosFormInputType.DATETIME -> data[ENABLE_TIME] = true
+            EcosFormInputType.JOURNAL -> {
+                if (config.has(TYPE_REF)) {
+                    val journalRef = context.getJournalRefByType(
+                        config[TYPE_REF].getAs(RecordRef::class.java) ?: RecordRef.EMPTY
+                    )
+                    if (RecordRef.isNotEmpty(journalRef)) {
+                        data[JOURNAL_ID] = journalRef.id
+                    }
+                }
+                if (!data.has(JOURNAL_ID)) {
+                    data[JOURNAL_ID] = "search"
                 }
             }
-            if (!data.has(JOURNAL_ID)) {
-                data[JOURNAL_ID] = "search"
-            }
+            EcosFormInputType.ORGSTRUCT_AUTHORITY -> data[ALLOWED_AUTHORITY_TYPE] = "USER, GROUP"
+            EcosFormInputType.ORGSTRUCT_PERSON -> data[ALLOWED_AUTHORITY_TYPE] = "USER"
+            EcosFormInputType.ORGSTRUCT_GROUP -> data[ALLOWED_AUTHORITY_TYPE] = "GROUP"
+            EcosFormInputType.JSON -> data["editor"] = "ace"
+            EcosFormInputType.FILE -> data["storage"] = "base64"
+            else -> {}
         }
     }
 

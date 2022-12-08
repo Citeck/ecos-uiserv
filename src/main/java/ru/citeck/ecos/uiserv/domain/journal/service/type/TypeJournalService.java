@@ -145,7 +145,7 @@ public class TypeJournalService {
     private Optional<JournalWithMeta> getJournalByFormIdImpl(String formId) {
 
         return Optional.empty();
-        /*EcosFormModel form = formService.getFormById(formId).orElse(null);
+        /*EcosFormDef form = formService.getFormById(formId).orElse(null);
         if (form == null) {
             return Optional.empty();
         }

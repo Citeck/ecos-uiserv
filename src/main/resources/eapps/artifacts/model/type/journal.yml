@@ -4,9 +4,14 @@ name:
   en: Journal
   ru: Журнал
 
+sourceId: uiserv/journal
+
 system: true
 
-sourceId: uiserv/journal
+actions:
+  - uiserv/action@download-base64-data-yml
+  - uiserv/action@record-copy
+  - uiserv/action@delete
 
 formRef: uiserv/form@journal-form
 journalRef: uiserv/journal@ecos-journals
@@ -20,7 +25,7 @@ createVariants:
 
   - id: upload-journal
     name: { ru: Загрузить журнал, en: Upload journal }
-    formRef: uiserv/form@ecos-module-upload
+    formRef: 'uiserv/form@ecos-artifact-upload'
 
 model:
   attributes:

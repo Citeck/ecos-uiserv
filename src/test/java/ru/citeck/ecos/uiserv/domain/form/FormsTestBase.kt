@@ -26,7 +26,7 @@ abstract class FormsTestBase {
         recordsService = services.recordsServiceV1
         ecosFormService = EcosFormServiceImpl(FormsEntityInMemDao(services.predicateService), services.recordsService)
 
-        val formsRecordsDao = EcosFormRecordsDao(ecosFormService)
+        val formsRecordsDao = EcosFormRecordsDao(ecosFormService, null)
         recordsService.register(formsRecordsDao)
 
         val typeService = Mockito.mock(EcosTypeService::class.java)

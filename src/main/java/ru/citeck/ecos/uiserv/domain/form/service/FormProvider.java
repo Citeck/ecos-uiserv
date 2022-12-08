@@ -1,6 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.form.service;
 
-import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
+import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 
 import java.util.List;
 
@@ -8,13 +8,13 @@ public interface FormProvider {
 
     int getCount();
 
-    List<EcosFormModel> getAllForms(int max, int skip);
+    List<EcosFormDef> getAllForms(int max, int skip);
 
-    EcosFormModel getFormByKey(String formKey);
+    EcosFormDef getFormByKey(String formKey);
 
-    EcosFormModel getFormByKeyAndMode(String formKey, String formMode);
+    EcosFormDef getFormByKeyAndMode(String formKey, String formMode);
 
-    EcosFormModel getFormById(String id);
+    EcosFormDef getFormById(String id);
 
     int getOrder();
 }

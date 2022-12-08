@@ -22,7 +22,7 @@ class MenuInMemDao : MenuDao {
 
     override fun findAllByAuthoritiesContains(authority: String): List<MenuEntity> {
         return data.values.filter { menu ->
-            menu.authorities?.map { it.toLowerCase() }?.contains(authority) ?: false
+            menu.authorities?.map { it.lowercase() }?.contains(authority) ?: false
         }
     }
 

@@ -5,6 +5,7 @@ import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
+import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
@@ -16,6 +17,8 @@ import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeAttsUtils
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
 import ru.citeck.ecos.uiserv.domain.form.service.FormDefUtils
+import ru.citeck.ecos.webapp.api.entity.EntityRef
+import ru.citeck.ecos.webapp.api.entity.ifEmpty
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 
 @Component
@@ -44,9 +47,9 @@ class EcosResolvedFormRecordsDao(
     }
 
     private fun mapToResolvedRecord(form: EcosFormRecord): ResolvedFormRecord {
-        var typeRef = form.typeRef
+        var typeRef = form.def.typeRef
         if (RecordRef.isEmpty(typeRef)) {
-            typeRef = ecosTypeService.getTypeRefByForm(RecordRef.create("uiserv", "form", form.id))
+            typeRef = ecosTypeService.getTypeRefByForm(RecordRef.create("uiserv", "form", form.def.id))
         }
         val typeInfo = ecosTypeService.getTypeInfo(typeRef)
         return ResolvedFormRecord(form, typeInfo, formService)
@@ -61,8 +64,13 @@ class EcosResolvedFormRecordsDao(
         val typeInfo: TypeDef?,
         val formService: EcosFormService
     ) {
+
+        fun getTypeRef(): EntityRef {
+            return form.def.typeRef.ifEmpty { TypeUtils.getTypeRef(typeInfo?.id ?: "base") }
+        }
+
         fun getDefinition(): ObjectData {
-            val definition: ObjectData = form.definition
+            val definition: ObjectData = form.def.definition
             val attributes = typeInfo?.model?.getAllAttributes()?.associateBy { it.id } ?: emptyMap()
             val mappedDef = FormDefUtils.mapComponents(definition.getData().copy(), { true }) {
                 mapComponent(it, attributes)
@@ -81,7 +89,7 @@ class EcosResolvedFormRecordsDao(
                     return component
                 }
                 val formDef = formService.getFormById(formRef.id).orElse(null)
-                if (formDef != null && formDef.definition != null) {
+                if (formDef?.definition != null) {
                     val components = formDef.definition["components"]
                     if (components.isArray()) {
                         return components

@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public interface JournalService {
 
@@ -26,6 +27,8 @@ public interface JournalService {
     long getCount();
 
     long getCount(Predicate predicate);
+
+    void onJournalDeleted(Consumer<JournalWithMeta> consumer);
 
     void onJournalChanged(BiConsumer<JournalDef, JournalDef> consumer);
 

@@ -31,8 +31,6 @@ class TypeJournalsProvider(
 
     private fun createJournalDef(typeDef: TypeDef): JournalDef {
 
-        // if (!typeDef.journalRef.id.startsWith())
-
         return JournalDef.create {
             withName(typeDef.name)
             withTypeRef(TypeUtils.getTypeRef(typeDef.id))

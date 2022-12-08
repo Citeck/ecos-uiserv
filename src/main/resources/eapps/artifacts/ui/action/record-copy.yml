@@ -1,0 +1,14 @@
+
+id: record-copy
+
+name:
+  ru: Копировать
+  en: Copy
+
+type: record-copy
+
+predicate:
+  t: and
+  val:
+    - { t: not-eq, a: '?localId', v: 'DEFAULT_FORM' }
+    - { t: not-eq, a: '?localId', v: 'DEFAULT_JOURNAL' }

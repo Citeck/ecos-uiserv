@@ -10,24 +10,29 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
+import ru.citeck.ecos.context.lib.auth.AuthRole;
 import ru.citeck.ecos.events2.type.RecordEventsService;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.PredicateService;
+import ru.citeck.ecos.records2.predicate.PredicateUtils;
+import ru.citeck.ecos.records2.predicate.model.AttributePredicate;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate;
-import ru.citeck.ecos.records3.record.atts.schema.resolver.AttSchemaResolver;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
 import ru.citeck.ecos.records3.record.dao.delete.RecordDeleteDao;
 import ru.citeck.ecos.records3.record.dao.delete.DelStatus;
 import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao;
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.QueryPage;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
-import ru.citeck.ecos.records3.record.request.RequestContext;
-import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel;
+import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
+import ru.citeck.ecos.uiserv.domain.form.registry.FormsRegistryConfiguration;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
+import ru.citeck.ecos.uiserv.domain.form.service.provider.TypeFormsProvider;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -37,7 +42,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class EcosFormRecordsDao extends AbstractRecordsDao
     implements RecordsQueryDao,
-    RecordMutateDtoDao<EcosFormRecord>,
+    RecordMutateDtoDao<EcosFormMutRecord>,
     RecordDeleteDao,
     RecordAttsDao {
 
@@ -45,12 +50,30 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
 
     private static final String FORMS_FOR_TYPE_LANG = "forms-for-type";
 
+    // form with default content for new forms
     private static final String DEFAULT_FORM_ID = "DEFAULT";
+    // form to create and edit any form metadata and definition
     private static final String ECOS_FORM_ID = "ECOS_FORM";
 
-    private static final Set<String> SYSTEM_FORMS = new HashSet<>(Arrays.asList(DEFAULT_FORM_ID, ECOS_FORM_ID));
+    private static final String DEFAULT_AUTO_FORM_FOR_TYPE = "DEFAULT_FORM";
+
+    private static final Map<String, String> ATTS_MAPPING;
+
+    public static final Set<String> SYSTEM_FORMS = new HashSet<>(Arrays.asList(
+        DEFAULT_AUTO_FORM_FOR_TYPE,
+        DEFAULT_FORM_ID,
+        ECOS_FORM_ID
+    ));
+
+    static {
+        ATTS_MAPPING = new HashMap<>();
+        ATTS_MAPPING.put("moduleId", "id");
+    }
 
     private final EcosFormService ecosFormService;
+    @Nullable
+    private final TypeFormsProvider typeFormsProvider;
+
     private RecordEventsService recordEventsService;
 
     @PostConstruct
@@ -68,25 +91,27 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
         return ID;
     }
 
-    @Secured({"ROLE_ADMIN"})
+    @Secured({ AuthRole.ADMIN })
     @Override
-    public EcosFormRecord getRecToMutate(@NotNull String formId) {
-        return toRecord(Optional.of(formId)
-            .filter(str -> !str.isEmpty())
-            .map(x -> ecosFormService.getFormById(x)
-                .orElseThrow(() -> new IllegalArgumentException("Form with id " + formId + " not found!")))
-            .map(EcosFormModel::new) //defensive copy, even though getFormById probably creates new instance
-            .orElseGet(EcosFormModel::new));
+    public EcosFormMutRecord getRecToMutate(@NotNull String formId) {
+        if (formId.isEmpty()) {
+            return new EcosFormMutRecord();
+        }
+        Optional<EcosFormDef> currentForm = ecosFormService.getFormById(formId);
+        if (!currentForm.isPresent()) {
+            throw new IllegalArgumentException("Form with id " + formId + " not found!");
+        }
+        return new EcosFormMutRecord(currentForm.get());
     }
 
-    private EcosFormRecord toRecord(EcosFormModel model) {
+    private EcosFormRecord toRecord(EcosFormDef model) {
         return new EcosFormRecord(model);
     }
 
     @NotNull
     @Override
-    public String saveMutatedRec(EcosFormRecord ecosFormModelRecord) {
-        return ecosFormService.save(ecosFormModelRecord);
+    public String saveMutatedRec(EcosFormMutRecord record) {
+        return ecosFormService.save(record.build());
     }
 
     @NotNull
@@ -104,9 +129,7 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
     @Override
     public EcosFormRecord getRecordAtts(@NotNull String formId) {
         if (formId.isEmpty()) {
-            final EcosFormModel form = new EcosFormRecord(new EcosFormModel());
-            form.setId("");
-            return toRecord(form);
+            return toRecord(EcosFormDef.create().build());
         }
         return ecosFormService.getFormById(formId)
             .map(this::toRecord)
@@ -144,27 +167,69 @@ public class EcosFormRecordsDao extends AbstractRecordsDao
             int max = page.getMaxItems();
             int skipCount = page.getSkipCount();
 
-            Predicate predicate = VoidPredicate.INSTANCE;
             if (PredicateService.LANGUAGE_PREDICATE.equals(recordsQuery.getLanguage())) {
-                predicate = recordsQuery.getQuery(Predicate.class);
+
+                Predicate predicate = PredicateUtils.mapAttributePredicates(
+                    recordsQuery.getQuery(Predicate.class),
+                    pred -> {
+                        if (ATTS_MAPPING.containsKey(pred.getAttribute())) {
+                            AttributePredicate copy = pred.copy();
+                            copy.setAttribute(ATTS_MAPPING.get(pred.getAttribute()));
+                            return copy;
+                        } else {
+                            return pred;
+                        }
+                    }
+                );
+
+                List<SortBy> mappedSortBy = recordsQuery.getSortBy().stream().map(it -> {
+                    if (ATTS_MAPPING.containsKey(it.getAttribute())) {
+                        return it.copy(b -> {
+                            b.setAttribute(ATTS_MAPPING.get(it.getAttribute()));
+                            return Unit.INSTANCE;
+                        });
+                    } else {
+                        return it;
+                    }
+                }).collect(Collectors.toList());
+
+                RecordsQuery registryQuery = recordsQuery.copy()
+                    .withSourceId(FormsRegistryConfiguration.FORMS_REGISTRY_SOURCE_ID)
+                    .withQuery(predicate)
+                    .withSortBy(mappedSortBy)
+                    .build();
+
+                RecsQueryRes<RecordRef> queryRes = recordsService.query(registryQuery);
+
+                List<EntityWithMeta<EcosFormDef>> journals = ecosFormService.getFormsByIds(queryRes.getRecords()
+                    .stream()
+                    .map(RecordRef::getId)
+                    .collect(Collectors.toList())
+                );
+                result.setRecords(journals.stream()
+                    .map(EntityWithMeta::getEntity)
+                    .map(this::toRecord)
+                    .collect(Collectors.toList()));
+                result.setTotalCount(queryRes.getTotalCount());
+
+            } else {
+                List<EcosFormRecord> forms = ecosFormService.getAllForms(
+                        VoidPredicate.INSTANCE,
+                        max,
+                        skipCount,
+                        recordsQuery.getSortBy()
+                    )
+                    .stream()
+                    .map(this::toRecord)
+                    .collect(Collectors.toList());
+
+                result.setRecords(forms);
+                result.setTotalCount(ecosFormService.getCount(VoidPredicate.INSTANCE));
             }
-
-            List<EcosFormRecord> forms = ecosFormService.getAllForms(
-                    predicate,
-                    max,
-                    skipCount,
-                    recordsQuery.getSortBy()
-                )
-                .stream()
-                .map(this::toRecord)
-                .collect(Collectors.toList());
-
-            result.setRecords(forms);
-            result.setTotalCount(ecosFormService.getCount(predicate));
             return result;
         }
 
-        Optional<EcosFormModel> form = Optional.empty();
+        Optional<EcosFormDef> form = Optional.empty();
 
         if (CollectionUtils.isNotEmpty(query.formKeys)) {
             List<EcosFormRecord> formsByKeys = ecosFormService.getFormsByKeys(query.formKeys)

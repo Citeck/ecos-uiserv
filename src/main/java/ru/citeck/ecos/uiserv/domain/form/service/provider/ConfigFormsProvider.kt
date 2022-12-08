@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.domain.form.service.provider
 
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
+import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.config.lib.dto.ConfigValueDef
 import ru.citeck.ecos.config.lib.dto.ConfigValueType
 import ru.citeck.ecos.config.lib.service.EcosConfigService
@@ -11,7 +12,7 @@ import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormBuilder
 import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormBuilderFactory
 import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormInputType
 import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormWidth
-import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormModel
+import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
 import javax.annotation.PostConstruct
 
@@ -28,16 +29,16 @@ class ConfigFormsProvider(
         ecosFormService.register(this)
     }
 
-    override fun getFormById(id: String): EcosFormModel? {
+    override fun getFormById(id: String): EntityWithMeta<EcosFormDef>? {
 
         val config = ecosConfigService.getConfig(id)
         val formBuilder = formBuilderFactory.createBuilder()
 
-        formBuilder.setWidth(EcosFormWidth.SMALL)
+        formBuilder.withWidth(EcosFormWidth.SMALL)
         addInput(formBuilder, config.valueDef)
         formBuilder.addCancelAndSubmitButtons()
 
-        return formBuilder.build()
+        return EntityWithMeta(formBuilder.build())
     }
 
     private fun addInput(formBuilder: EcosFormBuilder, valueDef: ConfigValueDef) {

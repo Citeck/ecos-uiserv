@@ -26,13 +26,11 @@
               "ru": "Название",
               "en": "Title"
             },
-            "key": "title",
+            "key": "name",
             "defaultValue": "",
             "refreshOn": [],
             "optionalWhenDisabled": false,
-            "properties": {
-              "attribute": "cm:title"
-            },
+            "properties": {},
             "type": "textfield",
             "input": true
           }

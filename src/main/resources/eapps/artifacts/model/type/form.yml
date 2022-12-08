@@ -8,6 +8,14 @@ sourceId: uiserv/form
 
 system: true
 
+actions:
+  - uiserv/action@debug-form
+  - uiserv/action@ecos-module-download
+  - uiserv/action@module-copy
+  - uiserv/action@open-localization-action-form
+  - uiserv/action@open-form-builder
+  - uiserv/action@delete
+
 formRef: uiserv/form@ECOS_FORM
 journalRef: uiserv/journal@ecos-forms
 
@@ -18,7 +26,7 @@ createVariants:
 
   - id: upload-form
     name: { ru: Загрузить форму, en: Upload form }
-    formRef: uiserv/form@ecos-module-upload
+    formRef: 'uiserv/form@ecos-artifact-upload'
 
 model:
   attributes:

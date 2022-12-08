@@ -1,6 +1,5 @@
 package ru.citeck.ecos.uiserv.domain.journal.api.records
 
-import ecos.com.fasterxml.jackson210.annotation.JsonProperty
 import ecos.com.fasterxml.jackson210.annotation.JsonValue
 import lombok.Data
 import lombok.RequiredArgsConstructor
@@ -9,10 +8,12 @@ import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.commons.json.YamlUtils
+import ru.citeck.ecos.context.lib.auth.AuthContext.isRunAsAdmin
 import ru.citeck.ecos.events2.type.RecordEventsService
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
+import ru.citeck.ecos.records3.record.atts.value.AttValue
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
 import ru.citeck.ecos.records3.record.dao.delete.DelStatus
@@ -26,8 +27,9 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalActionDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
-import ru.citeck.ecos.uiserv.domain.journal.registry.JournalsConfiguration
+import ru.citeck.ecos.uiserv.domain.journal.registry.JournalsRegistryConfiguration
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
+import ru.citeck.ecos.uiserv.domain.journal.service.JournalServiceImpl
 import java.nio.charset.StandardCharsets
 import java.util.*
 import javax.annotation.PostConstruct
@@ -83,7 +85,7 @@ class JournalRecordsDao(
             if (recsQuery.language == PredicateService.LANGUAGE_PREDICATE) {
 
                 val registryQuery = recsQuery.copy()
-                    .withSourceId(JournalsConfiguration.JOURNALS_REGISTRY_SOURCE_ID)
+                    .withSourceId(JournalsRegistryConfiguration.JOURNALS_REGISTRY_SOURCE_ID)
                     .build()
                 val queryRes = recordsService.query(registryQuery)
 
@@ -127,10 +129,6 @@ class JournalRecordsDao(
     }
 
     override fun saveMutatedRec(record: JournalMutateRec): String {
-        val localId = record.localId
-        if (!localId.isNullOrBlank()) {
-            record.withId(localId)
-        }
         return journalService.save(record.build()).journalDef.id
     }
 
@@ -192,6 +190,26 @@ class JournalRecordsDao(
         open fun getData(): ByteArray {
             return YamlUtils.toNonDefaultString(toNonDefaultJson()).toByteArray(StandardCharsets.UTF_8)
         }
+
+        open fun getPermissions(): Permissions? {
+            return Permissions()
+        }
+
+        inner class Permissions : AttValue {
+
+            override fun has(name: String): Boolean {
+                return if (name.equals("write", ignoreCase = true)) {
+                    val journalId: String = getLocalId()
+                    if (journalId.contains("$")) {
+                        false
+                    } else {
+                        isRunAsAdmin() && !JournalServiceImpl.SYSTEM_JOURNALS.contains(journalId)
+                    }
+                } else {
+                    name.equals("read", ignoreCase = true)
+                }
+            }
+        }
     }
 
     class ColumnAttValue(
@@ -205,21 +223,10 @@ class JournalRecordsDao(
 
     class JournalMutateRec(base: JournalDef) : JournalDef.Builder(base) {
 
-        var localId: String? = null
+        val originalId = base.id
 
-        init {
-            localId = base.id
-        }
-
-        fun setModuleId(moduleId: String) {
-            this.localId = moduleId
-        }
-
-        @JsonProperty("_content")
-        fun setContent(content: List<ObjectData>) {
-            val dataUriContent = content[0].get("url", "")
-            val data = mapper.read(dataUriContent, ObjectData::class.java)!!
-            mapper.applyData(this, data)
+        fun withModuleId(id: String) {
+            withId(id)
         }
     }
 }
