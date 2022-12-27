@@ -5,7 +5,7 @@
     "en": "Kanban board config"
   },
   "description": {},
-  "customModule": null,
+  "customModule": "",
   "typeRef": "",
   "width": "lg",
   "system": true,
@@ -77,9 +77,25 @@
                   "ru": "Возможно ли перемещать сущности между статусами",
                   "en": "Is it possible to move entities between states"
                 },
-                "key": "readOnly",
-                "refreshOn": [],
+                "key": "canDrag",
+                "persistent": false,
+                "refreshOn": [
+                  "recordAsyncData"
+                ],
+                "calculateValue": "const readOnly = _.get(data, 'recordAsyncData._readOnly');\n\nif (!_.isNil(readOnly)) {\n  value = !Boolean(readOnly);\n}\n",
+                "allowCalculateOverride": true,
+                "optionalWhenDisabled": false,
                 "type": "checkbox",
+                "input": true
+              },
+              {
+                "key": "readOnly",
+                "refreshOn": [
+                  "canDrag"
+                ],
+                "calculateValue": "value = !_.get(data, 'canDrag');",
+                "optionalWhenDisabled": false,
+                "type": "hidden",
                 "input": true
               }
             ],
@@ -251,7 +267,6 @@
             "optionalWhenDisabled": false,
             "type": "mlText",
             "input": true,
-            "addAnother": "ecos.forms.btn.add-another",
             "row": "0-1"
           }
         ]
@@ -271,7 +286,8 @@
                   "record": {
                     "id": "{{ recordId }}",
                     "attributes": {
-                      "typeRef": "typeRef?id"
+                      "typeRef": "typeRef?id",
+                      "_readOnly": "readOnly?bool"
                     }
                   },
                   "forceLoad": false
