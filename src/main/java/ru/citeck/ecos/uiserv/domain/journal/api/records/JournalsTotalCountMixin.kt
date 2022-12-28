@@ -12,15 +12,15 @@ import ru.citeck.ecos.records3.record.dao.query.dto.query.Consistency
 import ru.citeck.ecos.records3.record.dao.query.dto.query.QueryPage
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.mixin.AttMixin
+import ru.citeck.ecos.webapp.api.EcosWebAppApi
 import ru.citeck.ecos.webapp.api.constants.AppName
-import ru.citeck.ecos.webapp.api.context.EcosWebAppContext
 import javax.annotation.PostConstruct
 
 @Component
 class JournalsTotalCountMixin(
     val recordsService: RecordsService,
     val resolvedJournalRecordsDao: ResolvedJournalRecordsDao,
-    val ecosWebAppContext: EcosWebAppContext
+    val ecosWebAppContext: EcosWebAppApi
 ) : AttMixin {
 
     companion object {
@@ -41,7 +41,7 @@ class JournalsTotalCountMixin(
             return 0
         }
 
-        if (!ecosWebAppContext.getWebAppsApi().isAppAvailable(getAppName(sourceId))) {
+        if (!ecosWebAppContext.getRemoteWebAppsApi().isAppAvailable(getAppName(sourceId))) {
             return null
         }
 

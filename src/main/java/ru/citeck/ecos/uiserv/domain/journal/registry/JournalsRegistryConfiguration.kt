@@ -13,7 +13,7 @@ import ru.citeck.ecos.records3.record.dao.impl.ext.impl.ReadOnlyMapExtStorage
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
 import ru.citeck.ecos.uiserv.domain.journal.service.provider.TypeJournalsProvider
-import ru.citeck.ecos.webapp.api.lock.EcosLockService
+import ru.citeck.ecos.webapp.api.lock.EcosLockApi
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
 import java.time.Duration
@@ -21,7 +21,7 @@ import java.time.Duration
 @Configuration
 class JournalsRegistryConfiguration(
     private val hazelcast: HazelcastInstance,
-    private val appLockService: EcosLockService,
+    private val appLockService: EcosLockApi,
     private val journalsService: JournalService,
     private val typesRegistry: EcosTypesRegistry,
     private val typeJournalsProvider: TypeJournalsProvider

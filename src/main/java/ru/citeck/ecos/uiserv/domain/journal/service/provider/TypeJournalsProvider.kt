@@ -5,7 +5,6 @@ import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.context.lib.i18n.I18nContext
 import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
-import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records3.record.atts.schema.ScalarType
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
@@ -51,13 +50,15 @@ class TypeJournalsProvider(
                     .build()
             )
         }
-        columns.addAll(attributes.map {
-            JournalColumnDef.create()
-                .withId(it.id)
-                .withType(it.type)
-                .withName(it.name)
-                .build()
-        })
+        columns.addAll(
+            attributes.map {
+                JournalColumnDef.create()
+                    .withId(it.id)
+                    .withType(it.type)
+                    .withName(it.name)
+                    .build()
+            }
+        )
 
         return JournalDef.create {
             withName(typeDef.name)

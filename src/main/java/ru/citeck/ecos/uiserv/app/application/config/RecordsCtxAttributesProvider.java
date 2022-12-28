@@ -7,7 +7,8 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.record.request.ctxatts.CtxAttsProvider;
-import ru.citeck.ecos.webapp.api.context.EcosWebAppContext;
+import ru.citeck.ecos.webapp.api.EcosWebAppApi;
+import ru.citeck.ecos.webapp.api.constants.AppName;
 
 import java.util.Map;
 
@@ -15,7 +16,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RecordsCtxAttributesProvider implements CtxAttsProvider {
 
-    private final EcosWebAppContext webAppContext;
+    private final EcosWebAppApi webAppContext;
 
     @Override
     public void fillContextAtts(@NotNull Map<String, Object> map) {
@@ -25,7 +26,7 @@ public class RecordsCtxAttributesProvider implements CtxAttsProvider {
     }
 
     Object getAlfMeta() {
-        if (webAppContext.getWebAppsApi().isAppAvailable("alfresco")) {
+        if (webAppContext.getRemoteWebAppsApi().isAppAvailable(AppName.ALFRESCO)) {
             return RecordRef.valueOf("alfresco/meta@");
         } else {
             return null;

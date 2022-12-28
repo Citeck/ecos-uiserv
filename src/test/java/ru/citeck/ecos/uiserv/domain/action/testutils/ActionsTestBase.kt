@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.action.testutils
 
 import org.junit.jupiter.api.BeforeEach
-import ru.citeck.ecos.commons.test.EcosWebAppContextMock
+import ru.citeck.ecos.commons.test.EcosWebAppApiMock
 import ru.citeck.ecos.model.lib.type.repo.DefaultTypesRepo
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.RecordsServiceFactory
@@ -10,7 +10,7 @@ import ru.citeck.ecos.uiserv.domain.action.dao.ActionDao
 import ru.citeck.ecos.uiserv.domain.action.service.ActionEntityMapper
 import ru.citeck.ecos.uiserv.domain.action.service.ActionService
 import ru.citeck.ecos.uiserv.domain.action.service.DaoActionsProvider
-import ru.citeck.ecos.webapp.api.context.EcosWebAppContext
+import ru.citeck.ecos.webapp.api.EcosWebAppApi
 
 open class ActionsTestBase {
 
@@ -22,10 +22,10 @@ open class ActionsTestBase {
     @BeforeEach
     fun before() {
 
-        val webAppCtxMock = EcosWebAppContextMock("uiserv")
+        val webAppCtxMock = EcosWebAppApiMock("uiserv")
 
         val recordsServices = object : RecordsServiceFactory() {
-            override fun getEcosWebAppContext(): EcosWebAppContext? {
+            override fun getEcosWebAppApi(): EcosWebAppApi? {
                 return webAppCtxMock
             }
         }
