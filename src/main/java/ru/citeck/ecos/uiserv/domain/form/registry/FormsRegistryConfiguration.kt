@@ -12,7 +12,7 @@ import ru.citeck.ecos.records3.record.dao.impl.ext.impl.ReadOnlyMapExtStorage
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
 import ru.citeck.ecos.uiserv.domain.form.service.provider.TypeFormsProvider
-import ru.citeck.ecos.webapp.api.lock.EcosLockService
+import ru.citeck.ecos.webapp.api.lock.EcosLockApi
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
 import java.time.Duration
@@ -21,7 +21,7 @@ import java.time.Duration
 class FormsRegistryConfiguration(
     private val hazelcast: HazelcastInstance,
     private val formsService: EcosFormService,
-    private val appLockService: EcosLockService,
+    private val appLockService: EcosLockApi,
     private val typeFormsProvider: TypeFormsProvider,
     val typesRegistry: EcosTypesRegistry
 ) {

@@ -29,7 +29,7 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSearchConfig
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSortByDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedJournalDef
-import ru.citeck.ecos.webapp.api.apps.EcosWebAppsApi
+import ru.citeck.ecos.webapp.api.apps.EcosRemoteWebAppsApi
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import java.util.*
 import kotlin.collections.ArrayList
@@ -41,7 +41,7 @@ class ResolvedJournalRecordsDao(
     private val columnEditorResolver: ColumnEditorResolver,
     private val columnFormatterResolver: ColumnFormatterResolver,
     private val columnAttSchemaResolver: ColumnAttSchemaResolver,
-    private val ecosWebAppsApi: EcosWebAppsApi
+    private val ecosWebAppsApi: EcosRemoteWebAppsApi
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordAttsDao {

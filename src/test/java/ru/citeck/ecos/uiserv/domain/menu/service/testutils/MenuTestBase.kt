@@ -7,7 +7,7 @@ import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.io.file.EcosFile
 import ru.citeck.ecos.commons.io.file.std.EcosStdFile
 import ru.citeck.ecos.commons.json.Json
-import ru.citeck.ecos.commons.test.EcosWebAppContextMock
+import ru.citeck.ecos.commons.test.EcosWebAppApiMock
 import ru.citeck.ecos.config.lib.provider.InMemConfigProvider
 import ru.citeck.ecos.config.lib.records.CfgRecordsDao
 import ru.citeck.ecos.config.lib.service.EcosConfigServiceFactory
@@ -25,7 +25,7 @@ import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService
 import ru.citeck.ecos.uiserv.domain.menu.service.format.MenuReaderService
-import ru.citeck.ecos.webapp.api.context.EcosWebAppContext
+import ru.citeck.ecos.webapp.api.EcosWebAppApi
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import java.util.concurrent.ConcurrentHashMap
 
@@ -46,10 +46,10 @@ open class MenuTestBase {
         menuDao = MenuInMemDao()
         val menuReaderService = MenuReaderService()
 
-        val webAppContext = EcosWebAppContextMock(Application.NAME)
+        val webAppContext = EcosWebAppApiMock(Application.NAME)
 
         val recordsServices = object : RecordsServiceFactory() {
-            override fun getEcosWebAppContext(): EcosWebAppContext? {
+            override fun getEcosWebAppApi(): EcosWebAppApi? {
                 return webAppContext
             }
         }

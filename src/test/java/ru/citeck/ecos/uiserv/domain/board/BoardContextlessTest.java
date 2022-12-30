@@ -4,7 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.citeck.ecos.commons.data.MLText;
-import ru.citeck.ecos.commons.test.EcosWebAppContextMock;
+import ru.citeck.ecos.commons.test.EcosWebAppApiMock;
 import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.RecordsServiceFactory;
 import ru.citeck.ecos.records3.record.request.RequestContext;
@@ -15,7 +15,7 @@ import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.eapps.BoardArtifactHandler;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
-import ru.citeck.ecos.webapp.api.context.EcosWebAppContext;
+import ru.citeck.ecos.webapp.api.EcosWebAppApi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -28,12 +28,12 @@ public class BoardContextlessTest {
 
     @BeforeEach
     public void init(){
-        EcosWebAppContext webAppContext = new EcosWebAppContextMock(Application.NAME);
+        EcosWebAppApi webAppContext = new EcosWebAppApiMock(Application.NAME);
 
         recordsServiceFactory = new RecordsServiceFactory(){
             @Nullable
             @Override
-            public EcosWebAppContext getEcosWebAppContext() {
+            public EcosWebAppApi getEcosWebAppApi() {
                 return webAppContext;
             }
         };

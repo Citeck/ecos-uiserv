@@ -5,7 +5,9 @@ import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
+import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 import ru.citeck.ecos.model.lib.attributes.dto.computed.ComputedAttType
+import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormBuilder
 import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormBuilderFactory
@@ -68,8 +70,13 @@ class TypeFormsProvider(
         if (MLText.isEmpty(name)) {
             name = MLText(attribute.id)
         }
+        val fieldKey = if (attribute.type == AttributeType.CONTENT && attribute.id == "content") {
+            RecordConstants.ATT_CONTENT
+        } else {
+            attribute.id
+        }
         formBuilder.addInput(attribute.type, attribute.config)
-            .setKey(attribute.id)
+            .setKey(fieldKey)
             .setName(name)
             .setMultiple(attribute.multiple)
             .build()
