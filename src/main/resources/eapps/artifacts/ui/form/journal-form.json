@@ -643,9 +643,9 @@
                         },
                         "container": {},
                         "features": {
-                          "execForRecord": false,
-                          "execForRecords": false,
-                          "execForQuery": false
+                          "execForRecord": null,
+                          "execForRecords": null,
+                          "execForQuery": null
                         },
                         "checkbox": false,
                         "url": "",
@@ -932,7 +932,8 @@
                                         "key": "execForRecord",
                                         "refreshOn": [],
                                         "type": "checkbox",
-                                        "input": true
+                                        "input": true,
+                                        "hasThreeStates": true
                                       }
                                     ],
                                     "md": 4,
@@ -956,7 +957,8 @@
                                         "key": "execForRecords",
                                         "refreshOn": [],
                                         "type": "checkbox",
-                                        "input": true
+                                        "input": true,
+                                        "hasThreeStates": true
                                       }
                                     ]
                                   },
@@ -975,7 +977,8 @@
                                         "key": "execForQuery",
                                         "refreshOn": [],
                                         "type": "checkbox",
-                                        "input": true
+                                        "input": true,
+                                        "hasThreeStates": true
                                       }
                                     ]
                                   }
