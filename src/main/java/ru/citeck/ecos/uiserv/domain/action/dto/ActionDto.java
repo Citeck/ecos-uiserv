@@ -67,7 +67,7 @@ public class ActionDto {
         this.timeoutErrorMessage = other.timeoutErrorMessage;
 
         this.config = ObjectData.deepCopy(other.config);
-        this.features = DataValue.create(other.features).asMap(String.class, Boolean.class);
+        setFeatures(other.features);
     }
 
     public String getId() {
@@ -206,6 +206,12 @@ public class ActionDto {
     }
 
     public void setFeatures(Map<String, Boolean> features) {
-        this.features = features;
+        Map<String, Boolean> newFeatures = new HashMap<>();
+        features.forEach((k, v) -> {
+            if (v != null) {
+                newFeatures.put(k, v);
+            }
+        });
+        this.features = newFeatures;
     }
 }
