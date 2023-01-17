@@ -6,6 +6,7 @@ import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
 import ru.citeck.ecos.records2.RecordRef
+import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 
 @IncludeNonDefault
 @JsonDeserialize(builder = EcosFormDef.Builder::class)
@@ -20,7 +21,10 @@ data class EcosFormDef(
     val system: Boolean,
     val i18n: ObjectData,
     val definition: ObjectData,
-    val attributes: ObjectData
+    val attributes: ObjectData,
+
+    @AttName("_notExists")
+    val notExists: Boolean = true
 ) {
 
     companion object {
@@ -147,7 +151,8 @@ data class EcosFormDef(
                 system = system,
                 i18n = i18n,
                 definition = definition,
-                attributes = attributes
+                attributes = attributes,
+                notExists = id.isEmpty()
             )
         }
     }
