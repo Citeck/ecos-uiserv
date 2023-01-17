@@ -153,6 +153,10 @@ class JournalRecordsDao(
             }
             return map
         }
+
+        fun getAsJson(): Any {
+            return mapper.toNonDefaultJson(actionDef)
+        }
     }
 
     open class JournalRecord(base: JournalWithMeta) : JournalWithMeta(base) {
