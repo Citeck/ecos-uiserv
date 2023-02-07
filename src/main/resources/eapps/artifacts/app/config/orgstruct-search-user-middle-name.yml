@@ -1,0 +1,6 @@
+---
+id: orgstruct-search-user-middle-name
+name:
+  ru: Использовать Отчество для поиска пользователей
+  en: Use middle name to search for users
+value: false

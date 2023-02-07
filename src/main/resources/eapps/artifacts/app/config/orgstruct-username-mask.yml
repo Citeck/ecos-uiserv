@@ -1,0 +1,6 @@
+---
+id: orgstruct-username-mask
+name:
+  ru: Конфигурироемое имя пользователя в оргструктуре
+  en: Configurable username in the orgstructre
+value: null
