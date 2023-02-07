@@ -5,7 +5,7 @@
     "en": "Journal form"
   },
   "description": {},
-  "customModule": null,
+  "customModule": "",
   "typeRef": "emodel/type@journal",
   "width": "lg",
   "system": true,
@@ -233,8 +233,16 @@
                             "label": {
                               "ru": "Тип данных"
                             },
-                            "journalId": "ecos-types",
                             "key": "typeRef",
+                            "hideEditRowButton": true,
+                            "modalTitle": "",
+                            "customActionRefs": [
+                              "uiserv/action@edit-ecos-type"
+                            ],
+                            "journalId": "ecos-types",
+                            "queryData": "",
+                            "refreshOn": [],
+                            "optionalWhenDisabled": false,
                             "type": "selectJournal",
                             "input": true
                           }
@@ -1285,5 +1293,6 @@
       }
     ]
   },
-  "attributes": {}
+  "attributes": {},
+  "notExists": false
 }
