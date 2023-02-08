@@ -1,0 +1,6 @@
+---
+id: hide-disabled-users-for-everyone
+name:
+  ru: Скрывать отключенных пользователей для всех
+  en: Hide disabled users for everyone
+value: false
