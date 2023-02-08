@@ -6,9 +6,9 @@ ecos:
   webapp:
     dataSources:
       main:
-        url: jdbc:postgresql://localhost:5431/uiserv
+        url: jdbc:postgresql://localhost:14523/ecos_uiserv
         username: uiserv
-        password:
+        password: uiservpassword
 
 application:
   default-theme-id: citeckTheme
