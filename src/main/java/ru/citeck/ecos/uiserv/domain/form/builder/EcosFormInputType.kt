@@ -6,6 +6,8 @@ enum class EcosFormInputType(val typeId: String) {
 
     TEXT_FIELD("textfield"),
     ML_TEXT("mlText"),
+    TEXT_AREA("textarea"),
+    ML_TEXT_AREA("mlTextarea"),
     NUMBER("number"),
     CHECKBOX("checkbox"),
     JOURNAL("selectJournal"),

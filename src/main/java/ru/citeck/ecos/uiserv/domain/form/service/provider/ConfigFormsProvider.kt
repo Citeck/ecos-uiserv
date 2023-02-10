@@ -55,14 +55,14 @@ class ConfigFormsProvider(
         }
 
         val type = when (valueDef.type) {
-            ConfigValueType.TEXT -> EcosFormInputType.TEXT_FIELD
-            ConfigValueType.MLTEXT -> EcosFormInputType.ML_TEXT
+            ConfigValueType.TEXT -> EcosFormInputType.TEXT_AREA
+            ConfigValueType.MLTEXT -> EcosFormInputType.ML_TEXT_AREA
             ConfigValueType.NUMBER -> EcosFormInputType.NUMBER
             ConfigValueType.BOOLEAN -> EcosFormInputType.CHECKBOX
             ConfigValueType.DATE -> EcosFormInputType.DATE
             ConfigValueType.DATETIME -> EcosFormInputType.DATETIME
             ConfigValueType.ASSOC -> EcosFormInputType.JOURNAL
-            else -> EcosFormInputType.TEXT_FIELD
+            else -> EcosFormInputType.TEXT_AREA
         }
 
         formBuilder.addInput(type, valueDef.config)
