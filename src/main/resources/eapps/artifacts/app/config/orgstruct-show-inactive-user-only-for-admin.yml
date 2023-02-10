@@ -1,0 +1,6 @@
+---
+id: orgstruct-show-inactive-user-only-for-admin
+name:
+  ru: Скрывать отключенных пользователей для всех, кроме администраторов
+  en: Hide disabled users for everyone except admins
+value: false
