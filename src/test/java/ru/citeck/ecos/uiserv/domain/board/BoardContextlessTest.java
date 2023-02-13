@@ -4,7 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.citeck.ecos.commons.data.MLText;
-import ru.citeck.ecos.commons.test.EcosWebAppApiMock;
+import ru.citeck.ecos.test.commons.EcosWebAppApiMock;
 import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.RecordsServiceFactory;
 import ru.citeck.ecos.records3.record.request.RequestContext;
