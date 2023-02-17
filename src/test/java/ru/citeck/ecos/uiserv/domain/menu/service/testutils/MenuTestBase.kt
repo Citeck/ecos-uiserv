@@ -7,7 +7,7 @@ import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.io.file.EcosFile
 import ru.citeck.ecos.commons.io.file.std.EcosStdFile
 import ru.citeck.ecos.commons.json.Json
-import ru.citeck.ecos.commons.test.EcosWebAppApiMock
+import ru.citeck.ecos.test.commons.EcosWebAppApiMock
 import ru.citeck.ecos.config.lib.provider.InMemConfigProvider
 import ru.citeck.ecos.config.lib.records.CfgRecordsDao
 import ru.citeck.ecos.config.lib.service.EcosConfigServiceFactory

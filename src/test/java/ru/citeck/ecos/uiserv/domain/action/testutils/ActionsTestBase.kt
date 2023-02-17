@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.action.testutils
 
 import org.junit.jupiter.api.BeforeEach
-import ru.citeck.ecos.commons.test.EcosWebAppApiMock
+import ru.citeck.ecos.test.commons.EcosWebAppApiMock
 import ru.citeck.ecos.model.lib.type.repo.DefaultTypesRepo
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.RecordsServiceFactory

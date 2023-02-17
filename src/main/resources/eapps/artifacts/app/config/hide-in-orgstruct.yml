@@ -1,0 +1,6 @@
+---
+id: hide-in-orgstruct
+name:
+  ru: Скрывать пользователей/группы при поиске в оргструктуре
+  en: Hide users/groups on search in orgstructure widget
+value: ''

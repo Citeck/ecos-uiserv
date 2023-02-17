@@ -8,7 +8,9 @@ import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.DataValue;
+import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.QueryContext;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
@@ -20,6 +22,8 @@ import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
 import ru.citeck.ecos.uiserv.domain.form.service.FormDefUtils;
+import ru.citeck.ecos.webapp.api.constants.AppName;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,11 +32,12 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class TaskFormRecordsDao extends LocalRecordsDao
-                                implements LocalRecordsQueryWithMetaDao<Object> {
+    implements LocalRecordsQueryWithMetaDao<Object> {
 
     private static final String OUTCOME_PREFIX = "outcome_";
     private static final String LANG_TASKS = "tasks";
     private static final String LANG_FORM = "form";
+    private static final String WF_TASK_SOURCE_ID = "wftask";
 
     private final EcosFormService formService;
 
@@ -98,7 +103,7 @@ public class TaskFormRecordsDao extends LocalRecordsDao
         }
 
         RecordsQuery tasksRecsQuery = new RecordsQuery();
-        tasksRecsQuery.setSourceId("alfresco/wftask");
+        tasksRecsQuery.setSourceId(AppName.EPROC + "/" + WF_TASK_SOURCE_ID);
 
         TasksQuery tasksQuery = new TasksQuery();
         tasksQuery.setActive(true);
@@ -118,7 +123,8 @@ public class TaskFormRecordsDao extends LocalRecordsDao
 
         for (TaskInfo task : currentTasks) {
 
-            EcosFormDef form = formService.getFormByKey(task.getFormKey()).orElse(null);
+            EcosFormDef form = getEcosFormDef(task);
+
             if (form == null || form.getDefinition().isEmpty()) {
                 continue;
             }
@@ -140,11 +146,16 @@ public class TaskFormRecordsDao extends LocalRecordsDao
             List<Outcome> outcomes = getOutcomes(form.getDefinition().getData(), i18n);
             String taskId = task.getId();
             if (StringUtils.isNotBlank(taskId)) {
-                if (!taskId.startsWith("wftask") && !taskId.startsWith("alfresco")) {
-                    taskId = "wftask@" + taskId;
-                }
                 RecordRef taskRef = RecordRef.valueOf(taskId);
-                RecordRef formRef = RecordRef.create("uiserv", EcosFormRecordsDao.ID, form.getId());
+                if (taskRef.getAppName().isEmpty()) {
+                    taskRef = taskRef.withAppName(AppName.EPROC);
+                }
+
+                if (taskRef.getSourceId().isEmpty()) {
+                    taskRef = taskRef.withSourceId(WF_TASK_SOURCE_ID);
+                }
+
+                RecordRef formRef = RecordRef.create(AppName.UISERV, EcosFormRecordsDao.ID, form.getId());
                 actions.add(new TaskActionsInfo(task.getTaskDisp(), taskRef, formRef, outcomes));
             } else {
                 log.warn("Strange task: " + task);
@@ -152,6 +163,20 @@ public class TaskFormRecordsDao extends LocalRecordsDao
         }
 
         return actions;
+    }
+
+    private EcosFormDef getEcosFormDef(TaskInfo task) {
+        EcosFormDef form = null;
+
+        if (task.getFormRef() != null && task.getFormRef().isNotEmpty()) {
+            form = formService.getFormById(task.getFormRef().getLocalId()).orElse(null);
+        }
+
+        if (form == null) {
+            form = formService.getFormByKey(task.getFormKey()).orElse(null);
+        }
+
+        return form;
     }
 
     @NotNull
@@ -204,7 +229,16 @@ public class TaskFormRecordsDao extends LocalRecordsDao
         if (isOutcomeBtn(definition)) {
 
             String key = definition.get("key").asText();
-            String label = definition.get("label").asText();
+
+            DataValue labelData = definition.get("label");
+            String label;
+            if (labelData.isTextual()) {
+                label = labelData.asText();
+            } else {
+                MLText mlLabel = Json.getMapper().convert(labelData, MLText.class);
+                label = mlLabel != null ? mlLabel.getClosestValue(QueryContext.getCurrent().getLocale()) : "";
+            }
+
             if (!label.isEmpty()) {
                 DataValue msg = i18n.get(label);
                 if (msg.isNotNull() && !msg.asText().isEmpty()) {
@@ -277,6 +311,9 @@ public class TaskFormRecordsDao extends LocalRecordsDao
         private String taskDisp;
         @AttName("_formKey?str")
         private String formKey;
+
+        @AttName("_formRef")
+        private EntityRef formRef;
     }
 
     @Data

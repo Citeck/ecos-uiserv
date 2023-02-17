@@ -145,8 +145,18 @@ data class JournalActionDef(
             return this
         }
 
-        fun withFeatures(features: Map<String, Boolean>?): Builder {
-            this.features = features ?: emptyMap()
+        fun withFeatures(features: Map<String, Boolean?>?): Builder {
+            this.features = if (features == null) {
+                emptyMap()
+            } else {
+                val newFeatures = hashMapOf<String, Boolean>()
+                features.forEach { (k, v) ->
+                    if (v != null) {
+                        newFeatures[k] = v
+                    }
+                }
+                newFeatures
+            }
             return this
         }
 

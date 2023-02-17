@@ -5,7 +5,7 @@
     "en": "Journal form"
   },
   "description": {},
-  "customModule": null,
+  "customModule": "",
   "typeRef": "emodel/type@journal",
   "width": "lg",
   "system": true,
@@ -233,8 +233,16 @@
                             "label": {
                               "ru": "Тип данных"
                             },
-                            "journalId": "ecos-types",
                             "key": "typeRef",
+                            "hideEditRowButton": true,
+                            "modalTitle": "",
+                            "customActionRefs": [
+                              "uiserv/action@edit-ecos-type"
+                            ],
+                            "journalId": "ecos-types",
+                            "queryData": "",
+                            "refreshOn": [],
+                            "optionalWhenDisabled": false,
                             "type": "selectJournal",
                             "input": true
                           }
@@ -643,9 +651,9 @@
                         },
                         "container": {},
                         "features": {
-                          "execForRecord": false,
-                          "execForRecords": false,
-                          "execForQuery": false
+                          "execForRecord": null,
+                          "execForRecords": null,
+                          "execForQuery": null
                         },
                         "checkbox": false,
                         "url": "",
@@ -932,7 +940,8 @@
                                         "key": "execForRecord",
                                         "refreshOn": [],
                                         "type": "checkbox",
-                                        "input": true
+                                        "input": true,
+                                        "hasThreeStates": true
                                       }
                                     ],
                                     "md": 4,
@@ -956,7 +965,8 @@
                                         "key": "execForRecords",
                                         "refreshOn": [],
                                         "type": "checkbox",
-                                        "input": true
+                                        "input": true,
+                                        "hasThreeStates": true
                                       }
                                     ]
                                   },
@@ -975,7 +985,8 @@
                                         "key": "execForQuery",
                                         "refreshOn": [],
                                         "type": "checkbox",
-                                        "input": true
+                                        "input": true,
+                                        "hasThreeStates": true
                                       }
                                     ]
                                   }
@@ -1282,5 +1293,6 @@
       }
     ]
   },
-  "attributes": {}
+  "attributes": {},
+  "notExists": false
 }
