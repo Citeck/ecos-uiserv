@@ -24,6 +24,20 @@ import java.util.stream.Collectors
 
 interface MenuControllerInterface<T> extends ArtifactController<T, Unit>, ArtifactPatchController<T, Unit> {}
 
+class Artifact {
+    String id
+    String filename
+    byte[] data
+
+    Artifact() {}
+
+    Artifact(Artifact other) {
+        this.id = other.id
+        this.filename = other.filename
+        this.data = other.data
+    }
+}
+
 return new MenuControllerInterface<Artifact>() {
 
     private static final Logger log = LoggerFactory.getLogger(ArtifactController.class)
@@ -124,17 +138,4 @@ return new MenuControllerInterface<Artifact>() {
             .build();
     }
 
-    static class Artifact {
-        String id
-        String filename
-        byte[] data
-
-        Artifact() {}
-
-        Artifact(Artifact other) {
-            this.id = other.id
-            this.filename = other.filename
-            this.data = other.data
-        }
-    }
 }

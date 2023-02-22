@@ -15,6 +15,17 @@ import javax.xml.parsers.ParserConfigurationException
 import java.nio.file.Path
 import java.util.stream.Collectors
 
+class ThemeArtifactMeta {
+    MLText name
+    Map<String, String> images = new HashMap<>()
+}
+
+class Artifact {
+    String id;
+    ThemeArtifactMeta meta
+    Map<String, byte[]> resources
+}
+
 return new ArtifactController<Artifact, Unit>() {
 
     // ThemeService should has the same constants
@@ -79,16 +90,5 @@ return new ArtifactController<Artifact, Unit>() {
             .withId(artifact.id)
             .withName(artifact.meta.name)
             .build();
-    }
-
-    static class ThemeArtifactMeta {
-        MLText name
-        Map<String, String> images = new HashMap<>()
-    }
-
-    static class Artifact {
-        String id;
-        ThemeArtifactMeta meta
-        Map<String, byte[]> resources
     }
 }
