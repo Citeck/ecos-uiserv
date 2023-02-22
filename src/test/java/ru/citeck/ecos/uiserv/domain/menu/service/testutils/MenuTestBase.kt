@@ -7,7 +7,6 @@ import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.io.file.EcosFile
 import ru.citeck.ecos.commons.io.file.std.EcosStdFile
 import ru.citeck.ecos.commons.json.Json
-import ru.citeck.ecos.test.commons.EcosWebAppApiMock
 import ru.citeck.ecos.config.lib.provider.InMemConfigProvider
 import ru.citeck.ecos.config.lib.records.CfgRecordsDao
 import ru.citeck.ecos.config.lib.service.EcosConfigServiceFactory
@@ -15,6 +14,7 @@ import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.RecordsServiceFactory
+import ru.citeck.ecos.test.commons.EcosWebAppApiMock
 import ru.citeck.ecos.uiserv.Application
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.i18n.service.MessageResolver
