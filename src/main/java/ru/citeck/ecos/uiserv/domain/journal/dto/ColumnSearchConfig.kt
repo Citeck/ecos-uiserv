@@ -7,7 +7,8 @@ import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
 @JsonDeserialize(builder = ColumnSearchConfig.Builder::class)
 data class ColumnSearchConfig(
     val delimiters: List<String> = emptyList(),
-    val searchByText: SearchByText
+    val searchByText: SearchByText,
+    val searchAttribute: String
 ) {
 
     companion object {
@@ -43,10 +44,12 @@ data class ColumnSearchConfig(
 
         var delimiters: List<String> = emptyList()
         var searchByText: SearchByText = SearchByText.EMPTY
+        var searchAttribute: String = ""
 
         constructor(base: ColumnSearchConfig) : this() {
             withDelimiters(base.delimiters)
             searchByText = base.searchByText
+            searchAttribute = base.searchAttribute
         }
 
         fun withDelimiters(delimiters: List<String>?): Builder {
@@ -59,8 +62,13 @@ data class ColumnSearchConfig(
             return this
         }
 
+        fun withSearchAttribute(searchAttribute: String): Builder {
+            this.searchAttribute = searchAttribute
+            return this
+        }
+
         fun build(): ColumnSearchConfig {
-            return ColumnSearchConfig(delimiters, searchByText)
+            return ColumnSearchConfig(delimiters, searchByText, searchAttribute)
         }
     }
 }
