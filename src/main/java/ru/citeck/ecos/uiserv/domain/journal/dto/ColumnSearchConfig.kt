@@ -62,8 +62,8 @@ data class ColumnSearchConfig(
             return this
         }
 
-        fun withSearchAttribute(searchAttribute: String): Builder {
-            this.searchAttribute = searchAttribute
+        fun withSearchAttribute(searchAttribute: String?): Builder {
+            this.searchAttribute = searchAttribute ?: ""
             return this
         }
 
