@@ -1,14 +1,12 @@
 package ru.citeck.ecos.uiserv.domain.board;
 
 import org.hamcrest.Matcher;
-
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.Application;
@@ -30,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(EcosSpringExtension.class)
 @SpringBootTest(classes = Application.class)
-//@DirtiesContext
 public class BoardServiceContextTest {
 
     @Autowired

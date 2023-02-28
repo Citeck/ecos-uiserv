@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.app.test.config.TestConfigData;
@@ -29,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @ExtendWith(EcosSpringExtension.class)
 @SpringBootTest(classes = Application.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @ActiveProfiles(profiles = { "test-config-data", "test" })
 public class ConfigServiceTest {
 
