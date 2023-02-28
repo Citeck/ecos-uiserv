@@ -8,21 +8,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.records2.request.rest.RestHandler;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
-import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
 import ru.citeck.ecos.uiserv.TestEntityRecordUtil;
 import ru.citeck.ecos.uiserv.TestUtil;
+import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
+import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
+import ru.citeck.ecos.webapp.api.constants.AppName;
 import ru.citeck.ecos.webapp.lib.spring.context.api.rest.RecordsRestApi;
 import ru.citeck.ecos.webapp.lib.spring.context.records.RecordsServiceFactoryConfiguration;
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
@@ -45,7 +42,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @ExtendWith(EcosSpringExtension.class)
 @SpringBootTest(classes = Application.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class DashboardRecordControllerTest {
 
     private static final String RECORD_ID = "dashboard";
@@ -55,12 +51,6 @@ public class DashboardRecordControllerTest {
 
     @Autowired
     private ObjectMapper mapper;
-
-    @Autowired
-    private RestHandler restQueryHandler;
-
-    @Autowired
-    private RecordsService recordsService;
 
     @Autowired
     private RecordsServiceFactoryConfiguration factoryConfig;
@@ -91,9 +81,9 @@ public class DashboardRecordControllerTest {
             .thenReturn(Optional.of(getTestDtoForQueryWithId(id)));
 
         mockRecordsApi.perform(
-            post(TestEntityRecordUtil.URL_RECORDS_QUERY)
-                .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(queryJson))
+                post(TestEntityRecordUtil.URL_RECORDS_QUERY)
+                    .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                    .content(queryJson))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id", is(RECORD_ID_AT + id)))
             .andExpect(jsonPath("$.attributes.config.menu.type", is("TOP")))
@@ -118,51 +108,18 @@ public class DashboardRecordControllerTest {
             "  \t]\n" +
             "}";
 
-        //DashboardDto dto = new DashboardDto();
-        //dto.setKey(key);
-
-        //DashboardDto createdDto = new DashboardDto();
-        //createdDto.setKey(key);
-        //createdDto.setId(id);
-
-        //when(mockDashboardService.create(dto)).thenReturn(createdDto);
-
-        //TestEntityRecordUtil.performMutateAndCheckResponseId(json, RECORD_ID_AT + id, mockRecordsApi);
-    }
-
-    //@Test
-    public void mutate() throws Exception {
-        final String id = UUID.randomUUID().toString();
-        String key = "new-dashboard";
-        String type = "type";
-        String user = "user";
-
-        String json = "{\n" +
-            "  \"records\": [\n" +
-            "  \t\t{\n" +
-            "  \t\t\t\"id\": \"" + RECORD_ID_AT + id + "\",\n" +
-            "  \t\t\t\"attributes\": {\n" +
-            "  \t\t\t\t\"key\": \"" + key + "\"\n" +
-            "  \t\t\t}\n" +
-            "  \t\t}\n" +
-            "  \t]\n" +
-            "}";
-
         DashboardDto dto = new DashboardDto();
-        dto.setId(UUID.randomUUID().toString());
-        dto.setAuthority(user);
 
-        DashboardDto updatedDto = new DashboardDto();
-        updatedDto.setId(UUID.randomUUID().toString());
+        DashboardDto createdDto = new DashboardDto();
+        createdDto.setId(id);
 
-        when(mockDashboardService.getDashboardById(id)).thenReturn(Optional.of(dto));
-        //when(mockDashboardService.getByKey(type, key, user)).thenReturn(Optional.of(dto));
-        //when(mockDashboardService.update(dto)).thenReturn(updatedDto);
+        when(mockDashboardService.saveDashboard(dto)).thenReturn(createdDto);
 
-        TestEntityRecordUtil.performMutateAndCheckResponseId(json, RECORD_ID_AT + id, mockRecordsApi);
+        TestEntityRecordUtil.performMutateAndCheckResponseId(json,
+            AppName.UISERV + "/" + RECORD_ID_AT + id, mockRecordsApi);
     }
 
-    //@Test
+    @Test
     public void delete() throws Exception {
         final String id = UUID.randomUUID().toString();
         String json = "{\n" +
@@ -172,34 +129,15 @@ public class DashboardRecordControllerTest {
             "}";
 
         mockRecordsApi.perform(
-            MockMvcRequestBuilders.post(TestEntityRecordUtil.URL_RECORDS_DELETE)
-                .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(json))
+                MockMvcRequestBuilders.post(TestEntityRecordUtil.URL_RECORDS_DELETE)
+                    .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                    .content(json))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.records[*]", hasSize(1)))
             .andExpect(jsonPath("$.records[0].id", is(RECORD_ID_AT + id)));
     }
 
     @Test
-    public void queryNotExistsDashboard() {
-/*        String nonExistsId = "some-non-exists-id";
-        String json = "{\n" +
-            "  \"record\": \"" + RECORD_ID_AT + nonExistsId + "\",\n" +
-            "  \"attributes\": {\n" +
-            "    \"key\": \"key\",\n" +
-            "    \"config\": \"config?json\"\n" +
-            "  }\n" +
-            "}";
-
-        Throwable thrown = catchThrowable(() -> mockRecordsApi.perform(
-            post(TestEntityRecordUtil.URL_RECORDS_QUERY)
-                .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(json)));
-
-        assertEquals("Entity with id <" + nonExistsId + "> not found!", thrown.getCause().getMessage());*/
-    }
-
-    //@Test
     public void mutateNotExistsDashboard() {
         String nonExistsId = "some-non-exists-id";
         String json = "{\n" +
@@ -218,7 +156,7 @@ public class DashboardRecordControllerTest {
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(json)));
 
-        assertEquals("Entity with id <" + nonExistsId + "> not found!", thrown.getCause().getMessage());
+        assertEquals("Dashboard with id '" + nonExistsId + "' is not found!", thrown.getCause().getMessage());
     }
 
     private DashboardDto getTestDtoForQueryWithId(String id) throws IOException {

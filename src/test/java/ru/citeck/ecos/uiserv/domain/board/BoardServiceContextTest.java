@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(EcosSpringExtension.class)
 @SpringBootTest(classes = Application.class)
-@DirtiesContext
+//@DirtiesContext
 public class BoardServiceContextTest {
 
     @Autowired

@@ -5,12 +5,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.citeck.ecos.commons.data.DataValue;
-import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.TestEntityRecordUtil;
@@ -21,14 +19,13 @@ import ru.citeck.ecos.uiserv.domain.board.repo.BoardRepository;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @ExtendWith(EcosSpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class BoardRecordsDaoTest {
 
     static String QUERY = "query";

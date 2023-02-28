@@ -82,7 +82,7 @@ public class DashboardRecords extends AbstractRecordsDao
     @NotNull
     @Override
     public String saveMutatedRec(DashboardRecord dashboardRecord) {
-        return dashboardService.saveDashboard(dashboardRecord).getId();
+         return dashboardService.saveDashboard(dashboardRecord).getId();
     }
 
     @Nullable
