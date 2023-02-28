@@ -6,10 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.icon.repo.IconEntity;
 import ru.citeck.ecos.uiserv.domain.icon.dto.IconDto;
+import ru.citeck.ecos.uiserv.domain.icon.repo.IconEntity;
 import ru.citeck.ecos.uiserv.domain.icon.repo.IconRepository;
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
 
@@ -23,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(EcosSpringExtension.class)
 @SpringBootTest(classes = Application.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class IconServiceTest {
     @Autowired
     private IconRepository iconRepository;

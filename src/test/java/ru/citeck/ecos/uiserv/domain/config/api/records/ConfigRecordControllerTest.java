@@ -8,17 +8,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.request.rest.RestHandler;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.config.dto.ConfigDto;
-import ru.citeck.ecos.uiserv.domain.config.service.ConfigEntityService;
 import ru.citeck.ecos.uiserv.TestEntityRecordUtil;
 import ru.citeck.ecos.uiserv.TestUtil;
+import ru.citeck.ecos.uiserv.domain.config.dto.ConfigDto;
+import ru.citeck.ecos.uiserv.domain.config.service.ConfigEntityService;
 import ru.citeck.ecos.webapp.lib.spring.context.api.rest.RecordsRestApi;
 import ru.citeck.ecos.webapp.lib.spring.context.records.RecordsServiceFactoryConfiguration;
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
@@ -41,7 +40,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @ExtendWith(EcosSpringExtension.class)
 @SpringBootTest(classes = Application.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class ConfigRecordControllerTest {
 
     private static final String RECORD_ID = "config";

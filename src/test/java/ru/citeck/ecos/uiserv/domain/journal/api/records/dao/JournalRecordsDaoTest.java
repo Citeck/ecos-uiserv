@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.stereotype.Component;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.citeck.ecos.records2.RecordRef;
@@ -19,9 +18,9 @@ import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.uiserv.Application;
+import ru.citeck.ecos.uiserv.domain.action.repo.ActionRepository;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
-import ru.citeck.ecos.uiserv.domain.action.repo.ActionRepository;
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
 
 import java.util.*;
@@ -34,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(EcosSpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class JournalRecordsDaoTest {
 
     public static final String JOURNAL_DAO_ID = "journal";
@@ -55,60 +53,20 @@ public class JournalRecordsDaoTest {
         actionRepository.deleteAll();
     }
 
-    //@Test
-    void queryJournalByTypeRef_WithOtherJournalWithSameParentTypeRef() throws Exception {
-
-        //  arrange
-
-        JournalEntity journalEntity = new JournalEntity();
-        journalEntity.setExtId("myTestJournal");
-        journalEntity.setName("{\"en\":\"test\"}");
-
-        JournalEntity otherJournalEntity = new JournalEntity();
-        otherJournalEntity.setExtId("otherTestJournal");
-        otherJournalEntity.setName("{\"en\":\"test\"}");
-        otherJournalEntity.setTypeRef(TypesDao.baseTypeRef.toString());
-
-        journalRepository.save(journalEntity);
-        journalRepository.save(otherJournalEntity);
-
-        TypesDao.testTypeRecord.setJournal(null);
-        TypesDao.baseTypeRecord.setJournal(null);
-
-        TypesDao.records.put(TypesDao.testTypeRef.getId(), TypesDao.testTypeRecord);
-        TypesDao.records.put(TypesDao.baseTypeRecord.getId(), TypesDao.baseTypeRecord);
-
-        //  act and assert
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/records/query")
-            .contentType("application/json")
-            .header("Content-type", "application/json")
-            .content("{\n" +
-                "    \"query\": {\n" +
-                "        \"sourceId\": \"journal\",\n" +
-                "        \"query\": {\n" +
-                "            \"typeRef\": \"" + TypesDao.testTypeRef.toString() + "\"\n" +
-                "                   }" +
-                "               }" +
-                "     }"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.records[0]", is("uiserv/journal@" + otherJournalEntity.getExtId())));
-    }
-
     @Test
     void queryJournalByTypeRef_WithNotFoundJournal() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/records/query")
-            .contentType("application/json")
-            .header("Content-type", "application/json")
-            .content("{\n" +
-                "    \"query\": {\n" +
-                "        \"sourceId\": \"journal\",\n" +
-                "        \"query\": {\n" +
-                "            \"typeRef\": \"" + TypesDao.testTypeRef.toString() + "\"\n" +
-                "                   }" +
-                "               }" +
-                "     }"))
+                .contentType("application/json")
+                .header("Content-type", "application/json")
+                .content("{\n" +
+                    "    \"query\": {\n" +
+                    "        \"sourceId\": \"journal\",\n" +
+                    "        \"query\": {\n" +
+                    "            \"typeRef\": \"" + TypesDao.testTypeRef.toString() + "\"\n" +
+                    "                   }" +
+                    "               }" +
+                    "     }"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.records", is(Collections.emptyList())));
     }
@@ -162,21 +120,21 @@ public class JournalRecordsDaoTest {
         journalRepository.save(journalEntity);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/records/query")
-            .contentType("application/json")
-            .header("Content-type", "application/json")
-            .content("{\n" +
-                "    \"record\": \"journal@myTestJournal\",\n" +
-                "    \"attributes\": [\n" +
-                "        \"name\",\n" +
-                "        \"typeRef?id\",\n" +
-                "        \"predicate\",\n" +
-                "        \"editable\",\n" +
-                "        \"properties\",\n" +
-                "        \"columns[]?json\",\n" +
-                "        \"actions[]\",\n" +
-                "        \"metaRecord?id\"\n" +
-                "    ]\n" +
-                "}"))
+                .contentType("application/json")
+                .header("Content-type", "application/json")
+                .content("{\n" +
+                    "    \"record\": \"journal@myTestJournal\",\n" +
+                    "    \"attributes\": [\n" +
+                    "        \"name\",\n" +
+                    "        \"typeRef?id\",\n" +
+                    "        \"predicate\",\n" +
+                    "        \"editable\",\n" +
+                    "        \"properties\",\n" +
+                    "        \"columns[]?json\",\n" +
+                    "        \"actions[]\",\n" +
+                    "        \"metaRecord?id\"\n" +
+                    "    ]\n" +
+                    "}"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id",
                 is(JOURNAL_DAO_ID + "@" + journalEntity.getExtId())))
@@ -185,9 +143,9 @@ public class JournalRecordsDaoTest {
             .andExpect(jsonPath("$.attributes.predicate", is(journalEntity.getPredicate())))
             .andExpect(jsonPath("$.attributes.editable", is(Boolean.FALSE.toString())))
             .andExpect(jsonPath("$.attributes.properties", is(journalEntity.getAttributes())));
-            //.andExpect(jsonPath("$.attributes.columns", is(journalEntity.getColumns())))
-            //.andExpect(jsonPath("$['attributes']['actions[]'][0]", is(actions.get(0).toString())))
-            //.andExpect(jsonPath("$['attributes']['actions[]'][1]", is(actions.get(1).toString())))
+        //.andExpect(jsonPath("$.attributes.columns", is(journalEntity.getColumns())))
+        //.andExpect(jsonPath("$['attributes']['actions[]'][0]", is(actions.get(0).toString())))
+        //.andExpect(jsonPath("$['attributes']['actions[]'][1]", is(actions.get(1).toString())))
     }
 
     @Component
