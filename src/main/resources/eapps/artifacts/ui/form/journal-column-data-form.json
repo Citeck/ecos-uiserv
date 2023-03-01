@@ -376,6 +376,20 @@
                     "input": true
                   }
                 ]
+              },
+              {
+                "label": {
+                  "en": "2.3 Search attribute",
+                  "ru": "2.3 Атрибут для поиска"
+                },
+                "tooltip": {
+                  "ru": "Атрибут по которому должен выполняться поиск при использовании фильтра по столбцу",
+                  "en": "Attribute to be searched for when filtering by column"
+                },
+                "defaultValue": "",
+                "key":  "searchAttribute",
+                "type": "textfield",
+                "input": true
               }
             ]
           }
