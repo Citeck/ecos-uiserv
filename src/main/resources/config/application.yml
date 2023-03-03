@@ -28,6 +28,10 @@ uiserv:
       value: false
     active-theme:
       value: ecos
+    orgstruct-username-mask:
+      value: null
+    orgstruct-search-user-extra-fields:
+      value: null
 
   ecos-types-sync.active: true
 
