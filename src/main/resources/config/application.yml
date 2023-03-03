@@ -196,6 +196,10 @@ uiserv:
       value: false
     active-theme:
       value: ecos
+    orgstruct-username-mask:
+      value: null
+    orgstruct-search-user-extra-fields:
+      value: null
 
   ecos-records:
     apps:
@@ -224,4 +228,3 @@ spring.rabbitmq:
 
 # Persisted user configurations limit. If exceeded, the latest configuration is deleted
 max-user-configurations-persisted: 1000
-
