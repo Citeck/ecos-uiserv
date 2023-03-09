@@ -23,7 +23,8 @@
         {
           "id": "tasks",
           "label": {
-            "ru": "Задачи"
+            "ru": "Задачи",
+            "en": "Tasks"
           },
           "hidden": false,
           "type": "SECTION",
@@ -62,7 +63,8 @@
         {
           "id": "sections",
           "label": {
-            "ru": "Разделы"
+            "ru": "Разделы",
+            "en": "Sections"
           },
           "hidden": false,
           "type": "SECTION",
@@ -71,7 +73,8 @@
             {
               "id": "meetings-section",
               "label": {
-                "ru": "Совещания"
+                "ru": "Совещания",
+                "en": "Meetings"
               },
               "icon": "ui/icon@i-leftmenu-meetings",
               "type": "SECTION",
@@ -79,7 +82,8 @@
                 {
                   "id": "bd6c8ee5-4518-4805-9fbf-0ee71382aa1f",
                   "label": {
-                    "en": "Совещания"
+                    "ru": "Совещания",
+                    "en": "Meetings"
                   },
                   "type": "JOURNAL",
                   "config": {
@@ -93,7 +97,8 @@
             {
               "id": "order-passes-section",
               "label": {
-                "ru": "Пропуска"
+                "ru": "Пропуска",
+                "en": "Order passes"
               },
               "icon": "ui/icon@i-leftmenu-pass",
               "hidden": false,
@@ -107,7 +112,8 @@
                 {
                   "id": "272aa970-c181-447e-b565-1a8a9294d2be",
                   "label": {
-                    "en": "Пропуска"
+                    "ru": "Пропуска",
+                    "en": "Order passes"
                   },
                   "icon": "",
                   "hidden": false,
@@ -130,7 +136,8 @@
         {
           "id": "data-lists",
           "label": {
-            "ru": "Справочники"
+            "ru": "Справочники",
+            "en": "Data lists"
           },
           "hidden": false,
           "type": "SECTION",
@@ -140,7 +147,8 @@
         {
           "id": "admin-tools",
           "label": {
-            "ru": "Инструменты администратора"
+            "ru": "Инструменты администратора",
+            "en": "Admin tools"
           },
           "allowedFor": [
             "GROUP_ECOS_ADMINISTRATORS"
@@ -152,7 +160,8 @@
             {
               "id": "979bfe85-5361-4cf2-a0a3-dd43dabc95b6",
               "label": {
-                "ru": "Редактор бизнес-процессов"
+                "ru": "Редактор бизнес-процессов",
+                "en": "Business Process Editor"
               },
               "icon": "ui/icon@i-leftmenu-bpmn-editor",
               "hidden": false,
@@ -164,7 +173,8 @@
             {
               "id": "c3f0a948-bebf-4bae-9646-41acece5f3f9",
               "label": {
-                "ru": "Группы"
+                "ru": "Группы",
+                "en": "Groups"
               },
               "icon": "ui/icon@i-leftmenu-groups",
               "hidden": false,
@@ -176,7 +186,8 @@
             {
               "id": "c161291d-09c5-488c-b375-4bb8138afc32",
               "label": {
-                "ru": "Пользователи"
+                "ru": "Пользователи",
+                "en": "Users"
               },
               "icon": "ui/icon@i-leftmenu-users",
               "hidden": false,
@@ -188,7 +199,8 @@
             {
               "id": "5635b794-4158-4c97-9961-7e38852a14a4",
               "label": {
-                "ru": "Инструменты"
+                "ru": "Инструменты",
+                "en": "Tools"
               },
               "icon": "ui/icon@i-leftmenu-tools",
               "hidden": false,

@@ -49,7 +49,18 @@
       "Control": "Контрол",
       "Config": "Конфигурация",
       "columnFormatter": "Форматтер",
-      "tooltip.actionFromType": "empty (null) - если actions и actionsDef пустые, то добавляем действия из типа\ntrue - всегда добавляем действия из типа\nfalse - никогда не добавляем из типа"
+      "tooltip.actionFromType": "empty (null) - если actions и actionsDef пустые, то добавляем действия из типа\ntrue - всегда добавляем действия из типа\nfalse - никогда не добавляем из типа",
+      "association": "Ассоциация",
+      "person": "Человек",
+      "group": "Группа",
+      "authority": "Группа или человек",
+      "text": "Текст",
+      "ml_text": "Мультиязычный текст",
+      "number": "Число",
+      "boolean": "Булево",
+      "date": "Дата",
+      "date_time": "Дата и время",
+      "content": "Контент"
     },
     "en": {
       "Load columns": "Load columns",
@@ -91,6 +102,17 @@
       "Config": "Config",
       "columnFormatter": "Formatter",
       "tooltip.actionFromType": "empty (null) - if `actions` and `actionsDef` is empty, then add actions from type\ntrue - always add actions from type\nfalse - never add actions from type",
+      "association": "Association",
+      "person": "Person",
+      "group": "Group",
+      "authority": "Authority",
+      "text": "Text",
+      "ml_text": "ML text",
+      "number": "Number",
+      "boolean": "Boolean",
+      "date": "Date",
+      "date_time": "Date and time",
+      "content": "Content",
       "Add columns": "Add columns"
     }
   },
@@ -231,7 +253,8 @@
                           },
                           {
                             "label": {
-                              "ru": "Тип данных"
+                              "ru": "Тип данных",
+                              "en": "Data type"
                             },
                             "key": "typeRef",
                             "hideEditRowButton": true,
@@ -254,7 +277,7 @@
                     "input": false
                   },
                   {
-                    "label": "Свойства столбца",
+                    "label": "Column Properties",
                     "disableAddingRemovingRows": false,
                     "addAnother": "",
                     "addAnotherPosition": "bottom",
@@ -288,10 +311,19 @@
                     "components": [
                       {
                         "label": {
-                          "ru": "Системное имя"
+                          "ru": "Системное имя",
+                          "en": "System name"
                         },
-                        "defaultValue": "",
                         "key": "id",
+                        "inputMasks": [
+                          {
+                            "label": "",
+                            "mask": ""
+                          }
+                        ],
+                        "defaultValue": "",
+                        "refreshOn": [],
+                        "optionalWhenDisabled": false,
                         "type": "textfield",
                         "input": true,
                         "row": "0-0"
@@ -322,60 +354,62 @@
                               "ru": "Тип данных",
                               "en": "Data type"
                             },
-                            "hideLabel": true,
                             "key": "type",
+                            "hideLabel": true,
                             "customClass": "m-0",
                             "data": {
                               "values": [
                                 {
-                                  "label": "Ассоциация",
+                                  "label": "association",
                                   "value": "ASSOC"
                                 },
                                 {
-                                  "label": "Человек",
+                                  "label": "person",
                                   "value": "PERSON"
                                 },
                                 {
-                                  "label": "Группа",
+                                  "label": "group",
                                   "value": "AUTHORITY_GROUP"
                                 },
                                 {
-                                  "label": "Группа или человек",
+                                  "label": "authority",
                                   "value": "AUTHORITY"
                                 },
                                 {
-                                  "label": "Текст",
+                                  "label": "text",
                                   "value": "TEXT"
                                 },
                                 {
-                                  "label": "Мультиязычный текст",
+                                  "label": "ml_text",
                                   "value": "MLTEXT"
                                 },
                                 {
-                                  "label": "Число",
+                                  "label": "number",
                                   "value": "NUMBER"
                                 },
                                 {
-                                  "label": "Булево",
+                                  "label": "boolean",
                                   "value": "BOOLEAN"
                                 },
                                 {
-                                  "label": "Дата",
+                                  "label": "date",
                                   "value": "DATE"
                                 },
                                 {
-                                  "label": "Дата и время",
+                                  "label": "date_time",
                                   "value": "DATETIME"
                                 },
                                 {
-                                  "label": "Контент",
+                                  "label": "content",
                                   "value": "CONTENT"
                                 }
                               ]
                             },
+                            "dataPreProcessingCode": "",
                             "valueProperty": "value",
                             "defaultValue": "",
                             "refreshOn": [],
+                            "optionalWhenDisabled": false,
                             "type": "select",
                             "input": true
                           }
@@ -1054,11 +1088,20 @@
                           "en": "Source ID",
                           "ru": "Идентификатор источника данных"
                         },
-                        "description": {
-                          "ru": "По умолчанию загружается из связанного типа"
-                        },
-                        "defaultValue": "",
                         "key": "sourceId",
+                        "description": {
+                          "ru": "По умолчанию загружается из связанного типа",
+                          "en": "By default, it is loaded from the associated type"
+                        },
+                        "inputMasks": [
+                          {
+                            "label": "",
+                            "mask": ""
+                          }
+                        ],
+                        "defaultValue": "",
+                        "refreshOn": [],
+                        "optionalWhenDisabled": false,
                         "type": "textfield",
                         "input": true
                       },
@@ -1291,7 +1334,8 @@
         "type": "columns",
         "input": false
       }
-    ]
+    ],
+    "formId": "journal-form"
   },
   "attributes": {},
   "notExists": false
