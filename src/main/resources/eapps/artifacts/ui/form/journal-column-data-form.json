@@ -4,10 +4,11 @@
   "title": {
     "en": "journal-column-data-form"
   },
-  "system": true,
-  "customModule": null,
+  "description": {},
+  "customModule": "",
   "typeRef": "",
-  "width": null,
+  "width": "",
+  "system": true,
   "i18n": {},
   "definition": {
     "components": [
@@ -40,7 +41,8 @@
               },
               {
                 "label": {
-                  "ru": "Можно ли искать в шапке колонки"
+                  "ru": "Можно ли искать в шапке колонки",
+                  "en": "Is allowed to search in the column header"
                 },
                 "hasThreeStates": true,
                 "key": "searchableByText",
@@ -49,10 +51,13 @@
               },
               {
                 "label": {
-                  "ru": "Можно ли сортировать"
+                  "ru": "Можно ли сортировать",
+                  "en": "Is sorting allowed"
                 },
-                "hasThreeStates": true,
                 "key": "sortable",
+                "hasThreeStates": true,
+                "refreshOn": [],
+                "optionalWhenDisabled": false,
                 "type": "checkbox",
                 "input": true
               }
@@ -70,49 +75,65 @@
             "components": [
               {
                 "label": {
-                  "ru": "Можно ли группировать"
+                  "ru": "Можно ли группировать",
+                  "en": "Is grouping allowed"
                 },
-                "hasThreeStates": true,
                 "key": "groupable",
+                "hasThreeStates": true,
+                "refreshOn": [],
+                "optionalWhenDisabled": false,
                 "type": "checkbox",
                 "input": true
               },
               {
                 "label": {
-                  "ru": "Можно ли редактировать в таблице"
+                  "ru": "Можно ли редактировать в таблице",
+                  "en": "Is allowed to edit in the table"
                 },
-                "hasThreeStates": true,
                 "key": "editable",
+                "hasThreeStates": true,
+                "refreshOn": [],
+                "optionalWhenDisabled": false,
                 "type": "checkbox",
                 "input": true
               },
               {
                 "label": {
-                  "ru": "Отображать по умолчанию"
+                  "ru": "Отображать по умолчанию",
+                  "en": "Display by default"
                 },
-                "hasThreeStates": true,
                 "key": "visible",
+                "hasThreeStates": true,
+                "refreshOn": [],
+                "optionalWhenDisabled": false,
                 "type": "checkbox",
                 "input": true
               },
               {
                 "label": {
-                  "ru": "Скрытая колонка"
+                  "ru": "Скрытая колонка",
+                  "en": "Hidden column"
                 },
-                "description": {
-                  "ru": "Можно искать по колонке, но её нельзя вывести в таблицу"
-                },
-                "hasThreeStates": true,
                 "key": "hidden",
+                "description": {
+                  "ru": "Можно искать по колонке, но её нельзя вывести в таблицу",
+                  "en": "You can search by column, but it cannot be displayed in a table"
+                },
+                "hasThreeStates": true,
+                "refreshOn": [],
+                "optionalWhenDisabled": false,
                 "type": "checkbox",
                 "input": true
               },
               {
                 "label": {
-                  "ru": "Множественное значение"
+                  "ru": "Множественное значение",
+                  "en": "Multiple value"
                 },
-                "hasThreeStates": true,
                 "key": "multiple",
+                "hasThreeStates": true,
+                "refreshOn": [],
+                "optionalWhenDisabled": false,
                 "type": "checkbox",
                 "input": true
               }
@@ -132,27 +153,42 @@
             "components": [
               {
                 "label": {
-                  "ru": "Форматтер для колонки"
+                  "ru": "Форматтер для колонки",
+                  "en": "Column formatter"
                 },
                 "key": "formatter",
+                "refreshOn": [],
+                "optionalWhenDisabled": false,
                 "type": "container",
                 "input": true,
                 "components": [
                   {
                     "label": {
-                      "ru": "Тип форматтера"
+                      "ru": "Тип форматтера",
+                      "en": "Formatter type"
                     },
-                    "defaultValue": "",
                     "key": "type",
+                    "inputMasks": [
+                      {
+                        "label": "",
+                        "mask": ""
+                      }
+                    ],
+                    "defaultValue": "",
+                    "refreshOn": [],
+                    "optionalWhenDisabled": false,
                     "type": "textfield",
                     "input": true
                   },
                   {
                     "label": {
-                      "ru": "Конфигурация"
+                      "ru": "Конфигурация",
+                      "en": "Configuration"
                     },
-                    "keyLabel": "",
                     "key": "config",
+                    "keyLabel": "",
+                    "refreshOn": [],
+                    "optionalWhenDisabled": false,
                     "type": "datamap",
                     "input": true
                   }
@@ -172,27 +208,42 @@
             "components": [
               {
                 "label": {
-                  "ru": "Редактор для колонки"
+                  "ru": "Редактор для колонки",
+                  "en": "Column editor"
                 },
                 "key": "editor",
+                "refreshOn": [],
+                "optionalWhenDisabled": false,
                 "type": "container",
                 "input": true,
                 "components": [
                   {
                     "label": {
-                      "ru": "Тип редактора"
+                      "ru": "Тип редактора",
+                      "en": "Editor type"
                     },
-                    "defaultValue": "",
                     "key": "type",
+                    "inputMasks": [
+                      {
+                        "label": "",
+                        "mask": ""
+                      }
+                    ],
+                    "defaultValue": "",
+                    "refreshOn": [],
+                    "optionalWhenDisabled": false,
                     "type": "textfield",
                     "input": true
                   },
                   {
                     "label": {
-                      "ru": "Конфигурация"
+                      "ru": "Конфигурация",
+                      "en": "Configuration"
                     },
-                    "keyLabel": "",
                     "key": "config",
+                    "keyLabel": "",
+                    "refreshOn": [],
+                    "optionalWhenDisabled": false,
                     "type": "datamap",
                     "input": true
                   }
@@ -397,7 +448,14 @@
       },
       {
         "label": {
-          "ru": "Вычисляемые значения"
+          "ru": "Вычисляемые значения",
+          "en": "Calculated values"
+        },
+        "key": "computed",
+        "multiple": true,
+        "validate": {
+          "minLength": "",
+          "maxLength": ""
         },
         "disableAddingRemovingRows": false,
         "addAnother": "",
@@ -406,7 +464,12 @@
         "defaultOpen": false,
         "layoutFixed": false,
         "enableRowGroups": false,
-        "multiple": true,
+        "rowGroups": [
+          {
+            "label": "",
+            "numberOfRows": ""
+          }
+        ],
         "reorder": false,
         "defaultValue": [
           {
@@ -419,11 +482,8 @@
             "config": {}
           }
         ],
-        "validate": {
-          "minLength": "",
-          "maxLength": ""
-        },
-        "key": "computed",
+        "refreshOn": [],
+        "optionalWhenDisabled": false,
         "type": "datagrid",
         "input": true,
         "components": [
@@ -467,7 +527,9 @@
           }
         ]
       }
-    ]
+    ],
+    "formId": "journal-column-data-form"
   },
-  "attributes": {}
+  "attributes": {},
+  "notExists": false
 }
