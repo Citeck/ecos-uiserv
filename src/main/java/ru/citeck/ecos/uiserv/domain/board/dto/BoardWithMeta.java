@@ -55,4 +55,8 @@ public class BoardWithMeta {
     public RecordRef getRef() {
         return RecordRef.create(Application.NAME, BoardRecordsDao.ID, getLocalId());
     }
+
+    public BoardDef getBoardDef() {
+        return boardDef;
+    }
 }

@@ -11,7 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 import javax.annotation.PostConstruct
 
 @Configuration
-class EcosTypesConfig(
+class EcosTypesComponent(
     private val typesRegistry: EcosTypesRegistry
 ) {
 
