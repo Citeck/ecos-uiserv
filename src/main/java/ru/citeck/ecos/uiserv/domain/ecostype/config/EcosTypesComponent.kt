@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.ecostype.config
 
 import org.springframework.context.annotation.Configuration
-import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
+import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
@@ -15,18 +15,18 @@ class EcosTypesComponent(
     private val typesRegistry: EcosTypesRegistry
 ) {
 
-    private val parentByType = ConcurrentHashMap<RecordRef, RecordRef>()
-    private val childrenByType = ConcurrentHashMap<RecordRef, MutableList<RecordRef>>()
-    private val typeInfoByTypeRef = ConcurrentHashMap<RecordRef, TypeDef>()
+    private val parentByType = ConcurrentHashMap<EntityRef, EntityRef>()
+    private val childrenByType = ConcurrentHashMap<EntityRef, MutableList<EntityRef>>()
+    private val typeInfoByTypeRef = ConcurrentHashMap<EntityRef, TypeDef>()
 
-    private val typeByJournal = ConcurrentHashMap<RecordRef, RecordRef>()
-    private val journalByType = ConcurrentHashMap<RecordRef, RecordRef>()
+    private val typeByJournal = ConcurrentHashMap<EntityRef, EntityRef>()
+    private val journalByType = ConcurrentHashMap<EntityRef, EntityRef>()
 
-    private val typeByForm = ConcurrentHashMap<RecordRef, RecordRef>()
-    private val formByType = ConcurrentHashMap<RecordRef, RecordRef>()
+    private val typeByForm = ConcurrentHashMap<EntityRef, EntityRef>()
+    private val formByType = ConcurrentHashMap<EntityRef, EntityRef>()
 
-    private val typeByBoard = ConcurrentHashMap<RecordRef, RecordRef>()
-    private val boardByType = ConcurrentHashMap<RecordRef, RecordRef>()
+    private val typeByBoard = ConcurrentHashMap<EntityRef, EntityRef>()
+    private val boardByType = ConcurrentHashMap<EntityRef, EntityRef>()
 
     @PostConstruct
     fun init() {
@@ -39,17 +39,17 @@ class EcosTypesComponent(
 
     private fun onTypeChanged(type: TypeDef) {
 
-        val typeRef = TypeUtils.getTypeRef(type.id)
+        val typeRef = ModelUtils.getTypeRef(type.id)
         typeInfoByTypeRef[typeRef] = type
 
         val prevParentRef = parentByType[typeRef] ?: RecordRef.EMPTY
-        val newParentRef = type.parentRef ?: RecordRef.EMPTY
+        val newParentRef = type.parentRef
 
         if (prevParentRef != type.parentRef) {
-            if (RecordRef.isNotEmpty(prevParentRef)) {
+            if (EntityRef.isNotEmpty(prevParentRef)) {
                 childrenByType[prevParentRef]?.remove(typeRef)
             }
-            if (RecordRef.isNotEmpty(newParentRef)) {
+            if (EntityRef.isNotEmpty(newParentRef)) {
                 childrenByType.computeIfAbsent(newParentRef) { CopyOnWriteArrayList() }.add(typeRef)
             }
             parentByType[typeRef] = newParentRef
@@ -61,19 +61,19 @@ class EcosTypesComponent(
     }
 
     private fun updateRefs(
-        refByTypeMap: MutableMap<RecordRef, RecordRef>,
-        typeByRefMap: MutableMap<RecordRef, RecordRef>,
-        typeRef: RecordRef,
-        newRef: RecordRef?
+        refByTypeMap: MutableMap<EntityRef, EntityRef>,
+        typeByRefMap: MutableMap<EntityRef, EntityRef>,
+        typeRef: EntityRef,
+        newRef: EntityRef?
     ) {
         val newRefNotNull = newRef ?: RecordRef.EMPTY
         val prevRef = refByTypeMap[typeRef] ?: RecordRef.EMPTY
 
         if (newRef != prevRef) {
-            if (RecordRef.isNotEmpty(prevRef)) {
+            if (EntityRef.isNotEmpty(prevRef)) {
                 typeByRefMap.remove(prevRef)
             }
-            if (RecordRef.isNotEmpty(newRef)) {
+            if (EntityRef.isNotEmpty(newRef)) {
                 typeByRefMap[newRefNotNull] = typeRef
             }
             refByTypeMap[typeRef] = newRefNotNull
@@ -88,20 +88,20 @@ class EcosTypesComponent(
         }
     }
 
-    fun getJournalRefByType(journalRef: EntityRef): RecordRef {
-        return journalByType[journalRef] ?: RecordRef.EMPTY
+    fun getJournalRefByType(journalRef: EntityRef): EntityRef {
+        return journalByType[journalRef] ?: EntityRef.EMPTY
     }
 
-    fun getTypeRefByJournal(journalRef: EntityRef): RecordRef {
-        return typeByJournal[journalRef] ?: RecordRef.EMPTY
+    fun getTypeRefByJournal(journalRef: EntityRef): EntityRef {
+        return typeByJournal[journalRef] ?: EntityRef.EMPTY
     }
 
-    fun getTypeRefByForm(formRef: EntityRef): RecordRef {
+    fun getTypeRefByForm(formRef: EntityRef): EntityRef {
         return typeByForm[formRef] ?: RecordRef.EMPTY
     }
 
-    fun getTypeRefByBoard(boardRef: EntityRef): RecordRef {
-        return typeByBoard[boardRef] ?: RecordRef.EMPTY
+    fun getTypeRefByBoard(boardRef: EntityRef): EntityRef {
+        return typeByBoard[boardRef] ?: EntityRef.EMPTY
     }
 
     fun getTypeInfo(typeRef: EntityRef): TypeDef? {

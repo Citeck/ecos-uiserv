@@ -83,7 +83,7 @@ public class ResolvedBoardRecord {
         if (RecordRef.isNotEmpty(typeRef)) {
             TypeDef typeInfo = typeService.getTypeInfo(typeRef);
             if (typeInfo != null) {
-                return typeInfo.getJournalRef();
+                return RecordRef.valueOf(typeInfo.getJournalRef());
             }
         }
         return RecordRef.EMPTY;

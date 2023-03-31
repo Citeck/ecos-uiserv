@@ -32,7 +32,7 @@ class EcosTypeService(
             return typeRefForForm
         }
         val ref = RecordRef.create("uiserv", "form", formRef.id)
-        return typesComponent.getTypeRefByForm(ref)
+        return RecordRef.valueOf(typesComponent.getTypeRefByForm(ref))
     }
 
     fun getTypeRefByBoard(boardId: String?): RecordRef {
@@ -44,7 +44,7 @@ class EcosTypeService(
             return boardData.boardDef.typeRef
         }
         val ref = RecordRef.create("uiserv", "board", boardId)
-        return typesComponent.getTypeRefByBoard(ref)
+        return RecordRef.valueOf(typesComponent.getTypeRefByBoard(ref))
     }
 
     fun getTypeRefByJournal(journalRef: RecordRef?): RecordRef {
@@ -56,7 +56,7 @@ class EcosTypeService(
             return journal.journalDef.typeRef
         }
         val ref = RecordRef.create("uiserv", "journal", journalRef.id)
-        return typesComponent.getTypeRefByJournal(ref)
+        return RecordRef.valueOf(typesComponent.getTypeRefByJournal(ref))
     }
 
     fun getJournalRefByTypeRef(typeRef: RecordRef): RecordRef {
@@ -67,14 +67,14 @@ class EcosTypeService(
 
         var journalRef = typesComponent.getJournalRefByType(typeRef)
         if (EntityRef.isNotEmpty(journalRef)) {
-            return journalRef
+            return RecordRef.valueOf(journalRef)
         }
         val parents = ecosTypesRegistry.getParents(typeRef)
         for (parentRef in parents) {
             if (EntityRef.isNotEmpty(parentRef)) {
                 journalRef = typesComponent.getJournalRefByType(parentRef)
                 if (EntityRef.isNotEmpty(journalRef)) {
-                    return journalRef
+                    return RecordRef.valueOf(journalRef)
                 }
             }
         }

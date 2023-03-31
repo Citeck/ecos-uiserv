@@ -8,6 +8,6 @@ class FormBuilderContextImpl(
 ) : FormBuilderContext {
 
     override fun getJournalRefByType(typeRef: RecordRef): RecordRef {
-        return ecosTypesComponent.getJournalRefByType(typeRef)
+        return RecordRef.valueOf(ecosTypesComponent.getJournalRefByType(typeRef))
     }
 }

@@ -6,6 +6,7 @@ import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 import ru.citeck.ecos.uiserv.domain.form.service.provider.EcosFormsProvider;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +37,7 @@ public interface EcosFormService {
 
     Optional<EcosFormDef> getFormById(String id);
 
-    List<EcosFormDef> getFormsForExactType(RecordRef typeRef);
+    List<EcosFormDef> getFormsForExactType(EntityRef typeRef);
 
     List<EcosFormDef> getAllFormsForType(RecordRef typeRef);
 

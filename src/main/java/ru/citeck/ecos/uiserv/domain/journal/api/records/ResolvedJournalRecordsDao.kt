@@ -100,8 +100,8 @@ class ResolvedJournalRecordsDao(
         }
 
         typeInfo?.actions?.map {
-            if (it.id != "record-actions") {
-                actions.add(it)
+            if (it.getLocalId() != "record-actions") {
+                actions.add(RecordRef.valueOf(it))
             }
         }
         journalBuilder.withActions(actions.distinct())
@@ -191,7 +191,7 @@ class ResolvedJournalRecordsDao(
 
         if (RecordRef.isEmpty(journal.metaRecord)) {
             if (typeInfo != null) {
-                journal.withMetaRecord(typeInfo.metaRecord)
+                journal.withMetaRecord(RecordRef.valueOf(typeInfo.metaRecord))
             }
             if (RecordRef.isEmpty(journal.metaRecord)) {
                 journal.withMetaRecord(RecordRef.valueOf(journal.sourceId + "@"))

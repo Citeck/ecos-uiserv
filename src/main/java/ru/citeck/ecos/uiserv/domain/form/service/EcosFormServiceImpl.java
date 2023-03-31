@@ -23,6 +23,7 @@ import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.form.repo.EcosFormEntity;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 import ru.citeck.ecos.uiserv.domain.form.service.provider.EcosFormsProvider;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -264,7 +265,7 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
-    public List<EcosFormDef> getFormsForExactType(RecordRef typeRef) {
+    public List<EcosFormDef> getFormsForExactType(EntityRef typeRef) {
         List<EcosFormEntity> forms = formsEntityDao.findAllByTypeRef(typeRef.toString());
         return forms.stream()
             .map(this::mapToDto)

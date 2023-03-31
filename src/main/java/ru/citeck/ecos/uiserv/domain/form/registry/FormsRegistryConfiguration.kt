@@ -55,8 +55,8 @@ class FormsRegistryConfiguration(
             }
             typesRegistry.initializationPromise().get()
             typesRegistry.listenEventsWithMeta { _, before, after ->
-                val idBefore = before?.entity?.formRef?.id ?: ""
-                val idAfter = after?.entity?.formRef?.id ?: ""
+                val idBefore = before?.entity?.formRef?.getLocalId() ?: ""
+                val idAfter = after?.entity?.formRef?.getLocalId() ?: ""
                 if (idBefore != idAfter || before?.entity?.name != after?.entity?.name) {
                     if (after != null && idAfter.startsWith(TYPE_AUTO_FORM_PREFIX)) {
                         setRegistryValue(registry, idAfter, createRegistryValue(after))
@@ -66,9 +66,9 @@ class FormsRegistryConfiguration(
                 }
             }
             typesRegistry.getAllValues().values.filter {
-                it.entity.formRef.id.startsWith(TYPE_AUTO_FORM_PREFIX)
+                it.entity.formRef.getLocalId().startsWith(TYPE_AUTO_FORM_PREFIX)
             }.forEach { value ->
-                setRegistryValue(registry, value.entity.formRef.id, createRegistryValue(value))
+                setRegistryValue(registry, value.entity.formRef.getLocalId(), createRegistryValue(value))
             }
         }
 

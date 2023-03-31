@@ -56,8 +56,8 @@ class JournalsRegistryConfiguration(
             }
             typesRegistry.initializationPromise().get()
             typesRegistry.listenEventsWithMeta { _, before, after ->
-                val idBefore = before?.entity?.journalRef?.id ?: ""
-                val idAfter = after?.entity?.journalRef?.id ?: ""
+                val idBefore = before?.entity?.journalRef?.getLocalId() ?: ""
+                val idAfter = after?.entity?.journalRef?.getLocalId() ?: ""
                 if (idBefore != idAfter || before?.entity?.name != after?.entity?.name) {
                     if (after != null && idAfter.startsWith(TYPE_AUTO_JOURNAL_PREFIX)) {
                         setRegistryValue(registry, idAfter, createRegistryValue(after))
@@ -67,9 +67,9 @@ class JournalsRegistryConfiguration(
                 }
             }
             typesRegistry.getAllValues().values.filter {
-                it.entity.journalRef.id.startsWith(TYPE_AUTO_JOURNAL_PREFIX)
+                it.entity.journalRef.getLocalId().startsWith(TYPE_AUTO_JOURNAL_PREFIX)
             }.forEach { value ->
-                setRegistryValue(registry, value.entity.journalRef.id, createRegistryValue(value))
+                setRegistryValue(registry, value.entity.journalRef.getLocalId(), createRegistryValue(value))
             }
         }
 
