@@ -4,39 +4,59 @@ import org.springframework.stereotype.Service
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.model.lib.type.dto.CreateVariantDef
 import ru.citeck.ecos.records2.RecordRef
-import ru.citeck.ecos.uiserv.domain.ecostype.config.EcosTypesConfig
+import ru.citeck.ecos.uiserv.domain.board.service.BoardService
+import ru.citeck.ecos.uiserv.domain.ecostype.config.EcosTypesComponent
+import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
+import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
 
 @Service
 class EcosTypeService(
-    private val typesConfig: EcosTypesConfig,
-    private val ecsosTypesRegistry: EcosTypesRegistry
+    private val typesComponent: EcosTypesComponent,
+    private val formService: EcosFormService,
+    private val boardService: BoardService,
+    private val journalService: JournalService,
+    private val ecosTypesRegistry: EcosTypesRegistry
 ) {
 
     fun getTypeRefByForm(formRef: RecordRef?): RecordRef {
         if (formRef == null || RecordRef.isEmpty(formRef)) {
             return RecordRef.EMPTY
         }
+        val typeRefForForm = formService.getFormById(formRef.getLocalId())
+            .map { it.typeRef }
+            .orElse(RecordRef.EMPTY)
+        if (EntityRef.isNotEmpty(typeRefForForm)) {
+            return typeRefForForm
+        }
         val ref = RecordRef.create("uiserv", "form", formRef.id)
-        return typesConfig.getTypeRefByForm(ref)
+        return typesComponent.getTypeRefByForm(ref)
     }
 
     fun getTypeRefByBoard(boardId: String?): RecordRef {
         if (boardId.isNullOrBlank()) {
             return RecordRef.EMPTY
         }
+        val boardData = boardService.getBoardById(boardId)
+        if (boardData != null && EntityRef.isNotEmpty(boardData.boardDef.typeRef)) {
+            return boardData.boardDef.typeRef
+        }
         val ref = RecordRef.create("uiserv", "board", boardId)
-        return typesConfig.getTypeRefByBoard(ref)
+        return typesComponent.getTypeRefByBoard(ref)
     }
 
     fun getTypeRefByJournal(journalRef: RecordRef?): RecordRef {
         if (journalRef == null || RecordRef.isEmpty(journalRef)) {
             return RecordRef.EMPTY
         }
+        val journal = journalService.getJournalById(journalRef.getLocalId())
+        if (journal != null && EntityRef.isNotEmpty(journal.journalDef.typeRef)) {
+            return journal.journalDef.typeRef
+        }
         val ref = RecordRef.create("uiserv", "journal", journalRef.id)
-        return typesConfig.getTypeRefByJournal(ref)
+        return typesComponent.getTypeRefByJournal(ref)
     }
 
     fun getJournalRefByTypeRef(typeRef: RecordRef): RecordRef {
@@ -45,14 +65,14 @@ class EcosTypeService(
             return RecordRef.EMPTY
         }
 
-        var journalRef = typesConfig.getJournalRefByType(typeRef)
+        var journalRef = typesComponent.getJournalRefByType(typeRef)
         if (EntityRef.isNotEmpty(journalRef)) {
             return journalRef
         }
-        val parents = ecsosTypesRegistry.getParents(typeRef)
+        val parents = ecosTypesRegistry.getParents(typeRef)
         for (parentRef in parents) {
             if (EntityRef.isNotEmpty(parentRef)) {
-                journalRef = typesConfig.getJournalRefByType(parentRef)
+                journalRef = typesComponent.getJournalRefByType(parentRef)
                 if (EntityRef.isNotEmpty(journalRef)) {
                     return journalRef
                 }
@@ -66,7 +86,7 @@ class EcosTypeService(
         if (typeRef == null) {
             return null
         }
-        val typeInfo = typesConfig.getTypeInfo(typeRef) ?: return null
+        val typeInfo = typesComponent.getTypeInfo(typeRef) ?: return null
 
         val copy = typeInfo.copy()
         copy.withCreateVariants(filterCreateVariants(copy.createVariants))

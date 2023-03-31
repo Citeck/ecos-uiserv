@@ -50,4 +50,8 @@ public class BoardDef {
     public static RecordRef createRef(String localId) {
         return RecordRef.create(Application.NAME, BoardRecordsDao.ID, localId);
     }
+
+    public RecordRef getTypeRef() {
+        return typeRef;
+    }
 }

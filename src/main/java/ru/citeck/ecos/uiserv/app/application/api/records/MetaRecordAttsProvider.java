@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.records2.source.dao.local.meta.MetaAttributesSupplier;
 import ru.citeck.ecos.records2.source.dao.local.meta.MetaRecordsDaoAttsProvider;
-import ru.citeck.ecos.uiserv.domain.ecostype.config.EcosTypesConfig;
+import ru.citeck.ecos.uiserv.domain.ecostype.config.EcosTypesComponent;
 import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService;
 import ru.citeck.ecos.uiserv.domain.icon.service.IconService;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService;
@@ -33,7 +33,7 @@ public class MetaRecordAttsProvider implements MetaAttributesSupplier {
     private final I18nService i18nService;
     private final ThemeService themeService;
     private final IconService iconService;
-    private final EcosTypesConfig ecosTypesConfig;
+    private final EcosTypesComponent ecosTypesComponent;
 
     private String typesLastModified = "";
 
@@ -41,7 +41,7 @@ public class MetaRecordAttsProvider implements MetaAttributesSupplier {
     void init() {
         provider.register(this);
 
-        ecosTypesConfig.addOnTypeChangedListener(type -> {
+        ecosTypesComponent.addOnTypeChangedListener(type -> {
             typesLastModified = "" + Instant.now().toEpochMilli();
             return Unit.INSTANCE;
         });
