@@ -6,7 +6,8 @@ import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
 @IncludeNonDefault
 @JsonDeserialize(builder = JournalSearchConfig.Builder::class)
 data class JournalSearchConfig(
-    val delimiters: List<String> = emptyList()
+    val delimiters: List<String> = emptyList(),
+    val headerSearchEnabled: Boolean = true
 ) {
 
     companion object {
@@ -37,9 +38,11 @@ data class JournalSearchConfig(
     class Builder() {
 
         var delimiters: List<String> = emptyList()
+        var headerSearchEnabled: Boolean = true
 
         constructor(base: JournalSearchConfig) : this() {
             withDelimiters(base.delimiters)
+            headerSearchEnabled = base.headerSearchEnabled
         }
 
         fun withDelimiters(delimiters: List<String>?): Builder {
@@ -47,8 +50,13 @@ data class JournalSearchConfig(
             return this
         }
 
+        fun withHeaderSearchEnabled(headerSearchEnabled: Boolean?): Builder {
+            this.headerSearchEnabled = headerSearchEnabled ?: true
+            return this
+        }
+
         fun build(): JournalSearchConfig {
-            return JournalSearchConfig(delimiters)
+            return JournalSearchConfig(delimiters, headerSearchEnabled)
         }
     }
 }
