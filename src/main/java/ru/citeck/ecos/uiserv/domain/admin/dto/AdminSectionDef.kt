@@ -9,6 +9,7 @@ import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
 @JsonDeserialize(builder = AdminSectionDef.Builder::class)
 data class AdminSectionDef(
     val name: MLText,
+    val shortName: MLText,
     val type: String,
     val config: ObjectData
 ) {
@@ -50,17 +51,24 @@ data class AdminSectionDef(
     open class Builder() {
 
         var name: MLText = MLText.EMPTY
+        var shortName: MLText = MLText.EMPTY
         var type: String = ""
         var config: ObjectData = ObjectData.create()
 
         constructor(base: AdminSectionDef) : this() {
             this.name = base.name
+            this.shortName = base.shortName
             this.type = base.type
             this.config = base.config
         }
 
         fun withName(name: MLText?): Builder {
             this.name = name ?: MLText.EMPTY
+            return this
+        }
+
+        fun withShortName(shortName: MLText?): Builder {
+            this.shortName = shortName ?: MLText.EMPTY
             return this
         }
 
@@ -77,6 +85,7 @@ data class AdminSectionDef(
         fun build(): AdminSectionDef {
             return AdminSectionDef(
                 name,
+                shortName,
                 type,
                 config
             )
