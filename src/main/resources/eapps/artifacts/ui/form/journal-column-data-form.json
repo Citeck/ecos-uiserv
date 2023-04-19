@@ -452,6 +452,16 @@
             "row": "0-0"
           }
         ]
+      },
+      {
+        "label": {
+          "ru": "Схема атрибута"
+        },
+        "key": "attSchema",
+        "defaultValue": "",
+        "refreshOn": [],
+        "type": "textfield",
+        "input": true
       }
     ]
   },

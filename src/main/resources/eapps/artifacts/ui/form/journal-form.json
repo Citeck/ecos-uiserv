@@ -389,7 +389,7 @@
                             "action": "custom",
                             "state": "",
                             "showValidations": false,
-                            "custom": "\nvar currentRow = row;\n\nCiteck.EcosFormUtils.getFormById('uiserv/form@journal-column-data-form', {\n    definition: 'definition?json'\n}).then(function(formConfig) {\n\n    var inputs = [\n        'attribute',\n        'editor',\n        'formatter',\n        'searchable',\n        'searchableByText',\n        'sortable',\n        'groupable',\n        'editable',\n        'visible',\n        'hidden',\n        'multiple',\n        'computed',\n        'properties',\n        'searchConfig',\n        'headerFilterEditor'\n    ];\n\n    var formData = {};\n\n    for (var i = 0; i < inputs.length; i++) {\n        var att = inputs[i];\n        var value = currentRow[att];\n        if (value === undefined) {\n            value = null;\n        } else if (Array.isArray(value)) {\n            value = value.filter(function(it) { return !!it; });\n        }\n        formData[att] = value;\n    }\n\n    Citeck.Dialogs.showFormDialog({\n        title: 'Column additional config',\n        showDefaultButtons: true,\n        formDefinition: formConfig.definition,\n        formData: formData,\n        onSubmit: submission => {\n            var data = submission.data || {};\n            for (var i = 0; i < inputs.length; i++) {\n                var att = inputs[i];\n                currentRow[att] = data[att];\n            }\n        }\n    })\n});\n",
+                            "custom": "\nvar currentRow = row;\n\nCiteck.EcosFormUtils.getFormById('uiserv/form@journal-column-data-form', {\n    definition: 'definition?json'\n}).then(function(formConfig) {\n\n    var inputs = [\n        'attribute',\n        'editor',\n        'attSchema',\n        'formatter',\n        'searchable',\n        'searchableByText',\n        'sortable',\n        'groupable',\n        'editable',\n        'visible',\n        'hidden',\n        'multiple',\n        'computed',\n        'properties',\n        'searchConfig',\n        'headerFilterEditor'\n    ];\n\n    var formData = {};\n\n    for (var i = 0; i < inputs.length; i++) {\n        var att = inputs[i];\n        var value = currentRow[att];\n        if (value === undefined) {\n            value = null;\n        } else if (Array.isArray(value)) {\n            value = value.filter(function(it) { return !!it; });\n        }\n        formData[att] = value;\n    }\n\n    Citeck.Dialogs.showFormDialog({\n        title: 'Column additional config',\n        showDefaultButtons: true,\n        formDefinition: formConfig.definition,\n        formData: formData,\n        onSubmit: submission => {\n            var data = submission.data || {};\n            for (var i = 0; i < inputs.length; i++) {\n                var att = inputs[i];\n                currentRow[att] = data[att];\n            }\n        }\n    })\n});\n",
                             "block": true,
                             "refreshOn": [],
                             "optionalWhenDisabled": false,
@@ -411,6 +411,18 @@
                               "ru": "editor"
                             },
                             "key": "editor",
+                            "properties": {
+                              "dataType": "json"
+                            },
+                            "type": "hidden",
+                            "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "attSchema"
+                            },
+                            "key": "attSchema",
+                            "refreshOn": [],
                             "properties": {
                               "dataType": "json"
                             },
