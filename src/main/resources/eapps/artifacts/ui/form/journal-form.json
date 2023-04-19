@@ -185,6 +185,23 @@
                           },
                           {
                             "label": {
+                              "ru": "implSourceId"
+                            },
+                            "key": "implSourceId",
+                            "inputMasks": [
+                              {
+                                "label": "",
+                                "mask": ""
+                              }
+                            ],
+                            "defaultValue": "",
+                            "refreshOn": [],
+                            "optionalWhenDisabled": false,
+                            "type": "textfield",
+                            "input": true
+                          },
+                          {
+                            "label": {
                               "ru": "Название журнала",
                               "en": "Journal name"
                             },
@@ -277,7 +294,10 @@
                     "input": false
                   },
                   {
-                    "label": "Column Properties",
+                    "label": {
+                      "ru": "Свойства столбца",
+                      "en": "Column Properties"
+                    },
                     "disableAddingRemovingRows": false,
                     "addAnother": "",
                     "addAnotherPosition": "bottom",
@@ -435,7 +455,13 @@
                             "action": "custom",
                             "state": "",
                             "showValidations": false,
-                            "custom": "\nvar currentRow = row;\n\nCiteck.EcosFormUtils.getFormById('uiserv/form@journal-column-data-form', {\n    definition: 'definition?json'\n}).then(function(formConfig) {\n\n    var inputs = [\n        'attribute',\n        'editor',\n        'formatter',\n        'searchable',\n        'searchableByText',\n        'sortable',\n        'groupable',\n        'editable',\n        'visible',\n        'hidden',\n        'multiple',\n        'computed',\n        'properties',\n        'searchConfig',\n        'headerFilterEditor'\n    ];\n\n    var formData = {};\n\n    for (var i = 0; i < inputs.length; i++) {\n        var att = inputs[i];\n        var value = currentRow[att];\n        if (value === undefined) {\n            value = null;\n        } else if (Array.isArray(value)) {\n            value = value.filter(function(it) { return !!it; });\n        }\n        formData[att] = value;\n    }\n\n    Citeck.Dialogs.showFormDialog({\n        title: 'Column additional config',\n        showDefaultButtons: true,\n        formDefinition: formConfig.definition,\n        formData: formData,\n        onSubmit: submission => {\n            var data = submission.data || {};\n            for (var i = 0; i < inputs.length; i++) {\n                var att = inputs[i];\n                currentRow[att] = data[att];\n            }\n        }\n    })\n});\n",
+                            "custom": "\nvar currentRow = row;\nconst currentComponent = arguments[5];\n\nCiteck.EcosFormUtils.getFormById('uiserv/form@journal-column-data-form', {\n    definition: 'definition?json'\n}).then(function(formConfig) {\n\n    var inputs = [\n        'attribute',\n        'editor',\n        'formatter',\n        'searchable',\n        'searchableByText',\n        'sortable',\n        'groupable',\n        'editable',\n        'visible',\n        'hidden',\n        'multiple',\n        'computed',\n        'properties',\n        'searchConfig',\n        'headerFilterEditor'\n    ];\n\n    var formData = {};\n\n    for (var i = 0; i < inputs.length; i++) {\n        var att = inputs[i];\n        var value = currentRow[att];\n        if (value === undefined) {\n            value = null;\n        } else if (Array.isArray(value)) {\n            value = value.filter(function(it) { return !!it; });\n        }\n        formData[att] = value;\n    }\n\n    Citeck.Dialogs.showFormDialog({\n        title: 'Column additional config',\n        showDefaultButtons: true,\n        formDefinition: formConfig.definition,\n        formData: formData,\n        onSubmit: submission => {\n            var data = submission.data || {};\n            for (var i = 0; i < inputs.length; i++) {\n                var att = inputs[i];\n                currentRow[att] = data[att];\n            }\n            \n            form.emit('change', {\n              changed: {\n              instance: currentRow,\n              component: currentComponent,\n            },\n             data: submission.data\n           });\n        }\n    })\n});\n",
+                            "headers": [
+                              {
+                                "header": "",
+                                "value": ""
+                              }
+                            ],
                             "block": true,
                             "refreshOn": [],
                             "optionalWhenDisabled": false,
@@ -1236,7 +1262,20 @@
                         "components": [
                           {
                             "label": {
-                              "ru": "Delimiters"
+                              "ru": "Поле поиска",
+                              "en": "Search field"
+                            },
+                            "key": "headerSearchEnabled",
+                            "defaultValue": true,
+                            "refreshOn": [],
+                            "optionalWhenDisabled": false,
+                            "type": "checkbox",
+                            "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "Разделители",
+                              "en": "Delimiters"
                             },
                             "key": "delimiters",
                             "multiple": true,
