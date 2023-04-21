@@ -185,23 +185,6 @@
                           },
                           {
                             "label": {
-                              "ru": "implSourceId"
-                            },
-                            "key": "implSourceId",
-                            "inputMasks": [
-                              {
-                                "label": "",
-                                "mask": ""
-                              }
-                            ],
-                            "defaultValue": "",
-                            "refreshOn": [],
-                            "optionalWhenDisabled": false,
-                            "type": "textfield",
-                            "input": true
-                          },
-                          {
-                            "label": {
                               "ru": "Название журнала",
                               "en": "Journal name"
                             },
