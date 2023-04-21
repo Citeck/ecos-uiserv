@@ -423,9 +423,6 @@
                             },
                             "key": "attSchema",
                             "refreshOn": [],
-                            "properties": {
-                              "dataType": "json"
-                            },
                             "type": "hidden",
                             "input": true
                           },

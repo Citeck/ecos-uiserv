@@ -455,7 +455,8 @@
       },
       {
         "label": {
-          "ru": "Схема атрибута"
+          "ru": "Схема атрибута",
+          "en": "Attribute scheme"
         },
         "key": "attSchema",
         "defaultValue": "",
