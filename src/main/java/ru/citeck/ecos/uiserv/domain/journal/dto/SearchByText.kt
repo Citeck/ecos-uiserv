@@ -53,7 +53,11 @@ data class SearchByText(
         }
 
         fun withInnerQuery(innerQuery: ObjectData?): Builder {
-            this.innerQuery = innerQuery ?: ObjectData.create()
+            if (innerQuery != null && innerQuery["sourceId"].isEmpty()) {
+                this.innerQuery = ObjectData.create()
+            } else {
+                this.innerQuery = innerQuery ?: ObjectData.create()
+            }
             return this
         }
 
