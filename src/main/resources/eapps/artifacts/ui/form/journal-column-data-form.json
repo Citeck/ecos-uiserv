@@ -168,16 +168,19 @@
                       "en": "Formatter type"
                     },
                     "key": "type",
-                    "inputMasks": [
-                      {
-                        "label": "",
-                        "mask": ""
-                      }
-                    ],
+                    "dataSrc": "custom",
+                    "data": {
+                      "headers": [
+                        {
+                          "key": "",
+                          "value": ""
+                        }
+                      ],
+                      "custom": "const registry = Citeck.FormattersRegistry;\nif (registry) {\n  const formatters = registry.getAllFormatters();\n  values = formatters.map((formatter) => ({\n    label: `journals.formatter.${formatter.getType()}.name`, \n    value: formatter.getType(),\n  }));\n}"
+                    },
                     "defaultValue": "",
-                    "refreshOn": [],
                     "optionalWhenDisabled": false,
-                    "type": "textfield",
+                    "type": "ecosSelect",
                     "input": true
                   },
                   {
@@ -438,7 +441,7 @@
                   "en": "Attribute to be searched for when filtering by column"
                 },
                 "defaultValue": "",
-                "key":  "searchAttribute",
+                "key": "searchAttribute",
                 "type": "textfield",
                 "input": true
               }
