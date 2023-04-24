@@ -40,7 +40,8 @@
               },
               {
                 "label": {
-                  "ru": "Можно ли искать в шапке колонки"
+                  "ru": "Можно ли искать в шапке колонки",
+                  "en": "Column header search is allowed"
                 },
                 "hasThreeStates": true,
                 "key": "searchableByText",
@@ -49,7 +50,8 @@
               },
               {
                 "label": {
-                  "ru": "Можно ли сортировать"
+                  "ru": "Можно ли сортировать",
+                  "en": "Sorting is allowed"
                 },
                 "hasThreeStates": true,
                 "key": "sortable",
@@ -70,7 +72,8 @@
             "components": [
               {
                 "label": {
-                  "ru": "Можно ли группировать"
+                  "ru": "Можно ли группировать",
+                  "en": "Grouping is allowed"
                 },
                 "hasThreeStates": true,
                 "key": "groupable",
@@ -79,7 +82,8 @@
               },
               {
                 "label": {
-                  "ru": "Можно ли редактировать в таблице"
+                  "ru": "Можно ли редактировать в таблице",
+                  "en": "Cell editing is allowed"
                 },
                 "hasThreeStates": true,
                 "key": "editable",
@@ -88,7 +92,8 @@
               },
               {
                 "label": {
-                  "ru": "Отображать по умолчанию"
+                  "ru": "Отображать по умолчанию",
+                  "en": "Default display"
                 },
                 "hasThreeStates": true,
                 "key": "visible",
@@ -97,10 +102,12 @@
               },
               {
                 "label": {
-                  "ru": "Скрытая колонка"
+                  "ru": "Скрытая колонка",
+                  "en": "Hidden coluumn"
                 },
                 "description": {
-                  "ru": "Можно искать по колонке, но её нельзя вывести в таблицу"
+                  "ru": "Можно искать по колонке, но её нельзя вывести в таблицу",
+                  "en": "Can be searched but not displayed"
                 },
                 "hasThreeStates": true,
                 "key": "hidden",
@@ -109,7 +116,8 @@
               },
               {
                 "label": {
-                  "ru": "Множественное значение"
+                  "ru": "Множественное значение",
+                  "en": "Multiple value"
                 },
                 "hasThreeStates": true,
                 "key": "multiple",
@@ -132,7 +140,8 @@
             "components": [
               {
                 "label": {
-                  "ru": "Форматтер для колонки"
+                  "ru": "Форматтер для колонки",
+                  "en": "Column formatter"
                 },
                 "key": "formatter",
                 "type": "container",
@@ -140,7 +149,8 @@
                 "components": [
                   {
                     "label": {
-                      "ru": "Тип форматтера"
+                      "ru": "Тип форматтера",
+                      "en": "Formatter type"
                     },
                     "defaultValue": "",
                     "key": "type",
@@ -149,7 +159,8 @@
                   },
                   {
                     "label": {
-                      "ru": "Конфигурация"
+                      "ru": "Конфигурация",
+                      "en": "Configuration"
                     },
                     "keyLabel": "",
                     "key": "config",
@@ -172,7 +183,8 @@
             "components": [
               {
                 "label": {
-                  "ru": "Редактор для колонки"
+                  "ru": "Редактор для колонки",
+                  "en": "Column editor"
                 },
                 "key": "editor",
                 "type": "container",
@@ -180,7 +192,8 @@
                 "components": [
                   {
                     "label": {
-                      "ru": "Тип редактора"
+                      "ru": "Тип редактора",
+                      "en": "Editor type"
                     },
                     "defaultValue": "",
                     "key": "type",
@@ -189,7 +202,8 @@
                   },
                   {
                     "label": {
-                      "ru": "Конфигурация"
+                      "ru": "Конфигурация",
+                      "en": "Configuration"
                     },
                     "keyLabel": "",
                     "key": "config",
@@ -207,7 +221,8 @@
       },
       {
         "label": {
-          "ru": "Panel"
+          "ru": "Панель",
+          "en": "Panel"
         },
         "key": "headerFilterEditorPanel",
         "title": {
@@ -249,10 +264,14 @@
       },
       {
         "label": {
-          "ru": "Panel"
+          "ru": "Панель",
+          "en": "Panel"
         },
         "key": "searchConfigPanel",
-        "title": "Search Config",
+        "title": {
+          "en": "Search Config",
+          "ru": "Конфигурация поиска"
+        },
         "collapsible": true,
         "collapsed": true,
         "refreshOn": [],
@@ -262,7 +281,8 @@
         "components": [
           {
             "label": {
-              "ru": "Search Config"
+              "ru": "Конфигурация поиска",
+              "en": "Search Config"
             },
             "hideLabel": true,
             "key": "searchConfig",
@@ -383,7 +403,8 @@
       },
       {
         "label": {
-          "ru": "Вычисляемые значения"
+          "ru": "Вычисляемые значения",
+          "en": "Calculated values"
         },
         "disableAddingRemovingRows": false,
         "addAnother": "",
@@ -415,7 +436,8 @@
         "components": [
           {
             "label": {
-              "ru": "Panel"
+              "ru": "Панель",
+              "en": "Panel"
             },
             "key": "panel",
             "type": "panel",
@@ -423,7 +445,8 @@
             "components": [
               {
                 "label": {
-                  "ru": "id"
+                  "ru": "ID",
+                  "en": "Ид"
                 },
                 "defaultValue": "",
                 "key": "id",
@@ -432,7 +455,8 @@
               },
               {
                 "label": {
-                  "ru": "type"
+                  "ru": "Type",
+                  "en": "Тип"
                 },
                 "defaultValue": "",
                 "key": "type",
@@ -441,7 +465,8 @@
               },
               {
                 "label": {
-                  "ru": "Config"
+                  "ru": "Конфигурация",
+                  "en": "Configuration"
                 },
                 "keyLabel": "",
                 "key": "config",
@@ -452,6 +477,17 @@
             "row": "0-0"
           }
         ]
+      },
+      {
+        "label": {
+          "ru": "Схема атрибута",
+          "en": "Attribute scheme"
+        },
+        "key": "attSchema",
+        "defaultValue": "",
+        "refreshOn": [],
+        "type": "textfield",
+        "input": true
       }
     ]
   },
