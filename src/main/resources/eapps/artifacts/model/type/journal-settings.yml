@@ -16,7 +16,7 @@ model:
     - id: name
       type: MLTEXT
     - id: authority
-      name: { ru: "Человек или группа", en: "User or group" }
+      name: { ru: "Пользователь или группа", en: "User or group" }
     - id: journalId
       name: { ru: "Идентификатор журнала", en: "Journal ID" }
     - id: settings
