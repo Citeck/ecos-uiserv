@@ -30,4 +30,4 @@ columns:
     searchable: false
 
   - id: authority
-    name: { ru: Человек или группа, en: User or group }
+    name: { ru: Пользователь или группа, en: User or group }
