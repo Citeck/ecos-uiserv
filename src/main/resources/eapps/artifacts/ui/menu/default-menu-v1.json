@@ -134,6 +134,37 @@
           ]
         },
         {
+          "id":"orgstructure",
+          "label":  {
+            "ru": "Оргструктура",
+            "en": "Orgstructure"
+          },
+          "hidden":false,
+          "type":"SECTION",
+          "config":{},
+          "items":[
+            {
+              "id":"orgstructure-item",
+              "label": {
+                "ru":"Оргструктура",
+                "en": "Orgstructure"
+              },
+              "icon":"ui/icon@i-leftmenu-organizational-structure",
+              "hidden":false,
+              "type":"ARBITRARY",
+              "config":{
+                "url":"/v2/orgstructure"
+              },
+              "action":{
+              "type":"",
+              "config":{}
+              },
+              "items":[],
+              "allowedFor":[]
+            }
+          ]
+        },
+        {
           "id": "data-lists",
           "label": {
             "ru": "Справочники",
