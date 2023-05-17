@@ -10,5 +10,7 @@ interface EcosFormInputBuilder {
 
     fun setMultiple(multiple: Boolean): EcosFormInputBuilder
 
+    fun setMandatory(mandatory: Boolean): EcosFormInputBuilder
+
     fun build(): EcosFormBuilder
 }

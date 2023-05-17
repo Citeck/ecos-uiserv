@@ -18,6 +18,7 @@ open class EcosFormInputBuilderImpl(
         private const val NAME = "label"
         private const val INPUT = "input"
         private const val MULTIPLE = "multiple"
+        private const val REQUIRED = "$.validate.required"
 
         private const val ENABLE_TIME = "enableTime"
 
@@ -70,6 +71,15 @@ open class EcosFormInputBuilderImpl(
 
     override fun setMultiple(multiple: Boolean): EcosFormInputBuilder {
         data[MULTIPLE] = multiple
+        return this
+    }
+
+    override fun setMandatory(mandatory: Boolean): EcosFormInputBuilder {
+        if (mandatory) {
+            data[REQUIRED] = true
+        } else {
+            data.remove(REQUIRED)
+        }
         return this
     }
 

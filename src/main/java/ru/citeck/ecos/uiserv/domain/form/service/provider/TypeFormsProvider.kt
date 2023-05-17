@@ -79,6 +79,7 @@ class TypeFormsProvider(
             .setKey(fieldKey)
             .setName(name)
             .setMultiple(attribute.multiple)
+            .setMandatory(attribute.mandatory)
             .build()
     }
 
