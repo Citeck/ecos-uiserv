@@ -372,7 +372,7 @@
         {
           "id": "layout_bb6e6685-f802-4680-8606-007a42a8c1bd",
           "tab": {
-            "label": "Инф22ed1da2-c319-4fae-bfd5-dd36022ff3e7ормация",
+            "label": "Информация",
             "idLayout": "layout_bb6e6685-f802-4680-8606-007a42a8c1bd"
           },
           "type": "adaptive",
@@ -446,7 +446,6 @@
         }
       ]
     }
-  }
-,
+  },
   "attributes": {}
 }
