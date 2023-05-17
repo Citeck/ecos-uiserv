@@ -343,13 +343,36 @@
             }
           },
           "description": "Информация"
+        },
+        {
+          "name": "journal",
+          "label": "dashboard-settings.widget.journal",
+          "additionalProps": {},
+          "dndId": "785fbbbd-c098-4493-9a9c-8b4d65a1a1b8",
+          "id": "22ed1da2-c319-4fae-bfd5-dd36022ff3e7",
+          "props": {
+            "id": "22ed1da2-c319-4fae-bfd5-dd36022ff3e7",
+            "config": {
+              "version": "v2",
+              "v2": {
+                "onlyLinked": true,
+                "journalsListIds": [
+                  "uiserv/journal@auth-delegations"
+                ],
+                "journalSettingId": "",
+                "journalId": "auth-delegations",
+                "customJournalMode": false,
+                "customJournal": ""
+              }
+            }
+          }
         }
       ],
       "desktop": [
         {
           "id": "layout_bb6e6685-f802-4680-8606-007a42a8c1bd",
           "tab": {
-            "label": "Информация",
+            "label": "Инф22ed1da2-c319-4fae-bfd5-dd36022ff3e7ормация",
             "idLayout": "layout_bb6e6685-f802-4680-8606-007a42a8c1bd"
           },
           "type": "adaptive",
@@ -362,6 +385,24 @@
                 "128e12a3-aa42-401c-b33b-b4850bc05821",
                 "ca2bb8ff-3e0b-414f-9e85-428df7d1458d",
                 "50d79720-f007-43f7-a91f-f7094f928b07"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "layout_7e715a28-81da-482c-a28a-90c1fa4c85fd",
+          "tab": {
+            "label": {
+              "ru": "Делегирование",
+              "en": "Delegation"
+            },
+            "idLayout": "layout_7e715a28-81da-482c-a28a-90c1fa4c85fd"
+          },
+          "type": "1-column",
+          "columns": [
+            {
+              "widgets": [
+                "22ed1da2-c319-4fae-bfd5-dd36022ff3e7"
               ]
             }
           ]
@@ -405,6 +446,7 @@
         }
       ]
     }
-  },
+  }
+,
   "attributes": {}
 }
