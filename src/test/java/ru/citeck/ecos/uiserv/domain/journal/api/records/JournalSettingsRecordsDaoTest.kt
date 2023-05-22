@@ -576,7 +576,7 @@ internal class JournalSettingsRecordsDaoTest {
             RecordAtts(
                 RecordRef.create("uiserv", "journal-settings", "id1"),
                 ObjectData.create()
-                    .set("name", "{\"ru\":\"some\",\"en\":\"body\"}")
+                    .set("name", DataValue.create("{\"ru\":\"some\",\"en\":\"body\"}"))
             )
         )
         val check2 = repo.findByExtId("id1")
