@@ -10,7 +10,10 @@
       {
         "id": "layout_bb6e6685-f802-4680-8606-007a42a8c1bd",
         "tab": {
-          "label": "Информация",
+          "label": {
+            "ru": "Информация",
+            "en": "Information"
+          },
           "idLayout": "layout_bb6e6685-f802-4680-8606-007a42a8c1bd"
         },
         "type": "adaptive",
@@ -132,7 +135,10 @@
       {
         "id": "layout_bb6e6685-f802-4680-8606-007a42a8c1bd",
         "tab": {
-          "label": "Информация",
+          "label": {
+            "ru": "Информация",
+            "en": "Information"
+          },
           "idLayout": "layout_bb6e6685-f802-4680-8606-007a42a8c1bd"
         },
         "type": "mobile",
@@ -372,7 +378,10 @@
         {
           "id": "layout_bb6e6685-f802-4680-8606-007a42a8c1bd",
           "tab": {
-            "label": "Информация",
+            "label": {
+              "ru": "Информация",
+              "en": "Information"
+            },
             "idLayout": "layout_bb6e6685-f802-4680-8606-007a42a8c1bd"
           },
           "type": "adaptive",
@@ -412,7 +421,10 @@
         {
           "id": "layout_bb6e6685-f802-4680-8606-007a42a8c1bd",
           "tab": {
-            "label": "Информация",
+            "label": {
+              "ru": "Информация",
+              "en": "Information"
+            },
             "idLayout": "layout_bb6e6685-f802-4680-8606-007a42a8c1bd"
           },
           "type": "mobile",
