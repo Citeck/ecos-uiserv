@@ -6,13 +6,22 @@
   },
   "type": "open-url",
   "config": {
-    "url": "/gateway/alfresco/alfresco/s/citeck/print/printpdf?nodeRef=${?localId}&print=true"
+    "url": "/gateway/emodel/api/content/printpdf?ref=${?id}"
   },
-  "evaluator": {
-    "type": "has-attribute",
-    "config": {
-      "attribute": "cm:content"
-    }
+  "predicate": {
+    "t": "or",
+    "v": [
+      {
+        "t": "eq",
+        "a": "_has.cm:content?bool",
+        "v": true
+      },
+      {
+        "t": "eq",
+        "a": "_has._content?bool",
+        "v": true
+      }
+    ]
   }
 }
 
