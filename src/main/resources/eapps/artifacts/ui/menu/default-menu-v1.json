@@ -69,69 +69,7 @@
           "hidden": false,
           "type": "SECTION",
           "config": {},
-          "items": [
-            {
-              "id": "meetings-section",
-              "label": {
-                "ru": "Совещания",
-                "en": "Meetings"
-              },
-              "icon": "ui/icon@i-leftmenu-meetings",
-              "type": "SECTION",
-              "items": [
-                {
-                  "id": "bd6c8ee5-4518-4805-9fbf-0ee71382aa1f",
-                  "label": {
-                    "ru": "Совещания",
-                    "en": "Meetings"
-                  },
-                  "type": "JOURNAL",
-                  "config": {
-                    "recordRef": "uiserv/journal@meetings"
-                  },
-                  "items": [],
-                  "allowedFor": []
-                }
-              ]
-            },
-            {
-              "id": "order-passes-section",
-              "label": {
-                "ru": "Пропуска",
-                "en": "Order passes"
-              },
-              "icon": "ui/icon@i-leftmenu-pass",
-              "hidden": false,
-              "type": "SECTION",
-              "config": {},
-              "action": {
-                "type": "",
-                "config": {}
-              },
-              "items": [
-                {
-                  "id": "272aa970-c181-447e-b565-1a8a9294d2be",
-                  "label": {
-                    "ru": "Пропуска",
-                    "en": "Order passes"
-                  },
-                  "icon": "",
-                  "hidden": false,
-                  "type": "JOURNAL",
-                  "config": {
-                    "recordRef": "uiserv/journal@order-passes"
-                  },
-                  "action": {
-                    "type": "",
-                    "config": {}
-                  },
-                  "items": [],
-                  "allowedFor": []
-                }
-              ],
-              "allowedFor": []
-            }
-          ]
+          "items": []
         },
         {
           "id":"orgstructure",
