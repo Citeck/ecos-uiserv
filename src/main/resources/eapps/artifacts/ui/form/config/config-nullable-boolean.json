@@ -1,0 +1,85 @@
+{
+  "id": "config-nullable-boolean",
+  "formKey": "",
+  "title": {},
+  "description": {},
+  "customModule": "",
+  "typeRef": "",
+  "width": "sm",
+  "system": true,
+  "i18n": {},
+  "definition": {
+    "components": [
+      {
+        "type": "checkbox",
+        "input": true,
+        "multiple": false,
+        "key": "_value",
+        "hasThreeStates": true,
+        "label": {
+          "ru": "Включить",
+          "en": "Enable"
+        }
+      },
+      {
+        "type": "columns",
+        "key": "buttons-columns",
+        "columns": [
+          {
+            "md": 3,
+            "type": "column",
+            "input": false,
+            "index": 0
+          },
+          {
+            "md": 3,
+            "type": "column",
+            "input": false,
+            "index": 1
+          },
+          {
+            "md": 3,
+            "type": "column",
+            "input": false,
+            "index": 2,
+            "components": [
+              {
+                "type": "button",
+                "key": "cancel",
+                "label": {
+                  "ru": "Отменить",
+                  "en": "Cancel"
+                },
+                "action": "event",
+                "event": "cancel",
+                "block": true,
+                "input": true
+              }
+            ]
+          },
+          {
+            "md": 3,
+            "type": "column",
+            "input": false,
+            "index": 3,
+            "components": [
+              {
+                "type": "button",
+                "theme": "primary",
+                "key": "submit",
+                "label": {
+                  "ru": "Сохранить",
+                  "en": "Save"
+                },
+                "block": true,
+                "input": true
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "attributes": {},
+  "notExists": false
+}

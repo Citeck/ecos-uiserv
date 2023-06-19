@@ -1,0 +1,10 @@
+---
+id: restrict-access-to-edit-dashboard-widgets
+name:
+  ru: Редактирование виджетов доступно только администраторам
+  en: Widgets editing allowed only for administrators
+
+value: null
+valueDef:
+  type: BOOLEAN
+  formRef: 'uiserv/form@config-nullable-boolean'
