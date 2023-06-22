@@ -24,8 +24,8 @@ class EcosConfigTest {
     fun test() {
         val expectedValue = "test-config-value"
 
-        assertThat(testConfig).isEqualTo(expectedValue)
         assertThat(records.getAtt("meta@", "\$cfg.test-config").asText()).isEqualTo(expectedValue)
         assertThat(records.getAtt("cfg@test-config", "value").asText()).isEqualTo(expectedValue)
+        assertThat(testConfig).isEqualTo(expectedValue)
     }
 }
