@@ -7,4 +7,5 @@ name:
 value: null
 valueDef:
   type: BOOLEAN
+  mandatory: false
   formRef: 'uiserv/form@config-nullable-boolean'
