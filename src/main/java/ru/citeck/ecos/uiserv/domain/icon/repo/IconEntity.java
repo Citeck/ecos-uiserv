@@ -13,8 +13,8 @@ import java.util.Objects;
 @Table(name = "icon")
 public class IconEntity extends AbstractAuditingEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "icon_seq_gen")
-    @SequenceGenerator(name = "icon_seq_gen")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hibernate_sequence")
+    @SequenceGenerator(name = "hibernate_sequence")
     private Long id;
     @Column(name = "ext_id")
     private String extId;

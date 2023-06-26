@@ -42,8 +42,7 @@ public class FileService {
         this.fileStore = fileStore;
     }
 
-    @Autowired
-    private void setFileMetadataExtractors(Collection<FileMetadataExtractorInfo> extractors) {
+    public void setFileMetadataExtractors(Collection<FileMetadataExtractorInfo> extractors) {
         this.fileMetadataExtractors = extractors.stream()
             .collect(Collectors.toConcurrentMap(
                 FileMetadataExtractorInfo::getFileType, FileMetadataExtractorInfo::getExtractor));

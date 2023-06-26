@@ -13,8 +13,8 @@ import java.time.Instant;
 @Table(name = "user_configuration")
 public class UserConfigurationEntity implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hibernate_sequence")
+    @SequenceGenerator(name = "hibernate_sequence")
     private Long id;
 
     @Column(name = "ext_id")

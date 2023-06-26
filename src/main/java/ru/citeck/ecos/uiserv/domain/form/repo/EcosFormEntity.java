@@ -12,8 +12,8 @@ import java.util.Objects;
 public class EcosFormEntity extends AbstractAuditingEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ecos_forms_seq_gen")
-    @SequenceGenerator(name = "ecos_forms_seq_gen")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hibernate_sequence")
+    @SequenceGenerator(name = "hibernate_sequence")
     private Long id;
 
     @Column(name = "ext_id")

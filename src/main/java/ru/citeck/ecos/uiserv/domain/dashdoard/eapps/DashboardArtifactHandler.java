@@ -20,7 +20,7 @@ public class DashboardArtifactHandler implements EcosArtifactHandler<DashboardDt
 
     @Override
     public void deployArtifact(@NotNull DashboardDto module) {
-        log.info("Dashboard module received: " + module.getId() + " " + module.getTypeRef());
+        log.info("Dashboard artifact received: " + module.getId() + " " + module.getTypeRef());
         AuthContext.runAsSystemJ(() -> {
             dashboardService.saveDashboard(module);
         });

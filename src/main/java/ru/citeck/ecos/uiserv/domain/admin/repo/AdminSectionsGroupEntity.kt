@@ -15,8 +15,8 @@ class AdminSectionsGroupEntity : AbstractAuditingEntity(), Serializable {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hibernate_sequence")
+    @SequenceGenerator(name = "hibernate_sequence")
     val id: Long? = null
 
     lateinit var extId: String

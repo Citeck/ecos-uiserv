@@ -10,8 +10,8 @@ import javax.persistence.*
 class ActionEntity : AbstractAuditingEntity() {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "actions_seq_gen")
-    @SequenceGenerator(name = "actions_seq_gen")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hibernate_sequence")
+    @SequenceGenerator(name = "hibernate_sequence")
     val id: Long? = null
 
     @Column(unique = true)

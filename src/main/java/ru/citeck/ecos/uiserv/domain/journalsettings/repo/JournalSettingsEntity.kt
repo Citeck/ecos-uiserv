@@ -8,8 +8,8 @@ import javax.persistence.*
 class JournalSettingsEntity : AbstractAuditingEntity() {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "journal_settings_seq_gen")
-    @SequenceGenerator(name = "journal_settings_seq_gen")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hibernate_sequence")
+    @SequenceGenerator(name = "hibernate_sequence")
     val id: Long? = null
 
     @Column(unique = true)

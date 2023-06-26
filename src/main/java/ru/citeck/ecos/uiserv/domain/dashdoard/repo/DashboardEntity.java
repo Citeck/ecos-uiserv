@@ -14,8 +14,8 @@ import java.util.Objects;
 public class DashboardEntity extends AbstractAuditingEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "dashboards_seq_gen")
-    @SequenceGenerator(name = "dashboards_seq_gen")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hibernate_sequence")
+    @SequenceGenerator(name = "hibernate_sequence")
     private Long id;
 
     private String extId;

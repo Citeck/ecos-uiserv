@@ -35,6 +35,7 @@ import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.commons.utils.StringUtils;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
+import ru.citeck.ecos.records3.record.atts.value.impl.EmptyAttValue;
 import ru.citeck.ecos.records3.record.request.RequestContext;
 import ru.citeck.ecos.uiserv.domain.action.service.ActionService;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto;
@@ -51,7 +52,7 @@ import java.util.stream.Collectors;
 @Component
 public class ActionRecords extends LocalRecordsDao
                            implements LocalRecordsQueryWithMetaDao<Object>,
-                                      LocalRecordsMetaDao<ActionRecords.ActionRecord>,
+                                      LocalRecordsMetaDao<Object>,
                                       MutableRecordsLocalDao<ActionRecords.ActionRecord> {
 
     private static final String RECORD_ACTIONS_TYPE = "record-actions";
@@ -93,7 +94,16 @@ public class ActionRecords extends LocalRecordsDao
 
     @Override
     public List<ActionRecord> getValuesToMutate(List<RecordRef> records) {
-        return getLocalRecordsMeta(records, null);
+        List<Object> recordAtts = getLocalRecordsMeta(records, null);
+        List<ActionRecord> toMutate = new ArrayList<>();
+        for (int i = 0; i < records.size(); i++) {
+            Object atts = recordAtts.get(i);
+            if (!(atts instanceof ActionRecord)) {
+                throw new RuntimeException("Action doesn't found: '" + records.get(i) + "'");
+            }
+            toMutate.add((ActionRecord) atts);
+        }
+        return toMutate;
     }
 
     @Override
@@ -107,7 +117,7 @@ public class ActionRecords extends LocalRecordsDao
     }
 
     @Override
-    public List<ActionRecord> getLocalRecordsMeta(List<RecordRef> records, MetaField metaField) {
+    public List<Object> getLocalRecordsMeta(List<RecordRef> records, MetaField metaField) {
         return records.stream()
             .map(r -> {
                 if (r.getId().isEmpty()) {
@@ -115,7 +125,15 @@ public class ActionRecords extends LocalRecordsDao
                 }
                 return actionService.getAction(r.getId());
             })
-            .map(ActionRecord::new)
+            .map(dto -> {
+                if (dto == null) {
+                    return EmptyAttValue.INSTANCE;
+                } else if (dto instanceof ActionRecord) {
+                    return dto;
+                } else {
+                    return new ActionRecord(dto);
+                }
+            })
             .collect(Collectors.toList());
     }
 

@@ -19,7 +19,7 @@ public class FormArtifactHandler implements EcosArtifactHandler<EcosFormDef> {
 
     @Override
     public void deployArtifact(@NotNull EcosFormDef formModel) {
-        log.info("Form module received: " + formModel.getId() + " " + formModel.getFormKey());
+        log.info("Form artifact received: " + formModel.getId() + " " + formModel.getFormKey());
         formService.save(formModel);
     }
 

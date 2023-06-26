@@ -7,8 +7,8 @@ import javax.persistence.*
 @Table(name = "evaluators")
 class EvaluatorEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "evaluators_seq_gen")
-    @SequenceGenerator(name = "evaluators_seq_gen")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hibernate_sequence")
+    @SequenceGenerator(name = "hibernate_sequence")
     val id: Long? = null
 
     @Column(name = "evaluator_id")

@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.form.registry
 
 import com.hazelcast.core.HazelcastInstance
-import com.hazelcast.core.ReplicatedMap
+import com.hazelcast.replicatedmap.ReplicatedMap
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta

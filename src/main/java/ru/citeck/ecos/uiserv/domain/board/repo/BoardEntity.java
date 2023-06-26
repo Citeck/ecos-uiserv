@@ -16,8 +16,8 @@ public class BoardEntity extends AbstractAuditingEntity {
     public static String SOURCE_ID = "board";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "board_seq_gen")
-    @SequenceGenerator(name = "board_seq_gen")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hibernate_sequence")
+    @SequenceGenerator(name = "hibernate_sequence")
     private Long id;
 
     @NotNull

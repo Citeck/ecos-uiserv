@@ -12,8 +12,8 @@ import java.util.Objects;
 public class I18nEntity extends AbstractAuditingEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "internationalization_seq_gen")
-    @SequenceGenerator(name = "internationalization_seq_gen")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hibernate_sequence")
+    @SequenceGenerator(name = "hibernate_sequence")
     private Long id;
 
     @Column(name = "ext_id")
