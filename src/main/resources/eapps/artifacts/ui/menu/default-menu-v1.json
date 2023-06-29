@@ -114,20 +114,17 @@
           "items": []
         },
         {
-          "id": "admin-tools",
+          "id": "modeling",
           "label": {
-            "ru": "Инструменты администратора",
-            "en": "Admin tools"
+            "ru": "Моделирование",
+            "en": "Modeling"
           },
-          "allowedFor": [
-            "GROUP_ECOS_ADMINISTRATORS"
-          ],
           "hidden": false,
           "type": "SECTION",
           "config": {},
           "items": [
             {
-              "id": "979bfe85-5361-4cf2-a0a3-dd43dabc95b6",
+              "id": "b0d9389d-76a9-44c2-a357-0dc55c4d972b",
               "label": {
                 "ru": "Редактор бизнес-процессов",
                 "en": "Business Process Editor"
@@ -139,6 +136,32 @@
                 "url": "/v2/bpmn-designer"
               }
             },
+            {
+              "id": "c4ab4955-8b9d-4a47-9f99-0ee2fa31f528",
+              "label": {
+                "ru": "Методы принятия решений",
+                "en": "Decision-making methods"
+              },
+              "icon": "ui/icon@i-leftmenu-groups",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/v2/admin?type=DMN"
+              }
+            }
+          ],
+          "allowedFor": []
+        },
+        {
+          "id": "admin-tools",
+          "label": {
+            "ru": "Инструменты администратора",
+            "en": "Admin tools"
+          },
+          "hidden": false,
+          "type": "SECTION",
+          "config": {},
+          "items": [
             {
               "id": "c3f0a948-bebf-4bae-9646-41acece5f3f9",
               "label": {
@@ -178,6 +201,9 @@
                 "url": "/v2/dev-tools"
               }
             }
+          ],
+          "allowedFor": [
+            "GROUP_ECOS_ADMINISTRATORS"
           ]
         }
       ]
