@@ -45,8 +45,12 @@ public class JournalServiceImpl implements JournalService {
     private static final String VALID_ID_PATTERN_TXT = "^[\\w/.-]+\\w$";
     private static final Pattern VALID_ID_PATTERN = Pattern.compile(VALID_ID_PATTERN_TXT);
 
-    private final Pattern VALID_COLUMN_NAME_PATTERN = Pattern.compile("^\\d?[a-zA-Z_][$\\da-zA-Z:_-]*$");
-    private final Pattern VALID_COLUMN_ATT_PATTERN = Pattern.compile("^[a-zA-Z_][$.\\da-zA-Z:_-]*$");
+    private static final Pattern VALID_COLUMN_NAME_PATTERN = Pattern.compile(
+        "^\\d?[a-zA-Z_][$\\da-zA-Z:_-]*$"
+    );
+    public static final Pattern VALID_COLUMN_ATT_PATTERN = Pattern.compile(
+        "^([a-zA-Z_][$.\\da-zA-Z:_-]*(\\(.+\\))?|\\(.+\\))$"
+    );
 
     private final JournalRepository journalRepository;
     private final JournalMapper journalMapper;
