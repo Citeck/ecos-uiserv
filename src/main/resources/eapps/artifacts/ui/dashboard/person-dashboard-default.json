@@ -104,7 +104,10 @@
       {
         "id": "layout_2e5973c9-de99-48ca-8bda-b33590106022",
         "tab": {
-          "label": "Документы",
+          "label": {
+            "ru": "Документы",
+            "en": "Documents"
+          },
           "idLayout": "layout_2e5973c9-de99-48ca-8bda-b33590106022"
         },
         "type": "adaptive",
