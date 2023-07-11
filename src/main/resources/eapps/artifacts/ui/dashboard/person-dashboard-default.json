@@ -1,6 +1,10 @@
 {
   "id": "person-dashboard",
   "typeRef": "emodel/type@person",
+  "appliedToRef": "",
+  "authority": null,
+  "scope": "",
+  "priority": 0,
   "config": {
     "layouts": [
       {
@@ -267,7 +271,10 @@
               "elementsDisplayCondition": {}
             }
           },
-          "description": "Информация"
+          "description": {
+            "ru": "Информация",
+            "en": "Information"
+          }
         },
         {
           "name": "properties",
@@ -283,7 +290,10 @@
               "titleAsFormName": true
             }
           },
-          "description": "Информация"
+          "description": {
+            "ru": "Информация",
+            "en": "Information"
+          }
         },
         {
           "dndId": "30c96b89-587b-4a44-afbc-fd5a3f8b1632",
@@ -299,7 +309,10 @@
               "titleAsFormName": true
             }
           },
-          "description": "Информация"
+          "description": {
+            "ru": "Информация",
+            "en": "Information"
+          }
         },
         {
           "name": "properties",
@@ -315,7 +328,10 @@
               "titleAsFormName": true
             }
           },
-          "description": "Информация"
+          "description": {
+            "ru": "Информация",
+            "en": "Information"
+          }
         },
         {
           "name": "properties",
@@ -331,7 +347,10 @@
               "titleAsFormName": true
             }
           },
-          "description": "Информация"
+          "description": {
+            "ru": "Информация",
+            "en": "Information"
+          }
         },
         {
           "name": "documents",
@@ -347,7 +366,10 @@
               "isLoadChecklist": true
             }
           },
-          "description": "Информация"
+          "description": {
+            "ru": "Информация",
+            "en": "Information"
+          }
         },
         {
           "name": "documents",
@@ -372,6 +394,8 @@
           "props": {
             "id": "328d005c-5cae-485e-b3a4-73c915183f5c",
             "config": {
+              "widgetDisplayCondition": null,
+              "elementsDisplayCondition": {},
               "version": "v2",
               "v2": {
                 "onlyLinked": true,
@@ -384,6 +408,10 @@
                 "customJournal": ""
               }
             }
+          },
+          "description": {
+            "en": "Delegation",
+            "ru": "Делегирование"
           }
         }
       ],
@@ -414,7 +442,10 @@
         {
           "id": "layout_2e5973c9-de99-48ca-8bda-b33590106022",
           "tab": {
-            "label": "Документы",
+            "label": {
+              "en": "Documents",
+              "ru": "Документы"
+            },
             "idLayout": "layout_2e5973c9-de99-48ca-8bda-b33590106022"
           },
           "type": "adaptive",
