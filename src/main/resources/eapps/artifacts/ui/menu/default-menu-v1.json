@@ -139,8 +139,8 @@
             {
               "id": "c4ab4955-8b9d-4a47-9f99-0ee2fa31f528",
               "label": {
-                "ru": "Методы принятия решений",
-                "en": "Decision-making methods"
+                "ru": "Таблицы принятия решений",
+                "en": "Decision model notation"
               },
               "icon": "ui/icon@i-leftmenu-groups",
               "hidden": false,
