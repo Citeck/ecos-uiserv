@@ -9,6 +9,9 @@ import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
+import ru.citeck.ecos.model.lib.attributes.dto.computed.ComputedAttDef
+import ru.citeck.ecos.model.lib.attributes.dto.computed.ComputedAttStoringType
+import ru.citeck.ecos.model.lib.attributes.dto.computed.ComputedAttType
 import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.predicate.PredicateUtils
@@ -323,7 +326,16 @@ class ResolvedJournalRecordsDao(
                 column.sortable = column.searchable != false && column.type != AttributeType.ASSOC
             }
             if (column.groupable == null) {
-                column.groupable = column.type == AttributeType.ASSOC
+                val computed = typeAtts[column.id]?.computed ?: ComputedAttDef.EMPTY
+                column.groupable = if (column.type == AttributeType.ASSOC) {
+                    if (computed.type != ComputedAttType.NONE) {
+                        computed.storingType != ComputedAttStoringType.NONE
+                    } else {
+                        true
+                    }
+                } else {
+                    false
+                }
             }
             if (column.hidden == null) {
                 column.hidden = false
