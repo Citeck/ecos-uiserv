@@ -63,10 +63,10 @@ class ConfigsMigration(
                 } else {
                     msg("config is empty: $conf")
                 }
-            } else if (value.isArray()) {
+            } else if (value.isArray() && !value.isEmpty()) {
                 records.mutateAtt("cfg@$conf", "value", value)
                 msg("'$conf' changed to '$value'")
-            } else if (value.isNull()) {
+            } else if (value.isNull() || value.isArray() && value.isEmpty()) {
                 msg("config is empty: $conf")
             } else {
                 msg("Invalid config value. Key: $conf Value: $value")
