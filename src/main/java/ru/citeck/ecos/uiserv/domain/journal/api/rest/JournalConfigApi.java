@@ -19,6 +19,6 @@ public class JournalConfigApi {
 
     @GetMapping
     public JournalConfigService.JournalConfigDownstream getJournalConfig(@RequestParam String journalId, Locale locale) {
-        return journalConfigService.getJournalConfig(journalId).get();
+        return journalConfigService.getJournalConfig(journalId).orElseThrow();
     }
 }

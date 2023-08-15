@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @ExtendWith(EcosSpringExtension.class)
 @SpringBootTest(classes = Application.class)
-@ActiveProfiles(profiles = { "test-config-data", "test" })
+@ActiveProfiles(profiles = {"test-config-data", "test"})
 public class ConfigServiceTest {
 
     @Autowired
@@ -42,22 +42,11 @@ public class ConfigServiceTest {
         assertThat(TestConfigData.testConfigs.size(), is(3));
 
         List<ConfigDto> found = TestConfigData.testConfigs.stream()
-            .map(dto -> configEntityService.getById(dto.getId()).get())
+            .map(dto -> configEntityService.getById(dto.getId()).orElseThrow())
             .collect(Collectors.toList());
 
         assertThat(found, is(found));
     }
-
-    //TODO: fix test
-    /*@Test
-    public void getByRecord() {
-        List<ConfigDTO> found = configs.stream()
-            .map(dto -> configEntityService.getByRecord(
-                RecordRef.create("config", dto.getId())
-            ).get())
-            .collect(Collectors.toList());
-        assertThat(found, is(found));
-    }*/
 
     @Test
     public void create() throws IOException {
@@ -67,14 +56,15 @@ public class ConfigServiceTest {
         dto.setTitle("Some title");
         dto.setDescription("Some description");
         dto.setId(id);
-        dto.setValue(objectMapper.readValue("{\n" +
-            "  \"menu\": {\n" +
-            "    \"type\": \"TOP\"\n" +
-            "  }\n" +
-            "}", JsonNode.class));
+        dto.setValue(objectMapper.readValue("""
+            {
+              "menu": {
+                "type": "TOP"
+              }
+            }""", JsonNode.class));
 
         ConfigDto saved = configEntityService.create(dto);
-        ConfigDto found = configEntityService.getById(id).get();
+        ConfigDto found = configEntityService.getById(id).orElseThrow();
 
         assertThat(found, is(saved));
     }
@@ -87,21 +77,23 @@ public class ConfigServiceTest {
         topConfig.setTitle("Some title");
         topConfig.setDescription("Some description");
         topConfig.setId(id);
-        topConfig.setValue(objectMapper.readValue("{\n" +
-            "  \"menu\": {\n" +
-            "    \"type\": \"TOP\"\n" +
-            "  }\n" +
-            "}", JsonNode.class));
+        topConfig.setValue(objectMapper.readValue("""
+            {
+              "menu": {
+                "type": "TOP"
+              }
+            }""", JsonNode.class));
 
         ConfigDto downConfig = new ConfigDto();
         downConfig.setTitle("Some title");
         downConfig.setDescription("Some description");
         downConfig.setId(id);
-        downConfig.setValue(objectMapper.readValue("{\n" +
-            "  \"menu\": {\n" +
-            "    \"type\": \"DOWN\"\n" +
-            "  }\n" +
-            "}", JsonNode.class));
+        downConfig.setValue(objectMapper.readValue("""
+            {
+              "menu": {
+                "type": "DOWN"
+              }
+            }""", JsonNode.class));
 
         Throwable thrown = Assertions.catchThrowable(() -> {
             configEntityService.create(topConfig);
@@ -116,11 +108,12 @@ public class ConfigServiceTest {
         ConfigDto dto = new ConfigDto();
         dto.setTitle("Some title");
         dto.setDescription("Some description");
-        dto.setValue(objectMapper.readValue("{\n" +
-            "  \"menu\": {\n" +
-            "    \"type\": \"TOP\"\n" +
-            "  }\n" +
-            "}", JsonNode.class));
+        dto.setValue(objectMapper.readValue("""
+            {
+              "menu": {
+                "type": "TOP"
+              }
+            }""", JsonNode.class));
 
         Throwable thrown = Assertions.catchThrowable(() -> configEntityService.create(dto));
 
@@ -133,14 +126,15 @@ public class ConfigServiceTest {
 
         ConfigDto dto = new ConfigDto();
         dto.setId(id);
-        dto.setValue(objectMapper.readValue("{\n" +
-            "  \"menu\": {\n" +
-            "    \"type\": \"TOP\"\n" +
-            "  }\n" +
-            "}", JsonNode.class));
+        dto.setValue(objectMapper.readValue("""
+            {
+              "menu": {
+                "type": "TOP"
+              }
+            }""", JsonNode.class));
 
         ConfigDto saved = configEntityService.create(dto);
-        ConfigDto found = configEntityService.getById(id).get();
+        ConfigDto found = configEntityService.getById(id).orElseThrow();
 
         assertThat(saved, is(found));
     }
@@ -153,7 +147,7 @@ public class ConfigServiceTest {
         dto.setId(id);
 
         ConfigDto saved = configEntityService.create(dto);
-        ConfigDto found = configEntityService.getById(id).get();
+        ConfigDto found = configEntityService.getById(id).orElseThrow();
 
         assertThat(saved, is(found));
     }
@@ -166,23 +160,25 @@ public class ConfigServiceTest {
         dto.setId(id);
         dto.setTitle("Some title");
         dto.setDescription("Some description");
-        dto.setValue(objectMapper.readValue("{\n" +
-            "  \"menu\": {\n" +
-            "    \"type\": \"TOP\"\n" +
-            "  }\n" +
-            "}", JsonNode.class));
+        dto.setValue(objectMapper.readValue("""
+            {
+              "menu": {
+                "type": "TOP"
+              }
+            }""", JsonNode.class));
 
         configEntityService.create(dto);
 
-        ConfigDto found = configEntityService.getById(id).get();
-        found.setValue(objectMapper.readValue("{\n" +
-            "  \"menu\": {\n" +
-            "    \"type\": \"DOWN\"\n" +
-            "  }\n" +
-            "}", JsonNode.class));
+        ConfigDto found = configEntityService.getById(id).orElseThrow();
+        found.setValue(objectMapper.readValue("""
+            {
+              "menu": {
+                "type": "DOWN"
+              }
+            }""", JsonNode.class));
 
         ConfigDto mutated = configEntityService.update(found);
-        ConfigDto mutatedFound = configEntityService.getById(id).get();
+        ConfigDto mutatedFound = configEntityService.getById(id).orElseThrow();
 
         assertThat(mutated, is(mutatedFound));
     }
@@ -195,14 +191,15 @@ public class ConfigServiceTest {
         dto.setTitle("Some title");
         dto.setDescription("Some description");
         dto.setId(id);
-        dto.setValue(objectMapper.readValue("{\n" +
-            "  \"menu\": {\n" +
-            "    \"type\": \"TOP\"\n" +
-            "  }\n" +
-            "}", JsonNode.class));
+        dto.setValue(objectMapper.readValue("""
+            {
+              "menu": {
+                "type": "TOP"
+              }
+            }""", JsonNode.class));
 
         ConfigDto saved = configEntityService.create(dto);
-        ConfigDto found = configEntityService.getById(id).get();
+        ConfigDto found = configEntityService.getById(id).orElseThrow();
 
         assertThat(found, is(saved));
 

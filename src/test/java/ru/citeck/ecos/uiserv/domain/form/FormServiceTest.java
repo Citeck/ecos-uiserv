@@ -68,13 +68,13 @@ public class FormServiceTest {
         formService.save(modelA);
 
         Optional<EcosFormDef> modelA_ = formService.getFormById("TEST_FORM_A");
-        assertThat(modelA_.get().getFormKey(), is("B"));
+        assertThat(modelA_.orElseThrow().getFormKey(), is("B"));
 
         modelA = modelA.copy().withFormKey("C").build();
         formService.save(modelA);
 
         modelA_ = formService.getFormById("TEST_FORM_A");
-        assertThat(modelA_.get().getFormKey(), is("C"));
+        assertThat(modelA_.orElseThrow().getFormKey(), is("C"));
     }
 
     @Test
