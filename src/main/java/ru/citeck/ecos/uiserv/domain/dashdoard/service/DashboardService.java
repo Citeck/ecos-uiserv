@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.context.lib.auth.AuthContext;
@@ -19,6 +20,7 @@ import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardEntity;
 import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardRepository;
+import ru.citeck.ecos.webapp.api.constants.AppName;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory;
 
@@ -154,7 +156,7 @@ public class DashboardService {
         if (!RecordRef.isEmpty(recordRef)) {
 
             if (recordRef.getAppName().isEmpty()) {
-                recordRef = recordRef.addAppName("alfresco");
+                recordRef = recordRef.addAppName(AppName.ALFRESCO);
             }
 
             dashboards = findDashboardsByRecordRef(recordRef.toString(), authorities, scope, includeForAll);
@@ -233,6 +235,7 @@ public class DashboardService {
         DashboardDto dto = new DashboardDto();
 
         dto.setId(entity.getExtId());
+        dto.setName(Json.getMapper().read(entity.getName(), MLText.class));
         dto.setAuthority(entity.getAuthority());
         dto.setConfig(Json.getMapper().read(entity.getConfig(), ObjectData.class));
         dto.setPriority(entity.getPriority());
@@ -251,25 +254,25 @@ public class DashboardService {
         RecordRef recordRef = dto.getAppliedToRef();
 
         if (RecordRef.isNotEmpty(recordRef) && recordRef.getAppName().isEmpty()) {
-            recordRef = recordRef.addAppName("alfresco");
+            recordRef = recordRef.addAppName(AppName.ALFRESCO);
         }
 
         if (RecordRef.isEmpty(dto.getTypeRef()) && RecordRef.isEmpty(dto.getAppliedToRef())) {
-            throw new IllegalArgumentException("One of typeRef or appliedToRef should be specified");
-        }
-        String scope = StringUtils.defaultString(dto.getScope());
-
-        if (authority == null) {
-            if (RecordRef.isEmpty(recordRef)) {
-                optEntity = repo.findByTypeRefForAll(dto.getTypeRef().toString(), scope);
-            } else {
-                optEntity = repo.findByRecordRefForAll(recordRef.toString(), scope);
-            }
+            optEntity = repo.findByExtId(dto.getId());
         } else {
-            if (RecordRef.isEmpty(recordRef)) {
-                optEntity = repo.findByAuthorityAndTypeRefAndScope(authority, dto.getTypeRef().toString(), scope);
+            String scope = StringUtils.defaultString(dto.getScope());
+            if (authority == null) {
+                if (RecordRef.isEmpty(recordRef)) {
+                    optEntity = repo.findByTypeRefForAll(dto.getTypeRef().toString(), scope);
+                } else {
+                    optEntity = repo.findByRecordRefForAll(recordRef.toString(), scope);
+                }
             } else {
-                optEntity = repo.findByAuthorityAndAppliedToRefAndScope(authority, recordRef.toString(), scope);
+                if (RecordRef.isEmpty(recordRef)) {
+                    optEntity = repo.findByAuthorityAndTypeRefAndScope(authority, dto.getTypeRef().toString(), scope);
+                } else {
+                    optEntity = repo.findByAuthorityAndAppliedToRefAndScope(authority, recordRef.toString(), scope);
+                }
             }
         }
 
@@ -285,7 +288,7 @@ public class DashboardService {
     private RecordRef getAppliedToRefFromDto(DashboardDto dto) {
         RecordRef recordRef = dto.getAppliedToRef();
         if (RecordRef.isNotEmpty(recordRef) && recordRef.getAppName().isEmpty()) {
-            recordRef = recordRef.addAppName("alfresco");
+            recordRef = recordRef.addAppName(AppName.ALFRESCO);
         }
         return recordRef;
     }
@@ -324,6 +327,12 @@ public class DashboardService {
 
         if (dto.getConfig() != null && dto.getConfig().size() > 0) {
             entity.setConfig(Json.getMapper().toBytes(dto.getConfig()));
+        }
+        if (!MLText.isEmpty(dto.getName())) {
+            entity.setName(Json.getMapper().toString(dto.getName()));
+        }
+        if (StringUtils.isNotBlank(dto.getScope())) {
+            entity.setScope(dto.getScope());
         }
 
         return entity;

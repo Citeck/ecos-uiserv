@@ -57,5 +57,6 @@
     <include file="changelog/20220902000000_add_default_filters.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20220906000000_add_system_flags.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20221129000000_add_scope_for_dashboards.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20230905000000_add_name_for_dashboards.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

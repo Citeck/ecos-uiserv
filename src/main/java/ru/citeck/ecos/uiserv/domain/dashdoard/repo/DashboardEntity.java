@@ -19,6 +19,7 @@ public class DashboardEntity extends AbstractAuditingEntity {
     private Long id;
 
     private String extId;
+    private String name;
     private String typeRef;
     @ColumnTransformer(write = "LOWER(?)")
     private String authority;

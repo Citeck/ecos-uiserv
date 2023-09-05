@@ -16,13 +16,14 @@ import ru.citeck.ecos.events2.type.RecordEventsService;
 import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records3.record.atts.dto.LocalRecordAtts;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
 import ru.citeck.ecos.records3.record.dao.delete.DelStatus;
 import ru.citeck.ecos.records3.record.dao.delete.RecordDeleteDao;
-import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao;
+import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDao;
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DashboardRecords extends AbstractRecordsDao
     implements RecordsQueryDao,
-               RecordMutateDtoDao<DashboardRecords.DashboardRecord>,
+               RecordMutateDao,
                RecordDeleteDao,
                RecordAttsDao {
 
@@ -69,20 +70,37 @@ public class DashboardRecords extends AbstractRecordsDao
         return DelStatus.OK;
     }
 
-    @Override
-    public DashboardRecord getRecToMutate(@NotNull String dashboardId) {
-        if (dashboardId.isEmpty()) {
-            return new DashboardRecord();
-        }
-        return dashboardService.getDashboardById(dashboardId)
-            .map(DashboardRecord::new)
-            .orElseThrow(() -> new IllegalArgumentException("Dashboard with id '" + dashboardId + "' is not found!"));
-    }
-
     @NotNull
     @Override
-    public String saveMutatedRec(DashboardRecord dashboardRecord) {
-         return dashboardService.saveDashboard(dashboardRecord).getId();
+    public String mutate(@NotNull LocalRecordAtts record) throws Exception {
+
+        Optional<DashboardDto> dashboardDto = Optional.empty();
+        if (!record.getId().isBlank()) {
+            dashboardDto = dashboardService.getDashboardById(record.getId());
+            if (dashboardDto.isEmpty()) {
+                throw new IllegalArgumentException("Dashboard with id '" + record.getId() + "' is not found!");
+            }
+        }
+        if (dashboardDto.isEmpty()) {
+            String newId = record.getAtt("id", "");
+            if (!newId.isBlank()) {
+                dashboardDto = dashboardService.getDashboardById(newId);
+            }
+        }
+
+        String idBefore = dashboardDto.map(DashboardDto::getId).orElse("");
+        DashboardRecord toMutate = dashboardDto.map(DashboardRecord::new).orElseGet(DashboardRecord::new);
+
+        Json.getMapper().applyData(toMutate, record.getAtts());
+
+        if (!idBefore.isBlank()
+                && !idBefore.equals(toMutate.getId())
+                && dashboardService.getDashboardById(toMutate.getId()).isPresent()
+        ) {
+            throw new RuntimeException("Record with id '" + toMutate.getId() + "' already exists");
+        }
+
+        return dashboardService.saveDashboard(toMutate).getId();
     }
 
     @Nullable
