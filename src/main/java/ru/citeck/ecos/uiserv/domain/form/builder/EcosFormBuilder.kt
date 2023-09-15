@@ -19,5 +19,7 @@ interface EcosFormBuilder {
 
     fun addCancelAndSubmitButtons(): EcosFormBuilder
 
+    fun addButton(): EcosFormButtonBuilder
+
     fun build(): EcosFormDef
 }
