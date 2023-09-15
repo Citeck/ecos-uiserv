@@ -46,7 +46,7 @@ class EcosFormRecordsDao(
         const val ID = "form"
 
         private const val QUERY_LANG_FORMS_FOR_TYPE = "forms-for-type"
-        private const val QUERY_LANG_FORM_FOR_MOBILE_TASK = "form-for-mobile-task"
+        private const val QUERY_LANG_FORMS_FOR_MOBILE_TASKS = "forms-for-mobile-tasks"
 
         // form with default content for new forms
         private const val DEFAULT_FORM_ID = "DEFAULT"
@@ -133,12 +133,11 @@ class EcosFormRecordsDao(
                     .map { toRecord(it) }
             )
             return result
-        } else if (recsQuery.language == QUERY_LANG_FORM_FOR_MOBILE_TASK) {
 
-            val form = getFormForMobileTask(recsQuery.getQuery(FormForMobileTaskQuery::class.java))
-            if (form != null) {
-                result.setRecords(listOf(form))
-            }
+        } else if (recsQuery.language == QUERY_LANG_FORMS_FOR_MOBILE_TASKS) {
+
+            val forms = getFormsForMobileTasks(recsQuery.getQuery(FormsForMobileTasksQuery::class.java))
+            result.setRecords(forms)
             return result
         }
         if (query == null) {
@@ -214,18 +213,20 @@ class EcosFormRecordsDao(
         return result
     }
 
-    private fun getFormForMobileTask(query: FormForMobileTaskQuery): EntityRef? {
+    private fun getFormsForMobileTasks(query: FormsForMobileTasksQuery): List<EntityRef> {
 
-        val taskLocalId = query.taskRef?.getLocalId() ?: ""
-        if (taskLocalId.isBlank()) {
-            return null
-        }
-        if (taskLocalId.startsWith("activiti$") || taskLocalId.startsWith("flowable$")) {
-            val keys: List<String> = recordsService.getAtt(query.taskRef, "_formKey_mobile[]").asStrList()
-            return ecosFormService.getFormByKey(keys).orElse(null)?.let { EntityRef.create(ID, it.id) }
-        }
+        return query.tasks.map { taskRef ->
+            val taskLocalId = taskRef.getLocalId()
 
-        return EntityRef.create(AppName.UISERV, ID, "mobile-task$" + query.taskRef)
+            if (taskLocalId.startsWith("activiti$") || taskLocalId.startsWith("flowable$")) {
+                val keys: List<String> = recordsService.getAtt(taskRef, "_formKey_mobile[]").asStrList()
+                ecosFormService.getFormByKey(keys)
+                    .orElse(EcosFormDef.EMPTY)
+                    .let { EntityRef.create(AppName.UISERV, ID, it.id) }
+            } else {
+                EntityRef.create(AppName.UISERV, ID, "mobile-task$$taskRef")
+            }
+        }
     }
 
     override fun getId(): String {
@@ -248,7 +249,7 @@ class EcosFormRecordsDao(
         val typeRef: RecordRef? = null
     )
 
-    data class FormForMobileTaskQuery(
-        val taskRef: EntityRef? = null
+    data class FormsForMobileTasksQuery(
+        val tasks: List<EntityRef>
     )
 }
