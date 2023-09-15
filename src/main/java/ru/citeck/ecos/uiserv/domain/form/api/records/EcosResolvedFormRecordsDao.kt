@@ -17,6 +17,7 @@ import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeAttsUtils
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
 import ru.citeck.ecos.uiserv.domain.form.service.FormDefUtils
+import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.api.entity.ifEmpty
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
@@ -33,11 +34,19 @@ class EcosResolvedFormRecordsDao(
     }
 
     override fun queryRecords(recsQuery: RecordsQuery): Any? {
-        val formsResult = ecosFormRecordsDao.queryRecords(recsQuery) ?: return null
-        val queryResult = RecsQueryRes<ResolvedFormRecord>()
+        val formsResult = recordsService.query(
+            recsQuery.copy()
+                .withSourceId(EcosFormRecordsDao.ID)
+                .build()
+        )
+        val queryResult = RecsQueryRes<EntityRef>()
         queryResult.setHasMore(formsResult.getHasMore())
         queryResult.setTotalCount(formsResult.getTotalCount())
-        queryResult.setRecords(formsResult.getRecords().map { mapToResolvedRecord(it) })
+        queryResult.setRecords(
+            formsResult.getRecords().map {
+                EntityRef.create(AppName.UISERV, ID, it.getLocalId())
+            }
+        )
         return queryResult
     }
 

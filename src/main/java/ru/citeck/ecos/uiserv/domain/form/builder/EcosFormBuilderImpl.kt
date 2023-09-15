@@ -96,6 +96,13 @@ class EcosFormBuilderImpl(
         }
     }
 
+    override fun addButton(): EcosFormButtonBuilder {
+        return EcosFormButtonBuilderImpl {
+            components.add(it)
+            this
+        }
+    }
+
     override fun addCancelAndSubmitButtons(): EcosFormBuilder {
         components.add(CANCEL_AND_SUBMIT_BUTTONS)
         return this

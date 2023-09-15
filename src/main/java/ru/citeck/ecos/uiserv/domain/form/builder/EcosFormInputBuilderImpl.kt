@@ -27,7 +27,7 @@ open class EcosFormInputBuilderImpl(
         private const val ALLOWED_AUTHORITY_TYPE = "allowedAuthorityType"
     }
 
-    private val data = DataValue.createObj()
+    private var data = DataValue.createObj()
 
     init {
         data[TYPE] = type.typeId
@@ -57,6 +57,11 @@ open class EcosFormInputBuilderImpl(
             EcosFormInputType.FILE -> data["storage"] = "base64"
             else -> {}
         }
+    }
+
+    override fun setData(data: DataValue): EcosFormInputBuilder {
+        this.data = data.copy()
+        return this
     }
 
     override fun setKey(key: String): EcosFormInputBuilder {

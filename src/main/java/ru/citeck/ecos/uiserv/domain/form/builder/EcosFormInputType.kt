@@ -21,6 +21,10 @@ enum class EcosFormInputType(val typeId: String) {
 
     companion object {
 
+        fun getByTypeIdOrNull(typeId: String): EcosFormInputType? {
+            return values().find { it.typeId == typeId }
+        }
+
         fun getFromAttributeType(type: AttributeType): EcosFormInputType {
             return when (type) {
                 AttributeType.TEXT -> TEXT_FIELD
