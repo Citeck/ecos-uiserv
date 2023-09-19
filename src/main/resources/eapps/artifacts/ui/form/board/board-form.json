@@ -89,6 +89,17 @@
                 "input": true
               },
               {
+                "label" : {
+                  "ru" : "Скрыть заголовок",
+                  "en" : "Hide the title"
+                },
+                "key" : "disableTitle",
+                "refreshOn" : [ ],
+                "optionalWhenDisabled" : false,
+                "type" : "checkbox",
+                "input" : true
+              },
+              {
                 "key": "readOnly",
                 "refreshOn": [
                   "canDrag"
