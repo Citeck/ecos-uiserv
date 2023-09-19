@@ -19,6 +19,7 @@ public class BoardDef {
     private RecordRef cardFormRef;
 
     private Boolean readOnly;
+    private Boolean disableTitle;
 
     private MLText name;
     private List<RecordRef> actions;
@@ -37,6 +38,7 @@ public class BoardDef {
         this.journalRef = other.getJournalRef();
         this.cardFormRef = other.getCardFormRef();
         this.readOnly = other.getReadOnly();
+        this.disableTitle = other.getDisableTitle();
         this.name = other.getName();
         this.actions = other.getActions();
         this.columns = other.getColumns();

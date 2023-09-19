@@ -29,6 +29,8 @@ model:
     - id: cardFormRef
     - id: readOnly
       type: BOOLEAN
+    - id: disableTitle
+      type: BOOLEAN
     - id: name
       type: MLTEXT
     - id: actions
