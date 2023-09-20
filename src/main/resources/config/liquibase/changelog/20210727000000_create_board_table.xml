@@ -20,7 +20,6 @@
 
             <column name="name" type="VARCHAR" />
             <column name="read_only" type="BOOLEAN" defaultValue="false" />
-            <column name="disable_title" type="BOOLEAN" defaultValue="false" />
             <column name="type_ref" type="VARCHAR"/>
             <column name="journal_ref" type="VARCHAR"/>
             <column name="card_form_ref" type="VARCHAR"/>
