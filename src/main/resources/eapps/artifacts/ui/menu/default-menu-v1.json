@@ -57,6 +57,20 @@
                 "recordRef": "uiserv/journal@bpmn-historic-tasks",
                 "displayCount": true
               }
+            },
+            {
+              "id": "61388ecc-5c1c-45f2-bccd-1e3c13cdda92",
+              "label": {
+                "ru": "Задачи подчиненных",
+                "en": "Subordinates tasks"
+              },
+              "icon": "ui/icon@i-leftmenu-organizational-structure",
+              "hidden": false,
+              "type": "JOURNAL",
+              "config": {
+                "recordRef": "uiserv/journal@bpmn-subordinates-tasks",
+                "displayCount": true
+              }
             }
           ]
         },
