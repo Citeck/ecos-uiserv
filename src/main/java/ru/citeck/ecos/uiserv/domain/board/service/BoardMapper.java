@@ -20,6 +20,7 @@ public class BoardMapper {
         BoardDef boardDto = new BoardDef();
         boardDto.setId(entity.getExtId());
         boardDto.setReadOnly(entity.getReadOnly());
+        boardDto.setDisableTitle(entity.getDisableTitle());
         boardDto.setName(Json.getMapper().read(entity.getName(), MLText.class));
         if (entity.getTypeRef() != null) {
             boardDto.setTypeRef(RecordRef.valueOf(entity.getTypeRef()));
@@ -61,6 +62,7 @@ public class BoardMapper {
         }
         entity.setName(Json.getMapper().toString(board.getName()));
         entity.setReadOnly(board.getReadOnly());
+        entity.setDisableTitle(board.getDisableTitle());
 
         entity.setTypeRef(RecordRef.isNotEmpty(board.getTypeRef()) ? RecordRef.toString(board.getTypeRef()) : null);
 
