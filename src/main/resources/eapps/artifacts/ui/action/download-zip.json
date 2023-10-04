@@ -1,10 +1,27 @@
 {
   "id": "download-zip",
   "type": "download-zip",
-  "evaluator": {
-    "type": "has-attribute",
-    "config": {
-      "attribute": "_content"
-    }
+  "config": {
+    "targetApp": "transformations"
+  },
+  "features": {
+    "execForRecords": true,
+    "execForRecord": false,
+    "execForQuery": false
+  },
+  "predicate": {
+    "t": "or",
+    "v": [
+      {
+        "t": "eq",
+        "a": "_has._content?bool!",
+        "v": true
+      },
+      {
+        "t": "eq",
+        "a": "_has.docs:documents?bool!",
+        "v": true
+      }
+    ]
   }
 }
