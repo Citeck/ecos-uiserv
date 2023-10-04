@@ -9,8 +9,8 @@ import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 import ru.citeck.ecos.model.lib.attributes.dto.computed.ComputedAttType
 import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records3.RecordsService
-import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormBuilder
 import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormBuilderFactory
+import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormComponentsBuilder
 import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormWidth
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
@@ -51,17 +51,19 @@ class TypeFormsProvider(
             .withWidth(EcosFormWidth.MEDIUM)
             .withTitle(typeDef.entity.name)
 
-        if (withDefinition) {
-            typeDef.entity.model.attributes.forEach {
-                createInput(formBuilder, it)
+        val form = formBuilder.withComponents { formComponents ->
+            if (withDefinition) {
+                typeDef.entity.model.attributes.forEach {
+                    createInput(formComponents, it)
+                }
+                formComponents.addCancelAndSubmitButtons()
             }
-            formBuilder.addCancelAndSubmitButtons()
-        }
+        }.build()
 
-        return EntityWithMeta(formBuilder.build(), typeDef.meta)
+        return EntityWithMeta(form, typeDef.meta)
     }
 
-    private fun createInput(formBuilder: EcosFormBuilder, attribute: AttributeDef) {
+    private fun createInput(formBuilder: EcosFormComponentsBuilder, attribute: AttributeDef) {
 
         if (attribute.computed.type != ComputedAttType.NONE) {
             return
@@ -76,10 +78,10 @@ class TypeFormsProvider(
             attribute.id
         }
         formBuilder.addInput(attribute.type, attribute.config)
-            .setKey(fieldKey)
-            .setName(name)
-            .setMultiple(attribute.multiple)
-            .setMandatory(attribute.mandatory)
+            .withKey(fieldKey)
+            .withName(name)
+            .withMultiple(attribute.multiple)
+            .withMandatory(attribute.mandatory)
             .build()
     }
 

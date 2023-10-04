@@ -8,10 +8,7 @@ import ru.citeck.ecos.context.lib.i18n.I18nContext
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
-import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormBuilder
-import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormBuilderFactory
-import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormInputType
-import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormWidth
+import ru.citeck.ecos.uiserv.domain.form.builder.*
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
 import ru.citeck.ecos.uiserv.domain.form.service.FormDefUtils
@@ -35,28 +32,39 @@ class MobileTaskFormsProvider(
         val taskRef = EntityRef.valueOf(id)
         val taskAtts = recordsService.getAtts(taskRef, TaskAtts::class.java)
 
-        val formBuilder = formBuilderFactory.createBuilder()
-        buildDocumentFields(formBuilder, ecosFormService.getFormById(taskAtts.documentFormId).orElse(null))
-        buildTaskOutcomeFields(formBuilder, taskAtts.possibleOutcomes)
+        val form = formBuilderFactory.createBuilder()
+            .withComponents { formComponents ->
+                formComponents.addPanel()
+                    .withKey("body_panel")
+                    .withComponents { bodyComponents ->
+                        buildDocumentFields(
+                            bodyComponents,
+                            ecosFormService.getFormById(taskAtts.documentFormId).orElse(null)
+                        )
+                    }.build()
+                formComponents.addPanel()
+                    .withKey("footer_panel")
+                    .withComponents { footerComponents ->
+                        buildTaskOutcomeFields(footerComponents, taskAtts.possibleOutcomes)
+                    }.build()
+        }.withWidth(EcosFormWidth.SMALL).build()
 
-        formBuilder.withWidth(EcosFormWidth.SMALL)
-
-        return EntityWithMeta(formBuilder.build())
+        return EntityWithMeta(form)
     }
 
-    private fun buildTaskOutcomeFields(builder: EcosFormBuilder, outcomes: List<OutcomeAtts>) {
+    private fun buildTaskOutcomeFields(builder: EcosFormComponentsBuilder, outcomes: List<OutcomeAtts>) {
         outcomes.forEach {
             builder.addButton()
-                .setKey("outcome_" + it.id)
-                .setName(it.name)
+                .withKey("outcome_" + it.id)
+                .withName(it.name)
                 .build()
         }
     }
 
-    private fun buildDocumentFields(builder: EcosFormBuilder, documentForm: EcosFormDef?) {
+    private fun buildDocumentFields(builder: EcosFormComponentsBuilder, documentForm: EcosFormDef?) {
 
         if (documentForm == null) {
-            builder.addInput(AttributeType.TEXT, ObjectData.create()).setName(
+            builder.addInput(AttributeType.TEXT, ObjectData.create()).withName(
                 MLText(
                     I18nContext.RUSSIAN to "Имя документа",
                     I18nContext.ENGLISH to "Document name"
@@ -69,8 +77,8 @@ class MobileTaskFormsProvider(
             val type = EcosFormInputType.getByTypeIdOrNull(component["type"].asText())
             if (type != null) {
                 builder.addInput(type, ObjectData.create())
-                    .setData(component)
-                    .setKey("_ECM_" + component["key"].asText())
+                    .withData(component)
+                    .withKey("_ECM_" + component["key"].asText())
                     .build()
             }
             component

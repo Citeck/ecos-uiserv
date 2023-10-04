@@ -2,13 +2,13 @@ package ru.citeck.ecos.uiserv.domain.form.builder
 
 import ru.citeck.ecos.commons.data.MLText
 
-interface EcosFormButtonBuilder {
+interface EcosFormButtonBuilder<T> {
 
-    fun setKey(key: String): EcosFormButtonBuilder
+    fun withKey(key: String): EcosFormButtonBuilder<T>
 
-    fun setName(name: MLText): EcosFormButtonBuilder
+    fun withName(name: MLText): EcosFormButtonBuilder<T>
 
-    fun setProperty(key: String, value: String): EcosFormButtonBuilder
+    fun withProperty(key: String, value: String): EcosFormButtonBuilder<T>
 
-    fun build(): EcosFormBuilder
+    fun build(): T
 }

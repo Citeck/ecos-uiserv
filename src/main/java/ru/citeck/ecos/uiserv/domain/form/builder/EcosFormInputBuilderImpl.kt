@@ -5,17 +5,16 @@ import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.records2.RecordRef
 
-open class EcosFormInputBuilderImpl(
+open class EcosFormInputBuilderImpl<T>(
     type: EcosFormInputType,
     config: ObjectData,
     context: FormBuilderContext,
-    private val buildImpl: (DataValue) -> EcosFormBuilder
-) : EcosFormInputBuilder {
+    private val buildImpl: (DataValue) -> T
+) : EcosFormInputBuilder<T> {
 
     companion object {
-        private const val KEY = "key"
+
         private const val TYPE = "type"
-        private const val NAME = "label"
         private const val INPUT = "input"
         private const val MULTIPLE = "multiple"
         private const val REQUIRED = "$.validate.required"
@@ -59,27 +58,27 @@ open class EcosFormInputBuilderImpl(
         }
     }
 
-    override fun setData(data: DataValue): EcosFormInputBuilder {
+    override fun withData(data: DataValue): EcosFormInputBuilder<T> {
         this.data = data.copy()
         return this
     }
 
-    override fun setKey(key: String): EcosFormInputBuilder {
-        data[KEY] = key
+    override fun withKey(key: String): EcosFormInputBuilder<T> {
+        data[EcosFormComponentProps.KEY] = key
         return this
     }
 
-    override fun setName(name: MLText): EcosFormInputBuilder {
-        data[NAME] = name
+    override fun withName(name: MLText): EcosFormInputBuilder<T> {
+        data[EcosFormComponentProps.NAME] = name
         return this
     }
 
-    override fun setMultiple(multiple: Boolean): EcosFormInputBuilder {
+    override fun withMultiple(multiple: Boolean): EcosFormInputBuilder<T> {
         data[MULTIPLE] = multiple
         return this
     }
 
-    override fun setMandatory(mandatory: Boolean): EcosFormInputBuilder {
+    override fun withMandatory(mandatory: Boolean): EcosFormInputBuilder<T> {
         if (mandatory) {
             data[REQUIRED] = true
         } else {
@@ -88,7 +87,7 @@ open class EcosFormInputBuilderImpl(
         return this
     }
 
-    override fun build(): EcosFormBuilder {
+    override fun build(): T {
         return buildImpl(data)
     }
 }

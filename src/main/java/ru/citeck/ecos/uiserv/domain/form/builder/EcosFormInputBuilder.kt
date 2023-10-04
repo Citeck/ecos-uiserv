@@ -3,17 +3,17 @@ package ru.citeck.ecos.uiserv.domain.form.builder
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
 
-interface EcosFormInputBuilder {
+interface EcosFormInputBuilder<T> {
 
-    fun setData(data: DataValue): EcosFormInputBuilder
+    fun withData(data: DataValue): EcosFormInputBuilder<T>
 
-    fun setKey(key: String): EcosFormInputBuilder
+    fun withKey(key: String): EcosFormInputBuilder<T>
 
-    fun setName(name: MLText): EcosFormInputBuilder
+    fun withName(name: MLText): EcosFormInputBuilder<T>
 
-    fun setMultiple(multiple: Boolean): EcosFormInputBuilder
+    fun withMultiple(multiple: Boolean): EcosFormInputBuilder<T>
 
-    fun setMandatory(mandatory: Boolean): EcosFormInputBuilder
+    fun withMandatory(mandatory: Boolean): EcosFormInputBuilder<T>
 
-    fun build(): EcosFormBuilder
+    fun build(): T
 }
