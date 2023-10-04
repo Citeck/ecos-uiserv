@@ -8,10 +8,7 @@ import ru.citeck.ecos.config.lib.dto.ConfigValueType
 import ru.citeck.ecos.config.lib.service.EcosConfigService
 import ru.citeck.ecos.context.lib.i18n.I18nContext
 import ru.citeck.ecos.records3.RecordsService
-import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormBuilder
-import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormBuilderFactory
-import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormInputType
-import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormWidth
+import ru.citeck.ecos.uiserv.domain.form.builder.*
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
 import javax.annotation.PostConstruct
@@ -32,16 +29,19 @@ class ConfigFormsProvider(
     override fun getFormById(id: String): EntityWithMeta<EcosFormDef>? {
 
         val config = ecosConfigService.getConfig(id)
-        val formBuilder = formBuilderFactory.createBuilder()
 
-        formBuilder.withWidth(EcosFormWidth.SMALL)
-        addInput(formBuilder, config.valueDef)
-        formBuilder.addCancelAndSubmitButtons()
+        val form = formBuilderFactory.createBuilder()
+            .withWidth(EcosFormWidth.SMALL)
+            .withComponents { formComponents ->
+                addInput(formComponents, config.valueDef)
+                formComponents.addCancelAndSubmitButtons()
+            }.build()
 
-        return EntityWithMeta(formBuilder.build())
+
+        return EntityWithMeta(form)
     }
 
-    private fun addInput(formBuilder: EcosFormBuilder, valueDef: ConfigValueDef) {
+    private fun addInput(formBuilder: EcosFormComponentsBuilder, valueDef: ConfigValueDef) {
 
         val name = if (valueDef.type == ConfigValueType.BOOLEAN) {
             MLText(
@@ -67,9 +67,9 @@ class ConfigFormsProvider(
         }
 
         formBuilder.addInput(type, valueDef.config)
-            .setKey("_value")
-            .setMultiple(valueDef.multiple)
-            .setName(name)
+            .withKey("_value")
+            .withMultiple(valueDef.multiple)
+            .withName(name)
             .build()
     }
 
