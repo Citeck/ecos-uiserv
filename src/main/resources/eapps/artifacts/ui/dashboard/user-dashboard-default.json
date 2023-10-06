@@ -43,7 +43,10 @@
       {
         "id": "layout_330b11c3-f296-4949-8a4d-2e0c698e656c",
         "tab": {
-          "label": "Вкладка",
+          "label": {
+            "ru": "Вкладка",
+            "en": "Tab"
+          },
           "idLayout": "layout_330b11c3-f296-4949-8a4d-2e0c698e656c"
         },
         "type": "mobile",

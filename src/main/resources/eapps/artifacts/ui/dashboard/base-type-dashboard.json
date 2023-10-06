@@ -5,7 +5,10 @@
     "mobile": [
       {
         "tab": {
-          "label": "Вкладка",
+          "label": {
+            "ru": "Вкладка",
+            "en": "Tab"
+          },
           "idLayout": "layout_b4b01e70-e01c-457d-abfa-aaaf0a4ca691"
         },
         "columns": [
@@ -251,7 +254,10 @@
         {
           "id": "layout_b4b01e70-e01c-457d-abfa-aaaf0a4ca691",
           "tab": {
-            "label": "Вкладка",
+            "label": {
+              "ru": "Вкладка",
+              "en": "Tab"
+            },
             "idLayout": "layout_b4b01e70-e01c-457d-abfa-aaaf0a4ca691"
           },
           "type": "mobile",
