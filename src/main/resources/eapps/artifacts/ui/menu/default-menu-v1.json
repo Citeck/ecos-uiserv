@@ -151,6 +151,24 @@
               }
             },
             {
+              "id": "299dd45c-b862-41fb-9ad6-42fc72b54a7b",
+              "label": {
+                "ru": "Администрирование БП"
+              },
+              "icon": "ui/icon@icon-empty",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/v2/admin?type=BPMN_ADMIN"
+              },
+              "action": {
+                "type": "",
+                "config": {}
+              },
+              "items": [],
+              "allowedFor": []
+            },
+            {
               "id": "c4ab4955-8b9d-4a47-9f99-0ee2fa31f528",
               "label": {
                 "ru": "Таблицы принятия решений",
