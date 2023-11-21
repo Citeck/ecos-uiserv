@@ -55,7 +55,7 @@
               "type": "JOURNAL",
               "config": {
                 "recordRef": "uiserv/journal@bpmn-historic-tasks",
-                "displayCount": true
+                "displayCount": false
               }
             },
             {
@@ -153,9 +153,10 @@
             {
               "id": "299dd45c-b862-41fb-9ad6-42fc72b54a7b",
               "label": {
-                "ru": "Администрирование БП"
+                "ru": "Администрирование БП",
+                "en": "BP Administration"
               },
-              "icon": "ui/icon@icon-empty",
+              "icon": "ui/icon@i-leftmenu-running-processes",
               "hidden": false,
               "type": "ARBITRARY",
               "config": {
