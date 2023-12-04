@@ -1,6 +1,5 @@
 package ru.citeck.ecos.uiserv.domain.journal.service;
 
-import ecos.com.fasterxml.jackson210.databind.node.ObjectNode;
 import kotlin.Pair;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -8,10 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.citeck.ecos.commons.data.DataValue;
-import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
-import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
@@ -232,21 +228,6 @@ public class JournalServiceImpl implements JournalService {
                         "Journal column attribute is invalid: '" + column.getAttribute() + "'. Column: " + column);
                 }
             }
-        });
-
-        dto.getActionsDef().forEach(action -> {
-            ObjectData config = action.getConfig();
-            config.forEachJ((k, v) -> {
-                if (v.isTextual()) {
-                    String value = v.getAs(String.class);
-                    if (value != null && value.charAt(0) == '{' && value.charAt(value.length() - 1) == '}') {
-                        DataValue convertedValue = DataValue.createAsIs(Json.getMapper().convert(v, ObjectNode.class));
-                        if (convertedValue.isNotNull()) {
-                            config.set(k, convertedValue);
-                        }
-                    }
-                }
-            });
         });
 
         JournalWithMeta valueBefore = journalRepository.findByExtId(dto.getId())
