@@ -25,16 +25,40 @@ createVariants:
 model:
   attributes:
     - id: typeRef
+      name:
+        en: Data type
+        ru: Тип данных
     - id: journalRef
+      name:
+        en: Journal
+        ru: Журнал
     - id: cardFormRef
+      name:
+        en: Form
+        ru: Форма
     - id: readOnly
+      name:
+        en: Read only
+        ru: Только на чтение
       type: BOOLEAN
     - id: disableTitle
+      name:
+        en: Hide the title
+        ru: Скрыть заголовок
       type: BOOLEAN
     - id: name
+      name:
+        en: Kanban board name
+        ru: Имя канбан-доски
       type: MLTEXT
     - id: actions
+      name:
+        en: Actions
+        ru: Действия
       multiple: true
     - id: columns
+      name:
+        en: Columns
+        ru: Колонки
       multiple: true
       type: JSON
