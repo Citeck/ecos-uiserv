@@ -1,13 +1,16 @@
 package ru.citeck.ecos.uiserv.domain.journal.api.records
 
 import ecos.com.fasterxml.jackson210.annotation.JsonValue
+import ecos.com.fasterxml.jackson210.databind.node.ObjectNode
 import lombok.Data
 import lombok.RequiredArgsConstructor
 import org.springframework.stereotype.Component
+import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.commons.json.YamlUtils
+import ru.citeck.ecos.commons.utils.StringUtils
 import ru.citeck.ecos.context.lib.auth.AuthContext.isRunAsAdmin
 import ru.citeck.ecos.events2.type.RecordEventsService
 import ru.citeck.ecos.records2.RecordRef
@@ -31,7 +34,6 @@ import ru.citeck.ecos.uiserv.domain.journal.registry.JournalsRegistryConfigurati
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalServiceImpl
 import java.nio.charset.StandardCharsets
-import java.util.*
 import javax.annotation.PostConstruct
 
 @Component
@@ -129,6 +131,21 @@ class JournalRecordsDao(
     }
 
     override fun saveMutatedRec(record: JournalMutateRec): String {
+        record.actionsDef.forEach {
+            val config = it.config
+            config.forEach { k, v ->
+                if (v.isTextual()) {
+                    val value = v.asText()
+                    if (StringUtils.isNotBlank(value) && value[0] == '{' && value[value.length - 1] == '}') {
+                        val convertedValue = DataValue.of(mapper.convert(v, ObjectNode::class.java))
+                        if (convertedValue.isObject()) {
+                            config[k] = convertedValue
+                        }
+                    }
+                }
+            }
+        }
+
         return journalService.save(record.build()).journalDef.id
     }
 
