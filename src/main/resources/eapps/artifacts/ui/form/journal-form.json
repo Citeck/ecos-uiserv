@@ -438,19 +438,16 @@
                             "action": "custom",
                             "state": "",
                             "showValidations": false,
-                            "custom": "\nvar currentRow = row;\nconst currentComponent = arguments[5];\n\nCiteck.EcosFormUtils.getFormById('uiserv/form@journal-column-data-form', {\n    definition: 'definition?json'\n}).then(function(formConfig) {\n\n    var inputs = [\n        'attribute',\n        'editor',\n        'formatter',\n        'searchable',\n        'searchableByText',\n        'sortable',\n        'groupable',\n        'editable',\n        'visible',\n        'hidden',\n        'multiple',\n        'computed',\n        'properties',\n        'searchConfig',\n        'headerFilterEditor'\n    ];\n\n    var formData = {};\n\n    for (var i = 0; i < inputs.length; i++) {\n        var att = inputs[i];\n        var value = currentRow[att];\n        if (value === undefined) {\n            value = null;\n        } else if (Array.isArray(value)) {\n            value = value.filter(function(it) { return !!it; });\n        }\n        formData[att] = value;\n    }\n\n    Citeck.Dialogs.showFormDialog({\n        title: 'Column additional config',\n        showDefaultButtons: true,\n        formDefinition: formConfig.definition,\n        formData: formData,\n        onSubmit: submission => {\n            var data = submission.data || {};\n            for (var i = 0; i < inputs.length; i++) {\n                var att = inputs[i];\n                currentRow[att] = data[att];\n            }\n            \n            form.emit('change', {\n              changed: {\n              instance: currentRow,\n              component: currentComponent,\n            },\n             data: submission.data\n           });\n        }\n    })\n});\n",
-                            "headers": [
-                              {
-                                "header": "",
-                                "value": ""
-                              }
-                            ],
+                            "custom": "var currentRow = row;\nconst currentComponent = arguments[5];\n\nCiteck.EcosFormUtils.getFormById('uiserv/form@journal-column-data-form', {\n    definition: 'definition?json'\n}).then(function(formConfig) {\n\n    var inputs = [\n        'attribute',\n        'editor',\n        'formatter',\n        'searchable',\n        'searchableByText',\n        'sortable',\n        'groupable',\n        'editable',\n        'visible',\n        'hidden',\n        'multiple',\n        'computed',\n        'properties',\n        'searchConfig',\n        'headerFilterEditor'\n    ];\n\n    var formData = {};\n\n    for (var i = 0; i < inputs.length; i++) {\n        var att = inputs[i];\n        var value = currentRow[att];\n        if (value === undefined) {\n            value = null;\n        } else if (Array.isArray(value)) {\n            value = value.filter(function(it) { return !!it; });\n        }\n        formData[att] = value;\n    }\n\n    formData.parentType = currentComponent.data.type;\n\n    Citeck.Dialogs.showFormDialog({\n        title: 'Column additional config',\n        showDefaultButtons: true,\n        formDefinition: formConfig.definition,\n        formData: formData,\n        onSubmit: submission => {\n            var data = submission.data || {};\n            for (var i = 0; i < inputs.length; i++) {\n                var att = inputs[i];\n                currentRow[att] = data[att];\n            }\n            \n            form.emit('change', {\n              changed: {\n              instance: currentRow,\n              component: currentComponent,\n            },\n             data: submission.data\n           });\n        }\n    })\n});",
                             "block": true,
                             "refreshOn": [],
                             "optionalWhenDisabled": false,
                             "type": "button",
                             "input": true,
-                            "row": "0-2"
+                            "row": "0-2",
+                            "headers": [
+                              {}
+                            ]
                           },
                           {
                             "label": {
