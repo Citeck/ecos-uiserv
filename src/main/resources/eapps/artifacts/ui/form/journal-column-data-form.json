@@ -60,6 +60,19 @@
                 "optionalWhenDisabled": false,
                 "type": "checkbox",
                 "input": true
+              },
+              {
+                "label": {
+                  "ru": "Отобразить общую сумму колонки",
+                  "en": "Display the total amount of the column"
+                },
+                "key": "hasTotalSumField",
+                "refreshOn": [],
+                "optionalWhenDisabled": false,
+                "customConditional": "show = data.parentType === \"NUMBER\";",
+                "type": "checkbox",
+                "input": true,
+                "show": false
               }
             ],
             "type": "column",
