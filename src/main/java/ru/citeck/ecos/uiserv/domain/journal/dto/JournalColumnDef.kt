@@ -45,6 +45,11 @@ class JournalColumnDef(
 
     val formatter: ColumnFormatterDef,
 
+    /**
+     * Show total sum of all records in table
+     */
+    val hasTotalSumField: Boolean,
+
     // features
 
     /**
@@ -132,6 +137,7 @@ class JournalColumnDef(
         var attSchema: String = ""
         var editor: ColumnEditorDef = ColumnEditorDef.EMPTY
         var formatter: ColumnFormatterDef = ColumnFormatterDef.EMPTY
+        var hasTotalSumField: Boolean = false
         var searchable: Boolean? = null
         var searchableByText: Boolean? = null
         var searchConfig: ColumnSearchConfig = ColumnSearchConfig.EMPTY
@@ -153,6 +159,7 @@ class JournalColumnDef(
             attSchema = base.attSchema
             editor = base.editor
             formatter = base.formatter
+            hasTotalSumField = base.hasTotalSumField
             searchable = base.searchable
             searchableByText = base.searchableByText
             searchConfig = base.searchConfig
@@ -273,7 +280,12 @@ class JournalColumnDef(
             return this
         }
 
-        fun withHeaderFilterEditor(headerFilterEditor: ColumnEditorDef): Builder {
+        fun withHasTotalSumField(hasTotalSumField: Boolean?): Builder {
+            this.hasTotalSumField = hasTotalSumField ?: false
+            return this
+        }
+
+        fun withHeaderFilterEditor(headerFilterEditor: ColumnEditorDef?): Builder {
             this.headerFilterEditor = headerFilterEditor ?: ColumnEditorDef.EMPTY
             return this
         }
@@ -288,6 +300,7 @@ class JournalColumnDef(
                 attSchema,
                 editor,
                 formatter,
+                hasTotalSumField,
                 searchable,
                 searchableByText,
                 searchConfig,
