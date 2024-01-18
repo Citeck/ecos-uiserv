@@ -67,6 +67,7 @@
                   "en": "Display the total amount of the column"
                 },
                 "key": "hasTotalSumField",
+                "hasThreeStates": true,
                 "refreshOn": [],
                 "optionalWhenDisabled": false,
                 "customConditional": "show = data.parentType === \"NUMBER\";",
