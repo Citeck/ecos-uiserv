@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.uiserv.app.web.exception.JournalPrefsNotFoundException;
@@ -43,13 +44,18 @@ public class JournalPrefApi {
     public JsonNode getJournalPrefs(@RequestParam String id) {
 
         String username = AuthContext.getCurrentUser();
-        JournalSettingsDto settings = journalSettingsService.getById(id);
-        if (settings != null) {
-            if (!username.equals(settings.getAuthority())) {
-                throw new RuntimeException("Access denied");
+
+        EntityWithMeta<JournalSettingsDto> settingsWithMeta = journalSettingsService.getById(id);
+        if (settingsWithMeta != null) {
+            JournalSettingsDto settings = settingsWithMeta.getEntity();
+            if (settings != null) {
+                if (!username.equals(settings.getAuthority())) {
+                    throw new RuntimeException("Access denied");
+                }
+                return settings.getSettings().getAs(JsonNode.class);
             }
-            return settings.getSettings().getAs(JsonNode.class);
         }
+
         Optional<JournalPrefService.JournalPreferences> optionalJournalPrefs = journalPrefService.getJournalPrefs(id);
         return optionalJournalPrefs.orElseThrow(() -> new JournalPrefsNotFoundException(id)).getData();
     }
@@ -63,7 +69,13 @@ public class JournalPrefApi {
                                 @RequestBody byte[] bytes) {
         validateBody(bytes);
 
-        JournalSettingsDto dto = journalSettingsService.getById(id);
+        EntityWithMeta<JournalSettingsDto> dtoWithMeta = journalSettingsService.getById(id);
+        if (dtoWithMeta == null) {
+            fileService.deployFileOverride(FileType.JOURNALPREFS, id, null, bytes);
+            return;
+        }
+
+        JournalSettingsDto dto = dtoWithMeta.getEntity();
         if (dto == null) {
             fileService.deployFileOverride(FileType.JOURNALPREFS, id, null, bytes);
             return;
@@ -91,16 +103,22 @@ public class JournalPrefApi {
 
         String username = AuthContext.getCurrentUser();
 
-        JournalSettingsDto settings = journalSettingsService.getById(journalViewPrefsId);
-        if (settings != null) {
-            if (!Objects.equals(username, settings.getAuthority())) {
-                throw new RuntimeException("Access denied");
+        EntityWithMeta<JournalSettingsDto> settingsWithMeta = journalSettingsService.getById(journalViewPrefsId);
+        if (settingsWithMeta != null) {
+            JournalSettingsDto settings = settingsWithMeta.getEntity();
+            if (settings != null) {
+                if (!Objects.equals(username, settings.getAuthority())) {
+                    throw new RuntimeException("Access denied");
+                } else {
+                    journalSettingsService.delete(journalViewPrefsId);
+                }
             } else {
-                journalSettingsService.delete(journalViewPrefsId);
+                fileService.deployFileOverride(FileType.JOURNALPREFS, journalViewPrefsId, null, null,
+                    Collections.emptyMap());
             }
         } else {
             fileService.deployFileOverride(FileType.JOURNALPREFS, journalViewPrefsId, null, null,
-                    Collections.emptyMap());
+                Collections.emptyMap());
         }
     }
 
