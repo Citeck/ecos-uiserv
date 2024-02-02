@@ -44,6 +44,15 @@ class ActionEntityMapper(
         if (configJson != null) {
             action.config = mapper.convert(configJson, ObjectData::class.java)
         }
+
+        val execForRecordsBatchSize = actionEntity.execForRecordsBatchSize
+        if (execForRecordsBatchSize != null) {
+            action.execForRecordsBatchSize = execForRecordsBatchSize
+        }
+        val execForRecordsParallelBatchesCount = actionEntity.execForRecordsParallelBatchesCount
+        if (execForRecordsParallelBatchesCount != null) {
+            action.execForRecordsParallelBatchesCount = execForRecordsParallelBatchesCount
+        }
         action.execForQueryConfig = mapper.convert(actionEntity.execForQueryConfig, ExecForQueryConfig::class.java)
 
         val evaluator = actionEntity.evaluator
@@ -86,6 +95,8 @@ class ActionEntityMapper(
         actionEntity.features = mapper.toString(action.features)
         actionEntity.configJson = mapper.toString(action.config)
         actionEntity.predicate = mapper.toString(action.predicate)
+        actionEntity.execForRecordsBatchSize = action.execForRecordsBatchSize
+        actionEntity.execForRecordsParallelBatchesCount = action.execForRecordsParallelBatchesCount
         actionEntity.execForQueryConfig = mapper.toString(action.execForQueryConfig)
 
         val evaluator = action.evaluator
