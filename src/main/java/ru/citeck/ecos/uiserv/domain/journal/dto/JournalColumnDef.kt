@@ -45,6 +45,8 @@ class JournalColumnDef(
 
     val formatter: ColumnFormatterDef,
 
+    val width: Int?,
+
     /**
      * Show total sum of all records in table
      */
@@ -137,6 +139,7 @@ class JournalColumnDef(
         var attSchema: String = ""
         var editor: ColumnEditorDef = ColumnEditorDef.EMPTY
         var formatter: ColumnFormatterDef = ColumnFormatterDef.EMPTY
+        var width: Int? = null
         var hasTotalSumField: Boolean = false
         var searchable: Boolean? = null
         var searchableByText: Boolean? = null
@@ -159,6 +162,7 @@ class JournalColumnDef(
             attSchema = base.attSchema
             editor = base.editor
             formatter = base.formatter
+            width = base.width
             hasTotalSumField = base.hasTotalSumField
             searchable = base.searchable
             searchableByText = base.searchableByText
@@ -222,6 +226,11 @@ class JournalColumnDef(
 
         fun withFormatter(formatter: ColumnFormatterDef?): Builder {
             this.formatter = formatter ?: ColumnFormatterDef.EMPTY
+            return this
+        }
+
+        fun withWidth(width: Int?): Builder {
+            this.width = width
             return this
         }
 
@@ -293,26 +302,27 @@ class JournalColumnDef(
         fun build(): JournalColumnDef {
 
             return JournalColumnDef(
-                id,
-                name,
-                type,
-                attribute,
-                attSchema,
-                editor,
-                formatter,
-                hasTotalSumField,
-                searchable,
-                searchableByText,
-                searchConfig,
-                sortable,
-                groupable,
-                editable,
-                visible,
-                hidden,
-                multiple,
-                computed,
-                properties,
-                headerFilterEditor
+                id = id,
+                name = name,
+                type = type,
+                attribute = attribute,
+                attSchema = attSchema,
+                editor = editor,
+                formatter = formatter,
+                width = width,
+                hasTotalSumField = hasTotalSumField,
+                searchable = searchable,
+                searchableByText = searchableByText,
+                searchConfig = searchConfig,
+                sortable = sortable,
+                groupable = groupable,
+                editable = editable,
+                visible = visible,
+                hidden = hidden,
+                multiple = multiple,
+                computed = computed,
+                properties = properties,
+                headerFilterEditor = headerFilterEditor
             )
         }
     }
