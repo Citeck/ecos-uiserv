@@ -73,6 +73,10 @@ class JournalSettingsServiceImpl(
         return newDto
     }
 
+    override fun getDtoById(id: String): JournalSettingsDto? {
+        return getById(id)?.entity
+    }
+
     @Override
     override fun getById(id: String): EntityWithMeta<JournalSettingsDto>? {
         val entity = repo.findByExtId(id)

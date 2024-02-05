@@ -13,6 +13,8 @@ interface JournalSettingsService {
 
     fun save(settings: JournalSettingsDto): JournalSettingsDto
 
+    fun getDtoById(id: String): JournalSettingsDto?
+
     fun getById(id: String): EntityWithMeta<JournalSettingsDto>?
 
     fun delete(id: String): Boolean
