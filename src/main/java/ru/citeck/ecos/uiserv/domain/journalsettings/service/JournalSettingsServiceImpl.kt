@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.commons.data.entity.EntityMeta
+import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.records2.predicate.model.Predicate
@@ -71,19 +73,23 @@ class JournalSettingsServiceImpl(
         return newDto
     }
 
+    override fun getDtoById(id: String): JournalSettingsDto? {
+        return getById(id)?.entity
+    }
+
     @Override
-    override fun getById(id: String): JournalSettingsDto? {
+    override fun getById(id: String): EntityWithMeta<JournalSettingsDto>? {
         val entity = repo.findByExtId(id)
         if (entity != null) {
             if (permService.canRead(entity)) {
-                return toDto(entity)
+                return toDtoWithMeta(entity)
             }
             return null
         }
 
         val journalPrefs = journalPrefService.getJournalPrefs(id).orElse(null)
         return if (journalPrefs != null) {
-            toDto(journalPrefs, null)
+            EntityWithMeta(toDto(journalPrefs, null))
         } else {
             null
         }
@@ -117,22 +123,23 @@ class JournalSettingsServiceImpl(
         }
     }
 
-    override fun findAll(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<JournalSettingsDto> {
+    override fun findAll(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>):
+        List<EntityWithMeta<JournalSettingsDto>> {
         return if (AuthContext.isRunAsAdmin() || AuthContext.isRunAsSystem()) {
-            searchConv.findAll(repo, predicate, max, skip, sort).map { toDto(it) }
+            searchConv.findAll(repo, predicate, max, skip, sort).map { toDtoWithMeta(it) }
         } else {
             emptyList()
         }
     }
 
     @Override
-    override fun searchSettings(journalId: String): List<JournalSettingsDto> {
+    override fun searchSettings(journalId: String): List<EntityWithMeta<JournalSettingsDto>> {
         val searchSpecification = composeSearchSpecification(journalId)
         val foundedJournalSettings = repo.findAll(searchSpecification).stream()
-            .map { toDto(it) }
+            .map { toDtoWithMeta(it) }
             .collect(Collectors.toList())
 
-        val foundedJournalPrefs = searchJournalPrefs(journalId)
+        val foundedJournalPrefs = searchJournalPrefs(journalId).map { EntityWithMeta(it) }
 
         return mergeSettingsAndPrefs(foundedJournalSettings, foundedJournalPrefs)
     }
@@ -165,10 +172,11 @@ class JournalSettingsServiceImpl(
         return result
     }
 
-    private fun mergeSettingsAndPrefs(settings: List<JournalSettingsDto>, prefs: List<JournalSettingsDto>): List<JournalSettingsDto> {
-        val result = mutableListOf<JournalSettingsDto>()
-        val prefsMap = prefs.associateBy { it.id }
-        val settingsMap = settings.associateBy { it.id }
+    private fun mergeSettingsAndPrefs(settings: List<EntityWithMeta<JournalSettingsDto>>,
+                                      prefs: List<EntityWithMeta<JournalSettingsDto>>): List<EntityWithMeta<JournalSettingsDto>> {
+        val result = mutableListOf<EntityWithMeta<JournalSettingsDto>>()
+        val prefsMap = prefs.associateBy { it.entity.id }
+        val settingsMap = settings.associateBy { it.entity.id }
         prefsMap.forEach { id, dto ->
             if (!settingsMap.containsKey(id)) {
                 result.add(dto)
@@ -224,6 +232,21 @@ class JournalSettingsServiceImpl(
             .withSettings(Json.mapper.read(entity.settings, ObjectData::class.java))
             .withCreator(entity.createdBy)
             .build()
+    }
+
+    private fun toDtoWithMeta(entity: JournalSettingsEntity): EntityWithMeta<JournalSettingsDto> {
+        val dto = JournalSettingsDto.create()
+            .withId(entity.extId)
+            .withName(Json.mapper.read(entity.name, MLText::class.java))
+            .withAuthority(entity.authority)
+            .withJournalId(entity.journalId)
+            .withSettings(Json.mapper.read(entity.settings, ObjectData::class.java))
+            .withCreator(entity.createdBy)
+            .build()
+
+        val meta = EntityMeta(entity.createdDate, entity.createdBy, entity.lastModifiedDate, entity.lastModifiedBy)
+
+        return EntityWithMeta(dto, meta)
     }
 
     private fun toDto(pref: JournalPrefService.JournalPreferences, journalId: String?): JournalSettingsDto {

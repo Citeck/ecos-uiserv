@@ -43,7 +43,7 @@ public class JournalPrefApi {
     public JsonNode getJournalPrefs(@RequestParam String id) {
 
         String username = AuthContext.getCurrentUser();
-        JournalSettingsDto settings = journalSettingsService.getById(id);
+        JournalSettingsDto settings = journalSettingsService.getDtoById(id);
         if (settings != null) {
             if (!username.equals(settings.getAuthority())) {
                 throw new RuntimeException("Access denied");
@@ -63,7 +63,7 @@ public class JournalPrefApi {
                                 @RequestBody byte[] bytes) {
         validateBody(bytes);
 
-        JournalSettingsDto dto = journalSettingsService.getById(id);
+        JournalSettingsDto dto = journalSettingsService.getDtoById(id);
         if (dto == null) {
             fileService.deployFileOverride(FileType.JOURNALPREFS, id, null, bytes);
             return;
@@ -91,7 +91,7 @@ public class JournalPrefApi {
 
         String username = AuthContext.getCurrentUser();
 
-        JournalSettingsDto settings = journalSettingsService.getById(journalViewPrefsId);
+        JournalSettingsDto settings = journalSettingsService.getDtoById(journalViewPrefsId);
         if (settings != null) {
             if (!Objects.equals(username, settings.getAuthority())) {
                 throw new RuntimeException("Access denied");
