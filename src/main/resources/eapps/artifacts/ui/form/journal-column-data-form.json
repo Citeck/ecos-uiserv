@@ -74,6 +74,22 @@
                 "type": "checkbox",
                 "input": true,
                 "show": false
+              },
+              {
+                "label": {
+                  "ru": "Задать ширину колонки в пикселях",
+                  "en": "Set the column width in pixels"
+                },
+                "key": "width",
+                "validate": {
+                  "integer": false
+                },
+                "isBigNumber": false,
+                "delimiterValue": " ",
+                "optionalWhenDisabled": false,
+                "defaultValue": "",
+                "type": "number",
+                "input": true
               }
             ],
             "type": "column",

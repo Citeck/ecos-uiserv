@@ -37,6 +37,9 @@ class ActionEntity : AbstractAuditingEntity() {
     var pluralName: String? = null
     var predicate: String? = null
 
+    var execForRecordsBatchSize: Int? = null
+    var execForRecordsParallelBatchesCount: Int? = null
+
     var execForQueryConfig: String? = null
 
     override fun equals(other: Any?): Boolean {

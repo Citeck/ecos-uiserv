@@ -4,8 +4,10 @@ import ecos.com.fasterxml.jackson210.annotation.JsonValue
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
+import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.commons.json.YamlUtils
+import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
@@ -21,12 +23,16 @@ import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.domain.journalsettings.dto.JournalSettingsDto
 import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsPermissionsService
 import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsService
+import ru.citeck.ecos.webapp.api.authority.EcosAuthoritiesApi
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.nio.charset.StandardCharsets
+import java.time.Instant
 
 @Component
 class JournalSettingsRecordsDao(
     private val journalSettingsService: JournalSettingsService,
-    private val permService: JournalSettingsPermissionsService
+    private val permService: JournalSettingsPermissionsService,
+    private val authoritiesApi: EcosAuthoritiesApi
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordAttsDao,
@@ -39,7 +45,7 @@ class JournalSettingsRecordsDao(
     @Override
     override fun getRecordAtts(recordId: String): JournalSettingsRecord {
         val dto = journalSettingsService.getById(recordId)
-            ?: JournalSettingsDto.create { withId(recordId) }
+            ?: EntityWithMeta(JournalSettingsDto.create { withId(recordId) })
         return JournalSettingsRecord(dto)
     }
 
@@ -95,7 +101,8 @@ class JournalSettingsRecordsDao(
         }
     }
 
-    inner class JournalSettingsRecord(private val originalDto: JournalSettingsDto) : JournalSettingsDto.Builder(originalDto) {
+    inner class JournalSettingsRecord(private val originalDto: EntityWithMeta<JournalSettingsDto>) :
+        JournalSettingsDto.Builder(originalDto.entity) {
 
         fun getModuleId(): String {
             return id
@@ -109,7 +116,7 @@ class JournalSettingsRecordsDao(
         @JsonValue
         @com.fasterxml.jackson.annotation.JsonValue
         fun toNonDefaultJson(): Any {
-            return Json.mapper.toNonDefaultJson(originalDto)
+            return Json.mapper.toNonDefaultJson(originalDto.entity)
         }
 
         fun getData(): ByteArray {
@@ -118,6 +125,26 @@ class JournalSettingsRecordsDao(
 
         fun getPermissions(): SettingsPermissions {
             return SettingsPermissions(this)
+        }
+
+        @AttName(RecordConstants.ATT_CREATED)
+        fun getCreated(): Instant {
+            return originalDto.meta.created
+        }
+
+        @AttName(RecordConstants.ATT_CREATOR)
+        fun getCreatorAtt(): EntityRef {
+            return authoritiesApi.getPersonRef(creator)
+        }
+
+        @AttName(RecordConstants.ATT_MODIFIED)
+        fun getModified(): Instant {
+            return originalDto.meta.modified
+        }
+
+        @AttName(RecordConstants.ATT_MODIFIER)
+        fun getModifier(): EntityRef {
+            return authoritiesApi.getPersonRef(originalDto.meta.modifier)
         }
     }
 

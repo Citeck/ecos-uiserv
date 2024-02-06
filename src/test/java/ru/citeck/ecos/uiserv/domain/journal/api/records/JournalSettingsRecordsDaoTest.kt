@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.User
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records3.RecordsService
@@ -36,6 +37,7 @@ import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsPermi
 import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsPermissionsServiceImpl
 import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsService
 import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsServiceImpl
+import ru.citeck.ecos.webapp.api.authority.EcosAuthoritiesApi
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactoryImpl
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension
 
@@ -60,6 +62,9 @@ internal class JournalSettingsRecordsDaoTest {
 
     @Autowired
     lateinit var fileRepository: FileRepository
+
+    @Autowired
+    lateinit var authoritiesApi: EcosAuthoritiesApi
 
     @BeforeEach
     fun setUp() {
@@ -92,7 +97,8 @@ internal class JournalSettingsRecordsDaoTest {
         val permService = JournalSettingsPermissionsServiceImpl()
         val dao = JournalSettingsRecordsDao(
             JournalSettingsServiceImpl(repo, permService, journalPrefService, fileService, JpaSearchConverterFactoryImpl()),
-            permService
+            permService,
+            authoritiesApi
         )
         assertEquals("journal-settings", dao.getId())
     }
@@ -212,9 +218,10 @@ internal class JournalSettingsRecordsDaoTest {
         Mockito.doAnswer {
             assertEquals("test-id", it.arguments[0])
             return@doAnswer journalSettingsRecordsDao.JournalSettingsRecord(
-                JournalSettingsDto.create {
+                EntityWithMeta(JournalSettingsDto.create {
                     withName(MLText("test-name"))
-                }
+                })
+
             )
         }.`when`(journalSettingsRecordsDao).getRecordAtts(any(String::class.java))
 
@@ -783,20 +790,22 @@ internal class JournalSettingsRecordsDaoTest {
 
         Mockito.doReturn(
             listOf(
-                JournalSettingsDto.create {
-                    withId("id1")
-                    withName(MLText("name1"))
-                },
-                JournalSettingsDto.create {
-                    withId("id2")
-                    withName(MLText("name2"))
-                }
+                EntityWithMeta(
+                    JournalSettingsDto.create {
+                        withId("id1")
+                        withName(MLText("name1"))
+                    }),
+                EntityWithMeta(
+                    JournalSettingsDto.create {
+                        withId("id2")
+                        withName(MLText("name2"))
+                    })
             )
         ).`when`(journalSettingsService).searchSettings("journal1")
         Mockito.doReturn(emptyList<JournalSettingsDto>())
             .`when`(journalSettingsService).searchSettings("journal2")
 
-        val recordsDao = JournalSettingsRecordsDao(journalSettingsService, permService)
+        val recordsDao = JournalSettingsRecordsDao(journalSettingsService, permService, authoritiesApi)
 
         Mockito.verify(journalSettingsService, Mockito.times(0)).searchSettings(any(String::class.java))
 
