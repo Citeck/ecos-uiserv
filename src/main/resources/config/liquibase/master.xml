@@ -59,5 +59,6 @@
     <include file="changelog/20221129000000_add_scope_for_dashboards.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20230905000000_add_name_for_dashboards.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20230920000000_update_board_table.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20240202000000_update_actions.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
