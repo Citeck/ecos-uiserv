@@ -47,7 +47,7 @@ class MobileTaskFormsProvider(
                     .withComponents { footerComponents ->
                         buildTaskOutcomeFields(footerComponents, taskAtts.possibleOutcomes)
                     }.build()
-        }.withWidth(EcosFormWidth.SMALL).build()
+            }.withWidth(EcosFormWidth.SMALL).build()
 
         return EntityWithMeta(form)
     }

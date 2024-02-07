@@ -133,7 +133,6 @@ class EcosFormRecordsDao(
                     .map { toRecord(it) }
             )
             return result
-
         } else if (recsQuery.language == QUERY_LANG_FORMS_FOR_MOBILE_TASKS) {
 
             val forms = getFormsForMobileTasks(recsQuery.getQuery(FormsForMobileTasksQuery::class.java))

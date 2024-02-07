@@ -85,7 +85,7 @@ public class DashboardRecordControllerTest {
                     .contentType(TestUtil.APPLICATION_JSON_UTF8)
                     .content(queryJson))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id", is(RECORD_ID_AT + id)))
+            .andExpect(jsonPath("$.id", is("uiserv/" + RECORD_ID_AT + id)))
             .andExpect(jsonPath("$.attributes.config.menu.type", is("TOP")))
             .andExpect(jsonPath("$.attributes.config.layout.columns[1].widgets[0].id",
                 is("some-test-widget-id")));

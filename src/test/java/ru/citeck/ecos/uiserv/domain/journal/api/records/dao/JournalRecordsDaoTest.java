@@ -137,7 +137,7 @@ public class JournalRecordsDaoTest {
                     "}"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id",
-                is(JOURNAL_DAO_ID + "@" + journalEntity.getExtId())))
+                is("uiserv/" + JOURNAL_DAO_ID + "@" + journalEntity.getExtId())))
             .andExpect(jsonPath("$.attributes.name", is("test")))
             .andExpect(jsonPath("$.attributes.typeRef?id", is(journalEntity.getTypeRef())))
             .andExpect(jsonPath("$.attributes.predicate", is(journalEntity.getPredicate())))

@@ -172,8 +172,10 @@ class JournalSettingsServiceImpl(
         return result
     }
 
-    private fun mergeSettingsAndPrefs(settings: List<EntityWithMeta<JournalSettingsDto>>,
-                                      prefs: List<EntityWithMeta<JournalSettingsDto>>): List<EntityWithMeta<JournalSettingsDto>> {
+    private fun mergeSettingsAndPrefs(
+        settings: List<EntityWithMeta<JournalSettingsDto>>,
+        prefs: List<EntityWithMeta<JournalSettingsDto>>
+    ): List<EntityWithMeta<JournalSettingsDto>> {
         val result = mutableListOf<EntityWithMeta<JournalSettingsDto>>()
         val prefsMap = prefs.associateBy { it.entity.id }
         val settingsMap = settings.associateBy { it.entity.id }

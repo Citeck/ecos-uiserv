@@ -37,7 +37,6 @@ class ConfigFormsProvider(
                 formComponents.addCancelAndSubmitButtons()
             }.build()
 
-
         return EntityWithMeta(form)
     }
 

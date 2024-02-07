@@ -218,9 +218,11 @@ internal class JournalSettingsRecordsDaoTest {
         Mockito.doAnswer {
             assertEquals("test-id", it.arguments[0])
             return@doAnswer journalSettingsRecordsDao.JournalSettingsRecord(
-                EntityWithMeta(JournalSettingsDto.create {
-                    withName(MLText("test-name"))
-                })
+                EntityWithMeta(
+                    JournalSettingsDto.create {
+                        withName(MLText("test-name"))
+                    }
+                )
 
             )
         }.`when`(journalSettingsRecordsDao).getRecordAtts(any(String::class.java))
@@ -794,12 +796,14 @@ internal class JournalSettingsRecordsDaoTest {
                     JournalSettingsDto.create {
                         withId("id1")
                         withName(MLText("name1"))
-                    }),
+                    }
+                ),
                 EntityWithMeta(
                     JournalSettingsDto.create {
                         withId("id2")
                         withName(MLText("name2"))
-                    })
+                    }
+                )
             )
         ).`when`(journalSettingsService).searchSettings("journal1")
         Mockito.doReturn(emptyList<JournalSettingsDto>())
