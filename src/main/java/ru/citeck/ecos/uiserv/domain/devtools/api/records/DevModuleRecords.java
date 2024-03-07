@@ -16,6 +16,7 @@ import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -58,9 +59,9 @@ public class DevModuleRecords extends LocalRecordsDao implements LocalRecordsQue
     }
 
     @Override
-    public List<Object> getLocalRecordsMeta(@NotNull List<RecordRef> records, @NotNull MetaField metaField) {
+    public List<Object> getLocalRecordsMeta(@NotNull List<EntityRef> records, @NotNull MetaField metaField) {
         return records.stream().map(recRef -> {
-            Object rec = this.records.get(recRef.getId());
+            Object rec = this.records.get(recRef.getLocalId());
             if (rec == null) {
                 rec = EmptyValue.INSTANCE;
             }

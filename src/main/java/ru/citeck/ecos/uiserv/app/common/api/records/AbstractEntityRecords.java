@@ -15,6 +15,7 @@ import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsCrudDao;
 import ru.citeck.ecos.uiserv.app.common.service.EntityDto;
 import ru.citeck.ecos.uiserv.app.common.exception.RecordNotFoundException;
 import ru.citeck.ecos.uiserv.app.common.service.BaseEntityService;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,9 +26,9 @@ public abstract class AbstractEntityRecords<T extends EntityDto> extends LocalRe
     protected BaseEntityService<T> entityService;
 
     @Override
-    public List<T> getValuesToMutate(List<RecordRef> records) {
+    public List<T> getValuesToMutate(List<EntityRef> records) {
         return records.stream()
-            .map(RecordRef::getId)
+            .map(EntityRef::getLocalId)
             .map(id ->
                 Optional.of(id)
                     .filter(str -> !str.isEmpty())
@@ -47,7 +48,7 @@ public abstract class AbstractEntityRecords<T extends EntityDto> extends LocalRe
         List<RecordMeta> resultRecords = new ArrayList<>();
         deletion.getRecords()
             .forEach(recordRef -> {
-                entityService.delete(recordRef.getId());
+                entityService.delete(recordRef.getLocalId());
                 resultRecords.add(new RecordMeta(recordRef));
             });
 
@@ -57,9 +58,9 @@ public abstract class AbstractEntityRecords<T extends EntityDto> extends LocalRe
     }
 
     @Override
-    public List<T> getLocalRecordsMeta(@NotNull List<RecordRef> records, @NotNull MetaField metaField) {
+    public List<T> getLocalRecordsMeta(@NotNull List<EntityRef> records, @NotNull MetaField metaField) {
         return records.stream()
-            .map(RecordRef::getId)
+            .map(EntityRef::getLocalId)
             .map(id -> Optional.of(id)
                 .filter(str -> !str.isEmpty())
                 .map(x -> entityService.getById(x)

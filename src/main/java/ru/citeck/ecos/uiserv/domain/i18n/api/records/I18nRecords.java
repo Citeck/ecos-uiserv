@@ -29,6 +29,7 @@ import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.domain.i18n.dto.I18nDto;
 import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService;
 import ru.citeck.ecos.uiserv.domain.utils.LegacyRecordsUtils;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
@@ -83,16 +84,16 @@ public class I18nRecords extends LocalRecordsDao implements LocalRecordsQueryWit
     }
 
     @Override
-    public List<I18nRecord> getLocalRecordsMeta(@NotNull List<RecordRef> list,
+    public List<I18nRecord> getLocalRecordsMeta(@NotNull List<EntityRef> list,
                                                      @NotNull MetaField metaField) {
 
         return list.stream()
             .map(ref -> {
                 I18nDto dto;
-                if (RecordRef.isEmpty(ref)) {
+                if (EntityRef.isEmpty(ref)) {
                     dto = new I18nDto();
                 } else {
-                    dto = i18nService.getById(ref.getId());
+                    dto = i18nService.getById(ref.getLocalId());
                     if (dto == null) {
                         dto = new I18nDto();
                     }
@@ -108,7 +109,7 @@ public class I18nRecords extends LocalRecordsDao implements LocalRecordsQueryWit
 
         deletion.getRecords()
             .forEach(r -> {
-                i18nService.delete(r.getId());
+                i18nService.delete(r.getLocalId());
                 resultRecords.add(new RecordMeta(r));
             });
 
@@ -119,10 +120,10 @@ public class I18nRecords extends LocalRecordsDao implements LocalRecordsQueryWit
 
     @NotNull
     @Override
-    public List<I18nRecord> getValuesToMutate(@NotNull List<RecordRef> records) {
+    public List<I18nRecord> getValuesToMutate(@NotNull List<EntityRef> records) {
 
         return records.stream()
-            .map(RecordRef::getId)
+            .map(EntityRef::getLocalId)
             .map(id -> {
                 I18nDto dto = i18nService.getById(id);
                 if (dto == null) {

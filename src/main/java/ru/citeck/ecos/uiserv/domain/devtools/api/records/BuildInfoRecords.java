@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.graphql.meta.value.EmptyValue;
 import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.request.query.RecordsQuery;
@@ -19,11 +18,14 @@ import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.uiserv.domain.devtools.dto.AppBuildInfo;
 import ru.citeck.ecos.uiserv.domain.devtools.dto.BuildInfo;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.Instant;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -69,10 +71,10 @@ public class BuildInfoRecords extends LocalRecordsDao implements LocalRecordsQue
     }
 
     @Override
-    public List<Object> getLocalRecordsMeta(@NotNull List<RecordRef> records, @NotNull MetaField metaField) {
+    public List<Object> getLocalRecordsMeta(@NotNull List<EntityRef> records, @NotNull MetaField metaField) {
 
         return records.stream().map(ref -> {
-            BuildInfoRecord res = this.buildInfo.get(ref.getId());
+            BuildInfoRecord res = this.buildInfo.get(ref.getLocalId());
             return res != null ? res.buildInfo : EmptyValue.INSTANCE;
         }).collect(Collectors.toList());
     }

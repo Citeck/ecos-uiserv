@@ -12,6 +12,7 @@ import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
 import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records3.record.request.RequestContext;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ public class IsLockedEvaluatorTest extends LocalRecordsDao implements LocalRecor
     }
 
     @Override
-    public List<Object> getLocalRecordsMeta(List<RecordRef> list, MetaField metaField) {
+    public List<Object> getLocalRecordsMeta(List<EntityRef> list, MetaField metaField) {
         return Collections.singletonList(new TestRecord());
     }
 

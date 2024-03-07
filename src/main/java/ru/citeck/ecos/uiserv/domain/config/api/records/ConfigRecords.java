@@ -14,6 +14,7 @@ import ru.citeck.ecos.uiserv.domain.config.service.ConfigEntityService;
 import ru.citeck.ecos.uiserv.domain.config.dto.ConfigDto;
 import ru.citeck.ecos.uiserv.app.common.service.EntityDto;
 import ru.citeck.ecos.uiserv.app.common.api.records.AbstractEntityRecords;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,10 +65,10 @@ public class ConfigRecords extends AbstractEntityRecords<ConfigDto> {
     }
 
     @Override
-    public List<ConfigDto> getValuesToMutate(List<RecordRef> records) {
+    public List<ConfigDto> getValuesToMutate(List<EntityRef> records) {
         List<ConfigDto> result = new ArrayList<>();
-        for (RecordRef recordRef : records) {
-            String id = recordRef.getId();
+        for (EntityRef entityRef : records) {
+            String id = entityRef.getLocalId();
             if (StringUtils.isBlank(id)) {
                 result.add(getEmpty());
                 continue;
@@ -86,10 +87,10 @@ public class ConfigRecords extends AbstractEntityRecords<ConfigDto> {
     }
 
     @Override
-    public List<ConfigDto> getLocalRecordsMeta(@NotNull List<RecordRef> records, @NotNull MetaField metaField) {
+    public List<ConfigDto> getLocalRecordsMeta(@NotNull List<EntityRef> records, @NotNull MetaField metaField) {
         List<ConfigDto> result = new ArrayList<>();
-        for (RecordRef recordRef : records) {
-            String id = recordRef.getId();
+        for (EntityRef entityRef : records) {
+            String id = entityRef.getLocalId();
             if (StringUtils.isBlank(id)) {
                 result.add(getEmpty());
                 continue;

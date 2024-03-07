@@ -91,7 +91,7 @@ class JournalRecordsDao(
                     .build()
                 val queryRes = recordsService.query(registryQuery)
 
-                val journals = journalService.getAll(queryRes.getRecords().map { it.id }.toSet())
+                val journals = journalService.getAll(queryRes.getRecords().map { it.getLocalId() }.toSet())
                 result.setRecords(ArrayList(journals))
                 result.setTotalCount(queryRes.getTotalCount())
             } else {

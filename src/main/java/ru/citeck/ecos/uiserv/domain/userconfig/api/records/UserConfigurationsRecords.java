@@ -13,6 +13,7 @@ import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.uiserv.domain.userconfig.dto.UserConfigurationDto;
 import ru.citeck.ecos.uiserv.domain.userconfig.service.UserConfigurationsService;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.Collection;
 import java.util.List;
@@ -48,18 +49,18 @@ public class UserConfigurationsRecords extends LocalRecordsDao
     }
 
     @Override
-    public List<UserConfigurationDto> getValuesToMutate(@NotNull List<RecordRef> records) {
+    public List<UserConfigurationDto> getValuesToMutate(@NotNull List<EntityRef> records) {
         return getRecordsFromRecordRefs(records);
     }
 
     @Override
-    public List<UserConfigurationDto> getLocalRecordsMeta(@NotNull List<RecordRef> records, @NotNull MetaField metaField) {
+    public List<UserConfigurationDto> getLocalRecordsMeta(@NotNull List<EntityRef> records, @NotNull MetaField metaField) {
         return getRecordsFromRecordRefs(records);
     }
 
-    private List<UserConfigurationDto> getRecordsFromRecordRefs(Collection<RecordRef> records) {
+    private List<UserConfigurationDto> getRecordsFromRecordRefs(Collection<EntityRef> records) {
         return records.stream()
-            .map(RecordRef::getId)
+            .map(EntityRef::getLocalId)
             .map(extId ->
                 Optional.ofNullable(userConfigurationsService.findByExternalId(extId))
                     .orElseGet(UserConfigurationDto::new)

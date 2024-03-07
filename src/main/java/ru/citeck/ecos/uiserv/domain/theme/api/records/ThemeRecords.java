@@ -29,6 +29,7 @@ import ru.citeck.ecos.uiserv.domain.theme.dto.ThemeDto;
 import ru.citeck.ecos.uiserv.domain.theme.eapps.ThemeArtifactHandler;
 import ru.citeck.ecos.uiserv.domain.theme.service.ThemeService;
 import ru.citeck.ecos.uiserv.domain.utils.LegacyRecordsUtils;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -74,15 +75,15 @@ public class ThemeRecords extends LocalRecordsDao implements LocalRecordsQueryWi
     }
 
     @Override
-    public List<ThemeRecord> getLocalRecordsMeta(@NotNull List<RecordRef> list, @NotNull MetaField metaField) {
+    public List<ThemeRecord> getLocalRecordsMeta(@NotNull List<EntityRef> list, @NotNull MetaField metaField) {
 
         return list.stream()
             .map(ref -> {
                 ThemeDto dto;
-                if (RecordRef.isEmpty(ref)) {
+                if (EntityRef.isEmpty(ref)) {
                     dto = new ThemeDto();
                 } else {
-                    dto = themeService.getTheme(ref.getId());
+                    dto = themeService.getTheme(ref.getLocalId());
                     if (dto == null) {
                         dto = new ThemeDto();
                     }
@@ -98,7 +99,7 @@ public class ThemeRecords extends LocalRecordsDao implements LocalRecordsQueryWi
 
         deletion.getRecords()
             .forEach(r -> {
-                themeService.delete(r.getId());
+                themeService.delete(r.getLocalId());
                 resultRecords.add(new RecordMeta(r));
             });
 
@@ -109,10 +110,10 @@ public class ThemeRecords extends LocalRecordsDao implements LocalRecordsQueryWi
 
     @NotNull
     @Override
-    public List<ThemeRecord> getValuesToMutate(@NotNull List<RecordRef> records) {
+    public List<ThemeRecord> getValuesToMutate(@NotNull List<EntityRef> records) {
 
         return records.stream()
-            .map(RecordRef::getId)
+            .map(EntityRef::getLocalId)
             .map(id -> {
                 ThemeDto dto = themeService.getTheme(id);
                 if (dto == null) {

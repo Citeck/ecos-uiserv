@@ -16,6 +16,7 @@ import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.uiserv.domain.icon.service.IconService;
 import ru.citeck.ecos.uiserv.domain.icon.dto.IconDto;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,8 +38,8 @@ public class IconRecords extends LocalRecordsDao
     @Override
     public RecordsDelResult delete(RecordsDeletion deletion) {
         RecordsDelResult result = new RecordsDelResult();
-        for (RecordRef record : deletion.getRecords()) {
-            iconService.deleteById(record.getId());
+        for (EntityRef record : deletion.getRecords()) {
+            iconService.deleteById(record.getLocalId());
             result.addRecord(new RecordMeta(record));
         }
         return result;
@@ -68,7 +69,7 @@ public class IconRecords extends LocalRecordsDao
     }
 
     @Override
-    public List<IconDto> getValuesToMutate(List<RecordRef> records) {
+    public List<IconDto> getValuesToMutate(List<EntityRef> records) {
         return getLocalRecordsMeta(records, null);
     }
 
@@ -87,9 +88,9 @@ public class IconRecords extends LocalRecordsDao
     }
 
     @Override
-    public List<IconDto> getLocalRecordsMeta(List<RecordRef> records, MetaField metaField) {
+    public List<IconDto> getLocalRecordsMeta(List<EntityRef> records, MetaField metaField) {
         return records.stream()
-            .map(RecordRef::getId)
+            .map(EntityRef::getLocalId)
             .map(iconService::findById)
             .map(opt -> opt.orElseGet(IconDto::new))
             .collect(Collectors.toList());

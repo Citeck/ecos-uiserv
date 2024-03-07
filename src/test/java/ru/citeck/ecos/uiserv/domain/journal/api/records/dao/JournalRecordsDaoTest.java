@@ -21,6 +21,7 @@ import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.action.repo.ActionRepository;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
 
 import java.util.*;
@@ -183,9 +184,9 @@ public class JournalRecordsDaoTest {
         }
 
         @Override
-        public List<Object> getLocalRecordsMeta(List<RecordRef> records, MetaField metaField) {
+        public List<Object> getLocalRecordsMeta(List<EntityRef> records, MetaField metaField) {
             return records.stream()
-                .map(r -> TypesDao.records.get(r.getId()))
+                .map(r -> TypesDao.records.get(r.getLocalId()))
                 .collect(Collectors.toList());
         }
 

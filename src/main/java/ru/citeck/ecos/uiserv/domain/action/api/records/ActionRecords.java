@@ -40,6 +40,7 @@ import ru.citeck.ecos.records3.record.request.RequestContext;
 import ru.citeck.ecos.uiserv.domain.action.service.ActionService;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto;
 import ru.citeck.ecos.uiserv.domain.utils.LegacyRecordsUtils;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
@@ -85,15 +86,15 @@ public class ActionRecords extends LocalRecordsDao
     @Override
     public RecordsDelResult delete(RecordsDeletion deletion) {
         RecordsDelResult result = new RecordsDelResult();
-        for (RecordRef record : deletion.getRecords()) {
-            actionService.deleteAction(record.getId());
+        for (EntityRef record : deletion.getRecords()) {
+            actionService.deleteAction(record.getLocalId());
             result.addRecord(new RecordMeta(record));
         }
         return result;
     }
 
     @Override
-    public List<ActionRecord> getValuesToMutate(List<RecordRef> records) {
+    public List<ActionRecord> getValuesToMutate(List<EntityRef> records) {
         List<Object> recordAtts = getLocalRecordsMeta(records, null);
         List<ActionRecord> toMutate = new ArrayList<>();
         for (int i = 0; i < records.size(); i++) {
@@ -117,13 +118,13 @@ public class ActionRecords extends LocalRecordsDao
     }
 
     @Override
-    public List<Object> getLocalRecordsMeta(List<RecordRef> records, MetaField metaField) {
+    public List<Object> getLocalRecordsMeta(List<EntityRef> records, MetaField metaField) {
         return records.stream()
             .map(r -> {
-                if (r.getId().isEmpty()) {
+                if (r.getLocalId().isEmpty()) {
                     return new ActionRecord();
                 }
-                return actionService.getAction(r.getId());
+                return actionService.getAction(r.getLocalId());
             })
             .map(dto -> {
                 if (dto == null) {
@@ -224,7 +225,7 @@ public class ActionRecords extends LocalRecordsDao
 
     private void fillRecordsType(List<RecordInfo> recordsInfo) {
 
-        List<RecordRef> recordRefs = recordsInfo.stream().map(RecordInfo::getRecordRef).collect(Collectors.toList());
+        List<EntityRef> recordRefs = recordsInfo.stream().map(RecordInfo::getRecordRef).collect(Collectors.toList());
 
         RecordsResult<RecordTypeMeta> recordsTypesResult = recordsService.getMeta(recordRefs, RecordTypeMeta.class);
         List<RecordTypeMeta> recordTypes = recordsTypesResult.getRecords();
@@ -281,30 +282,30 @@ public class ActionRecords extends LocalRecordsDao
 
         fillRecordsType(recordsInfo);
 
-        Map<RecordRef, List<RecordInfo>> recordsByType = new HashMap<>();
+        Map<EntityRef, List<RecordInfo>> recordsByType = new HashMap<>();
 
         for (RecordInfo info : recordsInfo) {
-            RecordRef type = info.getType();
+            EntityRef type = info.getType();
             if (type != null) {
                 recordsByType.computeIfAbsent(type, k -> new ArrayList<>()).add(info);
             }
         }
 
-        List<RecordRef> typesRefs = new ArrayList<>(recordsByType.keySet());
+        List<EntityRef> typesRefs = new ArrayList<>(recordsByType.keySet());
         RecordsResult<ActionsRefMeta> typesActionsResult = recordsService.getMeta(typesRefs, ActionsRefMeta.class);
 
         List<ActionsRefMeta> typesActions = typesActionsResult.getRecords();
 
         for (int i = 0; i < typesActions.size(); i++) {
             ActionsRefMeta typeActions = typesActions.get(i);
-            RecordRef typeRef = typesRefs.get(i);
+            EntityRef typeRef = typesRefs.get(i);
             recordsByType.get(typeRef).forEach(info -> info.setActionIds(typeActions.getActions()));
         }
     }
 
     private void fillRecordActions(List<RecordInfo> recordsInfo) {
 
-        List<RecordRef> recordsToQueryActions = recordsInfo.stream().filter(info ->
+        List<EntityRef> recordsToQueryActions = recordsInfo.stream().filter(info ->
                    info.getActionIds() == null
                 || info.getResultActions() == null
                 || info.getResultActions()
@@ -318,7 +319,7 @@ public class ActionRecords extends LocalRecordsDao
 
         for (int i = 0; i < actions.size(); i++) {
             if (i < recordsToQueryActions.size()) {
-                RecordRef recordRef = recordsToQueryActions.get(i);
+                EntityRef recordRef = recordsToQueryActions.get(i);
                 for (RecordInfo info : recordsInfo) {
                     if (Objects.equals(info.getRecordRef(), recordRef)) {
                         info.setRecordActions(actions.get(i).actions);
