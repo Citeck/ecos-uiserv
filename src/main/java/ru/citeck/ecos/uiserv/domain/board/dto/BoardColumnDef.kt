@@ -3,7 +3,7 @@ package ru.citeck.ecos.uiserv.domain.board.dto
 import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
-import java.time.Instant
+import java.time.Duration
 
 @IncludeNonDefault
 @JsonDeserialize(builder = BoardColumnDef.Builder::class)
@@ -19,7 +19,7 @@ data class BoardColumnDef(
      */
     val name: MLText,
     val hideOldItems: Boolean,
-    val hideItemsOlderThan: Instant?
+    val hideItemsOlderThan: Duration? = null
 ) {
     companion object {
 
@@ -47,7 +47,7 @@ data class BoardColumnDef(
         var id: String = ""
         var name: MLText = MLText.EMPTY
         var hideOldItems: Boolean = false
-        var hideItemsOlderThan: Instant? = null
+        var hideItemsOlderThan: Duration? = null
 
         constructor(base: BoardColumnDef) : this() {
             this.id = base.id
@@ -71,7 +71,7 @@ data class BoardColumnDef(
             return this
         }
 
-        fun withHideItemsOlderThan(hideItemsOlderThan: Instant?): Builder {
+        fun withHideItemsOlderThan(hideItemsOlderThan: Duration?): Builder {
             this.hideItemsOlderThan = hideItemsOlderThan
             return this
         }
