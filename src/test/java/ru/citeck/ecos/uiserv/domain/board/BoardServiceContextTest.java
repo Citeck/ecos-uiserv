@@ -36,7 +36,7 @@ public class BoardServiceContextTest {
     private BoardRepository repository;
 
     @BeforeEach
-    public void createTestBoard(){
+    public void createTestBoard() {
         repository.save(BoardMapper.dtoToEntity(repository, BoardTestData.getTestBoard()));
     }
 
@@ -66,7 +66,16 @@ public class BoardServiceContextTest {
         Matcher<BoardDef> boardDefMatcher = is(boardDef);
         assertThat(service.getBoardById(BoardTestData.BOARD_ID).getBoardDef(), boardDefMatcher);
 
-        boardDef.setColumns(Arrays.asList(new BoardColumnDef("first", new MLText("1st Column")), new BoardColumnDef("second", new MLText("2d Column"))));
+        boardDef.setColumns(Arrays.asList(
+            BoardColumnDef.create()
+                .withId("first")
+                .withName(new MLText("1st Column"))
+                .build(),
+            BoardColumnDef.create()
+                .withId("second")
+                .withName(new MLText("2d Column"))
+                .build()
+        ));
         service.save(boardDef);
         assertThat(service.getBoardById(BoardTestData.BOARD_ID).getBoardDef(), boardDefMatcher);
 

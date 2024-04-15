@@ -26,8 +26,8 @@ public class BoardTestData {
         testBoard.setTypeRef(RecordRef.valueOf("emodel/type@user-board"));
         testBoard.setActions(Arrays.asList(RecordRef.valueOf("uiserv/action@test0")));
         testBoard.setColumns(Arrays.asList(
-            new BoardColumnDef("col1", new MLText("First Column")),
-            new BoardColumnDef("col2", new MLText("Second Column"))));
+            BoardColumnDef.create().withId("col1").withName(new MLText("First Column")).build(),
+            BoardColumnDef.create().withId("col2").withName(new MLText("Second Column")).build()));
     }
 
     public static BoardDef getTestBoard() {

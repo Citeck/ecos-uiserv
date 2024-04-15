@@ -53,7 +53,12 @@ public class ResolvedBoardRecord {
         if (typeInfo != null && typeInfo.getModel() != null) {
             List<BoardColumnDef> columns = new ArrayList<>();
             for (StatusDef statusDef : typeInfo.getModel().getStatuses()) {
-                columns.add(new BoardColumnDef(statusDef.getId(), statusDef.getName()));
+                columns.add(
+                    BoardColumnDef.create()
+                        .withId(statusDef.getId())
+                        .withName(statusDef.getName())
+                        .build()
+                );
             }
             return columns;
         }
