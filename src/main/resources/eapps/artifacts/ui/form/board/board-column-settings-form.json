@@ -1,0 +1,82 @@
+{
+  "id": "board-column-settings-form",
+  "formKey": "",
+  "title": {
+    "en": "Dashboard column settings"
+  },
+  "description": {},
+  "customModule": "",
+  "typeRef": "",
+  "width": "",
+  "system": false,
+  "i18n": {},
+  "definition": {
+    "components": [
+      {
+        "label": {
+          "ru": "Panel"
+        },
+        "key": "hiddenUntil",
+        "refreshOn": [],
+        "optionalWhenDisabled": false,
+        "type": "panel",
+        "input": false,
+        "components": [
+          {
+            "label": {
+              "ru": "Скрывать записи старше чем",
+              "en": "Hide items older than"
+            },
+            "key": "hideOldItems",
+            "refreshOn": [],
+            "optionalWhenDisabled": false,
+            "type": "checkbox",
+            "input": true
+          },
+          {
+            "label": {
+              "ru": "Продолжительность",
+              "en": "Duration"
+            },
+            "key": "hideItemsOlderThan",
+            "validate": {
+              "required": true,
+              "integer": false
+            },
+            "isBigNumber": false,
+            "delimiterValue": " ",
+            "refreshOn": [],
+            "optionalWhenDisabled": false,
+            "logic": [
+              {
+                "name": "check form",
+                "trigger": {
+                  "type": "javascript",
+                  "javascript": "if (data && data.hideOldItems) {\n  result = false;\n} else {\n  result = true;\n}"
+                },
+                "actions": [
+                  {
+                    "name": "action-disabled",
+                    "type": "property",
+                    "property": {
+                      "label": "Disabled",
+                      "value": "disabled",
+                      "type": "boolean"
+                    },
+                    "state": "true"
+                  }
+                ]
+              }
+            ],
+            "defaultValue": "",
+            "type": "number",
+            "input": true
+          }
+        ]
+      }
+    ],
+    "formId": "board-column-settings-form"
+  },
+  "attributes": {},
+  "notExists": false
+}

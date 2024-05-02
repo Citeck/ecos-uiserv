@@ -279,6 +279,59 @@
             "type": "mlText",
             "input": true,
             "row": "0-1"
+          },
+          {
+            "label": {
+              "ru": "Настройки",
+              "en": "Settings"
+            },
+            "key": "columns3",
+            "columns": [
+              {
+                "components": [
+                  {
+                    "label": {
+                      "ru": "Настройки",
+                      "en": "Settings"
+                    },
+                    "key": "submit2",
+                    "action": "custom",
+                    "state": "",
+                    "showValidations": false,
+                    "custom": "var currentRow = row;\nvar config = row || {}; \nvar formData = config;\n\nCiteck.EcosFormUtils.getFormById('board-column-settings-form', {\n    definition: 'definition?json'\n}).then(function(formConfig) {\n    \n    var inputs = Citeck.EcosFormUtils.getFormInputs(formConfig.definition);\n\n    Citeck.Dialogs.showFormDialog({\n        title: { ru: \"Настройки колонки\", en: \"Column settings\" },\n        showDefaultButtons: true,\n        formDefinition: formConfig.definition,\n        formData: formData,\n        onSubmit: submission => {\n            var data = submission.data || {};\n            var configData = {};\n            for (var i in inputs) {\n                var att = inputs[i].attribute;\n                if (att === \"hideItemsOlderThan\") {\n                  var duration = moment.duration(data[att], 'days');\n                  var isoString = duration.toISOString();\n                  currentRow[att] = isoString;\n                } else {\n                  currentRow[att] = data[att];\n                }\n            }\n        }\n    })\n    \n});",
+                    "block": true,
+                    "refreshOn": [],
+                    "optionalWhenDisabled": false,
+                    "type": "button",
+                    "input": true,
+                    "headers": [
+                      {}
+                    ]
+                  },
+                  {
+                    "key": "_statusModified",
+                    "refreshOn": [
+                      "data"
+                    ],
+                    "optionalWhenDisabled": false,
+                    "properties": {
+                      "_statusModified": "value"
+                    },
+                    "type": "hidden",
+                    "input": true
+                  }
+                ],
+                "type": "column",
+                "input": false,
+                "key": "column",
+                "index": 0,
+                "md": 20
+              }
+            ],
+            "oneColumnInViewMode": false,
+            "type": "columns",
+            "input": false,
+            "row": "0-2"
           }
         ]
       },
@@ -426,5 +479,6 @@
       }
     ]
   },
-  "attributes": {}
+  "attributes": {},
+  "notExists": false
 }
