@@ -190,7 +190,10 @@ class JournalSettingsServiceImpl(
 
     @Override
     override fun getSettings(authority: String?, journalId: String?): List<JournalSettingsDto> {
-        val configs: List<JournalSettingsEntity> = repo.findAllByAuthorityAndJournalId(authority, journalId)
+        var configs: List<JournalSettingsEntity> = repo.findAllByAuthorityAndJournalId(authority, journalId)
+        if (configs.isEmpty()) {
+            configs = repo.findAllByAuthoritiesInAndJournalId(listOf(authority), journalId)
+        }
         return configs.stream()
             .map { entity: JournalSettingsEntity -> toDto(entity) }
             .collect(Collectors.toList())
@@ -222,6 +225,7 @@ class JournalSettingsServiceImpl(
         settingsEntity.settings = Json.mapper.toString(dto.settings)
         settingsEntity.journalId = dto.journalId
         settingsEntity.authority = dto.authority
+        settingsEntity.authorities = dto.authorities
         return Pair(settingsEntity, isNew)
     }
 
@@ -230,6 +234,7 @@ class JournalSettingsServiceImpl(
             .withId(entity.extId)
             .withName(Json.mapper.read(entity.name, MLText::class.java))
             .withAuthority(entity.authority)
+            .withAuthorities(entity.authorities)
             .withJournalId(entity.journalId)
             .withSettings(Json.mapper.read(entity.settings, ObjectData::class.java))
             .withCreator(entity.createdBy)
@@ -241,6 +246,7 @@ class JournalSettingsServiceImpl(
             .withId(entity.extId)
             .withName(Json.mapper.read(entity.name, MLText::class.java))
             .withAuthority(entity.authority)
+            .withAuthorities(entity.authorities)
             .withJournalId(entity.journalId)
             .withSettings(Json.mapper.read(entity.settings, ObjectData::class.java))
             .withCreator(entity.createdBy)
@@ -258,6 +264,7 @@ class JournalSettingsServiceImpl(
             withId(pref.fileId)
             withName(Json.mapper.read(prefSettings["title"].asText(), MLText::class.java))
             withAuthority(currentUsername)
+            withAuthorities(listOf(currentUsername))
             withJournalId(journalId)
             withSettings(prefSettings)
             withCreator(currentUsername)

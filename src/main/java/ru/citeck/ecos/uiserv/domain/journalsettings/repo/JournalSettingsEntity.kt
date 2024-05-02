@@ -18,5 +18,11 @@ class JournalSettingsEntity : AbstractAuditingEntity() {
     var name: String? = null
     var journalId: String? = null
     var authority: String? = null
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @MapKeyColumn(name = "journal_settings_id")
+    @Column(name = "authority")
+    @CollectionTable(name = "journal_settings_authority", joinColumns = [JoinColumn(name = "journal_settings_id")])
+    var authorities: List<String>? = null
     var settings: String? = null
 }

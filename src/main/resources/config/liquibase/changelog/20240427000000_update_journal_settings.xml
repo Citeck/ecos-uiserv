@@ -1,0 +1,23 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="citeck" id="20240202000000">
+
+        <createTable tableName="journal_settings_authority">
+            <column name="journal_settings_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authority" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="journal_settings_id"
+                                 baseTableName="journal_settings_authority"
+                                 constraintName="fk_journal_settings_id_journal_settings"
+                                 referencedColumnNames="id"
+                                 referencedTableName="journal_settings"/>
+
+    </changeSet>
+
+</databaseChangeLog>

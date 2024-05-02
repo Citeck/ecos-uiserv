@@ -10,36 +10,44 @@ class JournalSettingsPermissionsServiceImpl : JournalSettingsPermissionsService 
 
     @Override
     override fun canRead(entity: JournalSettingsEntity): Boolean {
+        val currentUser = AuthContext.getCurrentUser()
 
         if (AuthContext.isRunAsAdmin() || AuthContext.isRunAsSystem()) {
             return true
         }
-        if (AuthContext.getCurrentUser() == entity.authority) {
+        if (currentUser == entity.authority) {
+            return true
+        }
+        if (entity.authorities?.contains(currentUser) == true) {
             return true
         }
         val isAuthority = AuthContext.getCurrentUserWithAuthorities().stream()
-            .anyMatch { it == entity.authority }
+            .anyMatch { it == entity.authority || entity.authorities?.contains(it) == true }
         if (isAuthority) {
             return true
         }
-        return AuthContext.getCurrentUser() == entity.createdBy
+        return currentUser == entity.createdBy
     }
 
     @Override
     override fun canRead(dto: JournalSettingsDto): Boolean {
+        val currentUser = AuthContext.getCurrentUser()
 
         if (AuthContext.isRunAsAdmin() || AuthContext.isRunAsSystem()) {
             return true
         }
-        if (AuthContext.getCurrentUser() == dto.authority) {
+        if (currentUser == dto.authority) {
+            return true
+        }
+        if (dto.authorities.contains(currentUser)) {
             return true
         }
         val isAuthority = AuthContext.getCurrentUserWithAuthorities().stream()
-            .anyMatch { it == dto.authority }
+            .anyMatch { it == dto.authority || dto.authorities.contains(it) }
         if (isAuthority) {
             return true
         }
-        return AuthContext.getCurrentUser() == dto.creator
+        return currentUser == dto.creator
     }
 
     @Override
@@ -63,6 +71,7 @@ class JournalSettingsPermissionsServiceImpl : JournalSettingsPermissionsService 
         if (AuthContext.isRunAsAdmin() || AuthContext.isRunAsSystem()) {
             return true
         }
-        return AuthContext.getCurrentUser() == dto.authority
+        val currentUser = AuthContext.getCurrentUser()
+        return currentUser == dto.authority || dto.authorities.contains(currentUser)
     }
 }
