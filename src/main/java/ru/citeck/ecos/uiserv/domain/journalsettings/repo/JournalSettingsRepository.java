@@ -26,5 +26,5 @@ public interface JournalSettingsRepository
                 "AND journal_settings.journalId = ?2 " +
             "ORDER BY journal_settings.name ASC"
     )
-    List<JournalSettingsEntity> findAllByAuthoritiesInAndJournalId(List<String> authorities, String journalId);
+    List<JournalSettingsEntity> findAllByAuthoritiesInAndJournalId(String authority, String journalId);
 }

@@ -93,6 +93,7 @@ internal class JournalSettingsServiceImplTest {
             journalSettingsEntity.extId = "searchable-id"
             journalSettingsEntity.name = "some-name"
             journalSettingsEntity.authority = "user-1"
+            journalSettingsEntity.authorities = listOf("user-1", "user-3")
             journalSettingsEntity.journalId = "some-journal"
             journalSettingsEntity.settings = "{}"
             repo.save(journalSettingsEntity)
@@ -103,6 +104,7 @@ internal class JournalSettingsServiceImplTest {
             assertEquals("searchable-id", foundedDto?.entity?.id)
             assertEquals("{\"en\":\"some-name\"}", foundedDto?.entity?.name.toString())
             assertEquals("user-1", foundedDto?.entity?.authority)
+            assertEquals(listOf("user-1", "user-3"), foundedDto?.entity?.authorities)
             assertEquals("some-journal", foundedDto?.entity?.journalId)
             assertEquals(ObjectData.create("{}"), foundedDto?.entity?.settings)
             assertEquals("user-1", foundedDto?.entity?.creator)
@@ -112,6 +114,11 @@ internal class JournalSettingsServiceImplTest {
 
         AuthContext.runAs("user-2") {
             assertNull(service.getById("searchable-id"))
+            assertNull(service.getById("unknown-id"))
+        }
+
+        AuthContext.runAs("user-3") {
+            assertNotNull(service.getById("searchable-id"))
             assertNull(service.getById("unknown-id"))
         }
     }
@@ -198,6 +205,60 @@ internal class JournalSettingsServiceImplTest {
             assertEquals("some-journal", updatedDto.journalId)
             assertEquals(ObjectData.create("{}"), updatedDto.settings)
             assertEquals("some-authority", updatedDto.creator)
+
+            Mockito.verify(spyPermService, Mockito.times(1)).canWrite(any(JournalSettingsEntity::class.java))
+            Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
+        }
+    }
+
+    @Test
+    fun saveWithAuthoritiesTest() {
+        val spyPermService = Mockito.spy(permService)
+        val service = JournalSettingsServiceImpl(
+            repo,
+            spyPermService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
+
+        AuthContext.runAs("some-authority-1") {
+            val createdDto = service.save(
+                JournalSettingsDto.create {
+                    withId("some-id")
+                    withName(MLText("some-name"))
+                    withAuthorities(listOf("some-authority-1", "some-authority-2"))
+                    withJournalId("some-journal")
+                    withSettings(ObjectData.create("{}"))
+                }
+            )
+
+            assertEquals("some-id", createdDto.id)
+            assertEquals("{\"en\":\"some-name\"}", createdDto.name.toString())
+            assertEquals(listOf("some-authority-1", "some-authority-2"), createdDto.authorities)
+            assertEquals("some-journal", createdDto.journalId)
+            assertEquals(ObjectData.create("{}"), createdDto.settings)
+            assertEquals("some-authority-1", createdDto.creator)
+
+            Mockito.verify(spyPermService, Mockito.times(0)).canWrite(any(JournalSettingsEntity::class.java))
+            Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
+
+            val updatedDto = service.save(
+                JournalSettingsDto.create {
+                    withId("some-id")
+                    withName(MLText("updated-name"))
+                    withAuthorities(listOf("some-authority-1", "some-authority-2"))
+                    withJournalId("some-journal")
+                    withSettings(ObjectData.create("{}"))
+                }
+            )
+
+            assertEquals("some-id", updatedDto.id)
+            assertEquals("{\"en\":\"updated-name\"}", updatedDto.name.toString())
+            assertEquals(listOf("some-authority-1", "some-authority-2"), updatedDto.authorities)
+            assertEquals("some-journal", updatedDto.journalId)
+            assertEquals(ObjectData.create("{}"), updatedDto.settings)
+            assertEquals("some-authority-1", updatedDto.creator)
 
             Mockito.verify(spyPermService, Mockito.times(1)).canWrite(any(JournalSettingsEntity::class.java))
             Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
@@ -321,6 +382,123 @@ internal class JournalSettingsServiceImplTest {
             Mockito.verify(spyPermService, Mockito.times(3)).canWriteNew(any(JournalSettingsDto::class.java))
         }
     }
+    @Test
+    fun saveByAnotherUserWithAuthoritiesTest() {
+        val spyPermService = Mockito.spy(JournalSettingsPermissionsServiceImpl())
+        val service = JournalSettingsServiceImpl(
+            repo,
+            spyPermService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
+
+        AuthContext.runAs("some-authority", listOf("some-authority", "GROUP_all", "ROLE_USER")) {
+            val createdDto = service.save(
+                JournalSettingsDto.create {
+                    withId("some-id")
+                    withName(MLText("some-name"))
+                    withAuthorities(listOf("some-authority", "some-authority-1"))
+                    withJournalId("some-journal")
+                    withSettings(ObjectData.create("{}"))
+                }
+            )
+
+            assertEquals("some-id", createdDto.id)
+            assertEquals("{\"en\":\"some-name\"}", createdDto.name.toString())
+            assertEquals(listOf("some-authority", "some-authority-1"), createdDto.authorities)
+            assertEquals("some-journal", createdDto.journalId)
+            assertEquals(ObjectData.create("{}"), createdDto.settings)
+            assertEquals("some-authority", createdDto.creator)
+
+            Mockito.verify(spyPermService, Mockito.times(0)).canWrite(any(JournalSettingsEntity::class.java))
+            Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
+        }
+
+        AuthContext.runAs("another-authority", listOf("another-authority", "GROUP_all", "ROLE_USER")) {
+            val exception1 = assertThrows(IllegalAccessException::class.java) {
+                service.save(
+                    JournalSettingsDto.create {
+                        withId("some-id")
+                        withName(MLText("updated-name"))
+                        withAuthorities(listOf("some-authority", "some-authority-1"))
+                        withJournalId("some-journal")
+                        withSettings(ObjectData.create("{}"))
+                    }
+                )
+            }
+
+            assertNotNull(exception1)
+            assertEquals("Access denied!", exception1.message)
+
+            Mockito.verify(spyPermService, Mockito.times(1)).canWrite(any(JournalSettingsEntity::class.java))
+            Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
+
+            val exception2 = assertThrows(IllegalAccessException::class.java) {
+                service.save(
+                    JournalSettingsDto.create {
+                        withId("another-id")
+                        withName(MLText("another-name"))
+                        withAuthorities(listOf("some-authority", "some-authority-1"))
+                        withJournalId("some-journal")
+                        withSettings(ObjectData.create("{}"))
+                    }
+                )
+            }
+
+            assertNotNull(exception2)
+            assertEquals("Access denied!", exception2.message)
+
+            Mockito.verify(spyPermService, Mockito.times(1)).canWrite(any(JournalSettingsEntity::class.java))
+            Mockito.verify(spyPermService, Mockito.times(2)).canWriteNew(any(JournalSettingsDto::class.java))
+        }
+
+        AuthContext.runAs("admin", listOf("admin", "GROUP_all", "ROLE_USER", "ROLE_ADMIN")) {
+            service.save(
+                JournalSettingsDto.create {
+                    withId("some-id")
+                    withName(MLText("updated-name"))
+                    withAuthorities(listOf("some-authority", "some-authority-1"))
+                    withJournalId("some-journal")
+                    withSettings(ObjectData.create("{}"))
+                }
+            )
+
+            Mockito.verify(spyPermService, Mockito.times(2)).canWrite(any(JournalSettingsEntity::class.java))
+            Mockito.verify(spyPermService, Mockito.times(2)).canWriteNew(any(JournalSettingsDto::class.java))
+
+            val updatedDto = service.getById("some-id")
+            assertNotNull(updatedDto)
+            assertEquals("some-id", updatedDto?.entity?.id)
+            assertEquals("{\"en\":\"updated-name\"}", updatedDto?.entity?.name.toString())
+            assertEquals(listOf("some-authority", "some-authority-1"), updatedDto?.entity?.authorities)
+            assertEquals("some-journal", updatedDto?.entity?.journalId)
+            assertEquals(ObjectData.create("{}"), updatedDto?.entity?.settings)
+            assertEquals("some-authority", updatedDto?.entity?.creator)
+
+            service.save(
+                JournalSettingsDto.create {
+                    withId("another-id")
+                    withName(MLText("another-name"))
+                    withAuthorities(listOf("some-authority", "some-authority-1"))
+                    withJournalId("some-journal")
+                    withSettings(ObjectData.create("{}"))
+                }
+            )
+
+            val createdForAnotherDto = service.getById("another-id")
+            assertNotNull(createdForAnotherDto)
+            assertEquals("another-id", createdForAnotherDto?.entity?.id)
+            assertEquals("{\"en\":\"another-name\"}", createdForAnotherDto?.entity?.name.toString())
+            assertEquals(listOf("some-authority", "some-authority-1"), createdForAnotherDto?.entity?.authorities)
+            assertEquals("some-journal", createdForAnotherDto?.entity?.journalId)
+            assertEquals(ObjectData.create("{}"), createdForAnotherDto?.entity?.settings)
+            assertEquals("admin", createdForAnotherDto?.entity?.creator)
+
+            Mockito.verify(spyPermService, Mockito.times(2)).canWrite(any(JournalSettingsEntity::class.java))
+            Mockito.verify(spyPermService, Mockito.times(3)).canWriteNew(any(JournalSettingsDto::class.java))
+        }
+    }
 
     @Test
     fun deleteTest() {
@@ -339,6 +517,42 @@ internal class JournalSettingsServiceImplTest {
                     withId("some-id")
                     withName(MLText("some-name"))
                     withAuthority("some-authority")
+                    withJournalId("some-journal")
+                    withSettings(ObjectData.create("{}"))
+                }
+            )
+            assertNotNull(service.getById("some-id"))
+
+            Mockito.verify(spyPermService, Mockito.times(0)).canWrite(any(JournalSettingsEntity::class.java))
+            Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
+
+            assertTrue(service.delete("some-id"))
+            assertNull(service.getById("some-id"))
+
+            assertFalse(service.delete("unknown-id"))
+
+            Mockito.verify(spyPermService, Mockito.times(1)).canWrite(any(JournalSettingsEntity::class.java))
+            Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
+        }
+    }
+
+    @Test
+    fun deleteWihtAuthoritiesTest() {
+        val spyPermService = Mockito.spy(permService)
+        val service = JournalSettingsServiceImpl(
+            repo,
+            spyPermService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
+
+        AuthContext.runAs("some-authority") {
+            service.save(
+                JournalSettingsDto.create {
+                    withId("some-id")
+                    withName(MLText("some-name"))
+                    withAuthorities(listOf("some-authority", "some-authority-1"))
                     withJournalId("some-journal")
                     withSettings(ObjectData.create("{}"))
                 }
@@ -419,6 +633,62 @@ internal class JournalSettingsServiceImplTest {
             assertThrows(IllegalAccessException::class.java, {
                 service.delete("some-id")
             })
+
+            Mockito.verify(spyPermService, Mockito.times(1)).canWrite(any(JournalSettingsEntity::class.java))
+            Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
+        }
+
+        AuthContext.runAs("admin", listOf("admin", "GROUP_all", "ROLE_USER", "ROLE_ADMIN")) {
+            assertNotNull(service.getById("some-id"))
+            assertTrue(service.delete("some-id"))
+            assertNull(service.getById("some-id"))
+
+            Mockito.verify(spyPermService, Mockito.times(2)).canWrite(any(JournalSettingsEntity::class.java))
+            Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
+        }
+    }
+
+    @Test
+    fun deleteByAnotherUserWithAuthoritiesTest() {
+
+        val spyPermService = Mockito.spy(JournalSettingsPermissionsServiceImpl())
+        val service = JournalSettingsServiceImpl(
+            repo,
+            spyPermService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
+
+        AuthContext.runAs("some-authority", listOf("some-authority", "GROUP_all", "ROLE_USER")) {
+
+            service.save(
+                JournalSettingsDto.create {
+                    withId("some-id")
+                    withName(MLText("some-name"))
+                    withAuthorities(listOf("some-authority", "some-authority-1"))
+                    withJournalId("some-journal")
+                    withSettings(ObjectData.create("{}"))
+                }
+            )
+
+            Mockito.verify(spyPermService, Mockito.times(0)).canWrite(any(JournalSettingsEntity::class.java))
+            Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
+        }
+
+        AuthContext.runAs("another-authority", listOf("another-authority", "GROUP_all", "ROLE_USER")) {
+            assertThrows(IllegalAccessException::class.java) {
+                service.delete("some-id")
+            }
+
+            Mockito.verify(spyPermService, Mockito.times(1)).canWrite(any(JournalSettingsEntity::class.java))
+            Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
+        }
+
+        AuthContext.runAs("some-authority-1", listOf("some-authority-1", "GROUP_all", "ROLE_USER")) {
+            assertThrows(IllegalAccessException::class.java) {
+                service.delete("some-id")
+            }
 
             Mockito.verify(spyPermService, Mockito.times(1)).canWrite(any(JournalSettingsEntity::class.java))
             Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
@@ -520,6 +790,103 @@ internal class JournalSettingsServiceImplTest {
     }
 
     @Test
+    fun searchSettingsWithAuthorities() {
+        val service = JournalSettingsServiceImpl(
+            repo,
+            permService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
+
+        setContext("admin")
+        repo.save(
+            JournalSettingsEntity().apply {
+                extId = "id-1"
+                name = "name-1"
+                authorities = listOf("user1")
+                journalId = "journal-1"
+                settings = "{}"
+            }
+        )
+        repo.save(
+            JournalSettingsEntity().apply {
+                extId = "id-2"
+                name = "name-2"
+                authorities = listOf("user1")
+                journalId = "journal-1"
+                settings = "{}"
+            }
+        )
+        repo.save(
+            JournalSettingsEntity().apply {
+                extId = "id-3"
+                name = "name-3"
+                authorities = listOf("user2")
+                journalId = "journal-1"
+                settings = "{}"
+            }
+        )
+        repo.save(
+            JournalSettingsEntity().apply {
+                extId = "id-4"
+                name = "name-4"
+                authorities = listOf("user2", "user1")
+                journalId = "journal-1"
+                settings = "{}"
+            }
+        )
+        repo.save(
+            JournalSettingsEntity().apply {
+                extId = "id-5"
+                name = "name-5"
+                authorities = listOf("user1", "user2")
+                journalId = "journal-2"
+                settings = "{}"
+            }
+        )
+        repo.save(
+            JournalSettingsEntity().apply {
+                extId = "id-6"
+                name = "name-6"
+                authorities = listOf("GROUP_all")
+                journalId = "journal-1"
+                settings = "{}"
+            }
+        )
+        clearContext()
+
+        setContext("user1")
+        val foundResult1 = service.searchSettings("journal-1")
+        assertEquals(4, foundResult1.size)
+        assertTrue(foundResult1.stream().anyMatch { it.entity.id == "id-1" })
+        assertTrue(foundResult1.stream().anyMatch { it.entity.id == "id-2" })
+        assertTrue(foundResult1.stream().anyMatch { it.entity.id == "id-4" })
+        assertTrue(foundResult1.stream().anyMatch { it.entity.id == "id-6" })
+        clearContext()
+
+        setContext("user2")
+        val foundResult2 = service.searchSettings("journal-1")
+        assertEquals(3, foundResult2.size)
+        assertTrue(foundResult2.stream().anyMatch { it.entity.id == "id-3" })
+        assertTrue(foundResult2.stream().anyMatch { it.entity.id == "id-4" })
+        assertTrue(foundResult2.stream().anyMatch { it.entity.id == "id-6" })
+        clearContext()
+
+        setContext("user1")
+        val foundResult3 = service.searchSettings("journal-2")
+        assertEquals(1, foundResult3.size)
+        assertTrue(foundResult3.stream().anyMatch { it.entity.id == "id-5" })
+        clearContext()
+
+        setContext("user2")
+        val foundResult4 = service.searchSettings("journal-2")
+        assertEquals(1, foundResult4.size)
+        assertTrue(foundResult4.stream().anyMatch { it.entity.id == "id-5" })
+        clearContext()
+    }
+
+    @Test
     fun searchUserSettingsByAdmin() {
         val service = JournalSettingsServiceImpl(
             repo,
@@ -580,6 +947,105 @@ internal class JournalSettingsServiceImplTest {
                 extId = "id-6"
                 name = "name-6"
                 authority = "admin"
+                journalId = "journal-1"
+                settings = "{}"
+            }
+        )
+        clearContext()
+
+        setContext("admin")
+        val foundResult1 = service.searchSettings("journal-1")
+        assertEquals(5, foundResult1.size)
+        assertTrue(foundResult1.stream().anyMatch { it.entity.id == "id-1" })
+        assertTrue(foundResult1.stream().anyMatch { it.entity.id == "id-2" })
+        assertTrue(foundResult1.stream().anyMatch { it.entity.id == "id-3" })
+        assertTrue(foundResult1.stream().anyMatch { it.entity.id == "id-5" })
+        assertTrue(foundResult1.stream().anyMatch { it.entity.id == "id-6" })
+        clearContext()
+
+        setContext("admin")
+        val foundResult2 = service.searchSettings("journal-2")
+        assertEquals(1, foundResult2.size)
+        assertTrue(foundResult2.stream().anyMatch { it.entity.id == "id-4" })
+        clearContext()
+
+        setContext("anotherAdmin")
+        val foundResult3 = service.searchSettings("journal-1")
+        assertEquals(4, foundResult3.size)
+        assertTrue(foundResult3.stream().anyMatch { it.entity.id == "id-1" })
+        assertTrue(foundResult3.stream().anyMatch { it.entity.id == "id-2" })
+        assertTrue(foundResult3.stream().anyMatch { it.entity.id == "id-3" })
+        assertTrue(foundResult3.stream().anyMatch { it.entity.id == "id-5" })
+        clearContext()
+
+        setContext("anotherAdmin")
+        val foundResult4 = service.searchSettings("journal-2")
+        assertEquals(1, foundResult4.size)
+        assertTrue(foundResult4.stream().anyMatch { it.entity.id == "id-4" })
+        clearContext()
+    }
+
+    @Test
+    fun searchUserSettingsByAdminWithAuthorities() {
+        val service = JournalSettingsServiceImpl(
+            repo,
+            permService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
+
+        setContext("admin")
+        repo.save(
+            JournalSettingsEntity().apply {
+                extId = "id-1"
+                name = "name-1"
+                authorities = listOf("user1")
+                journalId = "journal-1"
+                settings = "{}"
+            }
+        )
+        repo.save(
+            JournalSettingsEntity().apply {
+                extId = "id-2"
+                name = "name-2"
+                authorities = listOf("user1")
+                journalId = "journal-1"
+                settings = "{}"
+            }
+        )
+        repo.save(
+            JournalSettingsEntity().apply {
+                extId = "id-3"
+                name = "name-3"
+                authorities = listOf("user2")
+                journalId = "journal-1"
+                settings = "{}"
+            }
+        )
+        repo.save(
+            JournalSettingsEntity().apply {
+                extId = "id-4"
+                name = "name-4"
+                authorities = listOf("user1")
+                journalId = "journal-2"
+                settings = "{}"
+            }
+        )
+        repo.save(
+            JournalSettingsEntity().apply {
+                extId = "id-5"
+                name = "name-5"
+                authorities = listOf("GROUP_all")
+                journalId = "journal-1"
+                settings = "{}"
+            }
+        )
+        repo.save(
+            JournalSettingsEntity().apply {
+                extId = "id-6"
+                name = "name-6"
+                authorities = listOf("admin")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -782,6 +1248,100 @@ internal class JournalSettingsServiceImplTest {
         assertEquals(2, service.getSettings("auth-1", "journal-1").size)
         assertEquals(1, service.getSettings("auth-1", "journal-2").size)
         assertEquals(1, service.getSettings("auth-2", "journal-1").size)
+    }
+
+    @Test
+    fun getSettingsByAuthorityAndJournalIdWithAuthorities() {
+        val service = JournalSettingsServiceImpl(
+            repo,
+            permService,
+            journalPrefService,
+            fileService,
+            JpaSearchConverterFactoryImpl()
+        )
+
+        AuthContext.runAs("auth-1") {
+            service.save(
+                JournalSettingsDto.create {
+                    withId("id-1")
+                    withName(MLText("name-1"))
+                    withAuthorities(listOf("auth-1", "auth-2"))
+                    withJournalId("journal-1")
+                    withSettings(ObjectData.create("{}"))
+                }
+            )
+            service.save(
+                JournalSettingsDto.create {
+                    withId("id-2")
+                    withName(MLText("name-2"))
+                    withAuthorities(listOf("auth-1", "auth-2"))
+                    withJournalId("journal-1")
+                    withSettings(ObjectData.create("{}"))
+                }
+            )
+            service.save(
+                JournalSettingsDto.create {
+                    withId("id-3")
+                    withName(MLText("name-4"))
+                    withAuthorities(listOf("auth-1", "auth-2"))
+                    withJournalId("journal-2")
+                    withSettings(ObjectData.create("{}"))
+                }
+            )
+            service.save(
+                JournalSettingsDto.create {
+                    withId("id-4")
+                    withName(MLText("name-1"))
+                    withAuthorities(listOf("auth-1"))
+                    withJournalId("journal-1")
+                    withSettings(ObjectData.create("{}"))
+                }
+            )
+            service.save(
+                JournalSettingsDto.create {
+                    withId("id-5")
+                    withName(MLText("name-2"))
+                    withAuthorities(listOf("auth-1"))
+                    withJournalId("journal-1")
+                    withSettings(ObjectData.create("{}"))
+                }
+            )
+            service.save(
+                JournalSettingsDto.create {
+                    withId("id-6")
+                    withName(MLText("name-4"))
+                    withAuthorities(listOf("auth-1"))
+                    withJournalId("journal-2")
+                    withSettings(ObjectData.create("{}"))
+                }
+            )
+        }
+
+        AuthContext.runAs("auth-2") {
+            service.save(
+                JournalSettingsDto.create {
+                    withId("id-7")
+                    withName(MLText("name-3"))
+                    withAuthorities(listOf("auth-1", "auth-2"))
+                    withJournalId("journal-1")
+                    withSettings(ObjectData.create("{}"))
+                }
+            )
+            service.save(
+                JournalSettingsDto.create {
+                    withId("id-8")
+                    withName(MLText("name-3"))
+                    withAuthorities(listOf("auth-2"))
+                    withJournalId("journal-1")
+                    withSettings(ObjectData.create("{}"))
+                }
+            )
+        }
+
+        assertEquals(5, service.getSettings("auth-1", "journal-1").size)
+        assertEquals(2, service.getSettings("auth-1", "journal-2").size)
+        assertEquals(4, service.getSettings("auth-2", "journal-1").size)
+        assertEquals(1, service.getSettings("auth-2", "journal-2").size)
     }
 
     private fun <T> any(type: Class<T>): T = Mockito.any<T>(type)
