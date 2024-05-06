@@ -20,7 +20,6 @@ import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.context.lib.auth.AuthContext
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.record.atts.dto.RecordAtts
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
@@ -30,6 +29,7 @@ import ru.citeck.ecos.uiserv.domain.file.repo.FileType
 import ru.citeck.ecos.uiserv.domain.file.service.FileService
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService
 import ru.citeck.ecos.uiserv.domain.journalsettings.api.records.JournalSettingsRecordsDao
+import ru.citeck.ecos.uiserv.domain.journalsettings.dao.JournalSettingsRepoDao
 import ru.citeck.ecos.uiserv.domain.journalsettings.dto.JournalSettingsDto
 import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsEntity
 import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsRepository
@@ -38,7 +38,8 @@ import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsPermi
 import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsService
 import ru.citeck.ecos.uiserv.domain.journalsettings.service.JournalSettingsServiceImpl
 import ru.citeck.ecos.webapp.api.authority.EcosAuthoritiesApi
-import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactoryImpl
+import ru.citeck.ecos.webapp.api.entity.EntityRef
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension
 
 @ExtendWith(EcosSpringExtension::class)
@@ -65,6 +66,9 @@ internal class JournalSettingsRecordsDaoTest {
 
     @Autowired
     lateinit var authoritiesApi: EcosAuthoritiesApi
+
+    @Autowired
+    lateinit var jpaSearchConverterFactory: JpaSearchConverterFactory
 
     @BeforeEach
     fun setUp() {
@@ -95,8 +99,15 @@ internal class JournalSettingsRecordsDaoTest {
     @Test
     fun getId() {
         val permService = JournalSettingsPermissionsServiceImpl()
+        val journalSettingsRecordsDao = JournalSettingsRepoDao(repo, jpaSearchConverterFactory)
         val dao = JournalSettingsRecordsDao(
-            JournalSettingsServiceImpl(repo, permService, journalPrefService, fileService, JpaSearchConverterFactoryImpl()),
+            JournalSettingsServiceImpl(
+                repo,
+                permService,
+                journalPrefService,
+                fileService,
+                journalSettingsRecordsDao
+            ),
             permService,
             authoritiesApi
         )
@@ -208,7 +219,7 @@ internal class JournalSettingsRecordsDaoTest {
     }
 
     private fun getAtt(extId: String, attName: String): DataValue {
-        return recordsService.getAtt(RecordRef.create("uiserv", "journal-settings", extId), attName)
+        return recordsService.getAtt(EntityRef.create("uiserv", "journal-settings", extId), attName)
     }
 
     @Test
@@ -241,7 +252,7 @@ internal class JournalSettingsRecordsDaoTest {
         setContext("admin")
         recordsService.mutate(
             RecordAtts(
-                RecordRef.create("uiserv", "journal-settings", "id1"),
+                EntityRef.create("uiserv", "journal-settings", "id1"),
                 ObjectData.create()
                     .set("name", "name1")
                     .set("authority", "admin")
@@ -264,7 +275,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertThrows(Exception::class.java) {
             recordsService.mutate(
                 RecordAtts(
-                    RecordRef.create("uiserv", "journal-settings", "id1"),
+                    EntityRef.create("uiserv", "journal-settings", "id1"),
                     ObjectData.create()
                         .set("name", "user1ChangeName")
                 )
@@ -277,7 +288,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertThrows(Exception::class.java) {
             recordsService.mutate(
                 RecordAtts(
-                    RecordRef.create("uiserv", "journal-settings", "id1"),
+                    EntityRef.create("uiserv", "journal-settings", "id1"),
                     ObjectData.create()
                         .set("name", "user2ChangeName")
                 )
@@ -297,7 +308,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertEquals("admin", check2?.createdBy)
         recordsService.mutate(
             RecordAtts(
-                RecordRef.create("uiserv", "journal-settings", "id1"),
+                EntityRef.create("uiserv", "journal-settings", "id1"),
                 ObjectData.create()
                     .set("name", "anotherName")
             )
@@ -319,7 +330,7 @@ internal class JournalSettingsRecordsDaoTest {
         setContext("user1")
         recordsService.mutate(
             RecordAtts(
-                RecordRef.create("uiserv", "journal-settings", "id1"),
+                EntityRef.create("uiserv", "journal-settings", "id1"),
                 ObjectData.create()
                     .set("name", "name1")
                     .set("authority", "user1")
@@ -342,7 +353,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertThrows(Exception::class.java) {
             recordsService.mutate(
                 RecordAtts(
-                    RecordRef.create("uiserv", "journal-settings", "id1"),
+                    EntityRef.create("uiserv", "journal-settings", "id1"),
                     ObjectData.create()
                         .set("name", "user2ChangeName")
                 )
@@ -362,7 +373,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertEquals("user1", check2?.createdBy)
         recordsService.mutate(
             RecordAtts(
-                RecordRef.create("uiserv", "journal-settings", "id1"),
+                EntityRef.create("uiserv", "journal-settings", "id1"),
                 ObjectData.create()
                     .set("name", "anotherNameUser1")
             )
@@ -381,7 +392,7 @@ internal class JournalSettingsRecordsDaoTest {
         setContext("admin")
         recordsService.mutate(
             RecordAtts(
-                RecordRef.create("uiserv", "journal-settings", "id1"),
+                EntityRef.create("uiserv", "journal-settings", "id1"),
                 ObjectData.create()
                     .set("name", "anotherNameAdmin")
             )
@@ -403,7 +414,7 @@ internal class JournalSettingsRecordsDaoTest {
         setContext("admin")
         recordsService.mutate(
             RecordAtts(
-                RecordRef.create("uiserv", "journal-settings", "id1"),
+                EntityRef.create("uiserv", "journal-settings", "id1"),
                 ObjectData.create()
                     .set("name", "name1")
                     .set("authority", "user1")
@@ -426,7 +437,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertThrows(Exception::class.java) {
             recordsService.mutate(
                 RecordAtts(
-                    RecordRef.create("uiserv", "journal-settings", "id1"),
+                    EntityRef.create("uiserv", "journal-settings", "id1"),
                     ObjectData.create()
                         .set("name", "user1ChangeName")
                 )
@@ -439,7 +450,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertThrows(Exception::class.java) {
             recordsService.mutate(
                 RecordAtts(
-                    RecordRef.create("uiserv", "journal-settings", "id1"),
+                    EntityRef.create("uiserv", "journal-settings", "id1"),
                     ObjectData.create()
                         .set("name", "user2ChangeName")
                 )
@@ -459,7 +470,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertEquals("admin", check2?.createdBy)
         recordsService.mutate(
             RecordAtts(
-                RecordRef.create("uiserv", "journal-settings", "id1"),
+                EntityRef.create("uiserv", "journal-settings", "id1"),
                 ObjectData.create()
                     .set("name", "anotherNameAdmin")
             )
@@ -481,7 +492,7 @@ internal class JournalSettingsRecordsDaoTest {
         setContext("admin")
         recordsService.mutate(
             RecordAtts(
-                RecordRef.create("uiserv", "journal-settings", "id1"),
+                EntityRef.create("uiserv", "journal-settings", "id1"),
                 ObjectData.create()
                     .set("name", "name1")
                     .set("authority", "GROUP_all")
@@ -504,7 +515,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertThrows(Exception::class.java) {
             recordsService.mutate(
                 RecordAtts(
-                    RecordRef.create("uiserv", "journal-settings", "id1"),
+                    EntityRef.create("uiserv", "journal-settings", "id1"),
                     ObjectData.create()
                         .set("name", "user1ChangeName")
                 )
@@ -517,7 +528,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertThrows(Exception::class.java) {
             recordsService.mutate(
                 RecordAtts(
-                    RecordRef.create("uiserv", "journal-settings", "id1"),
+                    EntityRef.create("uiserv", "journal-settings", "id1"),
                     ObjectData.create()
                         .set("name", "user2ChangeName")
                 )
@@ -537,7 +548,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertEquals("admin", check2?.createdBy)
         recordsService.mutate(
             RecordAtts(
-                RecordRef.create("uiserv", "journal-settings", "id1"),
+                EntityRef.create("uiserv", "journal-settings", "id1"),
                 ObjectData.create()
                     .set("name", "anotherNameAdmin")
             )
@@ -559,7 +570,7 @@ internal class JournalSettingsRecordsDaoTest {
         setContext("admin")
         recordsService.mutate(
             RecordAtts(
-                RecordRef.create("uiserv", "journal-settings", "id1"),
+                EntityRef.create("uiserv", "journal-settings", "id1"),
                 ObjectData.create()
                     .set(
                         "name?json",
@@ -583,7 +594,7 @@ internal class JournalSettingsRecordsDaoTest {
 
         recordsService.mutate(
             RecordAtts(
-                RecordRef.create("uiserv", "journal-settings", "id1"),
+                EntityRef.create("uiserv", "journal-settings", "id1"),
                 ObjectData.create()
                     .set("name", DataValue.create("{\"ru\":\"some\",\"en\":\"body\"}"))
             )
@@ -617,7 +628,7 @@ internal class JournalSettingsRecordsDaoTest {
         // try delete record by user1
         setContext("user1")
         assertThrows(Exception::class.java) {
-            recordsService.delete(RecordRef.create("uiserv", "journal-settings", "id1"))
+            recordsService.delete(EntityRef.create("uiserv", "journal-settings", "id1"))
         }
         clearContext()
 
@@ -626,7 +637,7 @@ internal class JournalSettingsRecordsDaoTest {
         // try delete record by user2
         setContext("user2")
         assertThrows(Exception::class.java) {
-            recordsService.delete(RecordRef.create("uiserv", "journal-settings", "id1"))
+            recordsService.delete(EntityRef.create("uiserv", "journal-settings", "id1"))
         }
         clearContext()
 
@@ -634,7 +645,7 @@ internal class JournalSettingsRecordsDaoTest {
 
         // delete record by admin
         setContext("admin")
-        recordsService.delete(RecordRef.create("uiserv", "journal-settings", "id1"))
+        recordsService.delete(EntityRef.create("uiserv", "journal-settings", "id1"))
         clearContext()
 
         assertNull(repo.findByExtId("id1"))
@@ -658,7 +669,7 @@ internal class JournalSettingsRecordsDaoTest {
         // try delete record by user1
         setContext("user1")
         assertThrows(Exception::class.java) {
-            recordsService.delete(RecordRef.create("uiserv", "journal-settings", "id1"))
+            recordsService.delete(EntityRef.create("uiserv", "journal-settings", "id1"))
         }
         clearContext()
 
@@ -667,7 +678,7 @@ internal class JournalSettingsRecordsDaoTest {
         // try delete record by user2
         setContext("user2")
         assertThrows(Exception::class.java) {
-            recordsService.delete(RecordRef.create("uiserv", "journal-settings", "id1"))
+            recordsService.delete(EntityRef.create("uiserv", "journal-settings", "id1"))
         }
         clearContext()
 
@@ -675,7 +686,7 @@ internal class JournalSettingsRecordsDaoTest {
 
         // delete record by admin
         setContext("admin")
-        recordsService.delete(RecordRef.create("uiserv", "journal-settings", "id1"))
+        recordsService.delete(EntityRef.create("uiserv", "journal-settings", "id1"))
         clearContext()
 
         assertNull(repo.findByExtId("id1"))
@@ -699,7 +710,7 @@ internal class JournalSettingsRecordsDaoTest {
         // try delete record by user2
         setContext("user2")
         assertThrows(Exception::class.java) {
-            recordsService.delete(RecordRef.create("uiserv", "journal-settings", "id1"))
+            recordsService.delete(EntityRef.create("uiserv", "journal-settings", "id1"))
         }
         clearContext()
 
@@ -707,7 +718,7 @@ internal class JournalSettingsRecordsDaoTest {
 
         // delete record by user1
         setContext("user1")
-        recordsService.delete(RecordRef.create("uiserv", "journal-settings", "id1"))
+        recordsService.delete(EntityRef.create("uiserv", "journal-settings", "id1"))
         clearContext()
 
         assertNull(repo.findByExtId("id1"))
@@ -731,7 +742,7 @@ internal class JournalSettingsRecordsDaoTest {
         // try delete record by user2
         setContext("user2")
         assertThrows(Exception::class.java) {
-            recordsService.delete(RecordRef.create("uiserv", "journal-settings", "id1"))
+            recordsService.delete(EntityRef.create("uiserv", "journal-settings", "id1"))
         }
         clearContext()
 
@@ -739,7 +750,7 @@ internal class JournalSettingsRecordsDaoTest {
 
         // delete record by admin
         setContext("admin")
-        recordsService.delete(RecordRef.create("uiserv", "journal-settings", "id1"))
+        recordsService.delete(EntityRef.create("uiserv", "journal-settings", "id1"))
         clearContext()
 
         assertNull(repo.findByExtId("id1"))
@@ -763,7 +774,7 @@ internal class JournalSettingsRecordsDaoTest {
         // try delete record by user1
         setContext("user1")
         assertThrows(Exception::class.java) {
-            recordsService.delete(RecordRef.create("uiserv", "journal-settings", "id1"))
+            recordsService.delete(EntityRef.create("uiserv", "journal-settings", "id1"))
         }
         clearContext()
 
@@ -772,7 +783,7 @@ internal class JournalSettingsRecordsDaoTest {
         // try delete record by user2
         setContext("user2")
         assertThrows(Exception::class.java) {
-            recordsService.delete(RecordRef.create("uiserv", "journal-settings", "id1"))
+            recordsService.delete(EntityRef.create("uiserv", "journal-settings", "id1"))
         }
         clearContext()
 
@@ -780,7 +791,7 @@ internal class JournalSettingsRecordsDaoTest {
 
         // delete record by admin
         setContext("admin")
-        recordsService.delete(RecordRef.create("uiserv", "journal-settings", "id1"))
+        recordsService.delete(EntityRef.create("uiserv", "journal-settings", "id1"))
         clearContext()
 
         assertNull(repo.findByExtId("id1"))

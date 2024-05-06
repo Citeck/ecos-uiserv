@@ -13,19 +13,18 @@ import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.records2.predicate.model.Predicate
+import ru.citeck.ecos.records2.predicate.model.Predicates
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType
 import ru.citeck.ecos.uiserv.domain.file.service.FileService
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService
+import ru.citeck.ecos.uiserv.domain.journalsettings.dao.JournalSettingsDao
 import ru.citeck.ecos.uiserv.domain.journalsettings.dto.JournalSettingsDto
 import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsEntity
 import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsRepository
-import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter
-import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.stream.Collectors
-import javax.annotation.PostConstruct
 
 @Service
 @Transactional(
@@ -38,17 +37,11 @@ class JournalSettingsServiceImpl(
     private val permService: JournalSettingsPermissionsService,
     private val journalPrefService: JournalPrefService,
     private val fileService: FileService,
-    private val jpaSearchConverterFactory: JpaSearchConverterFactory
+    private val journalSettingsDao: JournalSettingsDao
 ) : JournalSettingsService {
 
     private val listeners = CopyOnWriteArrayList<(JournalSettingsDto?, JournalSettingsDto?) -> Unit>()
 
-    private lateinit var searchConv: JpaSearchConverter<JournalSettingsEntity>
-
-    @PostConstruct
-    fun init() {
-        searchConv = jpaSearchConverterFactory.createConverter(JournalSettingsEntity::class.java).build()
-    }
 
     @Override
     override fun save(settings: JournalSettingsDto): JournalSettingsDto {
@@ -117,7 +110,7 @@ class JournalSettingsServiceImpl(
 
     override fun getCount(predicate: Predicate): Long {
         return if (AuthContext.isRunAsAdmin() || AuthContext.isRunAsSystem()) {
-            searchConv.getCount(repo, predicate)
+            journalSettingsDao.getCount(predicate)
         } else {
             0L
         }
@@ -126,7 +119,7 @@ class JournalSettingsServiceImpl(
     override fun findAll(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>):
         List<EntityWithMeta<JournalSettingsDto>> {
         return if (AuthContext.isRunAsAdmin() || AuthContext.isRunAsSystem()) {
-            searchConv.findAll(repo, predicate, max, skip, sort).map { toDtoWithMeta(it) }
+            journalSettingsDao.findAll(predicate, max, skip, sort).map { toDtoWithMeta(it) }
         } else {
             emptyList()
         }
@@ -134,14 +127,27 @@ class JournalSettingsServiceImpl(
 
     @Override
     override fun searchSettings(journalId: String): List<EntityWithMeta<JournalSettingsDto>> {
-        val searchSpecification = composeSearchSpecification(journalId)
-        val foundedJournalSettings = repo.findAll(searchSpecification).stream()
-            .map { toDtoWithMeta(it) }
-            .collect(Collectors.toList())
+        val predicate = composeSearchPredicate(journalId)
+        val foundedJournalSettings =
+            journalSettingsDao.findAll(predicate, -1, 0, emptyList())
+                .stream()
+                .map { toDtoWithMeta(it) }
+                .collect(Collectors.toList())
 
         val foundedJournalPrefs = searchJournalPrefs(journalId).map { EntityWithMeta(it) }
 
         return mergeSettingsAndPrefs(foundedJournalSettings, foundedJournalPrefs)
+    }
+
+    private fun composeSearchPredicate(journalId: String): Predicate {
+        val currentUserAuthorities = AuthContext.getCurrentUserWithAuthorities()
+        return Predicates.and(
+            Predicates.eq("journalId", journalId),
+            Predicates.or(
+                Predicates.inVals("authority", currentUserAuthorities),
+                Predicates.inVals("authorities", currentUserAuthorities)
+            )
+        )
     }
 
     private fun composeSearchSpecification(journalId: String): Specification<JournalSettingsEntity> {
