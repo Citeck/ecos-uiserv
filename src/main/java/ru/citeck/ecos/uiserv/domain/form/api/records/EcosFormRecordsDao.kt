@@ -78,7 +78,7 @@ class EcosFormRecordsDao(
         }
     }
 
-    @Secured(AuthRole.ADMIN)
+    @Secured(AuthRole.ADMIN, AuthRole.SYSTEM)
     override fun getRecToMutate(recordId: String): EcosFormMutRecord {
         if (recordId.isEmpty()) {
             return EcosFormMutRecord()
@@ -96,6 +96,7 @@ class EcosFormRecordsDao(
         return ecosFormService.save(record.build())
     }
 
+    @Secured(AuthRole.ADMIN, AuthRole.SYSTEM)
     override fun delete(recordId: String): DelStatus {
         if (SYSTEM_FORMS.contains(recordId)) {
             return DelStatus.PROTECTED

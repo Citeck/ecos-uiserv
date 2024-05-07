@@ -4,6 +4,7 @@ import ecos.com.fasterxml.jackson210.annotation.JsonValue
 import ecos.com.fasterxml.jackson210.databind.node.ObjectNode
 import lombok.Data
 import lombok.RequiredArgsConstructor
+import org.springframework.security.access.annotation.Secured
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
@@ -12,6 +13,7 @@ import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.commons.json.YamlUtils
 import ru.citeck.ecos.commons.utils.StringUtils
 import ru.citeck.ecos.context.lib.auth.AuthContext.isRunAsAdmin
+import ru.citeck.ecos.context.lib.auth.AuthRole
 import ru.citeck.ecos.events2.type.RecordEventsService
 import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.predicate.PredicateService
@@ -120,11 +122,13 @@ class JournalRecordsDao(
         return JournalRecord(dto)
     }
 
+    @Secured(AuthRole.ADMIN, AuthRole.SYSTEM)
     override fun delete(recordId: String): DelStatus {
         journalService.delete(recordId)
         return DelStatus.OK
     }
 
+    @Secured(AuthRole.ADMIN, AuthRole.SYSTEM)
     override fun getRecToMutate(recordId: String): JournalMutateRec {
         val dto = journalService.getJournalById(recordId)
         return JournalMutateRec(dto?.journalDef ?: JournalDef.create { withId(recordId) })
