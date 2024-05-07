@@ -121,33 +121,53 @@ class JournalSettingsServiceImpl(
         return if (AuthContext.isRunAsAdmin() || AuthContext.isRunAsSystem()) {
             journalSettingsDao.findAll(predicate, max, skip, sort).map { toDtoWithMeta(it) }
         } else {
-            emptyList()
+            val currentUserAuthorities = AuthContext.getCurrentUserWithAuthorities()
+            journalSettingsDao.findAll(predicate, max, skip, sort)
+                .filter { compareAuthorities(it, currentUserAuthorities) }
+                .map { toDtoWithMeta(it) }
         }
     }
 
     @Override
     override fun searchSettings(journalId: String): List<EntityWithMeta<JournalSettingsDto>> {
-        val predicate = composeSearchPredicate(journalId)
-        val foundedJournalSettings =
-            journalSettingsDao.findAll(predicate, -1, 0, emptyList())
-                .stream()
-                .map { toDtoWithMeta(it) }
-                .collect(Collectors.toList())
-
+        val foundedJournalSettings = getJournalSettingsForCurrentUser(journalId)
         val foundedJournalPrefs = searchJournalPrefs(journalId).map { EntityWithMeta(it) }
 
         return mergeSettingsAndPrefs(foundedJournalSettings, foundedJournalPrefs)
     }
 
-    private fun composeSearchPredicate(journalId: String): Predicate {
+    fun getJournalSettingsForCurrentUser(journalId: String): List<EntityWithMeta<JournalSettingsDto>>{
         val currentUserAuthorities = AuthContext.getCurrentUserWithAuthorities()
-        return Predicates.and(
-            Predicates.eq("journalId", journalId),
-            Predicates.or(
-                Predicates.inVals("authority", currentUserAuthorities),
-                Predicates.inVals("authorities", currentUserAuthorities)
-            )
-        )
+        val predicate = searchPredicate(journalId)
+        return journalSettingsDao.findAll(predicate, -1, 0, emptyList())
+            .filter { compareAuthorities(it, currentUserAuthorities) }
+            .map { toDtoWithMeta(it) }
+    }
+
+    private fun searchPredicate(journalId: String): Predicate {
+        return Predicates.eq("journalId", journalId)
+    }
+
+    private fun compareAuthorities(journalSettingsEntity: JournalSettingsEntity,
+                                   currentUserAuthorities: List<String>): Boolean {
+        val createdBy = journalSettingsEntity.createdBy
+        if (AuthContext.isRunAsAdmin()) {
+            if (journalSettingsEntity.authorities?.contains(createdBy) == false &&
+                createdBy != journalSettingsEntity.authority) {
+                return true
+            }
+        }
+
+        if (currentUserAuthorities.contains(createdBy)) {
+            return true
+        }
+
+        if (currentUserAuthorities.contains(journalSettingsEntity.authority)) {
+            return true
+        }
+
+        return journalSettingsEntity.authorities?.stream()
+            ?.anyMatch { currentUserAuthorities.contains(it) } ?: false
     }
 
     private fun composeSearchSpecification(journalId: String): Specification<JournalSettingsEntity> {

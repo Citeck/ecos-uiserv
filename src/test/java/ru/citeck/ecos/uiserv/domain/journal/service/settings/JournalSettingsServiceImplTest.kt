@@ -623,7 +623,7 @@ internal class JournalSettingsServiceImplTest {
                 service.delete("some-id")
             }
 
-            Mockito.verify(spyPermService, Mockito.times(1)).canWrite(any(JournalSettingsEntity::class.java))
+            Mockito.verify(spyPermService, Mockito.times(2)).canWrite(any(JournalSettingsEntity::class.java))
             Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
         }
 
@@ -632,7 +632,7 @@ internal class JournalSettingsServiceImplTest {
             assertTrue(service.delete("some-id"))
             assertNull(service.getById("some-id"))
 
-            Mockito.verify(spyPermService, Mockito.times(2)).canWrite(any(JournalSettingsEntity::class.java))
+            Mockito.verify(spyPermService, Mockito.times(3)).canWrite(any(JournalSettingsEntity::class.java))
             Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
         }
     }

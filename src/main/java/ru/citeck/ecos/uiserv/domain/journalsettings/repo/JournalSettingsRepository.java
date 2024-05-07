@@ -27,4 +27,13 @@ public interface JournalSettingsRepository
             "ORDER BY journal_settings.name ASC"
     )
     List<JournalSettingsEntity> findAllByAuthoritiesInAndJournalId(String authority, String journalId);
+
+    @Query(
+        "SELECT journal_settings " +
+            "FROM JournalSettingsEntity journal_settings " +
+            "JOIN journal_settings.authorities authority " +
+            "WHERE lower(authority) = ?1 " +
+            "ORDER BY journal_settings.name ASC"
+    )
+    List<JournalSettingsEntity> findAllByAuthorities(String authority);
 }

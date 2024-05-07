@@ -8,6 +8,8 @@ interface JournalSettingsDao {
 
     fun findByExtId(extId: String): JournalSettingsEntity?
 
+    fun findAllByAuthorities(authority: String): List<JournalSettingsEntity>
+
     fun findAllByAuthoritiesInAndJournalId(authority: String, journalId: String): List<JournalSettingsEntity>
 
     fun delete(entity: JournalSettingsEntity)
