@@ -13,7 +13,7 @@ internal class JournalSettingsPermissionsServiceImplTest {
     fun canReadEntityUser() {
         AuthContext.runAs("user1", listOf("GROUP_all", "user1", "ROLE_USER")) {
             val service = JournalSettingsPermissionsServiceImpl()
-            // Old
+
             assertTrue(service.canRead(createEntity("user1", "user1")))
             assertTrue(service.canRead(createEntity("user1", "anotherUser")))
             assertTrue(service.canRead(createEntity("anotherUser", "user1")))
