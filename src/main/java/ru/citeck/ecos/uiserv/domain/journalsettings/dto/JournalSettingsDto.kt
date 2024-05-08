@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.journalsettings.dto
 
 import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
+import ecos.com.fasterxml.jackson210.databind.annotation.JsonPOJOBuilder
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
@@ -52,11 +53,7 @@ open class JournalSettingsDto(
     }
 
     fun getAuthority(): String {
-        return if (authorities.isEmpty()) {
-            ""
-        } else {
-            authorities.first()
-        }
+        return authorities.firstOrNull() ?: ""
     }
 
     fun copy(): Builder {
@@ -95,6 +92,7 @@ open class JournalSettingsDto(
         return result
     }
 
+    @JsonPOJOBuilder
     open class Builder() {
 
         var id: String = ""
@@ -123,19 +121,20 @@ open class JournalSettingsDto(
             return this
         }
 
-        fun setAuthority(authority: String?): Builder {
-            return withAuthority(authority)
+        fun getAuthority(): String {
+            return authorities.firstOrNull() ?: ""
         }
 
         fun withAuthority(authority: String?): Builder {
-            if (authority.isNullOrBlank()) {
-                return this
+            return if (authority.isNullOrBlank()) {
+                withAuthorities(null)
+            } else {
+                withAuthorities(listOf(authority))
             }
-            return withAuthorities(listOf(authority))
         }
 
         fun withAuthorities(authorities: List<String>?): Builder {
-            this.authorities.plus(authorities)
+            this.authorities = authorities ?: emptyList()
             return this
         }
 

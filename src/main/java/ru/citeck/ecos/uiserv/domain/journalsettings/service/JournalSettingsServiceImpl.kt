@@ -259,20 +259,31 @@ class JournalSettingsServiceImpl(
         return JournalSettingsDto.create()
             .withId(entity.extId)
             .withName(Json.mapper.read(entity.name, MLText::class.java))
-            .withAuthority(entity.authority)
-            .withAuthorities(entity.authorities)
+            .withAuthorities(getAuthorities(entity))
             .withJournalId(entity.journalId)
             .withSettings(Json.mapper.read(entity.settings, ObjectData::class.java))
             .withCreator(entity.createdBy)
             .build()
     }
 
+    private fun getAuthorities(entity: JournalSettingsEntity): List<String>? {
+        val authorities = entity.authorities
+        if (!authorities.isNullOrEmpty()) {
+            return authorities
+        }
+        val authority = entity.authority
+        return if (authority.isNullOrBlank()) {
+            null
+        } else {
+            listOf(authority)
+        }
+    }
+
     private fun toDtoWithMeta(entity: JournalSettingsEntity): EntityWithMeta<JournalSettingsDto> {
         val dto = JournalSettingsDto.create()
             .withId(entity.extId)
             .withName(Json.mapper.read(entity.name, MLText::class.java))
-            .withAuthority(entity.authority)
-            .withAuthorities(entity.authorities)
+            .withAuthorities(getAuthorities(entity))
             .withJournalId(entity.journalId)
             .withSettings(Json.mapper.read(entity.settings, ObjectData::class.java))
             .withCreator(entity.createdBy)
@@ -289,7 +300,6 @@ class JournalSettingsServiceImpl(
         return JournalSettingsDto.create {
             withId(pref.fileId)
             withName(Json.mapper.read(prefSettings["title"].asText(), MLText::class.java))
-            withAuthority(currentUsername)
             withAuthorities(listOf(currentUsername))
             withJournalId(journalId)
             withSettings(prefSettings)
