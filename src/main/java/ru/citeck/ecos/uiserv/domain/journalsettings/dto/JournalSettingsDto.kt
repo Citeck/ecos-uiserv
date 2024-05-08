@@ -11,7 +11,6 @@ import java.util.*
 open class JournalSettingsDto(
     val id: String,
     val name: MLText,
-    val authority: String,
     val authorities: List<String>,
     val journalId: String,
     val settings: ObjectData,
@@ -20,7 +19,6 @@ open class JournalSettingsDto(
     constructor(other: JournalSettingsDto) : this(
         other.id,
         other.name,
-        other.authority,
         other.authorities,
         other.journalId,
         other.settings,
@@ -30,7 +28,6 @@ open class JournalSettingsDto(
     constructor() : this(
         "",
         MLText.EMPTY,
-        "",
         Collections.emptyList(),
         "",
         ObjectData.create(),
@@ -54,6 +51,14 @@ open class JournalSettingsDto(
         }
     }
 
+    fun getAuthority(): String {
+        return if (authorities.isEmpty()) {
+            ""
+        } else {
+            authorities.first()
+        }
+    }
+
     fun copy(): Builder {
         return Builder(this)
     }
@@ -71,7 +76,6 @@ open class JournalSettingsDto(
 
         if (id != other.id) return false
         if (name != other.name) return false
-        if (authority != other.authority) return false
         if (authorities != other.authorities) return false
         if (journalId != other.journalId) return false
         if (settings != other.settings) return false
@@ -84,7 +88,6 @@ open class JournalSettingsDto(
     override fun hashCode(): Int {
         var result = id.hashCode()
         result = 31 * result + name.hashCode()
-        result = 31 * result + authority.hashCode()
         result = 31 * result + authorities.hashCode()
         result = 31 * result + journalId.hashCode()
         result = 31 * result + settings.hashCode()
@@ -96,7 +99,6 @@ open class JournalSettingsDto(
 
         var id: String = ""
         var name: MLText = MLText.EMPTY
-        var authority: String = ""
         var authorities: List<String> = Collections.emptyList()
         var journalId: String = ""
         var settings: ObjectData = ObjectData.create()
@@ -105,7 +107,6 @@ open class JournalSettingsDto(
         constructor(base: JournalSettingsDto) : this() {
             id = base.id
             name = base.name
-            authority = base.authority
             authorities = base.authorities
             journalId = base.journalId
             settings = base.settings.deepCopy()
@@ -122,13 +123,19 @@ open class JournalSettingsDto(
             return this
         }
 
+        fun setAuthority(authority: String?): Builder {
+            return withAuthority(authority)
+        }
+
         fun withAuthority(authority: String?): Builder {
-            this.authority = authority?: ""
-            return this
+            if (authority.isNullOrBlank()) {
+                return this
+            }
+            return withAuthorities(listOf(authority))
         }
 
         fun withAuthorities(authorities: List<String>?): Builder {
-            this.authorities = authorities ?: Collections.emptyList()
+            this.authorities.plus(authorities)
             return this
         }
 
@@ -151,7 +158,6 @@ open class JournalSettingsDto(
             return JournalSettingsDto(
                 id,
                 name,
-                authority,
                 authorities,
                 journalId,
                 settings,

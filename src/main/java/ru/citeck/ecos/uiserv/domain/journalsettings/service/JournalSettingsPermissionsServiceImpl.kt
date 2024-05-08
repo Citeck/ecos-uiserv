@@ -36,14 +36,11 @@ class JournalSettingsPermissionsServiceImpl : JournalSettingsPermissionsService 
         if (AuthContext.isRunAsAdmin() || AuthContext.isRunAsSystem()) {
             return true
         }
-        if (currentUser == dto.authority) {
-            return true
-        }
         if (dto.authorities.contains(currentUser)) {
             return true
         }
         val isAuthority = AuthContext.getCurrentUserWithAuthorities().stream()
-            .anyMatch { it == dto.authority || dto.authorities.contains(it) }
+            .anyMatch { dto.authorities.contains(it) }
         if (isAuthority) {
             return true
         }
@@ -72,6 +69,6 @@ class JournalSettingsPermissionsServiceImpl : JournalSettingsPermissionsService 
             return true
         }
         val currentUser = AuthContext.getCurrentUser()
-        return currentUser == dto.authority || dto.authorities.contains(currentUser)
+        return dto.authorities.contains(currentUser)
     }
 }
