@@ -216,11 +216,9 @@ class JournalSettingsServiceImpl(
 
     @Override
     override fun getSettings(authority: String?, journalId: String?): List<JournalSettingsDto> {
-        var configs: List<JournalSettingsEntity> = repo.findAllByAuthorityAndJournalId(authority, journalId)
-        if (configs.isEmpty()) {
-            configs = repo.findAllByAuthoritiesInAndJournalId(authority, journalId)
-        }
-        return configs.stream()
+        var configsSet: Set<JournalSettingsEntity> = repo.findAllByAuthorityAndJournalId(authority, journalId).toSet()
+        configsSet = configsSet.plus(repo.findAllByAuthoritiesInAndJournalId(authority, journalId))
+        return configsSet.stream()
             .map { entity: JournalSettingsEntity -> toDto(entity) }
             .collect(Collectors.toList())
     }
