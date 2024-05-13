@@ -44,7 +44,7 @@ import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension
 
 @ExtendWith(EcosSpringExtension::class)
 @SpringBootTest(classes = [Application::class])
-internal class JournalSettingsRecordsDaoTest {
+internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
 
     @Autowired
     lateinit var permService: JournalSettingsPermissionsService
@@ -121,7 +121,7 @@ internal class JournalSettingsRecordsDaoTest {
                 JournalSettingsEntity().apply {
                     extId = "ext-id-1"
                     name = "some-name-1"
-                    authority = "user-1"
+                    authorities = listOf("user-1", "user-3")
                     journalId = "journal-1"
                     settings = "{\"foo1\":\"bar\"}"
                 }
@@ -130,7 +130,7 @@ internal class JournalSettingsRecordsDaoTest {
                 JournalSettingsEntity().apply {
                     extId = "ext-id-2"
                     name = "some-name-2"
-                    authority = "user-2"
+                    authorities = listOf("user-2", "user-3")
                     journalId = "journal-1"
                     settings = "{\"foo2\":\"bar\"}"
                 }
@@ -143,7 +143,7 @@ internal class JournalSettingsRecordsDaoTest {
             assertEquals("ext-id-1", getAtt("ext-id-1", "moduleId").asText())
             assertEquals("some-name-1", getAtt("ext-id-1", "name").asText())
             assertEquals("some-name-1", getAtt("ext-id-1", "?disp").asText())
-            assertEquals("user-1", getAtt("ext-id-1", "authority").asText())
+            assertEquals(listOf("user-1", "user-3"), getAtt("ext-id-1", "authorities[]").asStrList())
             assertEquals("journal-1", getAtt("ext-id-1", "journalId").asText())
             assertEquals("{\"foo1\":\"bar\"}", getAtt("ext-id-1", "settings").asText())
             assertEquals("admin", getAtt("ext-id-1", "creator").asText())
@@ -155,7 +155,7 @@ internal class JournalSettingsRecordsDaoTest {
             assertEquals("ext-id-2", getAtt("ext-id-2", "moduleId").asText())
             assertEquals("", getAtt("ext-id-2", "name").asText())
             assertEquals("", getAtt("ext-id-2", "?disp").asText())
-            assertEquals("", getAtt("ext-id-2", "authority").asText())
+            assertEquals(emptyList<String>(), getAtt("ext-id-2", "authorities[]").asStrList())
             assertEquals("", getAtt("ext-id-2", "journalId").asText())
             assertEquals("{}", getAtt("ext-id-2", "settings").asText())
             assertEquals("", getAtt("ext-id-2", "creator").asText())
@@ -170,7 +170,7 @@ internal class JournalSettingsRecordsDaoTest {
             assertEquals("ext-id-1", getAtt("ext-id-1", "moduleId").asText())
             assertEquals("", getAtt("ext-id-1", "name").asText())
             assertEquals("", getAtt("ext-id-1", "?disp").asText())
-            assertEquals("", getAtt("ext-id-1", "authority").asText())
+            assertEquals(emptyList<String>(), getAtt("ext-id-1", "authorities[]").asStrList())
             assertEquals("", getAtt("ext-id-1", "journalId").asText())
             assertEquals("{}", getAtt("ext-id-1", "settings").asText())
             assertEquals("", getAtt("ext-id-1", "creator").asText())
@@ -182,7 +182,33 @@ internal class JournalSettingsRecordsDaoTest {
             assertEquals("ext-id-2", getAtt("ext-id-2", "moduleId").asText())
             assertEquals("some-name-2", getAtt("ext-id-2", "name").asText())
             assertEquals("some-name-2", getAtt("ext-id-2", "?disp").asText())
-            assertEquals("user-2", getAtt("ext-id-2", "authority").asText())
+            assertEquals(listOf("user-2", "user-3"), getAtt("ext-id-2", "authorities[]").asStrList())
+            assertEquals("journal-1", getAtt("ext-id-2", "journalId").asText())
+            assertEquals("{\"foo2\":\"bar\"}", getAtt("ext-id-2", "settings").asText())
+            assertEquals("admin", getAtt("ext-id-2", "creator").asText())
+            assertFalse(getAtt("ext-id-2", "permissions._has.Write").asBoolean())
+            assertTrue(getAtt("ext-id-2", "permissions._has.Read").asBoolean())
+        }
+
+        AuthContext.runAs("user-3") {
+            assertEquals("uiserv/journal-settings@ext-id-1", getAtt("ext-id-1", "?id").asText())
+            assertEquals("ext-id-1", getAtt("ext-id-1", "id").asText())
+            assertEquals("ext-id-1", getAtt("ext-id-1", "moduleId").asText())
+            assertEquals("some-name-1", getAtt("ext-id-1", "name").asText())
+            assertEquals("some-name-1", getAtt("ext-id-1", "?disp").asText())
+            assertEquals(listOf("user-1", "user-3"), getAtt("ext-id-1", "authorities[]").asStrList())
+            assertEquals("journal-1", getAtt("ext-id-1", "journalId").asText())
+            assertEquals("{\"foo1\":\"bar\"}", getAtt("ext-id-1", "settings").asText())
+            assertEquals("admin", getAtt("ext-id-1", "creator").asText())
+            assertFalse(getAtt("ext-id-1", "permissions._has.Write").asBoolean())
+            assertTrue(getAtt("ext-id-1", "permissions._has.Read").asBoolean())
+
+            assertEquals("uiserv/journal-settings@ext-id-2", getAtt("ext-id-2", "?id").asText())
+            assertEquals("ext-id-2", getAtt("ext-id-2", "id").asText())
+            assertEquals("ext-id-2", getAtt("ext-id-2", "moduleId").asText())
+            assertEquals("some-name-2", getAtt("ext-id-2", "name").asText())
+            assertEquals("some-name-2", getAtt("ext-id-2", "?disp").asText())
+            assertEquals(listOf("user-2", "user-3"), getAtt("ext-id-2", "authorities[]").asStrList())
             assertEquals("journal-1", getAtt("ext-id-2", "journalId").asText())
             assertEquals("{\"foo2\":\"bar\"}", getAtt("ext-id-2", "settings").asText())
             assertEquals("admin", getAtt("ext-id-2", "creator").asText())
@@ -197,7 +223,7 @@ internal class JournalSettingsRecordsDaoTest {
             assertEquals("ext-id-1", getAtt("ext-id-1", "moduleId").asText())
             assertEquals("some-name-1", getAtt("ext-id-1", "name").asText())
             assertEquals("some-name-1", getAtt("ext-id-1", "?disp").asText())
-            assertEquals("user-1", getAtt("ext-id-1", "authority").asText())
+            assertEquals(listOf("user-1", "user-3"), getAtt("ext-id-1", "authorities[]").asStrList())
             assertEquals("journal-1", getAtt("ext-id-1", "journalId").asText())
             assertEquals("{\"foo1\":\"bar\"}", getAtt("ext-id-1", "settings").asText())
             assertEquals("admin", getAtt("ext-id-1", "creator").asText())
@@ -209,7 +235,7 @@ internal class JournalSettingsRecordsDaoTest {
             assertEquals("ext-id-2", getAtt("ext-id-2", "moduleId").asText())
             assertEquals("some-name-2", getAtt("ext-id-2", "name").asText())
             assertEquals("some-name-2", getAtt("ext-id-2", "?disp").asText())
-            assertEquals("user-2", getAtt("ext-id-2", "authority").asText())
+            assertEquals(listOf("user-2", "user-3"), getAtt("ext-id-2", "authorities[]").asStrList())
             assertEquals("journal-1", getAtt("ext-id-2", "journalId").asText())
             assertEquals("{\"foo2\":\"bar\"}", getAtt("ext-id-2", "settings").asText())
             assertEquals("admin", getAtt("ext-id-2", "creator").asText())
@@ -255,7 +281,7 @@ internal class JournalSettingsRecordsDaoTest {
                 EntityRef.create("uiserv", "journal-settings", "id1"),
                 ObjectData.create()
                     .set("name", "name1")
-                    .set("authority", "admin")
+                    .set("authorities", listOf("admin"))
                     .set("journalId", "journal1")
                     .set("settings", "{}")
             )
@@ -264,7 +290,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check1)
         assertEquals("id1", check1?.extId)
         assertEquals("{\"en\":\"name1\"}", check1?.name)
-        assertEquals("admin", check1?.authority)
+        assertEquals(listOf("admin"), check1?.authorities)
         assertEquals("journal1", check1?.journalId)
         assertEquals("{}", check1?.settings)
         assertEquals("admin", check1?.createdBy)
@@ -302,7 +328,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check2)
         assertEquals("id1", check2?.extId)
         assertEquals("{\"en\":\"name1\"}", check2?.name)
-        assertEquals("admin", check2?.authority)
+        assertEquals(listOf("admin"), check2?.authorities)
         assertEquals("journal1", check2?.journalId)
         assertEquals("{}", check2?.settings)
         assertEquals("admin", check2?.createdBy)
@@ -317,7 +343,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check3)
         assertEquals("id1", check3?.extId)
         assertEquals("{\"en\":\"anotherName\"}", check3?.name)
-        assertEquals("admin", check3?.authority)
+        assertEquals(listOf("admin"), check3?.authorities)
         assertEquals("journal1", check3?.journalId)
         assertEquals("{}", check3?.settings)
         assertEquals("admin", check3?.createdBy)
@@ -333,7 +359,7 @@ internal class JournalSettingsRecordsDaoTest {
                 EntityRef.create("uiserv", "journal-settings", "id1"),
                 ObjectData.create()
                     .set("name", "name1")
-                    .set("authority", "user1")
+                    .set("authorities", listOf("user1"))
                     .set("journalId", "journal1")
                     .set("settings", "{}")
             )
@@ -342,7 +368,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check1)
         assertEquals("id1", check1?.extId)
         assertEquals("{\"en\":\"name1\"}", check1?.name)
-        assertEquals("user1", check1?.authority)
+        assertEquals(listOf("user1"), check1?.authorities)
         assertEquals("journal1", check1?.journalId)
         assertEquals("{}", check1?.settings)
         assertEquals("user1", check1?.createdBy)
@@ -367,7 +393,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check2)
         assertEquals("id1", check2?.extId)
         assertEquals("{\"en\":\"name1\"}", check2?.name)
-        assertEquals("user1", check2?.authority)
+        assertEquals(listOf("user1"), check2?.authorities)
         assertEquals("journal1", check2?.journalId)
         assertEquals("{}", check2?.settings)
         assertEquals("user1", check2?.createdBy)
@@ -382,7 +408,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check3)
         assertEquals("id1", check3?.extId)
         assertEquals("{\"en\":\"anotherNameUser1\"}", check3?.name)
-        assertEquals("user1", check3?.authority)
+        assertEquals(listOf("user1"), check3?.authorities)
         assertEquals("journal1", check3?.journalId)
         assertEquals("{}", check3?.settings)
         assertEquals("user1", check3?.createdBy)
@@ -401,7 +427,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check4)
         assertEquals("id1", check4?.extId)
         assertEquals("{\"en\":\"anotherNameAdmin\"}", check4?.name)
-        assertEquals("user1", check4?.authority)
+        assertEquals(listOf("user1"), check4?.authorities)
         assertEquals("journal1", check4?.journalId)
         assertEquals("{}", check4?.settings)
         assertEquals("user1", check4?.createdBy)
@@ -417,7 +443,7 @@ internal class JournalSettingsRecordsDaoTest {
                 EntityRef.create("uiserv", "journal-settings", "id1"),
                 ObjectData.create()
                     .set("name", "name1")
-                    .set("authority", "user1")
+                    .set("authorities", listOf("user1"))
                     .set("journalId", "journal1")
                     .set("settings", "{}")
             )
@@ -426,7 +452,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check1)
         assertEquals("id1", check1?.extId)
         assertEquals("{\"en\":\"name1\"}", check1?.name)
-        assertEquals("user1", check1?.authority)
+        assertEquals(listOf("user1"), check1?.authorities)
         assertEquals("journal1", check1?.journalId)
         assertEquals("{}", check1?.settings)
         assertEquals("admin", check1?.createdBy)
@@ -464,7 +490,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check2)
         assertEquals("id1", check2?.extId)
         assertEquals("{\"en\":\"name1\"}", check2?.name)
-        assertEquals("user1", check2?.authority)
+        assertEquals(listOf("user1"), check2?.authorities)
         assertEquals("journal1", check2?.journalId)
         assertEquals("{}", check2?.settings)
         assertEquals("admin", check2?.createdBy)
@@ -479,7 +505,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check3)
         assertEquals("id1", check3?.extId)
         assertEquals("{\"en\":\"anotherNameAdmin\"}", check3?.name)
-        assertEquals("user1", check3?.authority)
+        assertEquals(listOf("user1"), check3?.authorities)
         assertEquals("journal1", check3?.journalId)
         assertEquals("{}", check3?.settings)
         assertEquals("admin", check3?.createdBy)
@@ -495,7 +521,7 @@ internal class JournalSettingsRecordsDaoTest {
                 EntityRef.create("uiserv", "journal-settings", "id1"),
                 ObjectData.create()
                     .set("name", "name1")
-                    .set("authority", "GROUP_all")
+                    .set("authorities", listOf("GROUP_all"))
                     .set("journalId", "journal1")
                     .set("settings", "{}")
             )
@@ -504,7 +530,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check1)
         assertEquals("id1", check1?.extId)
         assertEquals("{\"en\":\"name1\"}", check1?.name)
-        assertEquals("GROUP_all", check1?.authority)
+        assertEquals(listOf("GROUP_all"), check1?.authorities)
         assertEquals("journal1", check1?.journalId)
         assertEquals("{}", check1?.settings)
         assertEquals("admin", check1?.createdBy)
@@ -542,7 +568,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check2)
         assertEquals("id1", check2?.extId)
         assertEquals("{\"en\":\"name1\"}", check2?.name)
-        assertEquals("GROUP_all", check2?.authority)
+        assertEquals(listOf("GROUP_all"), check2?.authorities)
         assertEquals("journal1", check2?.journalId)
         assertEquals("{}", check2?.settings)
         assertEquals("admin", check2?.createdBy)
@@ -557,7 +583,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check3)
         assertEquals("id1", check3?.extId)
         assertEquals("{\"en\":\"anotherNameAdmin\"}", check3?.name)
-        assertEquals("GROUP_all", check3?.authority)
+        assertEquals(listOf("GROUP_all"), check3?.authorities)
         assertEquals("journal1", check3?.journalId)
         assertEquals("{}", check3?.settings)
         assertEquals("admin", check3?.createdBy)
@@ -578,7 +604,7 @@ internal class JournalSettingsRecordsDaoTest {
                             .set("ru", "123")
                             .set("en", "321")
                     )
-                    .set("authority", "GROUP_all")
+                    .set("authorities", listOf("GROUP_all"))
                     .set("journalId", "journal1")
                     .set("settings", "{}")
             )
@@ -587,7 +613,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check1)
         assertEquals("id1", check1?.extId)
         assertEquals("{\"ru\":\"123\",\"en\":\"321\"}", check1?.name)
-        assertEquals("GROUP_all", check1?.authority)
+        assertEquals(listOf("GROUP_all"), check1?.authorities)
         assertEquals("journal1", check1?.journalId)
         assertEquals("{}", check1?.settings)
         assertEquals("admin", check1?.createdBy)
@@ -603,7 +629,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check2)
         assertEquals("id1", check2?.extId)
         assertEquals("{\"ru\":\"some\",\"en\":\"body\"}", check2?.name)
-        assertEquals("GROUP_all", check2?.authority)
+        assertEquals(listOf("GROUP_all"), check2?.authorities)
         assertEquals("journal1", check2?.journalId)
         assertEquals("{}", check2?.settings)
         assertEquals("admin", check2?.createdBy)
@@ -618,7 +644,7 @@ internal class JournalSettingsRecordsDaoTest {
             JournalSettingsEntity().apply {
                 extId = "id1"
                 name = "name1"
-                authority = "admin"
+                authorities = listOf("admin")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -659,7 +685,7 @@ internal class JournalSettingsRecordsDaoTest {
             JournalSettingsEntity().apply {
                 extId = "id1"
                 name = "name1"
-                authority = "user1"
+                authorities = listOf("user1")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -700,7 +726,7 @@ internal class JournalSettingsRecordsDaoTest {
             JournalSettingsEntity().apply {
                 extId = "id1"
                 name = "name1"
-                authority = "user1"
+                authorities = listOf("user1")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -732,7 +758,7 @@ internal class JournalSettingsRecordsDaoTest {
             JournalSettingsEntity().apply {
                 extId = "id1"
                 name = "name1"
-                authority = "user1"
+                authorities = listOf("user1")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -764,7 +790,7 @@ internal class JournalSettingsRecordsDaoTest {
             JournalSettingsEntity().apply {
                 extId = "id1"
                 name = "name1"
-                authority = "GROUP_all"
+                authorities = listOf("GROUP_all")
                 journalId = "journal-1"
                 settings = "{}"
             }

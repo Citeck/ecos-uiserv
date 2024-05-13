@@ -13,19 +13,18 @@ import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.records2.predicate.model.Predicate
+import ru.citeck.ecos.records2.predicate.model.Predicates
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType
 import ru.citeck.ecos.uiserv.domain.file.service.FileService
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService
+import ru.citeck.ecos.uiserv.domain.journalsettings.dao.JournalSettingsDao
 import ru.citeck.ecos.uiserv.domain.journalsettings.dto.JournalSettingsDto
 import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsEntity
 import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsRepository
-import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter
-import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.stream.Collectors
-import javax.annotation.PostConstruct
 
 @Service
 @Transactional(
@@ -38,17 +37,11 @@ class JournalSettingsServiceImpl(
     private val permService: JournalSettingsPermissionsService,
     private val journalPrefService: JournalPrefService,
     private val fileService: FileService,
-    private val jpaSearchConverterFactory: JpaSearchConverterFactory
+    private val journalSettingsDao: JournalSettingsDao
 ) : JournalSettingsService {
 
     private val listeners = CopyOnWriteArrayList<(JournalSettingsDto?, JournalSettingsDto?) -> Unit>()
 
-    private lateinit var searchConv: JpaSearchConverter<JournalSettingsEntity>
-
-    @PostConstruct
-    fun init() {
-        searchConv = jpaSearchConverterFactory.createConverter(JournalSettingsEntity::class.java).build()
-    }
 
     @Override
     override fun save(settings: JournalSettingsDto): JournalSettingsDto {
@@ -117,7 +110,7 @@ class JournalSettingsServiceImpl(
 
     override fun getCount(predicate: Predicate): Long {
         return if (AuthContext.isRunAsAdmin() || AuthContext.isRunAsSystem()) {
-            searchConv.getCount(repo, predicate)
+            journalSettingsDao.getCount(predicate)
         } else {
             0L
         }
@@ -126,22 +119,55 @@ class JournalSettingsServiceImpl(
     override fun findAll(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>):
         List<EntityWithMeta<JournalSettingsDto>> {
         return if (AuthContext.isRunAsAdmin() || AuthContext.isRunAsSystem()) {
-            searchConv.findAll(repo, predicate, max, skip, sort).map { toDtoWithMeta(it) }
+            journalSettingsDao.findAll(predicate, max, skip, sort).map { toDtoWithMeta(it) }
         } else {
-            emptyList()
+            val currentUserAuthorities = AuthContext.getCurrentUserWithAuthorities()
+            journalSettingsDao.findAll(predicate, max, skip, sort)
+                .filter { compareAuthorities(it, currentUserAuthorities) }
+                .map { toDtoWithMeta(it) }
         }
     }
 
     @Override
     override fun searchSettings(journalId: String): List<EntityWithMeta<JournalSettingsDto>> {
-        val searchSpecification = composeSearchSpecification(journalId)
-        val foundedJournalSettings = repo.findAll(searchSpecification).stream()
-            .map { toDtoWithMeta(it) }
-            .collect(Collectors.toList())
-
+        val foundedJournalSettings = getJournalSettingsForCurrentUser(journalId)
         val foundedJournalPrefs = searchJournalPrefs(journalId).map { EntityWithMeta(it) }
 
         return mergeSettingsAndPrefs(foundedJournalSettings, foundedJournalPrefs)
+    }
+
+    fun getJournalSettingsForCurrentUser(journalId: String): List<EntityWithMeta<JournalSettingsDto>>{
+        val currentUserAuthorities = AuthContext.getCurrentUserWithAuthorities()
+        val predicate = searchPredicate(journalId)
+        return journalSettingsDao.findAll(predicate, -1, 0, emptyList())
+            .filter { compareAuthorities(it, currentUserAuthorities) }
+            .map { toDtoWithMeta(it) }
+    }
+
+    private fun searchPredicate(journalId: String): Predicate {
+        return Predicates.eq("journalId", journalId)
+    }
+
+    private fun compareAuthorities(journalSettingsEntity: JournalSettingsEntity,
+                                   currentUserAuthorities: List<String>): Boolean {
+        val createdBy = journalSettingsEntity.createdBy
+        if (AuthContext.isRunAsAdmin()) {
+            if (journalSettingsEntity.authorities?.contains(createdBy) == false &&
+                createdBy != journalSettingsEntity.authority) {
+                return true
+            }
+        }
+
+        if (currentUserAuthorities.contains(createdBy)) {
+            return true
+        }
+
+        if (currentUserAuthorities.contains(journalSettingsEntity.authority)) {
+            return true
+        }
+
+        return journalSettingsEntity.authorities?.stream()
+            ?.anyMatch { currentUserAuthorities.contains(it) } ?: false
     }
 
     private fun composeSearchSpecification(journalId: String): Specification<JournalSettingsEntity> {
@@ -190,8 +216,9 @@ class JournalSettingsServiceImpl(
 
     @Override
     override fun getSettings(authority: String?, journalId: String?): List<JournalSettingsDto> {
-        val configs: List<JournalSettingsEntity> = repo.findAllByAuthorityAndJournalId(authority, journalId)
-        return configs.stream()
+        var configsSet: Set<JournalSettingsEntity> = repo.findAllByAuthorityAndJournalId(authority, journalId).toSet()
+        configsSet = configsSet.plus(repo.findAllByAuthoritiesInAndJournalId(authority, journalId))
+        return configsSet.stream()
             .map { entity: JournalSettingsEntity -> toDto(entity) }
             .collect(Collectors.toList())
     }
@@ -221,7 +248,8 @@ class JournalSettingsServiceImpl(
         settingsEntity.name = dto.name.toString()
         settingsEntity.settings = Json.mapper.toString(dto.settings)
         settingsEntity.journalId = dto.journalId
-        settingsEntity.authority = dto.authority
+        settingsEntity.authority = dto.getAuthority()
+        settingsEntity.authorities = dto.authorities
         return Pair(settingsEntity, isNew)
     }
 
@@ -229,18 +257,31 @@ class JournalSettingsServiceImpl(
         return JournalSettingsDto.create()
             .withId(entity.extId)
             .withName(Json.mapper.read(entity.name, MLText::class.java))
-            .withAuthority(entity.authority)
+            .withAuthorities(getAuthorities(entity))
             .withJournalId(entity.journalId)
             .withSettings(Json.mapper.read(entity.settings, ObjectData::class.java))
             .withCreator(entity.createdBy)
             .build()
     }
 
+    private fun getAuthorities(entity: JournalSettingsEntity): List<String>? {
+        val authorities = entity.authorities
+        if (!authorities.isNullOrEmpty()) {
+            return authorities
+        }
+        val authority = entity.authority
+        return if (authority.isNullOrBlank()) {
+            null
+        } else {
+            listOf(authority)
+        }
+    }
+
     private fun toDtoWithMeta(entity: JournalSettingsEntity): EntityWithMeta<JournalSettingsDto> {
         val dto = JournalSettingsDto.create()
             .withId(entity.extId)
             .withName(Json.mapper.read(entity.name, MLText::class.java))
-            .withAuthority(entity.authority)
+            .withAuthorities(getAuthorities(entity))
             .withJournalId(entity.journalId)
             .withSettings(Json.mapper.read(entity.settings, ObjectData::class.java))
             .withCreator(entity.createdBy)
@@ -257,7 +298,7 @@ class JournalSettingsServiceImpl(
         return JournalSettingsDto.create {
             withId(pref.fileId)
             withName(Json.mapper.read(prefSettings["title"].asText(), MLText::class.java))
-            withAuthority(currentUsername)
+            withAuthorities(listOf(currentUsername))
             withJournalId(journalId)
             withSettings(prefSettings)
             withCreator(currentUsername)

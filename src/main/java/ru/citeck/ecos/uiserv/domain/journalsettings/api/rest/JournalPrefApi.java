@@ -45,7 +45,7 @@ public class JournalPrefApi {
         String username = AuthContext.getCurrentUser();
         JournalSettingsDto settings = journalSettingsService.getDtoById(id);
         if (settings != null) {
-            if (!username.equals(settings.getAuthority())) {
+            if (!username.equals(settings.getAuthority()) && !settings.getAuthorities().contains(username)) {
                 throw new RuntimeException("Access denied");
             }
             return settings.getSettings().getAs(JsonNode.class);
@@ -71,7 +71,7 @@ public class JournalPrefApi {
 
         String username = AuthContext.getCurrentUser();
 
-        if (!Objects.equals(username, dto.getAuthority())) {
+        if (!Objects.equals(username, dto.getAuthority()) && !dto.getAuthorities().contains(username)) {
             throw new RuntimeException("Access denied");
         }
 
@@ -93,7 +93,7 @@ public class JournalPrefApi {
 
         JournalSettingsDto settings = journalSettingsService.getDtoById(journalViewPrefsId);
         if (settings != null) {
-            if (!Objects.equals(username, settings.getAuthority())) {
+            if (!Objects.equals(username, settings.getAuthority()) && !settings.getAuthorities().contains(username)) {
                 throw new RuntimeException("Access denied");
             } else {
                 journalSettingsService.delete(journalViewPrefsId);

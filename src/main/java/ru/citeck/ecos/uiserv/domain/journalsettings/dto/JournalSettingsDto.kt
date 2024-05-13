@@ -1,16 +1,18 @@
 package ru.citeck.ecos.uiserv.domain.journalsettings.dto
 
 import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
+import ecos.com.fasterxml.jackson210.databind.annotation.JsonPOJOBuilder
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
+import java.util.*
 
 @IncludeNonDefault
 @JsonDeserialize(builder = JournalSettingsDto.Builder::class)
 open class JournalSettingsDto(
     val id: String,
     val name: MLText,
-    val authority: String,
+    val authorities: List<String>,
     val journalId: String,
     val settings: ObjectData,
     val creator: String
@@ -18,7 +20,7 @@ open class JournalSettingsDto(
     constructor(other: JournalSettingsDto) : this(
         other.id,
         other.name,
-        other.authority,
+        other.authorities,
         other.journalId,
         other.settings,
         other.creator
@@ -27,7 +29,7 @@ open class JournalSettingsDto(
     constructor() : this(
         "",
         MLText.EMPTY,
-        "",
+        Collections.emptyList(),
         "",
         ObjectData.create(),
         ""
@@ -50,6 +52,10 @@ open class JournalSettingsDto(
         }
     }
 
+    fun getAuthority(): String {
+        return authorities.firstOrNull() ?: ""
+    }
+
     fun copy(): Builder {
         return Builder(this)
     }
@@ -67,7 +73,7 @@ open class JournalSettingsDto(
 
         if (id != other.id) return false
         if (name != other.name) return false
-        if (authority != other.authority) return false
+        if (authorities != other.authorities) return false
         if (journalId != other.journalId) return false
         if (settings != other.settings) return false
         if (creator != other.creator) return false
@@ -79,18 +85,19 @@ open class JournalSettingsDto(
     override fun hashCode(): Int {
         var result = id.hashCode()
         result = 31 * result + name.hashCode()
-        result = 31 * result + authority.hashCode()
+        result = 31 * result + authorities.hashCode()
         result = 31 * result + journalId.hashCode()
         result = 31 * result + settings.hashCode()
         result = 31 * result + creator.hashCode()
         return result
     }
 
+    @JsonPOJOBuilder
     open class Builder() {
 
         var id: String = ""
         var name: MLText = MLText.EMPTY
-        var authority: String = ""
+        var authorities: List<String> = Collections.emptyList()
         var journalId: String = ""
         var settings: ObjectData = ObjectData.create()
         var creator: String = ""
@@ -98,7 +105,7 @@ open class JournalSettingsDto(
         constructor(base: JournalSettingsDto) : this() {
             id = base.id
             name = base.name
-            authority = base.authority
+            authorities = base.authorities
             journalId = base.journalId
             settings = base.settings.deepCopy()
             creator = base.creator
@@ -114,8 +121,20 @@ open class JournalSettingsDto(
             return this
         }
 
+        fun getAuthority(): String {
+            return authorities.firstOrNull() ?: ""
+        }
+
         fun withAuthority(authority: String?): Builder {
-            this.authority = authority ?: ""
+            return if (authority.isNullOrBlank()) {
+                withAuthorities(null)
+            } else {
+                withAuthorities(listOf(authority))
+            }
+        }
+
+        fun withAuthorities(authorities: List<String>?): Builder {
+            this.authorities = authorities ?: emptyList()
             return this
         }
 
@@ -138,7 +157,7 @@ open class JournalSettingsDto(
             return JournalSettingsDto(
                 id,
                 name,
-                authority,
+                authorities,
                 journalId,
                 settings,
                 creator
