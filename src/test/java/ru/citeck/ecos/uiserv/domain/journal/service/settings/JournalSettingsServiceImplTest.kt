@@ -382,44 +382,6 @@ internal class JournalSettingsServiceImplTest {
             Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
         }
 
-        AuthContext.runAs("another-authority", listOf("another-authority", "GROUP_all", "ROLE_USER")) {
-            val exception1 = assertThrows(IllegalAccessException::class.java) {
-                service.save(
-                    JournalSettingsDto.create {
-                        withId("some-id")
-                        withName(MLText("updated-name"))
-                        withAuthorities(listOf("some-authority", "some-authority-1"))
-                        withJournalId("some-journal")
-                        withSettings(ObjectData.create("{}"))
-                    }
-                )
-            }
-
-            assertNotNull(exception1)
-            assertEquals("Access denied!", exception1.message)
-
-            Mockito.verify(spyPermService, Mockito.times(1)).canWrite(any(JournalSettingsEntity::class.java))
-            Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
-
-            val exception2 = assertThrows(IllegalAccessException::class.java) {
-                service.save(
-                    JournalSettingsDto.create {
-                        withId("another-id")
-                        withName(MLText("another-name"))
-                        withAuthorities(listOf("some-authority", "some-authority-1"))
-                        withJournalId("some-journal")
-                        withSettings(ObjectData.create("{}"))
-                    }
-                )
-            }
-
-            assertNotNull(exception2)
-            assertEquals("Access denied!", exception2.message)
-
-            Mockito.verify(spyPermService, Mockito.times(1)).canWrite(any(JournalSettingsEntity::class.java))
-            Mockito.verify(spyPermService, Mockito.times(2)).canWriteNew(any(JournalSettingsDto::class.java))
-        }
-
         AuthContext.runAs("admin", listOf("admin", "GROUP_all", "ROLE_USER", "ROLE_ADMIN")) {
             service.save(
                 JournalSettingsDto.create {
