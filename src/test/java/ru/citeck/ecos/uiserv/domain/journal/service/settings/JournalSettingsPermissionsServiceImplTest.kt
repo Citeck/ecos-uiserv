@@ -671,14 +671,14 @@ internal class JournalSettingsPermissionsServiceImplTest {
                     }
                 )
             )
-            assertFalse(
+            assertTrue(
                 service.canWriteNew(
                     JournalSettingsDto.create {
                         withAuthority("GROUP_all")
                     }
                 )
             )
-            assertFalse(
+            assertTrue(
                 service.canWriteNew(
                     JournalSettingsDto.create {
                         withAuthority("anotherUser")
@@ -701,14 +701,14 @@ internal class JournalSettingsPermissionsServiceImplTest {
                     }
                 )
             )
-            assertFalse(
+            assertTrue(
                 service.canWriteNew(
                     JournalSettingsDto.create {
                         withAuthorities(listOf("GROUP_all"))
                     }
                 )
             )
-            assertFalse(
+            assertTrue(
                 service.canWriteNew(
                     JournalSettingsDto.create {
                         withAuthorities(listOf("anotherUser"))

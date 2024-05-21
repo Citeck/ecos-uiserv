@@ -65,10 +65,6 @@ class JournalSettingsPermissionsServiceImpl : JournalSettingsPermissionsService 
 
     @Override
     override fun canWriteNew(dto: JournalSettingsDto): Boolean {
-        if (AuthContext.isRunAsAdmin() || AuthContext.isRunAsSystem()) {
-            return true
-        }
-        val currentUser = AuthContext.getCurrentUser()
-        return dto.authorities.contains(currentUser)
+        return true
     }
 }

@@ -288,24 +288,6 @@ internal class JournalSettingsServiceImplTest {
 
             Mockito.verify(spyPermService, Mockito.times(1)).canWrite(any(JournalSettingsEntity::class.java))
             Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
-
-            val exception2 = assertThrows(IllegalAccessException::class.java) {
-                service.save(
-                    JournalSettingsDto.create {
-                        withId("another-id")
-                        withName(MLText("another-name"))
-                        withAuthority("some-authority")
-                        withJournalId("some-journal")
-                        withSettings(ObjectData.create("{}"))
-                    }
-                )
-            }
-
-            assertNotNull(exception2)
-            assertEquals("Access denied!", exception2.message)
-
-            Mockito.verify(spyPermService, Mockito.times(1)).canWrite(any(JournalSettingsEntity::class.java))
-            Mockito.verify(spyPermService, Mockito.times(2)).canWriteNew(any(JournalSettingsDto::class.java))
         }
 
         AuthContext.runAs("admin", listOf("admin", "GROUP_all", "ROLE_USER", "ROLE_ADMIN")) {
@@ -320,7 +302,7 @@ internal class JournalSettingsServiceImplTest {
             )
 
             Mockito.verify(spyPermService, Mockito.times(2)).canWrite(any(JournalSettingsEntity::class.java))
-            Mockito.verify(spyPermService, Mockito.times(2)).canWriteNew(any(JournalSettingsDto::class.java))
+            Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
 
             val updatedDto = service.getById("some-id")
             assertNotNull(updatedDto)
@@ -351,7 +333,7 @@ internal class JournalSettingsServiceImplTest {
             assertEquals("admin", createdForAnotherDto?.entity?.creator)
 
             Mockito.verify(spyPermService, Mockito.times(2)).canWrite(any(JournalSettingsEntity::class.java))
-            Mockito.verify(spyPermService, Mockito.times(3)).canWriteNew(any(JournalSettingsDto::class.java))
+            Mockito.verify(spyPermService, Mockito.times(2)).canWriteNew(any(JournalSettingsDto::class.java))
         }
     }
 
@@ -400,24 +382,6 @@ internal class JournalSettingsServiceImplTest {
 
             Mockito.verify(spyPermService, Mockito.times(1)).canWrite(any(JournalSettingsEntity::class.java))
             Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
-
-            val exception2 = assertThrows(IllegalAccessException::class.java) {
-                service.save(
-                    JournalSettingsDto.create {
-                        withId("another-id")
-                        withName(MLText("another-name"))
-                        withAuthorities(listOf("some-authority", "some-authority-1"))
-                        withJournalId("some-journal")
-                        withSettings(ObjectData.create("{}"))
-                    }
-                )
-            }
-
-            assertNotNull(exception2)
-            assertEquals("Access denied!", exception2.message)
-
-            Mockito.verify(spyPermService, Mockito.times(1)).canWrite(any(JournalSettingsEntity::class.java))
-            Mockito.verify(spyPermService, Mockito.times(2)).canWriteNew(any(JournalSettingsDto::class.java))
         }
 
         AuthContext.runAs("admin", listOf("admin", "GROUP_all", "ROLE_USER", "ROLE_ADMIN")) {
@@ -432,7 +396,7 @@ internal class JournalSettingsServiceImplTest {
             )
 
             Mockito.verify(spyPermService, Mockito.times(2)).canWrite(any(JournalSettingsEntity::class.java))
-            Mockito.verify(spyPermService, Mockito.times(2)).canWriteNew(any(JournalSettingsDto::class.java))
+            Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
 
             val updatedDto = service.getById("some-id")
             assertNotNull(updatedDto)
@@ -463,7 +427,7 @@ internal class JournalSettingsServiceImplTest {
             assertEquals("admin", createdForAnotherDto?.entity?.creator)
 
             Mockito.verify(spyPermService, Mockito.times(2)).canWrite(any(JournalSettingsEntity::class.java))
-            Mockito.verify(spyPermService, Mockito.times(3)).canWriteNew(any(JournalSettingsDto::class.java))
+            Mockito.verify(spyPermService, Mockito.times(2)).canWriteNew(any(JournalSettingsDto::class.java))
         }
     }
 
