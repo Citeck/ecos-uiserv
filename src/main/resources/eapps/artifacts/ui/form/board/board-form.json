@@ -78,7 +78,6 @@
                   "en": "Is it possible to move entities between states"
                 },
                 "key": "canDrag",
-                "persistent": false,
                 "refreshOn": [
                   "recordAsyncData"
                 ],
