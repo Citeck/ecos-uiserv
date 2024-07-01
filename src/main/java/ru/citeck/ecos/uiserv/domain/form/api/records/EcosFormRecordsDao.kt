@@ -73,7 +73,7 @@ class EcosFormRecordsDao(
     fun init() {
         ecosFormService.addChangeListener { before: EcosFormDef?, after: EcosFormDef? ->
             if (after != null) {
-                recordEventsService?.emitRecChanged(before, after, getId()) { EcosFormRecord(it) }
+                recordEventsService?.emitRecChanged(before, after, getId()) { EcosFormRecord(AppName.UISERV, ID, it) }
             }
         }
     }
@@ -89,7 +89,7 @@ class EcosFormRecordsDao(
     }
 
     private fun toRecord(model: EcosFormDef): EcosFormRecord {
-        return EcosFormRecord(model)
+        return EcosFormRecord(AppName.UISERV, ID, model)
     }
 
     override fun saveMutatedRec(record: EcosFormMutRecord): String {

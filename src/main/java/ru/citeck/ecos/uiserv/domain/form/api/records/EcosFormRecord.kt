@@ -7,12 +7,22 @@ import ru.citeck.ecos.context.lib.auth.AuthContext.isRunAsAdmin
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.atts.value.AttValue
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.nio.charset.StandardCharsets
 
 class EcosFormRecord(
+    private val appName: String,
+    private val sourceId: String,
+
     @AttName("...")
     val def: EcosFormDef
 ) {
+
+    @AttName("?id")
+    fun getId(): EntityRef {
+        return EntityRef.create(appName, sourceId, def.id)
+    }
+
     fun getModuleId(): String {
         return def.id
     }
