@@ -1,5 +1,7 @@
 modelVersion: "1.0"
 
+source-id: admin-sections-group
+
 internal: true
 
 name:

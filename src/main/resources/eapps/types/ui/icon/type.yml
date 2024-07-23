@@ -5,7 +5,7 @@ name:
   ru: Иконка
   en: Icon
 
-source-id: ""
+source-id: "icon"
 
 controller:
   type: bin
