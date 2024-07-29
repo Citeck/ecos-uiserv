@@ -39,6 +39,10 @@
               "en": "Duration"
             },
             "key": "hideItemsOlderThan",
+            "tooltip": {
+              "ru": "Необходимо указать количество дней",
+              "en": "You must specify the number of days"
+            },
             "validate": {
               "required": true,
               "integer": false
