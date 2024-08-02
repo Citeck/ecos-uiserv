@@ -68,6 +68,11 @@
                       "type": "boolean"
                     },
                     "state": "true"
+                  },
+                  {
+                    "name": "field-clear",
+                    "type": "value",
+                    "value": "value = \"\""
                   }
                 ]
               }
