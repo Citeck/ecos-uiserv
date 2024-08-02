@@ -1,14 +1,13 @@
 package ru.citeck.ecos.uiserv.domain.ecostype.config
 
+import jakarta.annotation.PostConstruct
 import org.springframework.context.annotation.Configuration
 import ru.citeck.ecos.model.lib.utils.ModelUtils
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
-import javax.annotation.PostConstruct
 
 @Configuration
 class EcosTypesComponent(
@@ -42,7 +41,7 @@ class EcosTypesComponent(
         val typeRef = ModelUtils.getTypeRef(type.id)
         typeInfoByTypeRef[typeRef] = type
 
-        val prevParentRef = parentByType[typeRef] ?: RecordRef.EMPTY
+        val prevParentRef = parentByType[typeRef] ?: EntityRef.EMPTY
         val newParentRef = type.parentRef
 
         if (prevParentRef != type.parentRef) {
@@ -66,8 +65,8 @@ class EcosTypesComponent(
         typeRef: EntityRef,
         newRef: EntityRef?
     ) {
-        val newRefNotNull = newRef ?: RecordRef.EMPTY
-        val prevRef = refByTypeMap[typeRef] ?: RecordRef.EMPTY
+        val newRefNotNull = newRef ?: EntityRef.EMPTY
+        val prevRef = refByTypeMap[typeRef] ?: EntityRef.EMPTY
 
         if (newRef != prevRef) {
             if (EntityRef.isNotEmpty(prevRef)) {
@@ -97,7 +96,7 @@ class EcosTypesComponent(
     }
 
     fun getTypeRefByForm(formRef: EntityRef): EntityRef {
-        return typeByForm[formRef] ?: RecordRef.EMPTY
+        return typeByForm[formRef] ?: EntityRef.EMPTY
     }
 
     fun getTypeRefByBoard(boardRef: EntityRef): EntityRef {

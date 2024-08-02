@@ -2,16 +2,15 @@ package ru.citeck.ecos.uiserv.domain.menu.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.config.lib.records.CfgRecordsDao;
 import ru.citeck.ecos.context.lib.auth.AuthContext;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.menu.dao.MenuDao;
 import ru.citeck.ecos.uiserv.domain.menu.repo.MenuEntity;
@@ -20,7 +19,9 @@ import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef;
 import ru.citeck.ecos.uiserv.domain.menu.service.format.MenuReaderService;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
+
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -56,10 +57,10 @@ public class MenuService {
     @PostConstruct
     public void init() {
         CONFIGS_TO_REMOVE.forEach(cfg -> {
-            MenuEntity menu = Optional.ofNullable(menuDao.findByExtId(cfg)).orElse(null);
+            MenuEntity menu = menuDao.findByExtId(cfg);
             if (menu != null) {
                 MenuDto dtoToRemove = mapToDto(menu);
-                log.info("Remove menu config: " + Json.getMapper().toString(dtoToRemove));
+                log.info("Remove menu config: {}", Json.getMapper().toString(dtoToRemove));
                 menuDao.delete(menu);
             }
         });
@@ -121,7 +122,7 @@ public class MenuService {
 
     private MenuEntity mapToEntity(MenuDto menuDto) {
 
-        MenuEntity entity = Optional.ofNullable(menuDao.findByExtId(menuDto.getId())).orElse(null);
+        MenuEntity entity = menuDao.findByExtId(menuDto.getId());
         if (entity == null) {
             entity = new MenuEntity();
             entity.setExtId(menuDto.getId());
@@ -209,7 +210,7 @@ public class MenuService {
     private List<String> getOrderedAuthorities(Set<String> userAuthorities) {
 
         DataValue priorityArr = recordsService.getAtt(
-            RecordRef.create(CfgRecordsDao.ID, "menu-group-priority"), "value[]?json");
+            EntityRef.create(CfgRecordsDao.ID, "menu-group-priority"), "value[]?json");
 
         List<String> priority = new ArrayList<>();
         priorityArr.forEach(v -> {

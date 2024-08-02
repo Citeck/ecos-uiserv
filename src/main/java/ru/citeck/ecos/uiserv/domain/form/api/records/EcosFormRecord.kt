@@ -1,6 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.form.api.records
 
-import ecos.com.fasterxml.jackson210.annotation.JsonValue
+import com.fasterxml.jackson.annotation.JsonValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.json.YamlUtils.toNonDefaultString
 import ru.citeck.ecos.context.lib.auth.AuthContext.isRunAsAdmin
@@ -37,7 +37,6 @@ class EcosFormRecord(
     }
 
     @JsonValue
-    @com.fasterxml.jackson.annotation.JsonValue
     fun toJson(): EcosFormDef {
         return def
     }

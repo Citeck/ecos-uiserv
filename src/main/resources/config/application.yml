@@ -1,4 +1,3 @@
-
 server:
   port: 8081
 
@@ -9,6 +8,11 @@ ecos:
         url: jdbc:postgresql://localhost:14523/ecos_uiserv
         username: uiserv
         password: uiservpassword
+    x509:
+      keys:
+        application:
+          location: classpath:ecos/x509/keys/application.key
+
 
 application:
   default-theme-id: citeckTheme

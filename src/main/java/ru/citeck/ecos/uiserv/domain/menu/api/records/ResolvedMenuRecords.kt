@@ -1,12 +1,11 @@
 package ru.citeck.ecos.uiserv.domain.menu.api.records
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.model.lib.type.dto.CreateVariantDef
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
@@ -16,6 +15,7 @@ import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDef
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -115,13 +115,13 @@ class ResolvedMenuRecords(
 
                         val section = findMenuItemById(subMenus["left"]?.items, sectionId)
                         if (section == null) {
-                            log.warn("Section is not found by id: $sectionId")
+                            log.warn { "Section is not found by id: $sectionId" }
                         }
                         evalCreateVariants(section).forEach {
                             resultItems.add(it)
                         }
                     } else {
-                        log.warn("CREATE_IN_SECTION item without sectionId: $createMenuItem")
+                        log.warn { "CREATE_IN_SECTION item without sectionId: $createMenuItem" }
                     }
                 } else if (createMenuItem.type == "SECTION") {
 
@@ -154,7 +154,7 @@ class ResolvedMenuRecords(
 
             section ?: return emptyList()
 
-            val visitedTypes = HashSet<RecordRef>()
+            val visitedTypes = HashSet<EntityRef>()
 
             val variants = mutableMapOf<String, MutableList<CreateVariantDef>>()
             val sectionNameById = mutableMapOf<String, MLText>()
@@ -217,7 +217,7 @@ class ResolvedMenuRecords(
         private fun extractCreateVariantsFromItem(
             item: MenuItemDef,
             result: MutableList<CreateVariantDef>,
-            visitedTypes: MutableSet<RecordRef>
+            visitedTypes: MutableSet<EntityRef>
         ) {
 
             if (item.type == "SECTION") {
@@ -229,8 +229,8 @@ class ResolvedMenuRecords(
                 val journalRef = item.config.get("recordRef").asText()
 
                 if (journalRef.isNotBlank()) {
-                    val typeRef = ecosTypeService.getTypeRefByJournal(RecordRef.valueOf(journalRef))
-                    if (RecordRef.isNotEmpty(typeRef) && visitedTypes.add(typeRef)) {
+                    val typeRef = ecosTypeService.getTypeRefByJournal(EntityRef.valueOf(journalRef))
+                    if (EntityRef.isNotEmpty(typeRef) && visitedTypes.add(typeRef)) {
                         val typeInfo = ecosTypeService.getTypeInfo(typeRef)
                         result.addAll(typeInfo?.createVariants ?: emptyList())
                     }
@@ -273,13 +273,13 @@ class ResolvedMenuRecords(
             val newItem = item.copy()
 
             if (item.type == "LINK-CREATE-CASE") {
-                val typeRef = RecordRef.valueOf(item.config["typeRef"].asText())
-                var variantTypeRef = RecordRef.valueOf(item.config["variantTypeRef"].asText())
-                if (RecordRef.isEmpty(variantTypeRef)) {
+                val typeRef = EntityRef.valueOf(item.config["typeRef"].asText())
+                var variantTypeRef = EntityRef.valueOf(item.config["variantTypeRef"].asText())
+                if (EntityRef.isEmpty(variantTypeRef)) {
                     variantTypeRef = typeRef
                 }
                 val variantId = item.config["variantId"].asText()
-                if (RecordRef.isNotEmpty(variantTypeRef)) {
+                if (EntityRef.isNotEmpty(variantTypeRef)) {
                     val typeInfo = ecosTypeService.getTypeInfo(variantTypeRef)
                     val variant = typeInfo?.createVariants?.find {
                         it.id == variantId && it.typeRef == variantTypeRef

@@ -1,20 +1,20 @@
 package ru.citeck.ecos.uiserv.domain.menu.service
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.io.file.EcosFile
 import ru.citeck.ecos.commons.json.Json
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
 import ru.citeck.ecos.uiserv.domain.menu.service.testutils.MenuTestBase
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 class ResolvedMenuConfigsTest : MenuTestBase() {
 
     companion object {
-        private val MENU_RESOLVED_REF = RecordRef.valueOf("uiserv/rmenu@test-menu")
+        private val MENU_RESOLVED_REF = EntityRef.valueOf("uiserv/rmenu@test-menu")
 
         private val log = KotlinLogging.logger {}
     }
@@ -24,7 +24,7 @@ class ResolvedMenuConfigsTest : MenuTestBase() {
     private fun init() {
         loadAndRegisterAllTypes("types")
         menuDto = MenuDto()
-        menuDto.id = MENU_RESOLVED_REF.id
+        menuDto.id = MENU_RESOLVED_REF.getLocalId()
     }
 
     @Test

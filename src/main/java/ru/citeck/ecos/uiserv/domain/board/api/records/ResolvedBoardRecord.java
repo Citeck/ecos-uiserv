@@ -1,14 +1,14 @@
 package ru.citeck.ecos.uiserv.domain.board.api.records;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.model.lib.status.dto.StatusDef;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef;
 
 import java.util.ArrayList;
@@ -65,41 +65,41 @@ public class ResolvedBoardRecord {
         return new ArrayList<>();
     }
 
-    public RecordRef getTypeRef() {
+    public EntityRef getTypeRef() {
 
         if (boardDef == null) {
-            return RecordRef.EMPTY;
+            return EntityRef.EMPTY;
         }
-        if (RecordRef.isNotEmpty(boardDef.getTypeRef())) {
+        if (EntityRef.isNotEmpty(boardDef.getTypeRef())) {
             return boardDef.getTypeRef();
         }
         return typeService.getTypeRefByBoard(boardDef.getId());
     }
 
-    public RecordRef getJournalRef() {
+    public EntityRef getJournalRef() {
 
         if (boardDef == null) {
-            return RecordRef.EMPTY;
+            return EntityRef.EMPTY;
         }
-        if (RecordRef.isNotEmpty(boardDef.getJournalRef())) {
+        if (EntityRef.isNotEmpty(boardDef.getJournalRef())) {
             return boardDef.getJournalRef();
         }
-        RecordRef typeRef = getTypeRef();
-        if (RecordRef.isNotEmpty(typeRef)) {
+        EntityRef typeRef = getTypeRef();
+        if (EntityRef.isNotEmpty(typeRef)) {
             TypeDef typeInfo = typeService.getTypeInfo(typeRef);
             if (typeInfo != null) {
-                return RecordRef.valueOf(typeInfo.getJournalRef());
+                return EntityRef.valueOf(typeInfo.getJournalRef());
             }
         }
-        return RecordRef.EMPTY;
+        return EntityRef.EMPTY;
     }
 
-    public RecordRef getCardFormRef() {
+    public EntityRef getCardFormRef() {
         if (boardDef != null && boardDef.getCardFormRef() != null
-            && !StringUtils.isBlank(boardDef.getCardFormRef().getId())) {
-            return RecordRef.create(boardDef.getCardFormRef().getAppName(), ID, boardDef.getCardFormRef().getId());
+            && !StringUtils.isBlank(boardDef.getCardFormRef().getLocalId())) {
+            return EntityRef.create(boardDef.getCardFormRef().getAppName(), ID, boardDef.getCardFormRef().getLocalId());
         }
-        return RecordRef.valueOf("uiserv/form@board-card-default");
+        return EntityRef.valueOf("uiserv/form@board-card-default");
     }
 
     public String getEcosType() {

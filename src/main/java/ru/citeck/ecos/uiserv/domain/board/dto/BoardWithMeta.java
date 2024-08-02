@@ -2,10 +2,10 @@ package ru.citeck.ecos.uiserv.domain.board.dto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.board.api.records.BoardRecordsDao;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.time.Instant;
 
@@ -52,8 +52,8 @@ public class BoardWithMeta {
         this.creator = other.creator;
     }
 
-    public RecordRef getRef() {
-        return RecordRef.create(Application.NAME, BoardRecordsDao.ID, getLocalId());
+    public EntityRef getRef() {
+        return EntityRef.create(Application.NAME, BoardRecordsDao.ID, getLocalId());
     }
 
     public BoardDef getBoardDef() {

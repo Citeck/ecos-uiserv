@@ -7,8 +7,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.RecordsService;
+import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.records2.predicate.model.Predicates;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef;
@@ -16,7 +15,9 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
+
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -32,7 +33,7 @@ public class TypeJournalService {
     private final JournalService journalService;
     private final JournalByFormGenerator byFormGenerator;
 
-    private LoadingCache<RecordRef, Optional<JournalWithMeta>> journalByTypeCache;
+    private LoadingCache<EntityRef, Optional<JournalWithMeta>> journalByTypeCache;
     private LoadingCache<String, Optional<JournalWithMeta>> journalByFormIdCache;
 
     @PostConstruct
@@ -51,22 +52,22 @@ public class TypeJournalService {
         formService.addChangeListener((before, after) -> journalByFormIdCache.invalidate(after.getId()));
     }
 
-    public Optional<JournalWithMeta> getJournalForType(RecordRef typeRef) {
-        if (RecordRef.isEmpty(typeRef)) {
+    public Optional<JournalWithMeta> getJournalForType(EntityRef typeRef) {
+        if (EntityRef.isEmpty(typeRef)) {
             return Optional.empty();
         }
         return journalByTypeCache.getUnchecked(typeRef);
     }
 
-    private Optional<JournalWithMeta> getJournalForTypeImpl(RecordRef typeRef) {
+    private Optional<JournalWithMeta> getJournalForTypeImpl(EntityRef typeRef) {
 
-        if (RecordRef.isEmpty(typeRef)) {
+        if (EntityRef.isEmpty(typeRef)) {
             return Optional.empty();
         }
 
         TypeMetaWithParents typeMeta = null;
         try {
-            typeMeta = recordsService.getMeta(typeRef, TypeMetaWithParents.class);
+            typeMeta = recordsService.getAtts(typeRef, TypeMetaWithParents.class);
         } catch (Exception e) {
             log.error("Type meta can't be received for type: " + typeRef, e);
         }
@@ -86,17 +87,17 @@ public class TypeJournalService {
         return journal;
     }
 
-    private Optional<JournalWithMeta> getJournalForTypeImpl(List<RecordRef> types, int idx) {
+    private Optional<JournalWithMeta> getJournalForTypeImpl(List<EntityRef> types, int idx) {
 
         if (types == null || types.isEmpty() || idx >= types.size()) {
             return Optional.empty();
         }
 
-        RecordRef typeRef = types.get(idx);
+        EntityRef typeRef = types.get(idx);
 
         TypeMeta meta = null;
         try {
-            meta = recordsService.getMeta(typeRef, TypeMeta.class);
+            meta = recordsService.getAtts(typeRef, TypeMeta.class);
         } catch (Exception e) {
             log.error("Type meta can't be received for type: " + typeRef, e);
         }
@@ -116,25 +117,25 @@ public class TypeJournalService {
         return journal;
     }
 
-    private Optional<JournalWithMeta> getJournal(RecordRef typeRef,
+    private Optional<JournalWithMeta> getJournal(EntityRef typeRef,
                                                  String sourceId,
-                                                 RecordRef journalRef,
-                                                 RecordRef formRef) {
+                                                 EntityRef journalRef,
+                                                 EntityRef formRef) {
 
-        if (RecordRef.isNotEmpty(journalRef)) {
-            JournalWithMeta journal = journalService.getJournalById(journalRef.getId());
+        if (EntityRef.isNotEmpty(journalRef)) {
+            JournalWithMeta journal = journalService.getJournalById(journalRef.getLocalId());
             if (journal != null) {
                 return Optional.of(journal);
             }
         }
-        if (RecordRef.isNotEmpty(formRef)) {
-            return journalByFormIdCache.getUnchecked(formRef.getId())
+        if (EntityRef.isNotEmpty(formRef)) {
+            return journalByFormIdCache.getUnchecked(formRef.getLocalId())
                 .map(dto -> {
                     JournalWithMeta result = new JournalWithMeta(dto);
                     result.setJournalDef(JournalDef.create()
                         .withTypeRef(typeRef)
                         .withPredicate(Predicates.eq("_type", typeRef.toString()))
-                        .withId(JOURNAL_ID_PREFIX + typeRef.getId())
+                        .withId(JOURNAL_ID_PREFIX + typeRef.getLocalId())
                         .build());
                     return result;
                 });
@@ -163,18 +164,18 @@ public class TypeJournalService {
     public static class TypeMetaWithParents {
 
         private String sourceId;
-        private RecordRef journal;
-        private RecordRef form;
+        private EntityRef journal;
+        private EntityRef form;
 
         @AttName("parents[]?id")
-        private List<RecordRef> parentsRefs;
+        private List<EntityRef> parentsRefs;
     }
 
     @Data
     public static class TypeMeta {
 
         private String sourceId;
-        private RecordRef journal;
-        private RecordRef form;
+        private EntityRef journal;
+        private EntityRef form;
     }
 }

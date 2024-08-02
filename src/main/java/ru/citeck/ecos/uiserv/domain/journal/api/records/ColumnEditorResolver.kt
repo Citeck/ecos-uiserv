@@ -3,15 +3,15 @@ package ru.citeck.ecos.uiserv.domain.journal.api.records
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.context.lib.i18n.I18nContext
 import ru.citeck.ecos.model.lib.attributes.dto.AttOptionDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 import ru.citeck.ecos.model.lib.status.constants.StatusConstants
-import ru.citeck.ecos.records2.RecordRef
-import ru.citeck.ecos.records3.record.request.RequestContext
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnEditorDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 @Component
 class ColumnEditorResolver(
@@ -36,7 +36,7 @@ class ColumnEditorResolver(
                 "options",
                 attOptions.map {
                     val option = ObjectData.create()
-                    option.set("label", MLText.getClosestValue(it.label, RequestContext.getLocale()))
+                    option.set("label", MLText.getClosestValue(it.label, I18nContext.getLocale()))
                     option.set("value", it.value)
                     option
                 }
@@ -127,8 +127,8 @@ class ColumnEditorResolver(
     private fun resolveEditorForAssoc(typeAtt: AttributeDef?): ColumnEditorDef {
 
         val calculatedJournalId: String? = if (typeAtt != null) {
-            val assocTypeRef = RecordRef.valueOf(typeAtt.config.get("typeRef").asText())
-            ecosTypeService.getJournalRefByTypeRef(assocTypeRef).id
+            val assocTypeRef = EntityRef.valueOf(typeAtt.config.get("typeRef").asText())
+            ecosTypeService.getJournalRefByTypeRef(assocTypeRef).getLocalId()
         } else {
             null
         }

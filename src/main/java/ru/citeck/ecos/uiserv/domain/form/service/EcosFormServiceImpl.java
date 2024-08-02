@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.commons.data.MLText;
@@ -14,9 +14,8 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.data.entity.EntityMeta;
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
 import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate;
+import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
@@ -87,9 +86,9 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
-    public void updateFormType(String formId, RecordRef typeRef) {
+    public void updateFormType(String formId, EntityRef typeRef) {
 
-        if (RecordRef.isEmpty(typeRef)) {
+        if (EntityRef.isEmpty(typeRef)) {
             return;
         }
 
@@ -274,7 +273,7 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
-    public List<EcosFormDef> getAllFormsForType(RecordRef typeRef) {
+    public List<EcosFormDef> getAllFormsForType(EntityRef typeRef) {
 
         List<EcosFormEntity> forms = new ArrayList<>();
         Set<String> formIds = new HashSet<>();
@@ -286,9 +285,9 @@ public class EcosFormServiceImpl implements EcosFormService {
         };
 
         try {
-            ParentsAndFormByType parents = recordsService.getMeta(typeRef, ParentsAndFormByType.class);
-            if (!RecordRef.isEmpty(parents.form)) {
-                Optional.ofNullable(formsEntityDao.findByExtId(parents.form.getId()))
+            ParentsAndFormByType parents = recordsService.getAtts(typeRef, ParentsAndFormByType.class);
+            if (!EntityRef.isEmpty(parents.form)) {
+                Optional.ofNullable(formsEntityDao.findByExtId(parents.form.getLocalId()))
                     .ifPresent(addIfNotAdded);
             }
 
@@ -317,7 +316,7 @@ public class EcosFormServiceImpl implements EcosFormService {
             .withDescription(Json.getMapper().read(entity.getDescription(), MLText.class))
             .withWidth(entity.getWidth())
             .withFormKey(entity.getFormKey())
-            .withTypeRef(RecordRef.valueOf(entity.getTypeRef()))
+            .withTypeRef(EntityRef.valueOf(entity.getTypeRef()))
             .withCustomModule(entity.getCustomModule())
             .withI18n(Json.getMapper().read(entity.getI18n(), ObjectData.class))
             .withAttributes(Json.getMapper().read(entity.getAttributes(), ObjectData.class))
@@ -354,7 +353,7 @@ public class EcosFormServiceImpl implements EcosFormService {
         entity.setWidth(model.getWidth());
         entity.setDescription(Json.getMapper().toString(model.getDescription()));
         entity.setFormKey(model.getFormKey());
-        entity.setTypeRef(RecordRef.toString(model.getTypeRef()));
+        entity.setTypeRef(EntityRef.toString(model.getTypeRef()));
         entity.setCustomModule(model.getCustomModule());
         entity.setI18n(Json.getMapper().toString(model.getI18n()));
         entity.setDefinition(Json.getMapper().toString(model.getDefinition()));
@@ -371,8 +370,8 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     @Data
     public static class ParentsAndFormByType {
-        private List<RecordRef> parents;
-        private RecordRef form;
+        private List<EntityRef> parents;
+        private EntityRef form;
     }
 
     public static class FormKeys {

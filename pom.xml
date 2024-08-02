@@ -9,13 +9,28 @@
     <parent>
         <groupId>ru.citeck.ecos.webapp</groupId>
         <artifactId>ecos-webapp-spring-hibernate-parent</artifactId>
-        <version>2.32.9</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
 
     <properties>
         <surefire-plugin.spring-context-cache.maxSize>8</surefire-plugin.spring-context-cache.maxSize>
         <failsafe-plugin.spring-context-cache.maxSize>8</failsafe-plugin.spring-context-cache.maxSize>
     </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+    </dependencies>
 
     <repositories>
         <repository>

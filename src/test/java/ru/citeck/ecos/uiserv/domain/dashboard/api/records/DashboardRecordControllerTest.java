@@ -2,40 +2,29 @@ package ru.citeck.ecos.uiserv.domain.dashboard.api.records;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.TestEntityRecordUtil;
-import ru.citeck.ecos.uiserv.TestUtil;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
-import ru.citeck.ecos.webapp.api.constants.AppName;
-import ru.citeck.ecos.webapp.lib.spring.context.api.rest.RecordsRestApi;
-import ru.citeck.ecos.webapp.lib.spring.context.records.RecordsServiceFactoryConfiguration;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.util.Map;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Roman Makarskiy
@@ -47,121 +36,81 @@ public class DashboardRecordControllerTest {
     private static final String RECORD_ID = "dashboard";
     private static final String RECORD_ID_AT = RECORD_ID + "@";
 
-    private MockMvc mockRecordsApi;
-
     @Autowired
     private ObjectMapper mapper;
 
     @Autowired
-    private RecordsServiceFactoryConfiguration factoryConfig;
+    private RecordsService recordsService;
 
-    @MockBean
-    private DashboardService mockDashboardService;
+    @Autowired
+    private DashboardService dashboardService;
 
     @BeforeEach
     public void setup() {
-        RecordsRestApi recordsApi = new RecordsRestApi(factoryConfig);
-        this.mockRecordsApi = MockMvcBuilders
-            .standaloneSetup(recordsApi)
-            .build();
+        dashboardService.getAllDashboards().forEach(d -> dashboardService.removeDashboard(d.getId()));
     }
 
     @Test
     public void query() throws Exception {
+
         final String id = UUID.randomUUID().toString();
-        String queryJson = "{\n" +
-            "  \"record\": \"" + RECORD_ID_AT + id + "\",\n" +
-            "  \"attributes\": {\n" +
-            "    \"key\": \"key\",\n" +
-            "    \"config\": \"config?json\"\n" +
-            "  }\n" +
-            "}";
 
-        when(mockDashboardService.getDashboardById(id))
-            .thenReturn(Optional.of(getTestDtoForQueryWithId(id)));
+        recordsService.mutate(RECORD_ID_AT, getTestDtoForQueryWithId(id));
 
-        mockRecordsApi.perform(
-                post(TestEntityRecordUtil.URL_RECORDS_QUERY)
-                    .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                    .content(queryJson))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id", is("uiserv/" + RECORD_ID_AT + id)))
-            .andExpect(jsonPath("$.attributes.config.menu.type", is("TOP")))
-            .andExpect(jsonPath("$.attributes.config.layout.columns[1].widgets[0].id",
-                is("some-test-widget-id")));
+        val atts = recordsService.getAtts(RECORD_ID_AT + id, Map.of(
+            "key", "key",
+            "config", "config?json"
+        ));
 
+        assertThat(atts.get("$.config.menu.type").asText()).isEqualTo("TOP");
+        assertThat(atts.get("$.config.layout.columns[1].widgets[0].id").asText())
+            .isEqualTo("some-test-widget-id");
     }
 
     @Test
     public void create() throws Exception {
         final String id = UUID.randomUUID().toString();
         String key = "test-dashboard";
-
-        String json = "{\n" +
-            "  \"records\": [\n" +
-            "  \t\t{\n" +
-            "  \t\t\t\"id\": \"" + RECORD_ID_AT + "\",\n" +
-            "  \t\t\t\"attributes\": {\n" +
-            "  \t\t\t\t\"key\": \"" + key + "\"\n" +
-            "  \t\t\t}\n" +
-            "  \t\t}\n" +
-            "  \t]\n" +
-            "}";
-
-        DashboardDto dto = new DashboardDto();
-
-        DashboardDto createdDto = new DashboardDto();
-        createdDto.setId(id);
-
-        when(mockDashboardService.saveDashboard(dto)).thenReturn(createdDto);
-
-        TestEntityRecordUtil.performMutateAndCheckResponseId(json,
-            AppName.UISERV + "/" + RECORD_ID_AT + id, mockRecordsApi);
+        val res = recordsService.mutate(RECORD_ID_AT, Map.of(
+            "id", id,
+            "key", key
+        ));
+        assertThat(res.getLocalId()).isEqualTo(id);
     }
 
     @Test
     public void delete() throws Exception {
-        final String id = UUID.randomUUID().toString();
-        String json = "{\n" +
-            "  \"records\": [\n" +
-            "  \t\t\"" + RECORD_ID_AT + id + "\"\n" +
-            "  \t]\n" +
-            "}";
 
-        mockRecordsApi.perform(
-                MockMvcRequestBuilders.post(TestEntityRecordUtil.URL_RECORDS_DELETE)
-                    .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                    .content(json))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.records[*]", hasSize(1)))
-            .andExpect(jsonPath("$.records[0].id", is(RECORD_ID_AT + id)));
+        final String id = UUID.randomUUID().toString();
+
+        String key = "test-dashboard";
+        recordsService.mutate(RECORD_ID_AT, Map.of(
+            "id", id,
+            "key", key
+        ));
+        assertThat(recordsService.getAtt(RECORD_ID_AT + id, "_notExists?bool").asBoolean()).isFalse();
+        recordsService.delete(RECORD_ID_AT + id);
+        assertThat(recordsService.getAtt(RECORD_ID_AT + id, "_notExists?bool").asBoolean()).isTrue();
     }
 
     @Test
     public void mutateNotExistsDashboard() {
+
         String nonExistsId = "some-non-exists-id";
-        String json = "{\n" +
-            "  \"records\": [\n" +
-            "    {\n" +
-            "      \"id\": \"" + RECORD_ID_AT + nonExistsId + "\",\n" +
-            "      \"attributes\": {\n" +
-            "         \"key\": \"new-key\"\n" +
-            "      }\n" +
-            "    }\n" +
-            "  ]\n" +
-            "}";
 
-        Throwable thrown = catchThrowable(() -> mockRecordsApi.perform(
-            post(TestEntityRecordUtil.URL_RECORDS_MUTATE)
-                .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(json)));
-
-        assertEquals("Dashboard with id '" + nonExistsId + "' is not found!", thrown.getCause().getMessage());
+        val exception = assertThrows(RuntimeException.class, () -> {
+                recordsService.mutate(
+                    RECORD_ID_AT + nonExistsId,
+                    Map.of("key", "new-key")
+                );
+            }
+        );
+        assertEquals("Dashboard with id '" + nonExistsId + "' is not found!", exception.getMessage());
     }
 
     private DashboardDto getTestDtoForQueryWithId(String id) throws IOException {
         DashboardDto dto = new DashboardDto();
-        dto.setTypeRef(RecordRef.create("emodel", "type", "main-dashboard"));
+        dto.setTypeRef(EntityRef.create("emodel", "type", "main-dashboard"));
         dto.setId(id);
 
         String configJson = "{\n" +

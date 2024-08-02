@@ -3,46 +3,44 @@ package ru.citeck.ecos.uiserv.domain.action.api.records;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
-import ecos.com.fasterxml.jackson210.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import kotlin.Unit;
 import lombok.Data;
+import lombok.val;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.json.YamlUtils;
+import ru.citeck.ecos.context.lib.i18n.I18nContext;
 import ru.citeck.ecos.events2.type.RecordEventsService;
 import ru.citeck.ecos.model.lib.type.repo.TypesRepo;
 import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils;
-import ru.citeck.ecos.records2.QueryContext;
-import ru.citeck.ecos.records2.RecordMeta;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
-import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
-import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
-import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
-import ru.citeck.ecos.records2.request.query.RecordsQuery;
-import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
 import ru.citeck.ecos.records2.request.result.RecordsResult;
-import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
-import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDao;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
 import ru.citeck.ecos.commons.utils.StringUtils;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.records3.record.atts.value.impl.EmptyAttValue;
+import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
+import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
+import ru.citeck.ecos.records3.record.dao.delete.DelStatus;
+import ru.citeck.ecos.records3.record.dao.delete.RecordsDeleteDao;
+import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao;
+import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
+import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.records3.record.request.RequestContext;
 import ru.citeck.ecos.uiserv.domain.action.service.ActionService;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto;
-import ru.citeck.ecos.uiserv.domain.utils.LegacyRecordsUtils;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
+
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,24 +49,21 @@ import java.util.stream.Collectors;
  * @author Roman Makarskiy
  */
 @Component
-public class ActionRecords extends LocalRecordsDao
-                           implements LocalRecordsQueryWithMetaDao<Object>,
-                                      LocalRecordsMetaDao<Object>,
-                                      MutableRecordsLocalDao<ActionRecords.ActionRecord> {
+public class ActionRecords extends AbstractRecordsDao
+    implements RecordsQueryDao,
+    RecordAttsDao,
+    RecordMutateDtoDao<ActionRecords.ActionRecord>, RecordsDeleteDao {
 
     private static final String RECORD_ACTIONS_TYPE = "record-actions";
 
     public static final String ID = "action";
 
-    private final RecordsService recordsService;
     private final ActionService actionService;
     private RecordEventsService recordEventsService;
     private final TypesRepo typesRepo;
 
     @Autowired
-    public ActionRecords(RecordsService recordsService, ActionService actionService, TypesRepo typesRepo) {
-        setId(ID);
-        this.recordsService = recordsService;
+    public ActionRecords(ActionService actionService, TypesRepo typesRepo) {
         this.actionService = actionService;
         this.typesRepo = typesRepo;
     }
@@ -83,63 +78,49 @@ public class ActionRecords extends LocalRecordsDao
         });
     }
 
+    @NotNull
     @Override
-    public RecordsDelResult delete(RecordsDeletion deletion) {
-        RecordsDelResult result = new RecordsDelResult();
-        for (EntityRef record : deletion.getRecords()) {
-            actionService.deleteAction(record.getLocalId());
-            result.addRecord(new RecordMeta(record));
+    public List<DelStatus> delete(@NotNull List<String> records) throws Exception {
+        records.forEach(actionService::deleteAction);
+        return records.stream().map(r -> DelStatus.OK).toList();
+    }
+
+    @Override
+    public ActionRecord getRecToMutate(@NotNull String recordId) throws Exception {
+        Object recordAtts = getRecordAtts(recordId);
+        if (!(recordAtts instanceof ActionRecord)) {
+            throw new RuntimeException("Action doesn't found: '" + recordId + "'");
         }
-        return result;
+        return (ActionRecord) recordAtts;
     }
 
+    @NotNull
     @Override
-    public List<ActionRecord> getValuesToMutate(List<EntityRef> records) {
-        List<Object> recordAtts = getLocalRecordsMeta(records, null);
-        List<ActionRecord> toMutate = new ArrayList<>();
-        for (int i = 0; i < records.size(); i++) {
-            Object atts = recordAtts.get(i);
-            if (!(atts instanceof ActionRecord)) {
-                throw new RuntimeException("Action doesn't found: '" + records.get(i) + "'");
-            }
-            toMutate.add((ActionRecord) atts);
+    public String saveMutatedRec(ActionRecord actionRecord) throws Exception {
+        actionService.updateAction(actionRecord);
+        return actionRecord.getId();
+    }
+
+    @Nullable
+    @Override
+    public Object getRecordAtts(@NotNull String recordId) throws Exception {
+
+        if (recordId.isEmpty()) {
+            return new ActionRecord();
         }
-        return toMutate;
+        ActionDto action = actionService.getAction(recordId);
+        if (action == null) {
+            return EmptyAttValue.INSTANCE;
+        }
+        if (action instanceof ActionRecord) {
+            return action;
+        }
+        return new ActionRecord(action);
     }
 
+    @Nullable
     @Override
-    public RecordsMutResult save(List<ActionRecord> values) {
-        RecordsMutResult result = new RecordsMutResult();
-        values.forEach(value -> {
-            actionService.updateAction(value);
-            result.addRecord(new RecordMeta(RecordRef.valueOf(value.getId())));
-        });
-        return result;
-    }
-
-    @Override
-    public List<Object> getLocalRecordsMeta(List<EntityRef> records, MetaField metaField) {
-        return records.stream()
-            .map(r -> {
-                if (r.getLocalId().isEmpty()) {
-                    return new ActionRecord();
-                }
-                return actionService.getAction(r.getLocalId());
-            })
-            .map(dto -> {
-                if (dto == null) {
-                    return EmptyAttValue.INSTANCE;
-                } else if (dto instanceof ActionRecord) {
-                    return dto;
-                } else {
-                    return new ActionRecord(dto);
-                }
-            })
-            .collect(Collectors.toList());
-    }
-
-    @Override
-    public RecordsQueryResult<Object> queryLocalRecords(RecordsQuery recordsQuery, MetaField metaField) {
+    public Object queryRecords(@NotNull RecordsQuery recordsQuery) throws Exception {
 
         ActionsQuery parsedQuery = null;
         if (StringUtils.isBlank(recordsQuery.getLanguage())) {
@@ -148,10 +129,10 @@ public class ActionRecords extends LocalRecordsDao
 
         if (parsedQuery == null) {
 
-            RecordsQueryResult<Object> result = new RecordsQueryResult<>();
+            RecsQueryRes<Object> result = new RecsQueryRes<>();
 
-            int max = recordsQuery.getMaxItems();
-            int skip = recordsQuery.getSkipCount();
+            int max = recordsQuery.getPage().getMaxItems();
+            int skip = recordsQuery.getPage().getSkipCount();
 
             List<ActionDto> actions;
 
@@ -163,7 +144,7 @@ public class ActionRecords extends LocalRecordsDao
                     predicate,
                     max,
                     skip,
-                    LegacyRecordsUtils.mapLegacySortBy(recordsQuery.getSortBy())
+                    recordsQuery.getSortBy()
                 );
                 result.setTotalCount(actionService.getCount(predicate));
 
@@ -217,7 +198,7 @@ public class ActionRecords extends LocalRecordsDao
             resultList.add(recordActions);
         }
 
-        RecordsQueryResult<Object> queryResult = new RecordsQueryResult<>();
+        RecsQueryRes<Object> queryResult = new RecsQueryRes<>();
         resultList.forEach(queryResult::addRecord);
 
         return queryResult;
@@ -227,35 +208,34 @@ public class ActionRecords extends LocalRecordsDao
 
         List<EntityRef> recordRefs = recordsInfo.stream().map(RecordInfo::getRecordRef).collect(Collectors.toList());
 
-        RecordsResult<RecordTypeMeta> recordsTypesResult = recordsService.getMeta(recordRefs, RecordTypeMeta.class);
-        List<RecordTypeMeta> recordTypes = recordsTypesResult.getRecords();
+        List<RecordTypeMeta> recordTypes = recordsService.getAtts(recordRefs, RecordTypeMeta.class);
 
         for (int i = 0; i < recordTypes.size(); i++) {
             String type = recordTypes.get(i).type;
             if (i < recordsInfo.size() && StringUtils.isNotBlank(type)) {
-                recordsInfo.get(i).setType(RecordRef.valueOf(type));
+                recordsInfo.get(i).setType(EntityRef.valueOf(type));
             }
         }
     }
 
     private void expandActionIds(List<RecordInfo> recordsInfo) {
 
-        Map<Set<RecordRef>, List<RecordInfo>> recordsByActionsList = new HashMap<>();
+        Map<Set<EntityRef>, List<RecordInfo>> recordsByActionsList = new HashMap<>();
 
         recordsInfo.forEach(info -> {
             if (info.getActionIds() != null && !info.getActionIds().isEmpty()) {
-                Set<RecordRef> key = new HashSet<>(info.getActionIds());
+                Set<EntityRef> key = new HashSet<>(info.getActionIds());
                 recordsByActionsList.computeIfAbsent(key, ids -> new ArrayList<>()).add(info);
             }
         });
 
         recordsByActionsList.forEach((actions, records) -> {
 
-            List<RecordRef> refs = records.stream()
+            List<EntityRef> refs = records.stream()
                 .map(RecordInfo::getRecordRef)
                 .collect(Collectors.toList());
 
-            Map<RecordRef, List<ActionDto>> actionsRes = actionService.getActions(refs, new ArrayList<>(actions));
+            Map<EntityRef, List<ActionDto>> actionsRes = actionService.getActions(refs, new ArrayList<>(actions));
 
             records.forEach(info -> {
 
@@ -263,10 +243,10 @@ public class ActionRecords extends LocalRecordsDao
 
                 recordActions.sort((a0, a1) -> {
 
-                    List<RecordRef> recordActionIds = info.getActionIds();
+                    List<EntityRef> recordActionIds = info.getActionIds();
 
-                    RecordRef rec0 = RecordRef.create("uiserv", "action", a0.getId());
-                    RecordRef rec1 = RecordRef.create("uiserv", "action", a1.getId());
+                    EntityRef rec0 = EntityRef.create("uiserv", "action", a0.getId());
+                    EntityRef rec1 = EntityRef.create("uiserv", "action", a1.getId());
 
                     int idx0 = recordActionIds.indexOf(rec0);
                     int idx1 = recordActionIds.indexOf(rec1);
@@ -292,9 +272,7 @@ public class ActionRecords extends LocalRecordsDao
         }
 
         List<EntityRef> typesRefs = new ArrayList<>(recordsByType.keySet());
-        RecordsResult<ActionsRefMeta> typesActionsResult = recordsService.getMeta(typesRefs, ActionsRefMeta.class);
-
-        List<ActionsRefMeta> typesActions = typesActionsResult.getRecords();
+        List<ActionsRefMeta> typesActions = recordsService.getAtts(typesRefs, ActionsRefMeta.class);
 
         for (int i = 0; i < typesActions.size(); i++) {
             ActionsRefMeta typeActions = typesActions.get(i);
@@ -306,16 +284,14 @@ public class ActionRecords extends LocalRecordsDao
     private void fillRecordActions(List<RecordInfo> recordsInfo) {
 
         List<EntityRef> recordsToQueryActions = recordsInfo.stream().filter(info ->
-                   info.getActionIds() == null
+            info.getActionIds() == null
                 || info.getResultActions() == null
                 || info.getResultActions()
-                       .stream()
-                       .anyMatch(a -> RECORD_ACTIONS_TYPE.equals(a.getType()))
+                .stream()
+                .anyMatch(a -> RECORD_ACTIONS_TYPE.equals(a.getType()))
         ).map(RecordInfo::getRecordRef).collect(Collectors.toList());
 
-        RecordsResult<ActionsDtoMeta> actionsResult = recordsService.getMeta(recordsToQueryActions,
-                                                                             ActionsDtoMeta.class);
-        List<ActionsDtoMeta> actions = actionsResult.getRecords();
+        List<ActionsDtoMeta> actions = recordsService.getAtts(recordsToQueryActions, ActionsDtoMeta.class);
 
         for (int i = 0; i < actions.size(); i++) {
             if (i < recordsToQueryActions.size()) {
@@ -348,6 +324,12 @@ public class ActionRecords extends LocalRecordsDao
         return filteredActions;
     }
 
+    @NotNull
+    @Override
+    public String getId() {
+        return ID;
+    }
+
     @Autowired(required = false)
     public void setRecordEventsService(RecordEventsService recordEventsService) {
         this.recordEventsService = recordEventsService;
@@ -378,13 +360,13 @@ public class ActionRecords extends LocalRecordsDao
     @Data
     public static class ActionsRefMeta {
         @AttName("_actions[]?str")
-        private List<RecordRef> actions;
+        private List<EntityRef> actions;
     }
 
     @Data
     public static class ActionsQuery {
         private List<JsonNode> records;
-        private List<RecordRef> actions;
+        private List<EntityRef> actions;
     }
 
     @Data
@@ -399,26 +381,26 @@ public class ActionRecords extends LocalRecordsDao
     @Data
     private static class RecordInfo {
 
-        private final RecordRef recordRef;
-        private final RecordRef originalRecordRef;
+        private final EntityRef recordRef;
+        private final EntityRef originalRecordRef;
 
-        private RecordRef type = RecordRef.EMPTY;
+        private EntityRef type = EntityRef.EMPTY;
 
         private List<ActionDto> recordActions = Collections.emptyList();
         private List<ActionDto> resultActions = Collections.emptyList();
 
-        private List<RecordRef> actionIds;
+        private List<EntityRef> actionIds;
 
         public RecordInfo(JsonNode record) {
 
             if (record instanceof TextNode) {
-                originalRecordRef = RecordRef.valueOf(record.asText());
+                originalRecordRef = EntityRef.valueOf(record.asText());
             } else if (record instanceof ObjectNode) {
-                originalRecordRef = RecordRef.valueOf(record.get("record").asText());
+                originalRecordRef = EntityRef.valueOf(record.get("record").asText());
                 if (record.has("actions")) {
                     actionIds = new ArrayList<>();
                     record.get("actions").forEach(action ->
-                        actionIds.add(RecordRef.valueOf(action.asText()))
+                        actionIds.add(EntityRef.valueOf(action.asText()))
                     );
                 }
             } else {
@@ -428,13 +410,13 @@ public class ActionRecords extends LocalRecordsDao
             if (!originalRecordRef.getAppName().isEmpty()) {
                 recordRef = originalRecordRef;
             } else {
-                recordRef = originalRecordRef.addAppName("alfresco");
+                recordRef = originalRecordRef.withAppName("alfresco");
             }
         }
 
         private void setRecordActions(List<RecordActionDto> actions) {
 
-            if (actions != null && actions.size() > 0) {
+            if (actions != null && !actions.isEmpty()) {
 
                 recordActions = actions.stream().map(a -> {
                     ActionDto module = new ActionDto();
@@ -456,7 +438,7 @@ public class ActionRecords extends LocalRecordsDao
             if (text == null) {
                 text = "null";
             }
-            return MLText.EMPTY.withValue(RequestContext.getLocale(), text);
+            return MLText.EMPTY.withValue(I18nContext.getLocale(), text);
         }
     }
 
@@ -480,12 +462,12 @@ public class ActionRecords extends LocalRecordsDao
         @AttName("?disp")
         public String getDisplayName() {
             MLText mlName = getName();
-            String name = mlName != null ? mlName.getClosestValue(QueryContext.getCurrent().getLocale()) : null;
+            String name = mlName != null ? mlName.getClosestValue(I18nContext.getLocale()) : null;
             return StringUtils.defaultString(name, "Action");
         }
 
-        public RecordRef getEcosType() {
-            RecordRef typeRef = TypeUtils.getTypeRef("ui-action/" + this.getType());
+        public EntityRef getEcosType() {
+            EntityRef typeRef = TypeUtils.getTypeRef("ui-action/" + this.getType());
             if (typesRepo.getTypeInfo(typeRef) != null) {
                 return typeRef;
             }
@@ -502,7 +484,6 @@ public class ActionRecords extends LocalRecordsDao
         }
 
         @JsonValue
-        @com.fasterxml.jackson.annotation.JsonValue
         public ActionDto toJson() {
             return new ActionDto(this);
         }

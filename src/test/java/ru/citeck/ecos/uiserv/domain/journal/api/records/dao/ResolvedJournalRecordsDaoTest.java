@@ -1,6 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.journal.api.records.dao;
 
-import ecos.com.fasterxml.jackson210.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.LocaleUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,6 @@ import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.record.atts.dto.RecordAtts;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
@@ -23,6 +22,7 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedColumnDef;
 import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedJournalDef;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef;
 import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry;
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
@@ -86,10 +86,10 @@ public class ResolvedJournalRecordsDaoTest {
         journalRepository.save(journalEntity);
 
         ResolvedJournalDef recordAtts = (ResolvedJournalDef) testDao.getRecordAtts(journalEntity.getExtId());
-        List<RecordRef> expected = Collections.singletonList(
-            RecordRef.valueOf("uiserv/action@journal$simple-journal$group-action-def")
+        List<EntityRef> expected = Collections.singletonList(
+            EntityRef.valueOf("uiserv/action@journal$simple-journal$group-action-def")
         );
-        List<RecordRef> actionsList = recordAtts.getJournalDef().getActions();
+        List<EntityRef> actionsList = recordAtts.getJournalDef().getActions();
         assertThat(actionsList).isEqualTo(expected);
     }
 
@@ -101,11 +101,11 @@ public class ResolvedJournalRecordsDaoTest {
         journalRepository.save(journalEntity);
 
         ResolvedJournalDef recordAtts = (ResolvedJournalDef) testDao.getRecordAtts(journalEntity.getExtId());
-        List<RecordRef> expected = Arrays.asList(
-            RecordRef.valueOf("uiserv/action@edit"),
-            RecordRef.valueOf("uiserv/action@delete")
+        List<EntityRef> expected = Arrays.asList(
+            EntityRef.valueOf("uiserv/action@edit"),
+            EntityRef.valueOf("uiserv/action@delete")
         );
-        List<RecordRef> actionsList = recordAtts.getJournalDef().getActions();
+        List<EntityRef> actionsList = recordAtts.getJournalDef().getActions();
         assertThat(actionsList).isEqualTo(expected);
     }
 
@@ -117,12 +117,12 @@ public class ResolvedJournalRecordsDaoTest {
         journalRepository.save(journalEntity);
 
         ResolvedJournalDef recordAtts = (ResolvedJournalDef) testDao.getRecordAtts(journalEntity.getExtId());
-        List<RecordRef> expected = Arrays.asList(
-            RecordRef.valueOf("uiserv/action@ecos-module-download"),
-            RecordRef.valueOf("uiserv/action@edit"),
-            RecordRef.valueOf("uiserv/action@module-copy")
+        List<EntityRef> expected = Arrays.asList(
+            EntityRef.valueOf("uiserv/action@ecos-module-download"),
+            EntityRef.valueOf("uiserv/action@edit"),
+            EntityRef.valueOf("uiserv/action@module-copy")
         );
-        List<RecordRef> actionsList = recordAtts.getJournalDef().getActions();
+        List<EntityRef> actionsList = recordAtts.getJournalDef().getActions();
         assertThat(actionsList).isEqualTo(expected);
     }
 
@@ -134,10 +134,10 @@ public class ResolvedJournalRecordsDaoTest {
         journalRepository.save(journalEntity);
 
         ResolvedJournalDef recordAtts = (ResolvedJournalDef) testDao.getRecordAtts(journalEntity.getExtId());
-        List<RecordRef> expected = Collections.singletonList(
-            RecordRef.valueOf("uiserv/action@journal$simple-journal$group-action-def")
+        List<EntityRef> expected = Collections.singletonList(
+            EntityRef.valueOf("uiserv/action@journal$simple-journal$group-action-def")
         );
-        List<RecordRef> actionsList = recordAtts.getJournalDef().getActions();
+        List<EntityRef> actionsList = recordAtts.getJournalDef().getActions();
         assertThat(actionsList).isEqualTo(expected);
     }
 
@@ -149,8 +149,8 @@ public class ResolvedJournalRecordsDaoTest {
         journalRepository.save(journalEntity);
 
         ResolvedJournalDef recordAtts = (ResolvedJournalDef) testDao.getRecordAtts(journalEntity.getExtId());
-        List<RecordRef> expected = Collections.emptyList();
-        List<RecordRef> actionsList = recordAtts.getJournalDef().getActions();
+        List<EntityRef> expected = Collections.emptyList();
+        List<EntityRef> actionsList = recordAtts.getJournalDef().getActions();
         assertThat(actionsList).isEqualTo(expected);
     }
 
@@ -162,12 +162,12 @@ public class ResolvedJournalRecordsDaoTest {
         journalRepository.save(journalEntity);
 
         ResolvedJournalDef recordAtts = (ResolvedJournalDef) testDao.getRecordAtts(journalEntity.getExtId());
-        List<RecordRef> expected = Arrays.asList(
-            RecordRef.valueOf("uiserv/action@ecos-module-download"),
-            RecordRef.valueOf("uiserv/action@edit"),
-            RecordRef.valueOf("uiserv/action@module-copy")
+        List<EntityRef> expected = Arrays.asList(
+            EntityRef.valueOf("uiserv/action@ecos-module-download"),
+            EntityRef.valueOf("uiserv/action@edit"),
+            EntityRef.valueOf("uiserv/action@module-copy")
         );
-        List<RecordRef> actionsList = recordAtts.getJournalDef().getActions();
+        List<EntityRef> actionsList = recordAtts.getJournalDef().getActions();
         assertThat(actionsList).isEqualTo(expected);
     }
 
@@ -179,12 +179,12 @@ public class ResolvedJournalRecordsDaoTest {
         journalRepository.save(journalEntity);
 
         ResolvedJournalDef recordAtts = (ResolvedJournalDef) testDao.getRecordAtts(journalEntity.getExtId());
-        List<RecordRef> expected = Arrays.asList(
-            RecordRef.valueOf("uiserv/action@journal$simple-journal$group-action-def"),
-            RecordRef.valueOf("uiserv/action@edit"),
-            RecordRef.valueOf("uiserv/action@delete")
+        List<EntityRef> expected = Arrays.asList(
+            EntityRef.valueOf("uiserv/action@journal$simple-journal$group-action-def"),
+            EntityRef.valueOf("uiserv/action@edit"),
+            EntityRef.valueOf("uiserv/action@delete")
         );
-        List<RecordRef> actionsList = recordAtts.getJournalDef().getActions();
+        List<EntityRef> actionsList = recordAtts.getJournalDef().getActions();
         assertThat(actionsList).isEqualTo(expected);
     }
 
@@ -196,11 +196,11 @@ public class ResolvedJournalRecordsDaoTest {
         journalRepository.save(journalEntity);
 
         ResolvedJournalDef recordAtts = (ResolvedJournalDef) testDao.getRecordAtts(journalEntity.getExtId());
-        List<RecordRef> expected = Arrays.asList(
-            RecordRef.valueOf("uiserv/action@edit"),
-            RecordRef.valueOf("uiserv/action@delete")
+        List<EntityRef> expected = Arrays.asList(
+            EntityRef.valueOf("uiserv/action@edit"),
+            EntityRef.valueOf("uiserv/action@delete")
         );
-        List<RecordRef> actionsList = recordAtts.getJournalDef().getActions();
+        List<EntityRef> actionsList = recordAtts.getJournalDef().getActions();
         assertThat(actionsList).isEqualTo(expected);
     }
 
@@ -212,13 +212,13 @@ public class ResolvedJournalRecordsDaoTest {
         journalRepository.save(journalEntity);
 
         ResolvedJournalDef recordAtts = (ResolvedJournalDef) testDao.getRecordAtts(journalEntity.getExtId());
-        List<RecordRef> expected = Arrays.asList(
-            RecordRef.valueOf("uiserv/action@ecos-module-download"),
-            RecordRef.valueOf("uiserv/action@edit"),
-            RecordRef.valueOf("uiserv/action@module-copy"),
-            RecordRef.valueOf("uiserv/action@delete")
+        List<EntityRef> expected = Arrays.asList(
+            EntityRef.valueOf("uiserv/action@ecos-module-download"),
+            EntityRef.valueOf("uiserv/action@edit"),
+            EntityRef.valueOf("uiserv/action@module-copy"),
+            EntityRef.valueOf("uiserv/action@delete")
         );
-        List<RecordRef> actionsList = recordAtts.getJournalDef().getActions();
+        List<EntityRef> actionsList = recordAtts.getJournalDef().getActions();
         assertThat(actionsList).isEqualTo(expected);
     }
 
@@ -232,7 +232,7 @@ public class ResolvedJournalRecordsDaoTest {
 
         // Mock recordsService
         RecordsService recordsServiceMock = mock(RecordsService.class);
-        when(recordsServiceMock.getAtts(eq(RecordRef.valueOf("alfresco/@")), anyMap()))
+        when(recordsServiceMock.getAtts(eq(EntityRef.valueOf("alfresco/@")), anyMap()))
             .thenReturn(colsAtts);
 
         // Set recordsServiceMock in testDao

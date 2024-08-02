@@ -2,7 +2,6 @@ package ru.citeck.ecos.uiserv.domain.form
 
 import org.junit.jupiter.api.BeforeEach
 import org.mockito.Mockito
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.RecordsServiceFactory
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
@@ -10,6 +9,7 @@ import ru.citeck.ecos.uiserv.domain.form.api.records.EcosFormRecordsDao
 import ru.citeck.ecos.uiserv.domain.form.api.records.EcosResolvedFormRecordsDao
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormServiceImpl
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 
 abstract class FormsTestBase {
@@ -17,13 +17,13 @@ abstract class FormsTestBase {
     lateinit var recordsService: RecordsService
     lateinit var ecosFormService: EcosFormService
 
-    var types: MutableMap<RecordRef, TypeDef> = HashMap()
-    var typeByForm: MutableMap<RecordRef, RecordRef> = HashMap()
+    var types: MutableMap<EntityRef, TypeDef> = HashMap()
+    var typeByForm: MutableMap<EntityRef, EntityRef> = HashMap()
 
     @BeforeEach
     fun before() {
         val services = RecordsServiceFactory()
-        recordsService = services.recordsServiceV1
+        recordsService = services.recordsService
         ecosFormService = EcosFormServiceImpl(FormsEntityInMemDao(services.predicateService), services.recordsService)
 
         val formsRecordsDao = EcosFormRecordsDao(ecosFormService, null)

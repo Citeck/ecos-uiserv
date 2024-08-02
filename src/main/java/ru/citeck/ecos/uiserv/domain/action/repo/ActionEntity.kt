@@ -1,9 +1,9 @@
 package ru.citeck.ecos.uiserv.domain.action.repo
 
+import jakarta.persistence.*
 import ru.citeck.ecos.uiserv.app.common.repo.AbstractAuditingEntity
 import ru.citeck.ecos.uiserv.domain.evaluator.repo.EvaluatorEntity
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @Table(name = "actions")

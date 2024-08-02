@@ -38,9 +38,9 @@ public class ResolvedBoardRecordsDao extends AbstractRecordsDao implements Recor
     @Nullable
     @Override
     public ResolvedBoardRecord getRecordAtts(@NotNull String localBoardId) {
-        BoardRecord board = recordsDao.getRecordAtts(localBoardId);
-        if (board != null) {
-            return new ResolvedBoardRecord(board.getBoardDef(), ecosTypeService);
+        Object board = recordsDao.getRecordAtts(localBoardId);
+        if (board instanceof BoardRecord boardRec) {
+            return new ResolvedBoardRecord(boardRec.getBoardDef(), ecosTypeService);
         }
         return null;
     }

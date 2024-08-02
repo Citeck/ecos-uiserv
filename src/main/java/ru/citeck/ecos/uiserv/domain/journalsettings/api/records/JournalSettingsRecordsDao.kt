@@ -1,6 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.journalsettings.api.records
 
-import ecos.com.fasterxml.jackson210.annotation.JsonValue
+import com.fasterxml.jackson.annotation.JsonValue
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
@@ -114,7 +114,6 @@ class JournalSettingsRecordsDao(
         }
 
         @JsonValue
-        @com.fasterxml.jackson.annotation.JsonValue
         fun toNonDefaultJson(): Any {
             return Json.mapper.toNonDefaultJson(originalDto.entity)
         }

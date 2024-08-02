@@ -1,19 +1,16 @@
 package ru.citeck.ecos.uiserv.domain.i18n.service;
 
-import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.utils.MandatoryParam;
-import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.i18n.repo.I18nEntity;
@@ -21,9 +18,8 @@ import ru.citeck.ecos.uiserv.domain.i18n.dto.I18nDto;
 import ru.citeck.ecos.uiserv.domain.i18n.repo.I18nRepository;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory;
-import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactoryImpl;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -213,8 +209,8 @@ public class I18nService implements MessageResolver {
             int finLocIdx = localeIdx;
             dto.getMessages().forEach((key, msgs) -> {
                 String message = msgs.size() > finLocIdx ? msgs.get(finLocIdx) : null;
-                if (message == null && msgs.size() > 0 && !messages.containsKey(key)) {
-                    message = msgs.get(0);
+                if (message == null && !msgs.isEmpty() && !messages.containsKey(key)) {
+                    message = msgs.getFirst();
                 }
                 if (StringUtils.isNotBlank(message)) {
                     messages.put(key, message);

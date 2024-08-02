@@ -2,7 +2,7 @@ package ru.citeck.ecos.uiserv.domain.menu.service.resolving.resolvers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.citeck.ecos.records2.RecordsService;
+import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.uiserv.domain.menu.service.resolving.ResolvedMenuItemDto;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService;
 

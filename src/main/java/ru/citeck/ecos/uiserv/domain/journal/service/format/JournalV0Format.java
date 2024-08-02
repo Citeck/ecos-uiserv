@@ -82,8 +82,8 @@ public class JournalV0Format {
             if (cv.getRecordRef().getSourceId().equals("dict")) {
                 variant.setType(cv.getRecordRef().getId());
             }
-            variant.setFormId(RecordRef.toString(cv.getFormRef()));
-            variant.setRecordRef(RecordRef.toString(cv.getRecordRef()));
+            variant.setFormId(EntityRef.toString(cv.getFormRef()));
+            variant.setRecordRef(EntityRef.toString(cv.getRecordRef()));
             variant.setTitle(MLText.getClosestValue(cv.getName(), locale));
             variant.setCanCreate(true);
             variant.setAttributes(cv.getAttributes());

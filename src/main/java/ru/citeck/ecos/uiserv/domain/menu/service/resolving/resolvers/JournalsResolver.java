@@ -1,17 +1,16 @@
 package ru.citeck.ecos.uiserv.domain.menu.service.resolving.resolvers;
 
+import kotlin.Unit;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.context.i18n.LocaleContextHolder;
-import ru.citeck.ecos.commons.data.MLText;
-import ru.citeck.ecos.records2.RecordsService;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
+import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
-import ru.citeck.ecos.records2.request.query.QueryConsistency;
-import ru.citeck.ecos.records2.request.query.RecordsQuery;
-import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.Consistency;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
+import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.uiserv.domain.menu.service.resolving.ResolvedMenuItemDto;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService;
 
@@ -94,14 +93,15 @@ public class JournalsResolver {
         if (journalList == null || journalList.equals(""))
             return Collections.emptyList();
 
-        RecordsQuery query = new RecordsQuery();
-        query.setSourceId("alfresco/");
-        query.setQuery(String.format("TYPE:\"journal:journalsList\" AND =cm:name:\"%s\"",
-            journalList));
-        query.setLanguage("fts-alfresco");
-        query.setConsistency(QueryConsistency.TRANSACTIONAL);
+        RecordsQuery query = RecordsQuery.create(b -> {
+            b.withSourceId("alfresco/");
+            b.withQuery(String.format("TYPE:\"journal:journalsList\" AND =cm:name:\"%s\"", journalList));
+            b.withLanguage("fts-alfresco");
+            b.withConsistency(Consistency.TRANSACTIONAL);
+            return Unit.INSTANCE;
+        });
 
-        RecordsQueryResult<JournalListAtts> result = recordsService.queryRecords(query, JournalListAtts.class);
+        RecsQueryRes<JournalListAtts> result = recordsService.query(query, JournalListAtts.class);
         List<JournalAtts> journals = result.getRecords()
             .stream()
             .flatMap(journalListAtts -> journalListAtts.getJournals().stream())

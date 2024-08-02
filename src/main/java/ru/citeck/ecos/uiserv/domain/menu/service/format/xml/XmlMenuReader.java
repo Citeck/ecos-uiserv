@@ -4,17 +4,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemActionDef;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDef;
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef;
 import ru.citeck.ecos.uiserv.domain.menu.service.format.MenuReader;
 import ru.citeck.ecos.uiserv.domain.menu.service.format.xml.xml.*;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -108,7 +108,7 @@ public class XmlMenuReader implements MenuReader {
         if (item.getLabel() != null) {
             dto.withLabel(new MLText(item.getLabel()));
         }
-        dto.withIcon(RecordRef.valueOf(item.getIcon()));
+        dto.withIcon(EntityRef.valueOf(item.getIcon()));
 
         if (item.getAction() != null) {
             dto.withAction(actionDtoFromAction(item.getAction()));

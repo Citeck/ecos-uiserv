@@ -11,7 +11,6 @@ import ru.citeck.ecos.config.lib.provider.InMemConfigProvider
 import ru.citeck.ecos.config.lib.records.CfgRecordsDao
 import ru.citeck.ecos.config.lib.service.EcosConfigServiceFactory
 import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.RecordsServiceFactory
 import ru.citeck.ecos.test.commons.EcosWebAppApiMock
@@ -26,6 +25,7 @@ import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService
 import ru.citeck.ecos.uiserv.domain.menu.service.format.MenuReaderService
 import ru.citeck.ecos.webapp.api.EcosWebAppApi
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import java.util.concurrent.ConcurrentHashMap
 
@@ -54,7 +54,7 @@ open class MenuTestBase {
             }
         }
 
-        records = recordsServices.recordsServiceV1
+        records = recordsServices.recordsService
         val configServiceFactory = EcosConfigServiceFactory()
         configs = configServiceFactory.inMemConfigProvider
         records.register(CfgRecordsDao(configServiceFactory))
@@ -73,9 +73,9 @@ open class MenuTestBase {
 
         val ecosTypeService = Mockito.mock(EcosTypeService::class.java)
 
-        Mockito.`when`(ecosTypeService.getTypeInfo(Mockito.any(RecordRef::class.java))).thenAnswer {
-            val typeRef: RecordRef = it.getArgument(0)
-            typesInfo[typeRef.id]
+        Mockito.`when`(ecosTypeService.getTypeInfo(Mockito.any(EntityRef::class.java))).thenAnswer {
+            val typeRef: EntityRef = it.getArgument(0)
+            typesInfo[typeRef.getLocalId()]
         }
         Mockito.`when`(ecosTypeService.getTypeRefByJournal(Mockito.any())).thenAnswer { invocation ->
             typesInfo.values.firstOrNull {

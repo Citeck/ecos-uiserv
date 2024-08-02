@@ -1,13 +1,13 @@
 package ru.citeck.ecos.uiserv.domain.form.api.records
 
-import org.apache.commons.collections.CollectionUtils
-import org.apache.commons.lang.StringUtils
+import jakarta.annotation.PostConstruct
+import org.apache.commons.collections4.CollectionUtils
+import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.annotation.Secured
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.context.lib.auth.AuthRole
 import ru.citeck.ecos.events2.type.RecordEventsService
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.PredicateUtils
 import ru.citeck.ecos.records2.predicate.model.AttributePredicate
@@ -29,7 +29,6 @@ import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.util.*
 import java.util.stream.Collectors
-import javax.annotation.PostConstruct
 
 @Component
 class EcosFormRecordsDao(
@@ -126,7 +125,7 @@ class EcosFormRecordsDao(
         } else if (recsQuery.language == QUERY_LANG_FORMS_FOR_TYPE) {
 
             val formsForTypeQuery = recsQuery.getQuery(FormsForTypeQuery::class.java)
-            if (RecordRef.isEmpty(formsForTypeQuery.typeRef)) {
+            if (EntityRef.isEmpty(formsForTypeQuery.typeRef)) {
                 return result
             }
             result.addRecords(
@@ -241,12 +240,12 @@ class EcosFormRecordsDao(
     data class Query(
         val formKey: String? = null,
         val formKeys: List<String?>? = null,
-        val record: RecordRef? = null,
+        val record: EntityRef? = null,
         val isViewMode: Boolean? = null
     )
 
     data class FormsForTypeQuery(
-        val typeRef: RecordRef? = null
+        val typeRef: EntityRef? = null
     )
 
     data class FormsForMobileTasksQuery(

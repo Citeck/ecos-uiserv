@@ -5,11 +5,11 @@ import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json.mapper
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.uiserv.domain.journal.dto.*
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 @Component
 @Slf4j
@@ -25,15 +25,15 @@ class JournalMapper(
             .withId(entity.extId)
             .withEditable(entity.editable)
             .withSourceId(entity.sourceId)
-            .withMetaRecord(RecordRef.valueOf(entity.metaRecord))
+            .withMetaRecord(EntityRef.valueOf(entity.metaRecord))
             .withName(mapper.read(entity.name, MLText::class.java))
-            .withTypeRef(RecordRef.valueOf(entity.typeRef))
+            .withTypeRef(EntityRef.valueOf(entity.typeRef))
             .withPredicate(mapper.read(entity.predicate, Predicate::class.java))
             .withDefaultFilters(mapper.readList(entity.defaultFilters, Predicate::class.java))
             .withQueryData(mapper.read(entity.queryData, ObjectData::class.java))
             .withSearchConfig(mapper.read(entity.searchConfig, JournalSearchConfig::class.java))
             .withActionsFromType(entity.actionsFromType)
-            .withActions(mapper.readList(entity.actions, RecordRef::class.java))
+            .withActions(mapper.readList(entity.actions, EntityRef::class.java))
             .withActionsDef(mapper.readList(entity.actionsDef, JournalActionDef::class.java))
             .withProperties(mapper.read(entity.attributes, ObjectData::class.java))
             .withGroupBy(mapper.readList(entity.groupBy, String::class.java))
@@ -64,7 +64,7 @@ class JournalMapper(
         entity.columns = mapper.toString(journal.columns.map { mapper.toNonDefaultJson(it) })!!
         entity.editable = journal.editable
         entity.name = mapper.toString(journal.name)
-        entity.typeRef = RecordRef.toString(journal.typeRef)
+        entity.typeRef = EntityRef.toString(journal.typeRef)
         entity.predicate = mapper.toString(journal.predicate)
         entity.defaultFilters = mapper.toString(journal.defaultFilters)
         entity.queryData = mapper.toString(journal.queryData)

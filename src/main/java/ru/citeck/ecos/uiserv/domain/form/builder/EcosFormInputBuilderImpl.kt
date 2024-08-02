@@ -3,7 +3,7 @@ package ru.citeck.ecos.uiserv.domain.form.builder
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
-import ru.citeck.ecos.records2.RecordRef
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 open class EcosFormInputBuilderImpl<T>(
     type: EcosFormInputType,
@@ -39,10 +39,10 @@ open class EcosFormInputBuilderImpl<T>(
             EcosFormInputType.JOURNAL -> {
                 if (config.has(TYPE_REF)) {
                     val journalRef = context.getJournalRefByType(
-                        config[TYPE_REF].getAs(RecordRef::class.java) ?: RecordRef.EMPTY
+                        config[TYPE_REF].getAs(EntityRef::class.java) ?: EntityRef.EMPTY
                     )
-                    if (RecordRef.isNotEmpty(journalRef)) {
-                        data[JOURNAL_ID] = journalRef.id
+                    if (EntityRef.isNotEmpty(journalRef)) {
+                        data[JOURNAL_ID] = journalRef.getLocalId()
                     }
                 }
                 if (!data.has(JOURNAL_ID)) {

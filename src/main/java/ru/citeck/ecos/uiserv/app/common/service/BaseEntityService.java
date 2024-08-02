@@ -1,6 +1,6 @@
 package ru.citeck.ecos.uiserv.app.common.service;
 
-import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,5 +26,5 @@ public interface BaseEntityService<T> {
 
     Optional<T> getByKeys(String type, List<String> keys, String user);
 
-    Optional<T> getByRecord(RecordRef recordRef);
+    Optional<T> getByRecord(EntityRef recordRef);
 }

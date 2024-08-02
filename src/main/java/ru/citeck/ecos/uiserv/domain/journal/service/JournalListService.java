@@ -13,11 +13,11 @@ import ru.citeck.ecos.uiserv.domain.file.repo.FileVersion;
 import ru.citeck.ecos.uiserv.domain.file.repo.FileRepository;
 import ru.citeck.ecos.uiserv.domain.file.service.FileService;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.From;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.From;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;

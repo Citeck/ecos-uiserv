@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.icon.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
 import ru.citeck.ecos.commons.data.ObjectData;

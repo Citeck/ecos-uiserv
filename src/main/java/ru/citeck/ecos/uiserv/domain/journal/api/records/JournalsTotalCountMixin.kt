@@ -1,8 +1,8 @@
 package ru.citeck.ecos.uiserv.domain.journal.api.records
 
+import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.ObjectData
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
@@ -14,7 +14,7 @@ import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.mixin.AttMixin
 import ru.citeck.ecos.webapp.api.EcosWebAppApi
 import ru.citeck.ecos.webapp.api.constants.AppName
-import javax.annotation.PostConstruct
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 @Component
 class JournalsTotalCountMixin(
@@ -73,14 +73,14 @@ class JournalsTotalCountMixin(
     override fun getProvidedAtts() = PROVIDED_ATTS
 
     private fun getAppName(sourceId: String): String {
-        if (sourceId.indexOf(RecordRef.APP_NAME_DELIMITER) == -1) {
+        if (sourceId.indexOf(EntityRef.APP_NAME_DELIMITER) == -1) {
             return AppName.ALFRESCO
         }
-        return sourceId.substringBefore(RecordRef.APP_NAME_DELIMITER)
+        return sourceId.substringBefore(EntityRef.APP_NAME_DELIMITER)
     }
 
     private fun isAlfrescoNodeSourceIdWithEmptyPredicate(sourceId: String, predicate: Predicate?): Boolean {
-        return sourceId == AppName.ALFRESCO + RecordRef.APP_NAME_DELIMITER &&
+        return sourceId == AppName.ALFRESCO + EntityRef.APP_NAME_DELIMITER &&
             (predicate == null || predicate == VoidPredicate.INSTANCE)
     }
 }

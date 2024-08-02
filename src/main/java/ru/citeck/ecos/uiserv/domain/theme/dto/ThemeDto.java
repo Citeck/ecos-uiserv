@@ -3,7 +3,7 @@ package ru.citeck.ecos.uiserv.domain.theme.dto;
 import lombok.Data;
 import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.data.MLText;
-import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +12,7 @@ import java.util.Map;
 public class ThemeDto {
 
     private String id;
-    private RecordRef parentRef;
+    private EntityRef parentRef;
     private MLText name;
     private Map<String, String> images = new HashMap<>();
     private Map<String, byte[]> resources = new HashMap<>();

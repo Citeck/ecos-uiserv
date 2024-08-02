@@ -2,7 +2,7 @@ package ru.citeck.ecos.uiserv.domain.journal.service.type;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef;

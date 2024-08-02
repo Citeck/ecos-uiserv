@@ -12,19 +12,19 @@ import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.context.lib.auth.AuthContext;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardEntity;
 import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardRepository;
 import ru.citeck.ecos.webapp.api.constants.AppName;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
@@ -72,8 +72,8 @@ public class DashboardService {
         return repo.findByExtId(id).map(this::mapToDto);
     }
 
-    public Optional<DashboardDto> getForAuthority(RecordRef recordRef,
-                                                  RecordRef type,
+    public Optional<DashboardDto> getForAuthority(EntityRef recordRef,
+                                                  EntityRef type,
                                                   String user,
                                                   String scope,
                                                   boolean expandType,
@@ -138,8 +138,8 @@ public class DashboardService {
         repo.findByExtId(id).ifPresent(repo::delete);
     }
 
-    private Optional<DashboardEntity> getEntityForUser(RecordRef recordRef,
-                                                       RecordRef type,
+    private Optional<DashboardEntity> getEntityForUser(EntityRef recordRef,
+                                                       EntityRef type,
                                                        String user,
                                                        @NotNull String scope,
                                                        boolean expandType,
@@ -153,10 +153,10 @@ public class DashboardService {
             .collect(Collectors.toList());
 
         List<DashboardEntity> dashboards;
-        if (!RecordRef.isEmpty(recordRef)) {
+        if (!EntityRef.isEmpty(recordRef)) {
 
             if (recordRef.getAppName().isEmpty()) {
-                recordRef = recordRef.addAppName(AppName.ALFRESCO);
+                recordRef = recordRef.withAppName(AppName.ALFRESCO);
             }
 
             dashboards = findDashboardsByRecordRef(recordRef.toString(), authorities, scope, includeForAll);
@@ -169,7 +169,7 @@ public class DashboardService {
 
         if (dashboards.isEmpty() && expandType) {
 
-            ExpandedTypeMeta typeMeta = recordsService.getMeta(type, ExpandedTypeMeta.class);
+            ExpandedTypeMeta typeMeta = recordsService.getAtts(type, ExpandedTypeMeta.class);
             for (ParentMeta parent : typeMeta.getParents()) {
                 if (!Objects.equals(parent.inhDashboardType, typeMeta.inhDashboardType)) {
                     return Optional.empty();
@@ -240,8 +240,8 @@ public class DashboardService {
         dto.setConfig(Json.getMapper().read(entity.getConfig(), ObjectData.class));
         dto.setPriority(entity.getPriority());
         dto.setScope(StringUtils.defaultString(entity.getScope()));
-        dto.setTypeRef(RecordRef.valueOf(entity.getTypeRef()));
-        dto.setAppliedToRef(RecordRef.valueOf(entity.getAppliedToRef()));
+        dto.setTypeRef(EntityRef.valueOf(entity.getTypeRef()));
+        dto.setAppliedToRef(EntityRef.valueOf(entity.getAppliedToRef()));
 
         return dto;
     }
@@ -251,24 +251,24 @@ public class DashboardService {
 
         Optional<DashboardEntity> optEntity;
         String authority = getAuthorityFromDto(dto);
-        RecordRef recordRef = dto.getAppliedToRef();
+        EntityRef recordRef = dto.getAppliedToRef();
 
-        if (RecordRef.isNotEmpty(recordRef) && recordRef.getAppName().isEmpty()) {
-            recordRef = recordRef.addAppName(AppName.ALFRESCO);
+        if (EntityRef.isNotEmpty(recordRef) && recordRef.getAppName().isEmpty()) {
+            recordRef = recordRef.withAppName(AppName.ALFRESCO);
         }
 
-        if (RecordRef.isEmpty(dto.getTypeRef()) && RecordRef.isEmpty(dto.getAppliedToRef())) {
+        if (EntityRef.isEmpty(dto.getTypeRef()) && EntityRef.isEmpty(dto.getAppliedToRef())) {
             optEntity = repo.findByExtId(dto.getId());
         } else {
             String scope = StringUtils.defaultString(dto.getScope());
             if (authority == null) {
-                if (RecordRef.isEmpty(recordRef)) {
+                if (EntityRef.isEmpty(recordRef)) {
                     optEntity = repo.findByTypeRefForAll(dto.getTypeRef().toString(), scope);
                 } else {
                     optEntity = repo.findByRecordRefForAll(recordRef.toString(), scope);
                 }
             } else {
-                if (RecordRef.isEmpty(recordRef)) {
+                if (EntityRef.isEmpty(recordRef)) {
                     optEntity = repo.findByAuthorityAndTypeRefAndScope(authority, dto.getTypeRef().toString(), scope);
                 } else {
                     optEntity = repo.findByAuthorityAndAppliedToRefAndScope(authority, recordRef.toString(), scope);
@@ -285,10 +285,10 @@ public class DashboardService {
     }
 
     @Nullable
-    private RecordRef getAppliedToRefFromDto(DashboardDto dto) {
-        RecordRef recordRef = dto.getAppliedToRef();
-        if (RecordRef.isNotEmpty(recordRef) && recordRef.getAppName().isEmpty()) {
-            recordRef = recordRef.addAppName(AppName.ALFRESCO);
+    private EntityRef getAppliedToRefFromDto(DashboardDto dto) {
+        EntityRef recordRef = dto.getAppliedToRef();
+        if (EntityRef.isNotEmpty(recordRef) && recordRef.getAppName().isEmpty()) {
+            recordRef = recordRef.withAppName(AppName.ALFRESCO);
         }
         return recordRef;
     }
@@ -299,7 +299,7 @@ public class DashboardService {
 
     private DashboardEntity mapToEntity(DashboardDto dto, @Nullable DashboardEntity entity) {
 
-        RecordRef appliedToRef = getAppliedToRefFromDto(dto);
+        EntityRef appliedToRef = getAppliedToRefFromDto(dto);
 
         if (entity == null) {
 
@@ -317,15 +317,15 @@ public class DashboardService {
 
             newDashboard.setExtId(extId);
             newDashboard.setAuthority(getAuthorityFromDto(dto));
-            newDashboard.setTypeRef(RecordRef.toString(dto.getTypeRef()));
-            if (RecordRef.isNotEmpty(appliedToRef)) {
-                newDashboard.setAppliedToRef(RecordRef.toString(appliedToRef));
+            newDashboard.setTypeRef(EntityRef.toString(dto.getTypeRef()));
+            if (EntityRef.isNotEmpty(appliedToRef)) {
+                newDashboard.setAppliedToRef(EntityRef.toString(appliedToRef));
             }
             newDashboard.setScope(StringUtils.defaultString(dto.getScope()));
             entity = newDashboard;
         }
 
-        if (dto.getConfig() != null && dto.getConfig().size() > 0) {
+        if (dto.getConfig() != null && !dto.getConfig().isEmpty()) {
             entity.setConfig(Json.getMapper().toBytes(dto.getConfig()));
         }
         if (!MLText.isEmpty(dto.getName())) {

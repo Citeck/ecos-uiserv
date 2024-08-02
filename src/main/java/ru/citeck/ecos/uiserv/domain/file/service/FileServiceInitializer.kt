@@ -1,9 +1,9 @@
 package ru.citeck.ecos.uiserv.domain.file.service
 
+import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.uiserv.domain.file.service.FileService.FileMetadataExtractorInfo
-import javax.annotation.PostConstruct
 
 @Component
 @Deprecated("FileService is a legacy service and should not be used")

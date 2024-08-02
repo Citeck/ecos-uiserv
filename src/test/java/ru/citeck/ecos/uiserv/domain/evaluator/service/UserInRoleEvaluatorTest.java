@@ -2,19 +2,20 @@ package ru.citeck.ecos.uiserv.domain.evaluator.service;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.RecordsServiceFactory;
-import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
-import ru.citeck.ecos.records2.evaluator.RecordEvaluatorService;
-import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
-import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
-import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
+import ru.citeck.ecos.records3.record.atts.value.AttValue;
+import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
+import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
+import ru.citeck.ecos.uiserv.domain.evaluator.RecordEvaluatorDto;
+import ru.citeck.ecos.uiserv.domain.evaluator.RecordEvaluatorService;
 import ru.citeck.ecos.records3.record.request.RequestContext;
+import ru.citeck.ecos.uiserv.domain.evaluator.RecordEvaluatorServiceImpl;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.*;
@@ -22,24 +23,24 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRecordsMetaDao<Object> {
+public class UserInRoleEvaluatorTest extends AbstractRecordsDao implements RecordAttsDao {
 
     private static final String ID = "userInRoleEvaluatorTest";
     private static final String TEST_USERNAME = "$CURRENT";
     private static final String TEST_WRONG_USERNAME = "WRONG_USER";
 
-    private RecordEvaluatorService evaluatorsService;
+    private RecordEvaluatorServiceImpl evaluatorsService;
     private RecordsServiceFactory factory;
 
     @BeforeEach
     public void setup() {
-        setId(ID);
 
         factory = new RecordsServiceFactory();
         recordsService = factory.getRecordsService();
         recordsService.register(this);
 
-        evaluatorsService = factory.getRecordEvaluatorService();
+        evaluatorsService = new RecordEvaluatorServiceImpl();
+        evaluatorsService.setRecordsServiceFactory(factory);
         evaluatorsService.register(new UserInRoleEvaluator());
     }
 
@@ -48,7 +49,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
 
         //  arrange
         Map<String, Object> model = new HashMap<>();
-        RecordRef userRef = RecordRef.create(ID, "user");
+        EntityRef userRef = EntityRef.create(ID, "user");
         model.put("user", userRef);
 
         RecordEvaluatorDto evaluatorDto = new RecordEvaluatorDto();
@@ -58,7 +59,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
         config.setRole("Admin");
         evaluatorDto.setConfig(Json.getMapper().convert(config, ObjectData.class));
 
-        RecordRef recordRef = RecordRef.create(ID, "record");
+        EntityRef recordRef = EntityRef.create(ID, "record");
 
         TestCaseRole.currentUsername = TEST_USERNAME;
 
@@ -75,7 +76,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
 
         //  arrange
         Map<String, Object> model = new HashMap<>();
-        RecordRef userRef = RecordRef.create(ID, "user");
+        EntityRef userRef = EntityRef.create(ID, "user");
         model.put("user", userRef);
 
         RecordEvaluatorDto evaluatorDto = new RecordEvaluatorDto();
@@ -85,7 +86,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
         config.setAnyRole(new HashSet<>(Arrays.asList("Admin", "Initiator")));
         evaluatorDto.setConfig(Json.getMapper().convert(config, ObjectData.class));
 
-        RecordRef recordRef = RecordRef.create(ID, "record");
+        EntityRef recordRef = EntityRef.create(ID, "record");
 
         TestCaseRole.currentUsername = TEST_USERNAME;
 
@@ -102,7 +103,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
 
         //  arrange
         Map<String, Object> model = new HashMap<>();
-        RecordRef userRef = RecordRef.create(ID, "user");
+        EntityRef userRef = EntityRef.create(ID, "user");
         model.put("user", userRef);
 
         RecordEvaluatorDto evaluatorDto = new RecordEvaluatorDto();
@@ -112,7 +113,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
         config.setAnyRole(new HashSet<>(Arrays.asList("Admin", "Initiator")));
         evaluatorDto.setConfig(Json.getMapper().convert(config, ObjectData.class));
 
-        RecordRef recordRef = RecordRef.create(ID, "record");
+        EntityRef recordRef = EntityRef.create(ID, "record");
 
         TestCaseRole.currentUsername = TEST_WRONG_USERNAME;
 
@@ -129,7 +130,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
 
         //  arrange
         Map<String, Object> model = new HashMap<>();
-        RecordRef userRef = RecordRef.create(ID, "user");
+        EntityRef userRef = EntityRef.create(ID, "user");
         model.put("user", userRef);
 
         RecordEvaluatorDto evaluatorDto = new RecordEvaluatorDto();
@@ -139,7 +140,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
         config.setAnyRole(new HashSet<>(Arrays.asList("Initiator", "Expert")));
         evaluatorDto.setConfig(Json.getMapper().convert(config, ObjectData.class));
 
-        RecordRef recordRef = RecordRef.create(ID, "record");
+        EntityRef recordRef = EntityRef.create(ID, "record");
 
         TestCaseRole.currentUsername = TEST_USERNAME;
 
@@ -156,7 +157,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
 
         //  arrange
         Map<String, Object> model = new HashMap<>();
-        RecordRef userRef = RecordRef.create(ID, "user");
+        EntityRef userRef = EntityRef.create(ID, "user");
         model.put("user", userRef);
 
         RecordEvaluatorDto evaluatorDto = new RecordEvaluatorDto();
@@ -165,7 +166,7 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
         UserInRoleEvaluator.Config config = new UserInRoleEvaluator.Config();
         evaluatorDto.setConfig(Json.getMapper().convert(config, ObjectData.class));
 
-        RecordRef recordRef = RecordRef.create(ID, "record");
+        EntityRef recordRef = EntityRef.create(ID, "record");
 
         TestCaseRole.currentUsername = TEST_WRONG_USERNAME;
 
@@ -177,32 +178,40 @@ public class UserInRoleEvaluatorTest extends LocalRecordsDao implements LocalRec
         assertFalse(result);
     }
 
+    @Nullable
     @Override
-    public List<Object> getLocalRecordsMeta(List<EntityRef> list, MetaField metaField) {
-        return Collections.singletonList(new TestMixin());
+    public Object getRecordAtts(@NotNull String s) throws Exception {
+        return new TestMixin();
     }
 
     @Data
-    public static class TestMixin implements MetaValue {
+    public static class TestMixin implements AttValue {
 
         @Override
-        public Object getAttribute(String name, MetaField field) {
+        public Object getAtt(String name) {
             return new TestCaseRoles();
         }
     }
 
     @Data
-    public static class TestCaseRoles implements MetaValue {
+    public static class TestCaseRoles implements AttValue {
 
         @Override
-        public Object getAttribute(String name, MetaField field) {
+        public Object getAtt(String name) {
             return new TestCaseRole(name);
         }
     }
 
+
+    @NotNull
+    @Override
+    public String getId() {
+        return ID;
+    }
+
     @Data
     @AllArgsConstructor
-    public static class TestCaseRole implements MetaValue {
+    public static class TestCaseRole implements AttValue {
 
         private static String currentUsername;
         private String roleName;

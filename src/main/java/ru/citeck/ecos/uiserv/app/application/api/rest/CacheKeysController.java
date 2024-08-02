@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.app.application.api.rest;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -9,9 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.records2.RecordMeta;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.RecordsService;
+import ru.citeck.ecos.records3.RecordsService;
+import ru.citeck.ecos.records3.record.atts.dto.RecordAtts;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -26,7 +26,7 @@ public class CacheKeysController {
 
     private final RecordsService recordsService;
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public HttpEntity<byte[]> getCache(@RequestParam(required = false) String types) {
 
         if (types == null) {
@@ -46,7 +46,7 @@ public class CacheKeysController {
             return new HttpEntity<>("{}".getBytes(StandardCharsets.UTF_8), headers);
         }
 
-        RecordMeta attributes = recordsService.getAttributes(RecordRef.valueOf("meta@"), cacheAtts);
-        return new HttpEntity<>(Json.getMapper().toBytes(attributes.getAttributes()), headers);
+        RecordAtts attributes = recordsService.getAtts(EntityRef.valueOf("meta@"), cacheAtts);
+        return new HttpEntity<>(Json.getMapper().toBytes(attributes.getAtts()), headers);
     }
 }

@@ -60,7 +60,7 @@ public class JournalV1Format {
                 variantV1.setCanCreate(true);
                 variantV1.setFormId(variant.getFormRef().toString());
                 variantV1.setRecordRef(variant.getRecordRef().toString());
-                variantV1.setTitle(MLText.getClosestValue(variant.getName(), QueryContext.getCurrent().getLocale()));
+                variantV1.setTitle(MLText.getClosestValue(variant.getName(), I18nContext.getLocale()));
                 return variantV1;
             }).collect(Collectors.toList()));
         } else {
@@ -131,7 +131,7 @@ public class JournalV1Format {
         return resp;
     }
 
-    private List<CreateVariant> getCreateVariants(RecordRef typeRef) {
+    private List<CreateVariant> getCreateVariants(EntityRef typeRef) {
 
         List<CreateVariantDef> variants = typeUtils.getCreateVariants(typeRef);
         Locale locale = LocaleContextHolder.getLocale();
@@ -149,10 +149,10 @@ public class JournalV1Format {
             if (!destination.isEmpty()) {
                 resultVariant.setDestination(destination);
             }
-            resultVariant.setFormId(RecordRef.toString(variant.getFormRef()));
+            resultVariant.setFormId(EntityRef.toString(variant.getFormRef()));
             resultVariant.setTitle(MLText.getClosestValue(variant.getName(), locale));
 
-            resultVariant.setRecordRef(RecordRef.toString(variant.getRecordRef()));
+            resultVariant.setRecordRef(EntityRef.toString(variant.getRecordRef()));
 
             if (variant.getRecordRef().getSourceId().equals("dict")) {
                 resultVariant.setType(variant.getRecordRef().getId());

@@ -1,11 +1,11 @@
 package ru.citeck.ecos.uiserv.domain.board;
 
 import ru.citeck.ecos.commons.data.MLText;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.board.api.records.BoardRecordsDao;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -19,12 +19,12 @@ public class BoardTestData {
     public static String PROP_READ_ONLY = "readOnly";
     public static String PROP_COLUMNS = "columns";
     public static final BoardDef testBoard = new BoardDef(BOARD_ID);
-    public static final RecordRef testTypeRef = RecordRef.create("emodel", "type", "testType");
+    public static final EntityRef testTypeRef = EntityRef.create("emodel", "type", "testType");
 
     static {
         testBoard.setName(new MLText("Test board").withValue(Locale.GERMAN, "German name"));
-        testBoard.setTypeRef(RecordRef.valueOf("emodel/type@user-board"));
-        testBoard.setActions(Arrays.asList(RecordRef.valueOf("uiserv/action@test0")));
+        testBoard.setTypeRef(EntityRef.valueOf("emodel/type@user-board"));
+        testBoard.setActions(Arrays.asList(EntityRef.valueOf("uiserv/action@test0")));
         testBoard.setColumns(Arrays.asList(
             BoardColumnDef.create().withId("col1").withName(new MLText("First Column")).build(),
             BoardColumnDef.create().withId("col2").withName(new MLText("Second Column")).build()));

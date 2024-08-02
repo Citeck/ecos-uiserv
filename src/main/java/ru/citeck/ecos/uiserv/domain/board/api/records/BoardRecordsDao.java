@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.events2.type.RecordEventsService;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records3.record.atts.value.impl.EmptyAttValue;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
 import ru.citeck.ecos.records3.record.dao.delete.DelStatus;
@@ -24,7 +24,9 @@ import ru.citeck.ecos.uiserv.app.common.api.records.Utils;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,14 +79,14 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
      */
     @Nullable
     @Override
-    public BoardRecord getRecordAtts(@NotNull String localBoardId) {
+    public Object getRecordAtts(@NotNull String localBoardId) {
         if (localBoardId.isEmpty()) {
             return new BoardRecord();
         } else {
             BoardWithMeta board = boardService.getBoardById(localBoardId);
             if (board == null) {
-                log.warn("Board with ID {} was not found", localBoardId);
-                return new BoardRecord(localBoardId);
+                log.debug("Board with ID {} was not found", localBoardId);
+                return EmptyAttValue.INSTANCE;
             }
             return new BoardRecord(board);
         }
@@ -99,7 +101,7 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
 
         if (LANG_BY_TYPE.equals(recordsQuery.getLanguage())) {
             TypeQuery typeQuery = recordsQuery.getQuery(TypeQuery.class);
-            if (RecordRef.isEmpty(typeQuery.getTypeRef())) {
+            if (EntityRef.isEmpty(typeQuery.getTypeRef())) {
                 return result;
             }
             List<BoardWithMeta> boards = boardService.getBoardsForExactType(typeQuery.getTypeRef(), sort);
@@ -158,6 +160,6 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
 
     @Data
     public static class TypeQuery {
-        private RecordRef typeRef;
+        private EntityRef typeRef;
     }
 }

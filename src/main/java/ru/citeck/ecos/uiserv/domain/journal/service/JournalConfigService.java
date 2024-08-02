@@ -12,14 +12,14 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.records2.RecordMeta;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.commons.data.DataValue;
+import ru.citeck.ecos.records3.RecordsService;
+import ru.citeck.ecos.records3.record.atts.dto.RecordAtts;
 import ru.citeck.ecos.uiserv.domain.file.repo.File;
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType;
 import ru.citeck.ecos.uiserv.domain.file.service.FileService;
 import ru.citeck.ecos.uiserv.domain.file.service.FileViewCaching;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.beans.FeatureDescriptor;
 import java.io.IOException;
@@ -57,9 +57,9 @@ public class JournalConfigService {
     @Configuration
     @RequiredArgsConstructor
     public static class Mapper {
+
         private final ObjectMapper objectMapper;
         private final RecordsService recordsService;
-
 
         public Optional<JournalConfigDownstream> unmarshalFile(File file) {
             return Optional.of(unmarshal(file.getFileVersion().getBytes(), false));
@@ -129,8 +129,8 @@ public class JournalConfigService {
                 attributesEdges.put(attribute, ".edge(n:\"" + attribute + "\"){" + nameset + "}");
             }
 
-            final RecordRef recordRef = RecordRef.valueOf("alfresco/@" + sourceId + "@");
-            RecordMeta attInfoMeta = recordsService.getAttributes(recordRef, attributesEdges);
+            final EntityRef recordRef = EntityRef.valueOf("alfresco/@" + sourceId + "@");
+            RecordAtts attInfoMeta = recordsService.getAtts(recordRef, attributesEdges);
 
             Map<String, T> result = new HashMap<>();
 

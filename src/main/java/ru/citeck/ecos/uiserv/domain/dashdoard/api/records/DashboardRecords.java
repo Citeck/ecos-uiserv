@@ -1,8 +1,8 @@
 package ru.citeck.ecos.uiserv.domain.dashdoard.api.records;
 
-import ecos.com.fasterxml.jackson210.annotation.JsonIgnore;
-import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
-import ecos.com.fasterxml.jackson210.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,6 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.json.YamlUtils;
 import ru.citeck.ecos.events2.type.RecordEventsService;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.atts.dto.LocalRecordAtts;
@@ -30,7 +29,9 @@ import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
+
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,7 +45,7 @@ public class DashboardRecords extends AbstractRecordsDao
                RecordDeleteDao,
                RecordAttsDao {
 
-    private static final RecordRef DEFAULT_TYPE = RecordRef.valueOf("emodel/type@user-dashboard");
+    private static final EntityRef DEFAULT_TYPE = EntityRef.valueOf("emodel/type@user-dashboard");
 
     public static final String ID = "dashboard";
 
@@ -157,7 +158,7 @@ public class DashboardRecords extends AbstractRecordsDao
             if (query.getRecordRef() != null) {
                 DataValue ecosType = recordsService.getAtt(query.getRecordRef(), "_type?id");
                 if (ecosType.isTextual()) {
-                    query.setTypeRef(RecordRef.valueOf(ecosType.asText()));
+                    query.setTypeRef(EntityRef.valueOf(ecosType.asText()));
                 }
             }
             if (query.getTypeRef() == null) {
@@ -215,7 +216,6 @@ public class DashboardRecords extends AbstractRecordsDao
         }
 
         @JsonValue
-        @com.fasterxml.jackson.annotation.JsonValue
         public DashboardDto toJson() {
             return new DashboardDto(this);
         }
@@ -227,8 +227,8 @@ public class DashboardRecords extends AbstractRecordsDao
 
     @Data
     public static class Query {
-        private RecordRef recordRef;
-        private RecordRef typeRef;
+        private EntityRef recordRef;
+        private EntityRef typeRef;
         private String authority;
         private String scope;
         private boolean expandType = true;

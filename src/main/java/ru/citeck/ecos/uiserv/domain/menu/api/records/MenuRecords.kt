@@ -1,10 +1,11 @@
 package ru.citeck.ecos.uiserv.domain.menu.api.records
 
-import ecos.com.fasterxml.jackson210.annotation.JsonProperty
-import ecos.com.fasterxml.jackson210.annotation.JsonValue
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonValue
+import jakarta.annotation.PostConstruct
 import lombok.Data
 import lombok.RequiredArgsConstructor
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.ObjectData
@@ -31,7 +32,6 @@ import ru.citeck.ecos.uiserv.domain.menu.service.MenuService
 import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.stream.Collectors
-import javax.annotation.PostConstruct
 
 @Component
 @RequiredArgsConstructor
@@ -172,7 +172,7 @@ class MenuRecords(
             return result ?: 0
         }
 
-        @AttName(".disp")
+        @AttName("?disp")
         fun getDisplayName(): String {
             return id
         }
@@ -191,7 +191,6 @@ class MenuRecords(
         }
 
         @JsonValue
-        @com.fasterxml.jackson.annotation.JsonValue
         fun toJson(): Any? {
             return MenuDto(this)
         }

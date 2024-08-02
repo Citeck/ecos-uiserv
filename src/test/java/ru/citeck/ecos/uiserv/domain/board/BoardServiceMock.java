@@ -2,7 +2,6 @@ package ru.citeck.ecos.uiserv.domain.board;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.RecordsServiceFactory;
@@ -12,6 +11,7 @@ import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.repo.BoardEntity;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardMapper;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -79,7 +79,7 @@ public class BoardServiceMock implements BoardService {
     }
 
     @Override
-    public List<BoardWithMeta> getBoardsForJournal(RecordRef journalRef) {
+    public List<BoardWithMeta> getBoardsForJournal(EntityRef journalRef) {
         if (journalRef == null) {
             return null;
         }
@@ -105,7 +105,7 @@ public class BoardServiceMock implements BoardService {
     }
 
     @Override
-    public List<BoardWithMeta> getBoardsForExactType(RecordRef typeRef, Sort sort) {
+    public List<BoardWithMeta> getBoardsForExactType(EntityRef typeRef, Sort sort) {
         if (typeRef == null)
             return null;
         return data.values().stream()

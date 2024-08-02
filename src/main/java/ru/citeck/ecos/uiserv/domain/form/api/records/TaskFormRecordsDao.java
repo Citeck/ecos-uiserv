@@ -4,21 +4,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.records2.QueryContext;
-import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.context.lib.i18n.I18nContext;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
-import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
-import ru.citeck.ecos.records2.request.query.RecordsQuery;
-import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
-import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
+import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
+import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
+import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
 import ru.citeck.ecos.uiserv.domain.form.service.FormDefUtils;
@@ -31,8 +30,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class TaskFormRecordsDao extends LocalRecordsDao
-    implements LocalRecordsQueryWithMetaDao<Object> {
+public class TaskFormRecordsDao extends AbstractRecordsDao
+    implements RecordsQueryDao {
 
     private static final String OUTCOME_PREFIX = "outcome_";
     private static final String LANG_TASKS = "tasks";
@@ -41,39 +40,39 @@ public class TaskFormRecordsDao extends LocalRecordsDao
 
     private final EcosFormService formService;
 
+    @Nullable
     @Override
-    public RecordsQueryResult<Object> queryLocalRecords(@NotNull RecordsQuery query,
-                                                        @NotNull MetaField field) {
+    public Object queryRecords(@NotNull RecordsQuery recsQuery) throws Exception {
 
-        String language = query.getLanguage();
+        String language = recsQuery.getLanguage();
         if (StringUtils.isBlank(language)) {
-            return new RecordsQueryResult<>();
+            return new RecsQueryRes<>();
         }
 
         List<?> result = Collections.emptyList();
 
         switch (language) {
             case LANG_TASKS:
-                result = queryTasks(query.getQuery(ActionsQuery.class));
+                result = queryTasks(recsQuery.getQuery(ActionsQuery.class));
                 break;
             case LANG_FORM:
-                result = Collections.singletonList(queryForm(query.getQuery(FormQuery.class)));
+                result = Collections.singletonList(queryForm(recsQuery.getQuery(FormQuery.class)));
                 break;
         }
 
         @SuppressWarnings("unchecked")
         List<Object> typedRes = (List<Object>) result;
-        return new RecordsQueryResult<>(typedRes);
+        return new RecsQueryRes<>(typedRes);
     }
 
     @NotNull
     private EcosFormDef queryForm(FormQuery formQuery) {
 
-        if (formQuery == null || RecordRef.isEmpty(formQuery.formRef)) {
+        if (formQuery == null || EntityRef.isEmpty(formQuery.formRef)) {
             return EcosFormDef.create().build();
         }
 
-        EcosFormDef formById = formService.getFormById(formQuery.getFormRef().getId()).orElse(null);
+        EcosFormDef formById = formService.getFormById(formQuery.getFormRef().getLocalId()).orElse(null);
         if (formById == null) {
             return EcosFormDef.create().build();
         }
@@ -96,22 +95,23 @@ public class TaskFormRecordsDao extends LocalRecordsDao
         ).collect(Collectors.toList());
     }
 
-    private List<TaskActionsInfo> queryTasks(RecordRef recordRef) {
+    private List<TaskActionsInfo> queryTasks(EntityRef recordRef) {
 
-        if (recordRef == null || RecordRef.isEmpty(recordRef)) {
+        if (recordRef == null || EntityRef.isEmpty(recordRef)) {
             return Collections.emptyList();
         }
-
-        RecordsQuery tasksRecsQuery = new RecordsQuery();
-        tasksRecsQuery.setSourceId(AppName.EPROC + "/" + WF_TASK_SOURCE_ID);
 
         TasksQuery tasksQuery = new TasksQuery();
         tasksQuery.setActive(true);
         tasksQuery.setActor("$CURRENT");
         tasksQuery.setDocument(recordRef.toString());
-        tasksRecsQuery.setQuery(tasksQuery);
 
-        RecordsQueryResult<TaskInfo> tasks = recordsService.queryRecords(tasksRecsQuery, TaskInfo.class);
+        RecordsQuery tasksRecsQuery = RecordsQuery.create()
+                .withSourceId(AppName.EPROC + "/" + WF_TASK_SOURCE_ID)
+                .withQuery(tasksQuery)
+                .build();
+
+        RecsQueryRes<TaskInfo> tasks = recordsService.query(tasksRecsQuery, TaskInfo.class);
 
         List<TaskInfo> currentTasks = tasks.getRecords();
 
@@ -131,7 +131,7 @@ public class TaskFormRecordsDao extends LocalRecordsDao
 
             ObjectData i18n = form.getI18n();
             if (i18n.isNotEmpty()) {
-                Locale locale = QueryContext.getCurrent().getLocale();
+                Locale locale = I18nContext.getLocale();
                 DataValue messages = i18n.get(locale.getLanguage());
                 if (messages.isNotNull()) {
                     i18n = messages.asObjectData();
@@ -146,7 +146,7 @@ public class TaskFormRecordsDao extends LocalRecordsDao
             List<Outcome> outcomes = getOutcomes(form.getDefinition().getData(), i18n);
             String taskId = task.getId();
             if (StringUtils.isNotBlank(taskId)) {
-                RecordRef taskRef = RecordRef.valueOf(taskId);
+                EntityRef taskRef = EntityRef.valueOf(taskId);
                 if (taskRef.getAppName().isEmpty()) {
                     taskRef = taskRef.withAppName(AppName.EPROC);
                 }
@@ -155,10 +155,10 @@ public class TaskFormRecordsDao extends LocalRecordsDao
                     taskRef = taskRef.withSourceId(WF_TASK_SOURCE_ID);
                 }
 
-                RecordRef formRef = RecordRef.create(AppName.UISERV, EcosFormRecordsDao.ID, form.getId());
+                EntityRef formRef = EntityRef.create(AppName.UISERV, EcosFormRecordsDao.ID, form.getId());
                 actions.add(new TaskActionsInfo(task.getTaskDisp(), taskRef, formRef, outcomes));
             } else {
-                log.warn("Strange task: " + task);
+                log.warn("Strange task: {}", task);
             }
         }
 
@@ -205,7 +205,7 @@ public class TaskFormRecordsDao extends LocalRecordsDao
                 }
             }
 
-            if (resultArr.size() == 0) {
+            if (resultArr.isEmpty()) {
                 return DataValue.NULL;
             }
             setInnerComponents(resultComponent, resultArr);
@@ -236,7 +236,7 @@ public class TaskFormRecordsDao extends LocalRecordsDao
                 label = labelData.asText();
             } else {
                 MLText mlLabel = Json.getMapper().convert(labelData, MLText.class);
-                label = mlLabel != null ? mlLabel.getClosestValue(QueryContext.getCurrent().getLocale()) : "";
+                label = mlLabel != null ? mlLabel.getClosestValue(I18nContext.getLocale()) : "";
             }
 
             if (!label.isEmpty()) {
@@ -273,6 +273,7 @@ public class TaskFormRecordsDao extends LocalRecordsDao
         }
     }
 
+    @NotNull
     @Override
     public String getId() {
         return "task-form";
@@ -288,7 +289,7 @@ public class TaskFormRecordsDao extends LocalRecordsDao
     @Data
     @AllArgsConstructor
     public static class RecordTaskActionsInfo {
-        private RecordRef recordRef;
+        private EntityRef recordRef;
         private List<TaskActionsInfo> taskActions;
     }
 
@@ -297,9 +298,9 @@ public class TaskFormRecordsDao extends LocalRecordsDao
     public static class TaskActionsInfo {
         private String taskDisp;
         @NotNull
-        private RecordRef taskRef;
+        private EntityRef taskRef;
         @NotNull
-        private RecordRef formRef;
+        private EntityRef formRef;
         @NotNull
         private List<Outcome> outcomes;
     }
@@ -307,7 +308,7 @@ public class TaskFormRecordsDao extends LocalRecordsDao
     @Data
     public static class TaskInfo {
         private String id;
-        @AttName(".disp")
+        @AttName("?disp")
         private String taskDisp;
         @AttName("_formKey?str")
         private String formKey;
@@ -325,11 +326,11 @@ public class TaskFormRecordsDao extends LocalRecordsDao
 
     @Data
     public static class FormQuery {
-        private RecordRef formRef;
+        private EntityRef formRef;
     }
 
     @Data
     public static class ActionsQuery {
-        private List<RecordRef> recordRefs;
+        private List<EntityRef> recordRefs;
     }
 }

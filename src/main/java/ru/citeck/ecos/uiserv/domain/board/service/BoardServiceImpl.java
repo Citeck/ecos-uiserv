@@ -7,7 +7,6 @@ import org.springframework.util.Assert;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.Application;
@@ -15,10 +14,11 @@ import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.repo.BoardEntity;
 import ru.citeck.ecos.uiserv.domain.board.repo.BoardRepository;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -79,7 +79,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public List<BoardWithMeta> getBoardsForExactType(RecordRef typeRef, Sort sort) {
+    public List<BoardWithMeta> getBoardsForExactType(EntityRef typeRef, Sort sort) {
         Assert.notNull(typeRef, "To select boards typeRef must not be null");
         List<BoardEntity> boardEntities = repository.findAllByTypeRef(typeRef.toString(), sort);
         return boardEntities.stream().map(BoardMapper::entityToDto).collect(Collectors.toList());
@@ -116,7 +116,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public List<BoardWithMeta> getBoardsForJournal(RecordRef journalRef) {
+    public List<BoardWithMeta> getBoardsForJournal(EntityRef journalRef) {
         Assert.notNull(journalRef, "To select boards journalRef must not be null");
         return repository.findAllByJournalRef(journalRef.toString(), Sort.by(Sort.Direction.DESC, BoardEntity.ID))
             .stream().map(BoardMapper::entityToDto)
@@ -126,6 +126,6 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public List<BoardWithMeta> getBoardsForJournal(String journalLocalId) {
         Assert.notNull(journalLocalId, "To select boards journal local ID must not be null");
-        return getBoardsForJournal(RecordRef.create(Application.NAME, "journal", journalLocalId));
+        return getBoardsForJournal(EntityRef.create(Application.NAME, "journal", journalLocalId));
     }
 }

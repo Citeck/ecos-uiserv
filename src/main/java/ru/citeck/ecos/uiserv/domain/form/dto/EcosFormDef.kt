@@ -1,12 +1,12 @@
 package ru.citeck.ecos.uiserv.domain.form.dto
 
-import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
-import ecos.com.fasterxml.jackson210.databind.annotation.JsonPOJOBuilder
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 @IncludeNonDefault
 @JsonDeserialize(builder = EcosFormDef.Builder::class)
@@ -16,7 +16,7 @@ data class EcosFormDef(
     val title: MLText,
     val description: MLText,
     val customModule: String,
-    val typeRef: RecordRef,
+    val typeRef: EntityRef,
     val width: String,
     val system: Boolean,
     val i18n: ObjectData,
@@ -62,7 +62,7 @@ data class EcosFormDef(
         var title: MLText = MLText.EMPTY
         var description: MLText = MLText.EMPTY
         var customModule: String = ""
-        var typeRef: RecordRef = RecordRef.EMPTY
+        var typeRef: EntityRef = EntityRef.EMPTY
         var width: String = ""
         var system: Boolean = false
         var i18n: ObjectData = ObjectData.create()
@@ -108,7 +108,7 @@ data class EcosFormDef(
             return this
         }
 
-        fun withTypeRef(typeRef: RecordRef?): Builder {
+        fun withTypeRef(typeRef: EntityRef?): Builder {
             this.typeRef = typeRef ?: EMPTY.typeRef
             return this
         }

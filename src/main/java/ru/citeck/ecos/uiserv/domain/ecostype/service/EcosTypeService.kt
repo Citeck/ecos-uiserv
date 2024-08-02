@@ -3,7 +3,6 @@ package ru.citeck.ecos.uiserv.domain.ecostype.service
 import org.springframework.stereotype.Service
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.model.lib.type.dto.CreateVariantDef
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService
 import ru.citeck.ecos.uiserv.domain.ecostype.config.EcosTypesComponent
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
@@ -21,68 +20,68 @@ class EcosTypeService(
     private val ecosTypesRegistry: EcosTypesRegistry
 ) {
 
-    fun getTypeRefByForm(formRef: RecordRef?): RecordRef {
-        if (formRef == null || RecordRef.isEmpty(formRef)) {
-            return RecordRef.EMPTY
+    fun getTypeRefByForm(formRef: EntityRef?): EntityRef {
+        if (formRef == null || EntityRef.isEmpty(formRef)) {
+            return EntityRef.EMPTY
         }
         val typeRefForForm = formService.getFormById(formRef.getLocalId())
             .map { it.typeRef }
-            .orElse(RecordRef.EMPTY)
+            .orElse(EntityRef.EMPTY)
         if (EntityRef.isNotEmpty(typeRefForForm)) {
             return typeRefForForm
         }
-        val ref = RecordRef.create("uiserv", "form", formRef.id)
-        return RecordRef.valueOf(typesComponent.getTypeRefByForm(ref))
+        val ref = EntityRef.create("uiserv", "form", formRef.getLocalId())
+        return EntityRef.valueOf(typesComponent.getTypeRefByForm(ref))
     }
 
-    fun getTypeRefByBoard(boardId: String?): RecordRef {
+    fun getTypeRefByBoard(boardId: String?): EntityRef {
         if (boardId.isNullOrBlank()) {
-            return RecordRef.EMPTY
+            return EntityRef.EMPTY
         }
         val boardData = boardService.getBoardById(boardId)
         if (boardData != null && EntityRef.isNotEmpty(boardData.boardDef.typeRef)) {
             return boardData.boardDef.typeRef
         }
-        val ref = RecordRef.create("uiserv", "board", boardId)
-        return RecordRef.valueOf(typesComponent.getTypeRefByBoard(ref))
+        val ref = EntityRef.create("uiserv", "board", boardId)
+        return EntityRef.valueOf(typesComponent.getTypeRefByBoard(ref))
     }
 
-    fun getTypeRefByJournal(journalRef: RecordRef?): RecordRef {
-        if (journalRef == null || RecordRef.isEmpty(journalRef)) {
-            return RecordRef.EMPTY
+    fun getTypeRefByJournal(journalRef: EntityRef?): EntityRef {
+        if (journalRef == null || EntityRef.isEmpty(journalRef)) {
+            return EntityRef.EMPTY
         }
         val journal = journalService.getJournalById(journalRef.getLocalId())
         if (journal != null && EntityRef.isNotEmpty(journal.journalDef.typeRef)) {
             return journal.journalDef.typeRef
         }
-        val ref = RecordRef.create("uiserv", "journal", journalRef.id)
-        return RecordRef.valueOf(typesComponent.getTypeRefByJournal(ref))
+        val ref = EntityRef.create("uiserv", "journal", journalRef.getLocalId())
+        return EntityRef.valueOf(typesComponent.getTypeRefByJournal(ref))
     }
 
-    fun getJournalRefByTypeRef(typeRef: RecordRef): RecordRef {
+    fun getJournalRefByTypeRef(typeRef: EntityRef): EntityRef {
 
         if (EntityRef.isEmpty(typeRef)) {
-            return RecordRef.EMPTY
+            return EntityRef.EMPTY
         }
 
         var journalRef = typesComponent.getJournalRefByType(typeRef)
         if (EntityRef.isNotEmpty(journalRef)) {
-            return RecordRef.valueOf(journalRef)
+            return EntityRef.valueOf(journalRef)
         }
         val parents = ecosTypesRegistry.getParents(typeRef)
         for (parentRef in parents) {
             if (EntityRef.isNotEmpty(parentRef)) {
                 journalRef = typesComponent.getJournalRefByType(parentRef)
                 if (EntityRef.isNotEmpty(journalRef)) {
-                    return RecordRef.valueOf(journalRef)
+                    return EntityRef.valueOf(journalRef)
                 }
             }
         }
 
-        return RecordRef.EMPTY
+        return EntityRef.EMPTY
     }
 
-    fun getTypeInfo(typeRef: RecordRef?): TypeDef? {
+    fun getTypeInfo(typeRef: EntityRef?): TypeDef? {
         if (typeRef == null) {
             return null
         }

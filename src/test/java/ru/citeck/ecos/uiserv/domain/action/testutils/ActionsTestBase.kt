@@ -10,6 +10,7 @@ import ru.citeck.ecos.uiserv.domain.action.dao.ActionDao
 import ru.citeck.ecos.uiserv.domain.action.service.ActionEntityMapper
 import ru.citeck.ecos.uiserv.domain.action.service.ActionService
 import ru.citeck.ecos.uiserv.domain.action.service.DaoActionsProvider
+import ru.citeck.ecos.uiserv.domain.evaluator.RecordEvaluatorServiceImpl
 import ru.citeck.ecos.webapp.api.EcosWebAppApi
 
 open class ActionsTestBase {
@@ -35,9 +36,12 @@ open class ActionsTestBase {
 
         val actionsDaoProvider = DaoActionsProvider(actionDao, mapper)
 
-        records = recordsServices.recordsServiceV1
+        val evaluatorService = RecordEvaluatorServiceImpl()
+        evaluatorService.setRecordsServiceFactory(recordsServices)
+
+        records = recordsServices.recordsService
         actionService = ActionService(
-            recordsServices.recordEvaluatorService,
+            evaluatorService,
             mapper,
             actionDao
         )
@@ -45,7 +49,6 @@ open class ActionsTestBase {
 
         recordsServices.recordsService.register(
             ActionRecords(
-                recordsServices.recordsService,
                 actionService,
                 DefaultTypesRepo()
             )

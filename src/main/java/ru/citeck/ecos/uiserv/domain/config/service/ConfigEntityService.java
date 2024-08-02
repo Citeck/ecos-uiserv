@@ -1,13 +1,13 @@
 package ru.citeck.ecos.uiserv.domain.config.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.app.common.service.AbstractBaseEntityService;
 import ru.citeck.ecos.uiserv.domain.config.dto.ConfigDto;
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType;
 import ru.citeck.ecos.uiserv.domain.file.service.FileService;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.List;
 import java.util.Optional;
@@ -64,7 +64,7 @@ public class ConfigEntityService extends AbstractBaseEntityService<ConfigDto> {
     }
 
     @Override
-    public Optional<ConfigDto> getByRecord(RecordRef recordRef) {
+    public Optional<ConfigDto> getByRecord(EntityRef recordRef) {
         return Optional.empty();
     }
 

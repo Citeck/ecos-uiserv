@@ -5,7 +5,7 @@ import org.hibernate.annotations.ColumnTransformer;
 import org.jetbrains.annotations.NotNull;
 import ru.citeck.ecos.uiserv.app.common.repo.AbstractAuditingEntity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Objects;
 
 @Data

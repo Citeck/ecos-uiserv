@@ -1,18 +1,18 @@
 package ru.citeck.ecos.uiserv.domain.menu.dto
 
-import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
-import ru.citeck.ecos.records2.RecordRef
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 @IncludeNonDefault
 @JsonDeserialize(builder = MenuItemDef.Builder::class)
 class MenuItemDef(
     val id: String,
     val label: MLText,
-    val icon: RecordRef,
+    val icon: EntityRef,
     val hidden: Boolean,
     val type: String,
     val config: ObjectData,
@@ -46,7 +46,7 @@ class MenuItemDef(
 
         var id: String = ""
         var label: MLText = MLText.EMPTY
-        var icon: RecordRef = RecordRef.EMPTY
+        var icon: EntityRef = EntityRef.EMPTY
         var hidden: Boolean = false
         var type: String = ""
         var config: ObjectData = ObjectData.create()
@@ -76,8 +76,8 @@ class MenuItemDef(
             return this
         }
 
-        fun withIcon(icon: RecordRef?): Builder {
-            this.icon = icon ?: RecordRef.EMPTY
+        fun withIcon(icon: EntityRef?): Builder {
+            this.icon = icon ?: EntityRef.EMPTY
             return this
         }
 

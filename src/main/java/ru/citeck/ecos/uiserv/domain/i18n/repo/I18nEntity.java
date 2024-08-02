@@ -3,7 +3,7 @@ package ru.citeck.ecos.uiserv.domain.i18n.repo;
 import lombok.Data;
 import ru.citeck.ecos.uiserv.app.common.repo.AbstractAuditingEntity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Objects;
 
 @Data

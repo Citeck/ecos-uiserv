@@ -4,19 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.RecordsServiceFactory;
-import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
-import ru.citeck.ecos.records2.evaluator.RecordEvaluatorService;
-import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
-import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
-import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
+import ru.citeck.ecos.records3.record.atts.value.AttValue;
+import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
+import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
+import ru.citeck.ecos.uiserv.domain.evaluator.RecordEvaluatorDto;
 import ru.citeck.ecos.records3.record.request.RequestContext;
+import ru.citeck.ecos.uiserv.domain.evaluator.RecordEvaluatorServiceImpl;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.*;
@@ -24,27 +23,27 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UserInGroupEvaluatorTest extends LocalRecordsDao implements LocalRecordsMetaDao<Object> {
+public class UserInGroupEvaluatorTest extends AbstractRecordsDao implements RecordAttsDao {
 
     private static final String ID = "userInGroupEvaluatorTest";
-    private RecordEvaluatorService evaluatorsService;
+    private RecordEvaluatorServiceImpl evaluatorsService;
     private final RecordsServiceFactory factory = new RecordsServiceFactory();
 
     @BeforeEach
     public void setup() {
-        setId(ID);
 
         recordsService = factory.getRecordsService();
         recordsService.register(this);
 
-        evaluatorsService = factory.getRecordEvaluatorService();
+        evaluatorsService = new RecordEvaluatorServiceImpl();
+        evaluatorsService.setRecordsServiceFactory(factory);
         evaluatorsService.register(new UserInGroupEvaluator());
     }
 
     @Test
     public void evaluate_nullGroupInConfig_returnFalse() {
         Map<String, Object> model = new HashMap<>();
-        RecordRef userRef = RecordRef.create(ID, "user");
+        EntityRef userRef = EntityRef.create(ID, "user");
         model.put("user", userRef);
 
         RecordEvaluatorDto evaluatorDto = new RecordEvaluatorDto();
@@ -54,7 +53,7 @@ public class UserInGroupEvaluatorTest extends LocalRecordsDao implements LocalRe
         config.setGroupName(null);
         evaluatorDto.setConfig(Json.getMapper().convert(config, ObjectData.class));
 
-        RecordRef recordRef = RecordRef.create(ID, "record");
+        EntityRef recordRef = EntityRef.create(ID, "record");
 
         TestUserAuthorities.userAuthorities = Collections.emptyList();
 
@@ -67,7 +66,7 @@ public class UserInGroupEvaluatorTest extends LocalRecordsDao implements LocalRe
     @Test
     public void evaluate_oneGroupInConfig_userHasNotRole_returnFalse() {
         Map<String, Object> model = new HashMap<>();
-        RecordRef userRef = RecordRef.create(ID, "user");
+        EntityRef userRef = EntityRef.create(ID, "user");
         model.put("user", userRef);
 
         RecordEvaluatorDto evaluatorDto = new RecordEvaluatorDto();
@@ -77,7 +76,7 @@ public class UserInGroupEvaluatorTest extends LocalRecordsDao implements LocalRe
         config.setGroupName(Collections.singletonList("notIncludedRole"));
         evaluatorDto.setConfig(Json.getMapper().convert(config, ObjectData.class));
 
-        RecordRef recordRef = RecordRef.create(ID, "record");
+        EntityRef recordRef = EntityRef.create(ID, "record");
 
         TestUserAuthorities.userAuthorities = Collections.singletonList("userRole");
 
@@ -90,7 +89,7 @@ public class UserInGroupEvaluatorTest extends LocalRecordsDao implements LocalRe
     @Test
     public void evaluate_oneGroupInConfig_userHasRole_returnTrue() {
         Map<String, Object> model = new HashMap<>();
-        RecordRef userRef = RecordRef.create(ID, "user");
+        EntityRef userRef = EntityRef.create(ID, "user");
         model.put("user", userRef);
 
         RecordEvaluatorDto evaluatorDto = new RecordEvaluatorDto();
@@ -101,7 +100,7 @@ public class UserInGroupEvaluatorTest extends LocalRecordsDao implements LocalRe
         config.setGroupName(Collections.singletonList(includedRole));
         evaluatorDto.setConfig(Json.getMapper().convert(config, ObjectData.class));
 
-        RecordRef recordRef = RecordRef.create(ID, "record");
+        EntityRef recordRef = EntityRef.create(ID, "record");
 
         TestUserAuthorities.userAuthorities = Arrays.asList(
             includedRole,
@@ -117,7 +116,7 @@ public class UserInGroupEvaluatorTest extends LocalRecordsDao implements LocalRe
     @Test
     public void evaluate_multipleGroupInConfig_userHasOneOfRoles_returnTrue() {
         Map<String, Object> model = new HashMap<>();
-        RecordRef userRef = RecordRef.create(ID, "user");
+        EntityRef userRef = EntityRef.create(ID, "user");
         model.put("user", userRef);
 
         RecordEvaluatorDto evaluatorDto = new RecordEvaluatorDto();
@@ -132,7 +131,7 @@ public class UserInGroupEvaluatorTest extends LocalRecordsDao implements LocalRe
         ));
         evaluatorDto.setConfig(Json.getMapper().convert(config, ObjectData.class));
 
-        RecordRef recordRef = RecordRef.create(ID, "record");
+        EntityRef recordRef = EntityRef.create(ID, "record");
 
         TestUserAuthorities.userAuthorities = Arrays.asList(
             includedRole,
@@ -145,19 +144,23 @@ public class UserInGroupEvaluatorTest extends LocalRecordsDao implements LocalRe
         });
     }
 
+    @Nullable
     @Override
-    public List<Object> getLocalRecordsMeta(@NotNull List<EntityRef> records,
-                                            @NotNull MetaField metaField) {
+    public Object getRecordAtts(@NotNull String s) throws Exception {
+        return new TestUserRecord();
+    }
 
-        return Collections.singletonList(new TestUserRecord());
+    @NotNull
+    @Override
+    public String getId() {
+        return ID;
     }
 
     @Data
     @NoArgsConstructor
-    private static class TestUserRecord implements MetaValue {
+    private static class TestUserRecord implements AttValue {
         @Override
-        public Object getAttribute(@NotNull String name,
-                                   @NotNull MetaField field) {
+        public Object getAtt(@NotNull String name) {
             return new TestUserAuthorities();
         }
     }
@@ -165,7 +168,7 @@ public class UserInGroupEvaluatorTest extends LocalRecordsDao implements LocalRe
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    private static class TestUserAuthorities implements MetaValue {
+    private static class TestUserAuthorities implements AttValue {
 
         private static List<String> userAuthorities = new ArrayList<>();
         private List<String> authorities = new ArrayList<>();

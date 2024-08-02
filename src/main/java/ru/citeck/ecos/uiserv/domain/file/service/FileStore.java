@@ -12,8 +12,8 @@ import ru.citeck.ecos.uiserv.domain.file.repo.FileRepository;
 import ru.citeck.ecos.uiserv.domain.file.repo.FileVersionRepository;
 import ru.citeck.ecos.uiserv.domain.translation.repo.TranslatedRepository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import javax.transaction.Transactional;
 import java.util.Map;
 import java.util.Optional;

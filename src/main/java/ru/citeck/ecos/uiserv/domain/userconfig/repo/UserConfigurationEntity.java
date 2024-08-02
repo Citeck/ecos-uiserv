@@ -3,7 +3,7 @@ package ru.citeck.ecos.uiserv.domain.userconfig.repo;
 import lombok.Data;
 import org.hibernate.annotations.Immutable;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
 

@@ -2,11 +2,11 @@ package ru.citeck.ecos.uiserv.app.common.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import ru.citeck.ecos.records2.RecordRef;
+import org.apache.commons.collections4.CollectionUtils;
 import ru.citeck.ecos.uiserv.domain.file.repo.File;
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType;
 import ru.citeck.ecos.uiserv.domain.file.service.FileService;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -111,7 +111,7 @@ public abstract class AbstractBaseEntityService<T extends EntityDto> implements 
     }
 
     @Override
-    public abstract Optional<T> getByRecord(RecordRef recordRef);
+    public abstract Optional<T> getByRecord(EntityRef recordRef);
 
     private T fromJson(File file) {
         try {

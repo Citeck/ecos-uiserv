@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.action.dao
 
+import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
@@ -7,7 +8,6 @@ import ru.citeck.ecos.uiserv.domain.action.repo.ActionEntity
 import ru.citeck.ecos.uiserv.domain.action.repo.ActionRepository
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory
-import javax.annotation.PostConstruct
 
 @Component
 class ActionRepoDao(

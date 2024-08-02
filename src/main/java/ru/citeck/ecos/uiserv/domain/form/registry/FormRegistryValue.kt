@@ -1,8 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.form.registry
 
 import ru.citeck.ecos.commons.data.MLText
-import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
-import ru.citeck.ecos.records2.RecordRef
+import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 data class FormRegistryValue(
@@ -14,8 +13,8 @@ data class FormRegistryValue(
     val system: Boolean,
 ) {
     companion object {
-        private val TYPE = TypeUtils.getTypeRef("form")
+        private val TYPE = ModelUtils.getTypeRef("form")
     }
 
-    fun getEcosType(): RecordRef = TYPE
+    fun getEcosType(): EntityRef = TYPE
 }

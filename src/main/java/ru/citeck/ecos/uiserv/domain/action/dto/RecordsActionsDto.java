@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.action.dto;
 
 import lombok.Data;
-import ru.citeck.ecos.records2.RecordRef;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.List;
 import java.util.Map;
@@ -11,7 +11,7 @@ import java.util.Set;
 public class RecordsActionsDto {
 
     private List<ActionDto> actions;
-    private Map<RecordRef, Set<String>> recordActions;
+    private Map<EntityRef, Set<String>> recordActions;
 
     public List<ActionDto> getActions() {
         return actions;
@@ -21,11 +21,11 @@ public class RecordsActionsDto {
         this.actions = actions;
     }
 
-    public Map<RecordRef, Set<String>> getRecordActions() {
+    public Map<EntityRef, Set<String>> getRecordActions() {
         return recordActions;
     }
 
-    public void setRecordActions(Map<RecordRef, Set<String>> recordActions) {
+    public void setRecordActions(Map<EntityRef, Set<String>> recordActions) {
         this.recordActions = recordActions;
     }
 }

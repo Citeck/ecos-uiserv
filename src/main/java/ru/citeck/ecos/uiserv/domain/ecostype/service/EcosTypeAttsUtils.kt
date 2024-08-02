@@ -12,7 +12,7 @@ object EcosTypeAttsUtils {
             .withId("_disp")
             .withName(
                 MLText(
-                    Locale("ru") to "Имя",
+                    Locale.of("ru") to "Имя",
                     Locale.ENGLISH to "Name"
                 )
             )
@@ -22,7 +22,7 @@ object EcosTypeAttsUtils {
             .withId("_name")
             .withName(
                 MLText(
-                    Locale("ru") to "Имя",
+                    Locale.of("ru") to "Имя",
                     Locale.ENGLISH to "Name"
                 )
             )
@@ -42,7 +42,7 @@ object EcosTypeAttsUtils {
             .withId("_docNum")
             .withName(
                 MLText(
-                    Locale("ru") to "Номер документа",
+                    Locale.of("ru") to "Номер документа",
                     Locale.ENGLISH to "Document number"
                 )
             )

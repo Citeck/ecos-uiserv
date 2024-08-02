@@ -12,7 +12,7 @@ import ru.citeck.ecos.uiserv.domain.journal.service.JournalService;
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService;
 import ru.citeck.ecos.uiserv.domain.theme.service.ThemeService;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;

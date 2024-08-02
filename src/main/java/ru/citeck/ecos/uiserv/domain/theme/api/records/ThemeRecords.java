@@ -1,54 +1,49 @@
 package ru.citeck.ecos.uiserv.domain.theme.api.records;
 
-import ecos.com.fasterxml.jackson210.annotation.JsonIgnore;
-import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.io.file.EcosFile;
 import ru.citeck.ecos.commons.io.file.mem.EcosMemDir;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.utils.ZipUtils;
-import ru.citeck.ecos.records2.RecordMeta;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
-import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
-import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
-import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
-import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
-import ru.citeck.ecos.records2.request.query.RecordsQuery;
-import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
-import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
-import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDao;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
+import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
+import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
+import ru.citeck.ecos.records3.record.dao.delete.DelStatus;
+import ru.citeck.ecos.records3.record.dao.delete.RecordsDeleteDao;
+import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao;
+import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
+import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.uiserv.domain.theme.dto.ThemeDto;
 import ru.citeck.ecos.uiserv.domain.theme.eapps.ThemeArtifactHandler;
 import ru.citeck.ecos.uiserv.domain.theme.service.ThemeService;
-import ru.citeck.ecos.uiserv.domain.utils.LegacyRecordsUtils;
-import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class ThemeRecords extends LocalRecordsDao implements LocalRecordsQueryWithMetaDao<ThemeRecords.ThemeRecord>,
-    LocalRecordsMetaDao<ThemeRecords.ThemeRecord>,
-    MutableRecordsLocalDao<ThemeRecords.ThemeRecord> {
+public class ThemeRecords extends AbstractRecordsDao implements RecordsQueryDao,
+    RecordAttsDao,
+    RecordMutateDtoDao<ThemeRecords.ThemeRecord>,
+    RecordsDeleteDao {
 
     private final ThemeService themeService;
 
+    @Nullable
     @Override
-    public RecordsQueryResult<ThemeRecord> queryLocalRecords(@NotNull RecordsQuery recordsQuery,
-                                                             @NotNull MetaField metaField) {
+    public Object queryRecords(@NotNull RecordsQuery recordsQuery) throws Exception {
 
-        RecordsQueryResult<ThemeDto> result = new RecordsQueryResult<>();
+        RecsQueryRes<ThemeDto> result = new RecsQueryRes<>();
 
         if (recordsQuery.getLanguage().equals(PredicateService.LANGUAGE_PREDICATE)) {
 
@@ -56,9 +51,9 @@ public class ThemeRecords extends LocalRecordsDao implements LocalRecordsQueryWi
 
             List<ThemeDto> themeDtos = themeService.getAll(
                 predicate,
-                recordsQuery.getMaxItems(),
-                recordsQuery.getSkipCount(),
-                LegacyRecordsUtils.mapLegacySortBy(recordsQuery.getSortBy())
+                recordsQuery.getPage().getMaxItems(),
+                recordsQuery.getPage().getSkipCount(),
+                recordsQuery.getSortBy()
             );
 
             result.setRecords(new ArrayList<>(themeDtos));
@@ -66,78 +61,53 @@ public class ThemeRecords extends LocalRecordsDao implements LocalRecordsQueryWi
 
         } else {
             result.setRecords(new ArrayList<>(
-                themeService.getAll(recordsQuery.getMaxItems(), recordsQuery.getSkipCount()))
+                themeService.getAll(recordsQuery.getPage().getMaxItems(), recordsQuery.getPage().getSkipCount()))
             );
             result.setTotalCount(themeService.getCount());
         }
 
-        return new RecordsQueryResult<>(result, ThemeRecord::new);
+        return result.withRecords(ThemeRecord::new);
     }
 
+    @Nullable
     @Override
-    public List<ThemeRecord> getLocalRecordsMeta(@NotNull List<EntityRef> list, @NotNull MetaField metaField) {
-
-        return list.stream()
-            .map(ref -> {
-                ThemeDto dto;
-                if (EntityRef.isEmpty(ref)) {
-                    dto = new ThemeDto();
-                } else {
-                    dto = themeService.getTheme(ref.getLocalId());
-                    if (dto == null) {
-                        dto = new ThemeDto();
-                    }
-                }
-                return new ThemeRecord(dto);
-            }).collect(Collectors.toList());
-    }
-
-    @Override
-    public RecordsDelResult delete(RecordsDeletion deletion) {
-
-        List<RecordMeta> resultRecords = new ArrayList<>();
-
-        deletion.getRecords()
-            .forEach(r -> {
-                themeService.delete(r.getLocalId());
-                resultRecords.add(new RecordMeta(r));
-            });
-
-        RecordsDelResult result = new RecordsDelResult();
-        result.setRecords(resultRecords);
-        return result;
-    }
-
-    @NotNull
-    @Override
-    public List<ThemeRecord> getValuesToMutate(@NotNull List<EntityRef> records) {
-
-        return records.stream()
-            .map(EntityRef::getLocalId)
-            .map(id -> {
-                ThemeDto dto = themeService.getTheme(id);
-                if (dto == null) {
-                    dto = new ThemeDto();
-                    dto.setId(id);
-                }
-                return new ThemeRecord(dto);
-            })
-            .collect(Collectors.toList());
-    }
-
-    @NotNull
-    @Override
-    public RecordsMutResult save(@NotNull List<ThemeRecord> values) {
-
-        RecordsMutResult result = new RecordsMutResult();
-
-        for (final ThemeRecord model : values) {
-            result.addRecord(new RecordMeta(themeService.deploy(model).getId()));
+    public Object getRecordAtts(@NotNull String recordId) throws Exception {
+        ThemeDto dto;
+        if (recordId.isEmpty()) {
+            dto = new ThemeDto();
+        } else {
+            dto = themeService.getTheme(recordId);
+            if (dto == null) {
+                dto = new ThemeDto();
+            }
         }
-
-        return result;
+        return new ThemeRecord(dto);
     }
 
+    @NotNull
+    @Override
+    public List<DelStatus> delete(@NotNull List<String> records) throws Exception {
+        records.forEach(themeService::delete);
+        return records.stream().map(r -> DelStatus.OK).toList();
+    }
+
+    @Override
+    public ThemeRecord getRecToMutate(@NotNull String recordId) {
+        ThemeDto dto = themeService.getTheme(recordId);
+        if (dto == null) {
+            dto = new ThemeDto();
+            dto.setId(recordId);
+        }
+        return new ThemeRecord(dto);
+    }
+
+    @NotNull
+    @Override
+    public String saveMutatedRec(ThemeRecord themeRecord) {
+        return themeService.deploy(themeRecord).getId();
+    }
+
+    @NotNull
     @Override
     public String getId() {
         return "theme";

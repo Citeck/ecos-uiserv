@@ -3,20 +3,21 @@ package ru.citeck.ecos.uiserv.domain.journal.api.records.dao;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.val;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.stereotype.Component;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
-import ru.citeck.ecos.records2.graphql.meta.value.MetaValue;
-import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
+import ru.citeck.ecos.commons.data.DataValue;
+import ru.citeck.ecos.records3.RecordsService;
+import ru.citeck.ecos.records3.record.atts.value.AttValue;
+import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
+import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.action.repo.ActionRepository;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
@@ -25,28 +26,24 @@ import ru.citeck.ecos.webapp.api.entity.EntityRef;
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(EcosSpringExtension.class)
 @SpringBootTest(classes = Application.class)
-@AutoConfigureMockMvc
 public class JournalRecordsDaoTest {
 
     public static final String JOURNAL_DAO_ID = "journal";
     public static final String UISERV_APP_ID = "uiserv";
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
     private JournalRepository journalRepository;
 
     @Autowired
     private ActionRepository actionRepository;
+
+    @Autowired
+    private RecordsService recordsService;
 
     @BeforeEach
     void setUp() {
@@ -55,25 +52,18 @@ public class JournalRecordsDaoTest {
     }
 
     @Test
-    void queryJournalByTypeRef_WithNotFoundJournal() throws Exception {
+    void queryJournalByTypeRef_WithNotFoundJournal() {
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/records/query")
-                .contentType("application/json")
-                .header("Content-type", "application/json")
-                .content("{\n" +
-                    "    \"query\": {\n" +
-                    "        \"sourceId\": \"journal\",\n" +
-                    "        \"query\": {\n" +
-                    "            \"typeRef\": \"" + TypesDao.testTypeRef.toString() + "\"\n" +
-                    "                   }" +
-                    "               }" +
-                    "     }"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.records", is(Collections.emptyList())));
+        val res = recordsService.query(RecordsQuery.create()
+            .withSourceId("journal")
+            .withQuery(DataValue.createObj().set("typeRef", TypesDao.testTypeRef.toString()))
+            .build()
+        );
+        assertThat(res.getRecords()).isEmpty();
     }
 
     @Test
-    void queryJournalMeta() throws Exception {
+    void queryJournalMeta() {
 
         JournalEntity journalEntity = new JournalEntity();
         journalEntity.setExtId("myTestJournal");
@@ -113,52 +103,37 @@ public class JournalRecordsDaoTest {
             "        }\n" +
             "    ]");
 
-
-        //journalEntity.setActions("[\"uiserv/action@testAction\",\"uiserv/action@testAction2\"]");
-        //List<RecordRef> actions = Json.getMapper().readList(journalEntity.getActions(), RecordRef.class);
-        //String actionsString = Json.getMapper().toString(actions);
-
         journalRepository.save(journalEntity);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/records/query")
-                .contentType("application/json")
-                .header("Content-type", "application/json")
-                .content("{\n" +
-                    "    \"record\": \"journal@myTestJournal\",\n" +
-                    "    \"attributes\": [\n" +
-                    "        \"name\",\n" +
-                    "        \"typeRef?id\",\n" +
-                    "        \"predicate\",\n" +
-                    "        \"editable\",\n" +
-                    "        \"properties\",\n" +
-                    "        \"columns[]?json\",\n" +
-                    "        \"actions[]\",\n" +
-                    "        \"metaRecord?id\"\n" +
-                    "    ]\n" +
-                    "}"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id",
-                is("uiserv/" + JOURNAL_DAO_ID + "@" + journalEntity.getExtId())))
-            .andExpect(jsonPath("$.attributes.name", is("test")))
-            .andExpect(jsonPath("$.attributes.typeRef?id", is(journalEntity.getTypeRef())))
-            .andExpect(jsonPath("$.attributes.predicate", is(journalEntity.getPredicate())))
-            .andExpect(jsonPath("$.attributes.editable", is(Boolean.FALSE.toString())))
-            .andExpect(jsonPath("$.attributes.properties", is(journalEntity.getAttributes())));
-        //.andExpect(jsonPath("$.attributes.columns", is(journalEntity.getColumns())))
-        //.andExpect(jsonPath("$['attributes']['actions[]'][0]", is(actions.get(0).toString())))
-        //.andExpect(jsonPath("$['attributes']['actions[]'][1]", is(actions.get(1).toString())))
+        val recAtts = recordsService.getAtts(JOURNAL_DAO_ID +"@myTestJournal", List.of(
+            "name",
+            "typeRef?id",
+            "predicate",
+            "editable",
+            "properties",
+            "columns[]?json",
+            "actions[]",
+            "metaRecord?id"
+        ));
+
+        assertThat(recAtts.getId().toString()).isEqualTo("uiserv/" + JOURNAL_DAO_ID + "@" + journalEntity.getExtId());
+        assertThat(recAtts.get("name").asText()).isEqualTo("test");
+        assertThat(recAtts.get("typeRef?id").asText()).isEqualTo(journalEntity.getTypeRef());
+        assertThat(recAtts.get("predicate").asText()).isEqualTo(journalEntity.getPredicate());
+        assertThat(recAtts.get("editable").asText()).isEqualTo(Boolean.FALSE.toString());
+        assertThat(recAtts.get("properties").asText()).isEqualTo(journalEntity.getAttributes());
     }
 
     @Component
-    public static class TypesDao extends LocalRecordsDao implements LocalRecordsMetaDao<Object> {
+    public static class TypesDao extends AbstractRecordsDao implements RecordAttsDao {
 
         public static final String EMODEL_APP_ID = "emodel";
         public static final String TYPE_DAO_ID = "type";
 
-        public static final RecordRef journalRef = RecordRef.create(UISERV_APP_ID, JOURNAL_DAO_ID, "myTestJournal");
+        public static final EntityRef journalRef = EntityRef.create(UISERV_APP_ID, JOURNAL_DAO_ID, "myTestJournal");
 
-        public static final RecordRef testTypeRef = RecordRef.create(EMODEL_APP_ID, TYPE_DAO_ID, "testType");
-        public static final RecordRef baseTypeRef = RecordRef.create(EMODEL_APP_ID, TYPE_DAO_ID, "base");
+        public static final EntityRef testTypeRef = EntityRef.create(EMODEL_APP_ID, TYPE_DAO_ID, "testType");
+        public static final EntityRef baseTypeRef = EntityRef.create(EMODEL_APP_ID, TYPE_DAO_ID, "base");
 
         public static final TypeRecord testTypeRecord = new TypeRecord(
             "testType",
@@ -174,33 +149,33 @@ public class JournalRecordsDaoTest {
         private static Map<String, TypeRecord> records = new HashMap<>();
 
         static {
-            records.put(testTypeRef.getId(), testTypeRecord);
-            records.put(baseTypeRef.getId(), baseTypeRecord);
+            records.put(testTypeRef.getLocalId(), testTypeRecord);
+            records.put(baseTypeRef.getLocalId(), baseTypeRecord);
         }
 
-        public TypesDao() {
-            super(false);
-            setId(TYPE_DAO_ID);
-        }
-
+        @Nullable
         @Override
-        public List<Object> getLocalRecordsMeta(List<EntityRef> records, MetaField metaField) {
-            return records.stream()
-                .map(r -> TypesDao.records.get(r.getLocalId()))
-                .collect(Collectors.toList());
+        public Object getRecordAtts(@NotNull String recordId) throws Exception {
+            return TypesDao.records.get(recordId);
+        }
+
+        @NotNull
+        @Override
+        public String getId() {
+            return TYPE_DAO_ID;
         }
 
         @Data
         @AllArgsConstructor
         @NoArgsConstructor
-        public static class TypeRecord implements MetaValue {
+        public static class TypeRecord implements AttValue {
 
             private String id;
-            private List<RecordRef> parents = new ArrayList<>();
-            private RecordRef journal;
+            private List<EntityRef> parents = new ArrayList<>();
+            private EntityRef journal;
 
             @Override
-            public Object getAttribute(String name, MetaField field) {
+            public Object getAtt(String name) {
                 switch (name) {
                     case "parents":
                         return this.parents;

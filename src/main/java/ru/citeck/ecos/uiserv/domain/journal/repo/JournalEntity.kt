@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.journal.repo
 
+import jakarta.persistence.*
 import ru.citeck.ecos.uiserv.app.common.repo.AbstractAuditingEntity
-import javax.persistence.*
 
 @Entity
 @Table(name = "journal")

@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.context.lib.auth.AuthRole
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.source.dao.local.RecordsDaoBuilder
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.record.atts.dto.RecordAtts
@@ -18,6 +17,7 @@ import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.uiserv.Application
 import ru.citeck.ecos.uiserv.domain.dashdoard.api.records.DashboardRecords
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension
 import kotlin.collections.ArrayList
 
@@ -90,7 +90,7 @@ class DashboardRecordsTest {
         ).forEach {
 
             val newDashboard = RecordAtts()
-            newDashboard.setId(RecordRef.valueOf("dashboard@"))
+            newDashboard.setId(EntityRef.valueOf("dashboard@"))
             newDashboard.setAttributes(ObjectData.create(it))
 
             data.add(newDashboard.getAtts().getAs(DashboardDto::class.java)!!)
@@ -106,7 +106,7 @@ class DashboardRecordsTest {
 
         for (config in data) {
 
-            val dashboardRef = RecordRef.valueOf("dashboard@" + config.id)
+            val dashboardRef = EntityRef.valueOf("dashboard@" + config.id)
             assertEquals(
                 config.config.getData(),
                 recordsService.getAtt(dashboardRef, "config?json")
@@ -114,10 +114,10 @@ class DashboardRecordsTest {
 
             val recsQuery = DashboardRecords.Query()
 
-            if (RecordRef.isNotEmpty(config.appliedToRef)) {
+            if (EntityRef.isNotEmpty(config.appliedToRef)) {
                 recsQuery.recordRef = config.appliedToRef
             }
-            if (RecordRef.isNotEmpty(config.typeRef)) {
+            if (EntityRef.isNotEmpty(config.typeRef)) {
                 recsQuery.typeRef = config.typeRef
             }
             if (!config.authority.isNullOrBlank()) {
@@ -138,8 +138,8 @@ class DashboardRecordsTest {
 
         val recsQuery1 = DashboardRecords.Query()
         recsQuery1.authority = "admin"
-        recsQuery1.typeRef = RecordRef.valueOf("emodel/type@test-type")
-        recsQuery1.recordRef = RecordRef.valueOf("workspace://SpaceStore/123")
+        recsQuery1.typeRef = EntityRef.valueOf("emodel/type@test-type")
+        recsQuery1.recordRef = EntityRef.valueOf("workspace://SpaceStore/123")
 
         val recordsQuery1 = RecordsQuery.create {
             sourceId = "dashboard"
@@ -151,8 +151,8 @@ class DashboardRecordsTest {
         assertDto(data.firstOrNull { it.id == "with-applied-to-ref-and-authority" }, queryRes1.getRecords()[0])
 
         val recsQuery2 = DashboardRecords.Query()
-        recsQuery2.typeRef = RecordRef.valueOf("emodel/type@test-type")
-        recsQuery2.recordRef = RecordRef.valueOf("workspace://SpaceStore/123")
+        recsQuery2.typeRef = EntityRef.valueOf("emodel/type@test-type")
+        recsQuery2.recordRef = EntityRef.valueOf("workspace://SpaceStore/123")
 
         val recordsQuery2 = RecordsQuery.create {
             sourceId = "dashboard"
@@ -165,7 +165,7 @@ class DashboardRecordsTest {
 
         val recsQuery3 = DashboardRecords.Query()
         recsQuery3.authority = "admin"
-        recsQuery3.typeRef = RecordRef.valueOf("emodel/type@test-type")
+        recsQuery3.typeRef = EntityRef.valueOf("emodel/type@test-type")
 
         val recordsQuery3 = RecordsQuery.create {
             sourceId = "dashboard"
@@ -177,7 +177,7 @@ class DashboardRecordsTest {
         assertDto(data.firstOrNull { it.id == "with-type-and-authority" }, queryRes3.getRecords()[0])
 
         val recsQuery4 = DashboardRecords.Query()
-        recsQuery4.typeRef = RecordRef.valueOf("emodel/type@test-type")
+        recsQuery4.typeRef = EntityRef.valueOf("emodel/type@test-type")
 
         val recordsQuery4 = RecordsQuery.create {
             sourceId = "dashboard"
@@ -195,8 +195,8 @@ class DashboardRecordsTest {
         assertNotNull(actual)
 
         val expectedConfig = DashboardDto(expected)
-        if (RecordRef.isNotEmpty(expectedConfig.appliedToRef) && expectedConfig.appliedToRef.appName.isBlank()) {
-            expectedConfig.appliedToRef = expectedConfig.appliedToRef.addAppName("alfresco")
+        if (EntityRef.isNotEmpty(expectedConfig.appliedToRef) && expectedConfig.appliedToRef.getAppName().isBlank()) {
+            expectedConfig.appliedToRef = expectedConfig.appliedToRef.withAppName("alfresco")
         }
         if (!expectedConfig.authority.isNullOrBlank()) {
             expectedConfig.authority = expectedConfig.authority.lowercase()

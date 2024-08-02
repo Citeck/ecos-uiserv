@@ -1,6 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.journalsettings.service
 
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation
@@ -41,7 +41,6 @@ class JournalSettingsServiceImpl(
 ) : JournalSettingsService {
 
     private val listeners = CopyOnWriteArrayList<(JournalSettingsDto?, JournalSettingsDto?) -> Unit>()
-
 
     @Override
     override fun save(settings: JournalSettingsDto): JournalSettingsDto {
@@ -116,8 +115,7 @@ class JournalSettingsServiceImpl(
         }
     }
 
-    override fun findAll(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>):
-        List<EntityWithMeta<JournalSettingsDto>> {
+    override fun findAll(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<EntityWithMeta<JournalSettingsDto>> {
         return if (AuthContext.isRunAsAdmin() || AuthContext.isRunAsSystem()) {
             journalSettingsDao.findAll(predicate, max, skip, sort).map { toDtoWithMeta(it) }
         } else {
@@ -136,7 +134,7 @@ class JournalSettingsServiceImpl(
         return mergeSettingsAndPrefs(foundedJournalSettings, foundedJournalPrefs)
     }
 
-    fun getJournalSettingsForCurrentUser(journalId: String): List<EntityWithMeta<JournalSettingsDto>>{
+    fun getJournalSettingsForCurrentUser(journalId: String): List<EntityWithMeta<JournalSettingsDto>> {
         val currentUserAuthorities = AuthContext.getCurrentUserWithAuthorities()
         val predicate = searchPredicate(journalId)
         return journalSettingsDao.findAll(predicate, -1, 0, emptyList())
@@ -148,12 +146,15 @@ class JournalSettingsServiceImpl(
         return Predicates.eq("journalId", journalId)
     }
 
-    private fun compareAuthorities(journalSettingsEntity: JournalSettingsEntity,
-                                   currentUserAuthorities: List<String>): Boolean {
+    private fun compareAuthorities(
+        journalSettingsEntity: JournalSettingsEntity,
+        currentUserAuthorities: List<String>
+    ): Boolean {
         val createdBy = journalSettingsEntity.createdBy
         if (AuthContext.isRunAsAdmin()) {
             if (journalSettingsEntity.authorities?.contains(createdBy) == false &&
-                createdBy != journalSettingsEntity.authority) {
+                createdBy != journalSettingsEntity.authority
+            ) {
                 return true
             }
         }

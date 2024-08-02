@@ -2,11 +2,11 @@ package ru.citeck.ecos.uiserv.domain.board.service;
 
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Sort;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -17,7 +17,7 @@ public interface BoardService {
 
     void delete(String id);
 
-    List<BoardWithMeta> getBoardsForExactType(RecordRef typeRef, Sort sort);
+    List<BoardWithMeta> getBoardsForExactType(EntityRef typeRef, Sort sort);
 
     BoardWithMeta save(BoardDef boardDef);
 
@@ -29,7 +29,7 @@ public interface BoardService {
 
     void onBoardChanged(BiConsumer<BoardDef, BoardDef> listener);
 
-    List<BoardWithMeta> getBoardsForJournal(RecordRef journalRef);
+    List<BoardWithMeta> getBoardsForJournal(EntityRef journalRef);
 
     List<BoardWithMeta> getBoardsForJournal(String journalLocalId);
 }

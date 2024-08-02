@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.journal.api.records
 
-import mu.KotlinLogging
-import org.apache.commons.lang.StringUtils
+import io.github.oshai.kotlinlogging.KotlinLogging
+import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import org.springframework.util.DigestUtils
 import ru.citeck.ecos.commons.data.DataValue
@@ -13,7 +13,6 @@ import ru.citeck.ecos.model.lib.attributes.dto.computed.ComputedAttDef
 import ru.citeck.ecos.model.lib.attributes.dto.computed.ComputedAttStoringType
 import ru.citeck.ecos.model.lib.attributes.dto.computed.ComputedAttType
 import ru.citeck.ecos.records2.RecordConstants
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.predicate.PredicateUtils
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.Predicates
@@ -33,6 +32,7 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSortByDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedJournalDef
 import ru.citeck.ecos.webapp.api.apps.EcosRemoteWebAppsApi
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import java.util.*
 import kotlin.collections.ArrayList
@@ -82,7 +82,7 @@ class ResolvedJournalRecordsDao(
         val typeRef = journalBuilder.typeRef
 
         var typeInfo: TypeDef? = null
-        if (RecordRef.isNotEmpty(typeRef)) {
+        if (EntityRef.isNotEmpty(typeRef)) {
             typeInfo = ecosTypeService.getTypeInfo(typeRef)
         }
         resolveTypeJournalProps(journalBuilder, typeInfo)
@@ -104,7 +104,7 @@ class ResolvedJournalRecordsDao(
 
         typeInfo?.actions?.map {
             if (it.getLocalId() != "record-actions") {
-                actions.add(RecordRef.valueOf(it))
+                actions.add(EntityRef.valueOf(it))
             }
         }
         journalBuilder.withActions(actions.distinct())
@@ -128,7 +128,7 @@ class ResolvedJournalRecordsDao(
                 }
                 val action = it.copy()
                 action.withId("journal$${journalBuilder.id}$$localId")
-                actions.add(RecordRef.create("uiserv", "action", action.id))
+                actions.add(EntityRef.create("uiserv", "action", action.id))
                 action.build()
             }
         )
@@ -156,11 +156,11 @@ class ResolvedJournalRecordsDao(
 
     private fun resolveTypeRef(journal: JournalDef.Builder) {
 
-        if (RecordRef.isNotEmpty(journal.typeRef)) {
+        if (EntityRef.isNotEmpty(journal.typeRef)) {
             return
         }
 
-        val journalRef = RecordRef.create("uiserv", JournalRecordsDao.ID, journal.id)
+        val journalRef = EntityRef.create("uiserv", JournalRecordsDao.ID, journal.id)
         val typeRef = ecosTypeService.getTypeRefByJournal(journalRef)
 
         journal.withTypeRef(typeRef)
@@ -192,12 +192,12 @@ class ResolvedJournalRecordsDao(
             }
         }
 
-        if (RecordRef.isEmpty(journal.metaRecord)) {
+        if (EntityRef.isEmpty(journal.metaRecord)) {
             if (typeInfo != null) {
-                journal.withMetaRecord(RecordRef.valueOf(typeInfo.metaRecord))
+                journal.withMetaRecord(EntityRef.valueOf(typeInfo.metaRecord))
             }
-            if (RecordRef.isEmpty(journal.metaRecord)) {
-                journal.withMetaRecord(RecordRef.valueOf(journal.sourceId + "@"))
+            if (EntityRef.isEmpty(journal.metaRecord)) {
+                journal.withMetaRecord(EntityRef.valueOf(journal.sourceId + "@"))
             }
         }
     }
@@ -216,7 +216,7 @@ class ResolvedJournalRecordsDao(
 
     private fun resolveEdgeMetaImpl(
         journalSearchConfig: JournalSearchConfig,
-        metaRecord: RecordRef,
+        metaRecord: EntityRef,
         columns: List<JournalColumnDef.Builder>,
         typeInfo: TypeDef?
     ): List<ResolvedColumnDef> {
@@ -273,10 +273,10 @@ class ResolvedJournalRecordsDao(
             }
         }
 
-        if (!RecordRef.isEmpty(metaRecord) && attributeEdges.isNotEmpty()) {
+        if (!EntityRef.isEmpty(metaRecord) && attributeEdges.isNotEmpty()) {
 
             try {
-                val attributes = if (ecosWebAppsApi.isAppAvailable(metaRecord.appName)) {
+                val attributes = if (ecosWebAppsApi.isAppAvailable(metaRecord.getAppName())) {
                     recordsService.getAtts(metaRecord, attributeEdges)
                 } else {
                     RecordAtts(metaRecord)
@@ -373,7 +373,7 @@ class ResolvedJournalRecordsDao(
 
         val typeRef = journal.typeRef
 
-        if (RecordRef.isEmpty(typeRef)) {
+        if (EntityRef.isEmpty(typeRef)) {
             return
         }
 

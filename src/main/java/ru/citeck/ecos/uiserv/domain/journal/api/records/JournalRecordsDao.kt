@@ -1,7 +1,8 @@
 package ru.citeck.ecos.uiserv.domain.journal.api.records
 
-import ecos.com.fasterxml.jackson210.annotation.JsonValue
-import ecos.com.fasterxml.jackson210.databind.node.ObjectNode
+import com.fasterxml.jackson.annotation.JsonValue
+import com.fasterxml.jackson.databind.node.ObjectNode
+import jakarta.annotation.PostConstruct
 import lombok.Data
 import lombok.RequiredArgsConstructor
 import org.springframework.security.access.annotation.Secured
@@ -15,7 +16,6 @@ import ru.citeck.ecos.commons.utils.StringUtils
 import ru.citeck.ecos.context.lib.auth.AuthContext.isRunAsAdmin
 import ru.citeck.ecos.context.lib.auth.AuthRole
 import ru.citeck.ecos.events2.type.RecordEventsService
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.atts.value.AttValue
@@ -35,8 +35,8 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
 import ru.citeck.ecos.uiserv.domain.journal.registry.JournalsRegistryConfiguration
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalServiceImpl
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.nio.charset.StandardCharsets
-import javax.annotation.PostConstruct
 
 @Component
 @RequiredArgsConstructor
@@ -75,11 +75,11 @@ class JournalRecordsDao(
 
         if (recsQuery.language == "by-type") {
 
-            val typeRef = recsQuery.getQuery(JournalQueryByTypeRef::class.java).typeRef ?: RecordRef.EMPTY
+            val typeRef = recsQuery.getQuery(JournalQueryByTypeRef::class.java).typeRef ?: EntityRef.EMPTY
             val journalRef = ecosTypeService.getJournalRefByTypeRef(typeRef)
 
-            if (RecordRef.isNotEmpty(journalRef)) {
-                val dto = journalService.getJournalById(journalRef.id)
+            if (EntityRef.isNotEmpty(journalRef)) {
+                val dto = journalService.getJournalById(journalRef.getLocalId())
                 if (dto != null) {
                     result.addRecord(JournalRecord(dto))
                 }
@@ -155,7 +155,7 @@ class JournalRecordsDao(
 
     @Data
     class JournalQueryByTypeRef(
-        val typeRef: RecordRef? = null
+        val typeRef: EntityRef? = null
     )
 
     class ActionDefRecord(
@@ -191,7 +191,7 @@ class JournalRecordsDao(
         }
 
         @AttName("?type")
-        fun getType(): RecordRef = RecordRef.valueOf("emodel/type@journal")
+        fun getType(): EntityRef = EntityRef.valueOf("emodel/type@journal")
 
         fun getActionsDef(): List<ActionDefRecord> {
             return journalDef?.actionsDef?.map { ActionDefRecord(it) } ?: emptyList()
@@ -203,7 +203,6 @@ class JournalRecordsDao(
         }
 
         @JsonValue
-        @com.fasterxml.jackson.annotation.JsonValue
         open fun toNonDefaultJson(): Any {
             return mapper.toNonDefaultJson(journalDef)
         }

@@ -1,15 +1,15 @@
 package ru.citeck.ecos.uiserv.domain.menu.service.resolving;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.i18n.LocaleContextHolder;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemActionDef;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDef;
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef;
 import ru.citeck.ecos.uiserv.domain.menu.service.resolving.resolvers.MenuItemsResolver;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.*;
 import java.util.function.Function;
@@ -172,8 +172,8 @@ public class MenuFactory {
             targetElement.setLabel(label);
         }
 
-        RecordRef icon = newData.getIcon();
-        if (!RecordRef.isEmpty(icon)) {
+        EntityRef icon = newData.getIcon();
+        if (!EntityRef.isEmpty(icon)) {
             targetElement.setIcon(icon.toString());
         }
 

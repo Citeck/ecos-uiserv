@@ -4,10 +4,10 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.citeck.ecos.commons.data.MLText;
+import ru.citeck.ecos.context.lib.i18n.I18nContext;
 import ru.citeck.ecos.test.commons.EcosWebAppApiMock;
 import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.RecordsServiceFactory;
-import ru.citeck.ecos.records3.record.request.RequestContext;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.board.api.records.BoardRecordsDao;
 import ru.citeck.ecos.uiserv.domain.board.api.records.ResolvedBoardRecordsDao;
@@ -40,11 +40,11 @@ public class BoardContextlessTest {
         boardService = new BoardServiceMock(recordsServiceFactory);
         boardArtifactHandler = new BoardArtifactHandler(boardService);
         BoardRecordsDao recordsDao = new BoardRecordsDao(boardService);
-        recordsServiceFactory.getRecordsServiceV1().register(recordsDao);
+        recordsServiceFactory.getRecordsService().register(recordsDao);
         ResolvedBoardRecordsDao resolvedBoardRecordsDao = new ResolvedBoardRecordsDao(recordsDao, null);
-        recordsServiceFactory.getRecordsServiceV1().register(resolvedBoardRecordsDao);
+        recordsServiceFactory.getRecordsService().register(resolvedBoardRecordsDao);
         //BoardMixin for JournalRecordsDao
-        recordsService = recordsServiceFactory.getRecordsServiceV1();
+        recordsService = recordsServiceFactory.getRecordsService();
     }
 
     @Test
@@ -63,7 +63,7 @@ public class BoardContextlessTest {
         //attention: LocalRecordsResolver.getAttsFromSource returns actions=[], columns=[] instead of null value
         assertEquals(boardDef, boardFromRecords);
 
-        String displayName = MLText.getClosestValue(boardDef.getName(), RequestContext.getLocale());
+        String displayName = MLText.getClosestValue(boardDef.getName(), I18nContext.getLocale());
         assertEquals(displayName, recordsService.getAtt(boardDef.getRef(), "?disp").asText());
 
         recordsService.delete(boardDef.getRef());

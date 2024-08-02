@@ -1,17 +1,17 @@
 package ru.citeck.ecos.uiserv.domain.journal.service.provider
 
+import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.context.lib.i18n.I18nContext
-import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
+import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.records3.record.atts.schema.ScalarType
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
-import javax.annotation.PostConstruct
 
 @Component
 class TypeJournalsProvider(
@@ -62,7 +62,7 @@ class TypeJournalsProvider(
 
         return JournalDef.create {
             withName(typeDef.name)
-            withTypeRef(TypeUtils.getTypeRef(typeDef.id))
+            withTypeRef(ModelUtils.getTypeRef(typeDef.id))
             withColumns(columns)
         }
     }

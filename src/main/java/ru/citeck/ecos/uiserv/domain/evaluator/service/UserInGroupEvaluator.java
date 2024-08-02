@@ -2,7 +2,7 @@ package ru.citeck.ecos.uiserv.domain.evaluator.service;
 
 import lombok.Data;
 import org.springframework.stereotype.Component;
-import ru.citeck.ecos.records2.evaluator.RecordEvaluator;
+import ru.citeck.ecos.uiserv.domain.evaluator.RecordEvaluator;
 
 import java.util.List;
 import java.util.Map;

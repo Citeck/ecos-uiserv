@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.form.service.provider
 
+import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
@@ -13,7 +14,6 @@ import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
 import ru.citeck.ecos.uiserv.domain.form.service.FormDefUtils
 import ru.citeck.ecos.webapp.api.entity.EntityRef
-import javax.annotation.PostConstruct
 
 @Component
 class MobileTaskFormsProvider(

@@ -1,14 +1,14 @@
 package ru.citeck.ecos.uiserv.domain.journal.dto
 
-import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
-import ecos.com.fasterxml.jackson210.databind.annotation.JsonPOJOBuilder
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 @IncludeNonDefault
 @JsonDeserialize(builder = JournalDef.Builder::class)
@@ -26,7 +26,7 @@ data class JournalDef(
 
     val sourceId: String,
 
-    val metaRecord: RecordRef,
+    val metaRecord: EntityRef,
 
     /**
      * Predicate for base entities filtering in a table.
@@ -44,7 +44,7 @@ data class JournalDef(
     /**
      * ECOS type.
      */
-    val typeRef: RecordRef,
+    val typeRef: EntityRef,
 
     /**
      * Group records by specified attributes.
@@ -65,7 +65,7 @@ data class JournalDef(
      * Actions for every entity in a table.
      * Can be filtered for specific entities by evaluator.
      */
-    val actions: List<RecordRef>,
+    val actions: List<EntityRef>,
 
     /**
      * Action definitions for every entity in a table.
@@ -128,16 +128,16 @@ data class JournalDef(
         var id: String = ""
         var name: MLText = MLText.EMPTY
         var sourceId: String = ""
-        var metaRecord: RecordRef = RecordRef.EMPTY
+        var metaRecord: EntityRef = EntityRef.EMPTY
         var predicate: Predicate = VoidPredicate.INSTANCE
         var defaultFilters: List<Predicate> = emptyList()
         var queryData: ObjectData = ObjectData.create()
         var searchConfig: JournalSearchConfig = JournalSearchConfig.EMPTY
-        var typeRef: RecordRef = RecordRef.EMPTY
+        var typeRef: EntityRef = EntityRef.EMPTY
         var groupBy: List<String> = emptyList()
         var defaultSortBy: List<JournalSortByDef> = emptyList()
         var actionsFromType: Boolean? = null
-        var actions: List<RecordRef> = emptyList()
+        var actions: List<EntityRef> = emptyList()
         var actionsDef: List<JournalActionDef> = emptyList()
         var editable: Boolean = true
         var columns: List<JournalColumnDef> = emptyList()
@@ -158,7 +158,7 @@ data class JournalDef(
             groupBy = base.groupBy.let { DataValue.create(it).asStrList() }
             withDefaultSortBy(base.defaultSortBy)
             actionsFromType = base.actionsFromType
-            actions = base.actions.let { DataValue.create(it).asList(RecordRef::class.java) }
+            actions = base.actions.let { DataValue.create(it).asList(EntityRef::class.java) }
             actionsDef = base.actionsDef.let { DataValue.create(it).asList(JournalActionDef::class.java) }
             editable = base.editable
             withColumns(base.columns)
@@ -182,8 +182,8 @@ data class JournalDef(
             return this
         }
 
-        fun withMetaRecord(metaRecord: RecordRef?): Builder {
-            this.metaRecord = RecordRef.valueOf(metaRecord)
+        fun withMetaRecord(metaRecord: EntityRef?): Builder {
+            this.metaRecord = EntityRef.valueOf(metaRecord)
             return this
         }
 
@@ -202,8 +202,8 @@ data class JournalDef(
             return this
         }
 
-        fun withTypeRef(typeRef: RecordRef?): Builder {
-            this.typeRef = typeRef ?: RecordRef.EMPTY
+        fun withTypeRef(typeRef: EntityRef?): Builder {
+            this.typeRef = typeRef ?: EntityRef.EMPTY
             return this
         }
 
@@ -237,8 +237,8 @@ data class JournalDef(
             return this
         }
 
-        fun withActions(actions: List<RecordRef>?): Builder {
-            this.actions = actions?.filter { RecordRef.isNotEmpty(it) } ?: emptyList()
+        fun withActions(actions: List<EntityRef>?): Builder {
+            this.actions = actions?.filter { EntityRef.isNotEmpty(it) } ?: emptyList()
             return this
         }
 

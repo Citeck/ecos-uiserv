@@ -3,11 +3,11 @@ package ru.citeck.ecos.uiserv.domain.journal.api.records
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
-import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
-import ru.citeck.ecos.records2.RecordRef
+import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.journal.dto.ColumnFormatterDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
 
 @Component
@@ -16,7 +16,7 @@ class ColumnFormatterResolver(
     val ecosTypesRegistry: EcosTypesRegistry
 ) {
     companion object {
-        private val TYPE_CASE = TypeUtils.getTypeRef("case")
+        private val TYPE_CASE = ModelUtils.getTypeRef("case")
     }
 
     fun resolve(column: JournalColumnDef.Builder, typeAtt: AttributeDef?) {
@@ -30,7 +30,7 @@ class ColumnFormatterResolver(
             AttributeType.ASSOC -> {
                 val typeRef = typeAtt?.config?.get("typeRef")?.asText() ?: ""
                 if (typeRef.isNotBlank()) {
-                    val typeInfo = ecosTypeService.getTypeInfo(RecordRef.valueOf(typeRef))
+                    val typeInfo = ecosTypeService.getTypeInfo(EntityRef.valueOf(typeRef))
                     if (ecosTypesRegistry.getParents(typeInfo).contains(TYPE_CASE)) {
                         column.withFormatter(ColumnFormatterDef.create { withType("assoc") })
                     }

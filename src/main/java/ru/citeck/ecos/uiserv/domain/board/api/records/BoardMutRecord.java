@@ -1,6 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.board.api.records;
 
-import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;

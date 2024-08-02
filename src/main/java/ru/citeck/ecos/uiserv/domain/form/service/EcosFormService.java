@@ -1,7 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.form.service;
 
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
@@ -19,7 +18,7 @@ public interface EcosFormService {
 
     int getCount(Predicate predicate);
 
-    void updateFormType(String formId, RecordRef typeRef);
+    void updateFormType(String formId, EntityRef typeRef);
 
     List<EcosFormDef> getAllForms(Predicate predicate, int max, int skip, List<SortBy> sort);
 
@@ -39,7 +38,7 @@ public interface EcosFormService {
 
     List<EcosFormDef> getFormsForExactType(EntityRef typeRef);
 
-    List<EcosFormDef> getAllFormsForType(RecordRef typeRef);
+    List<EcosFormDef> getAllFormsForType(EntityRef typeRef);
 
     String save(EcosFormDef model);
 

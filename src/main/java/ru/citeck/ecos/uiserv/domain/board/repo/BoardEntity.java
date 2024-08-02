@@ -3,8 +3,8 @@ package ru.citeck.ecos.uiserv.domain.board.repo;
 import lombok.Data;
 import ru.citeck.ecos.uiserv.app.common.repo.AbstractAuditingEntity;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Entity

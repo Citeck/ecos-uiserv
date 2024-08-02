@@ -1,56 +1,50 @@
 package ru.citeck.ecos.uiserv.domain.icon.api.records;
 
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
-import ru.citeck.ecos.records2.RecordMeta;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
-import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
-import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
-import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
-import ru.citeck.ecos.records2.request.query.RecordsQuery;
-import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
-import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
-import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDao;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
+import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
+import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
+import ru.citeck.ecos.records3.record.dao.delete.DelStatus;
+import ru.citeck.ecos.records3.record.dao.delete.RecordsDeleteDao;
+import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao;
+import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
+import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.uiserv.domain.icon.service.IconService;
 import ru.citeck.ecos.uiserv.domain.icon.dto.IconDto;
-import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
-public class IconRecords extends LocalRecordsDao
-    implements LocalRecordsQueryWithMetaDao<IconDto>,
-    LocalRecordsMetaDao<IconDto>,
-    MutableRecordsLocalDao<IconDto> {
+public class IconRecords extends AbstractRecordsDao
+    implements RecordsQueryDao,
+    RecordAttsDao,
+    RecordMutateDtoDao<IconDto>,
+    RecordsDeleteDao {
 
     public static final String ID = "icon";
     private final IconService iconService;
 
     public IconRecords(IconService iconService) {
-        setId(ID);
         this.iconService = iconService;
     }
 
+    @NotNull
     @Override
-    public RecordsDelResult delete(RecordsDeletion deletion) {
-        RecordsDelResult result = new RecordsDelResult();
-        for (EntityRef record : deletion.getRecords()) {
-            iconService.deleteById(record.getLocalId());
-            result.addRecord(new RecordMeta(record));
-        }
-        return result;
+    public List<DelStatus> delete(@NotNull List<String> records) throws Exception {
+        records.forEach(iconService::deleteById);
+        return records.stream().map(r -> DelStatus.OK).toList();
     }
 
+    @Nullable
     @Override
-    public RecordsQueryResult<IconDto> queryLocalRecords(RecordsQuery recordsQuery, MetaField field) {
-        RecordsQueryResult<IconDto> result = new RecordsQueryResult<>();
+    public Object queryRecords(@NotNull RecordsQuery recordsQuery) throws Exception {
+        RecsQueryRes<IconDto> result = new RecsQueryRes<>();
 
         TypeQuery typeQuery = recordsQuery.getQuery(TypeQuery.class);
-        if (typeQuery == null || typeQuery.family == null && typeQuery.type == null) {
+        if (typeQuery.family == null && typeQuery.type == null) {
             result.setRecords(iconService.findAll());
             return result;
         }
@@ -69,31 +63,26 @@ public class IconRecords extends LocalRecordsDao
     }
 
     @Override
-    public List<IconDto> getValuesToMutate(List<EntityRef> records) {
-        return getLocalRecordsMeta(records, null);
+    public IconDto getRecToMutate(@NotNull String recordId) throws Exception {
+        return getRecordAtts(recordId);
     }
 
+    @NotNull
     @Override
-    public RecordsMutResult save(List<IconDto> values) {
-        RecordsMutResult result = new RecordsMutResult();
-
-        List<RecordMeta> savedList = values.stream()
-            .map(iconService::save)
-            .map(IconDto::getId)
-            .map(RecordMeta::new)
-            .collect(Collectors.toList());
-        result.setRecords(savedList);
-
-        return result;
+    public String saveMutatedRec(IconDto iconDto) throws Exception {
+        return iconService.save(iconDto).getId();
     }
 
+    @Nullable
     @Override
-    public List<IconDto> getLocalRecordsMeta(List<EntityRef> records, MetaField metaField) {
-        return records.stream()
-            .map(EntityRef::getLocalId)
-            .map(iconService::findById)
-            .map(opt -> opt.orElseGet(IconDto::new))
-            .collect(Collectors.toList());
+    public IconDto getRecordAtts(@NotNull String recordId) throws Exception {
+        return iconService.findById(recordId).orElseGet(IconDto::new);
+    }
+
+    @NotNull
+    @Override
+    public String getId() {
+        return ID;
     }
 
     @Data

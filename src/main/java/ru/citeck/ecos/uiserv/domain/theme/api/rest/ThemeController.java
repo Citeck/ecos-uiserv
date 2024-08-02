@@ -12,7 +12,7 @@ import ru.citeck.ecos.commons.io.file.std.EcosStdFile;
 import ru.citeck.ecos.uiserv.domain.theme.dto.ResourceData;
 import ru.citeck.ecos.uiserv.domain.theme.service.ThemeService;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;

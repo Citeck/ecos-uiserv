@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.PageRequest;
@@ -19,9 +19,8 @@ import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.io.file.mem.EcosMemDir;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.utils.ZipUtils;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.RecordsService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.icon.api.records.IconRecords;
 import ru.citeck.ecos.uiserv.domain.icon.dto.IconDto;
@@ -30,10 +29,11 @@ import ru.citeck.ecos.uiserv.domain.theme.dto.ResourceData;
 import ru.citeck.ecos.uiserv.domain.theme.dto.ThemeDto;
 import ru.citeck.ecos.uiserv.domain.theme.repo.ThemeEntity;
 import ru.citeck.ecos.uiserv.domain.theme.repo.ThemeRepository;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -96,7 +96,7 @@ public class ThemeService {
     private String getActiveThemeImpl() {
 
         String theme = recordsService.getAtt(
-            RecordRef.create("cfg", CURRENT_THEME_CONFIG_KEY), "value?str").asText();
+            EntityRef.create("cfg", CURRENT_THEME_CONFIG_KEY), "value?str").asText();
 
         if (StringUtils.isBlank(theme)) {
             theme = DEFAULT_THEME_ID;
@@ -205,7 +205,7 @@ public class ThemeService {
         if (StringUtils.isBlank(parentRef)) {
             parentThemeId = DEFAULT_THEME_ID;
         } else {
-            parentThemeId = RecordRef.valueOf(parentRef).getId();
+            parentThemeId = EntityRef.valueOf(parentRef).getLocalId();
         }
 
         return getInhResourceImpl(new ResourceKey(parentThemeId, key.type, key.path));
@@ -290,7 +290,7 @@ public class ThemeService {
         dto.setId(entity.getExtId());
         dto.setImages(Json.getMapper().readMap(entity.getImages(), String.class, String.class));
         dto.setName(Json.getMapper().read(entity.getName(), MLText.class));
-        dto.setParentRef(RecordRef.valueOf(entity.getParentRef()));
+        dto.setParentRef(EntityRef.valueOf(entity.getParentRef()));
 
         Map<String, byte[]> resources = new HashMap<>();
         dto.setResources(resources);
@@ -328,7 +328,7 @@ public class ThemeService {
 
         entity.setImages(Json.getMapper().toString(dto.getImages()));
         entity.setName(Json.getMapper().toString(dto.getName()));
-        entity.setParentRef(RecordRef.toString(dto.getParentRef()));
+        entity.setParentRef(EntityRef.toString(dto.getParentRef()));
 
         Map<String, byte[]> resources = dto.getResources();
         if (resources == null) {

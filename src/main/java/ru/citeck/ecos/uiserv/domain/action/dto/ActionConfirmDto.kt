@@ -1,18 +1,18 @@
 package ru.citeck.ecos.uiserv.domain.action.dto
 
-import ecos.com.fasterxml.jackson210.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
-import ru.citeck.ecos.records2.RecordRef
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 @IncludeNonDefault
 @JsonDeserialize(builder = ActionConfirmDef.Builder::class)
 data class ActionConfirmDef(
     val title: MLText,
     val message: MLText,
-    val formRef: RecordRef,
+    val formRef: EntityRef,
     val formAttributes: ObjectData,
     val attributesMapping: Map<String, String>
 ) {
@@ -47,7 +47,7 @@ data class ActionConfirmDef(
 
         var title: MLText = MLText.EMPTY
         var message: MLText = MLText.EMPTY
-        var formRef: RecordRef = RecordRef.EMPTY
+        var formRef: EntityRef = EntityRef.EMPTY
         var formAttributes: ObjectData = ObjectData.create()
         var attributesMapping: Map<String, String> = emptyMap()
 
@@ -69,8 +69,8 @@ data class ActionConfirmDef(
             return this
         }
 
-        fun withFormRef(formRef: RecordRef?): Builder {
-            this.formRef = formRef ?: RecordRef.EMPTY
+        fun withFormRef(formRef: EntityRef?): Builder {
+            this.formRef = formRef ?: EntityRef.EMPTY
             return this
         }
 

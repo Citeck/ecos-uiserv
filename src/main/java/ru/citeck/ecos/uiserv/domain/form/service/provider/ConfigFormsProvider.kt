@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.form.service.provider
 
+import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta
@@ -11,7 +12,6 @@ import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.uiserv.domain.form.builder.*
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
-import javax.annotation.PostConstruct
 
 @Component
 class ConfigFormsProvider(

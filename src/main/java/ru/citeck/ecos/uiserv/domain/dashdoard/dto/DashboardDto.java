@@ -4,8 +4,8 @@ import lombok.Data;
 import lombok.ToString;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 @Data
 @IncludeNonDefault
@@ -14,8 +14,8 @@ public class DashboardDto {
 
     private String id;
     private MLText name;
-    private RecordRef typeRef;
-    private RecordRef appliedToRef;
+    private EntityRef typeRef;
+    private EntityRef appliedToRef;
     private String authority;
     private String scope = "";
     private float priority;

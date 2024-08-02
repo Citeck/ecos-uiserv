@@ -1,9 +1,9 @@
 package ru.citeck.ecos.uiserv.domain.admin.repo
 
+import jakarta.persistence.*
 import lombok.Data
 import ru.citeck.ecos.uiserv.app.common.repo.AbstractAuditingEntity
 import java.io.Serializable
-import javax.persistence.*
 
 @Data
 @Entity

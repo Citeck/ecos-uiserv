@@ -1,12 +1,11 @@
 package ru.citeck.ecos.uiserv.domain.action.service
 
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json.mapper
-import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.uiserv.domain.action.dao.ActionDao
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionConfirmDef
@@ -14,6 +13,7 @@ import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionResultDto
 import ru.citeck.ecos.uiserv.domain.action.dto.ExecForQueryConfig
 import ru.citeck.ecos.uiserv.domain.action.repo.ActionEntity
+import ru.citeck.ecos.uiserv.domain.evaluator.RecordEvaluatorDto
 import ru.citeck.ecos.uiserv.domain.evaluator.repo.EvaluatorEntity
 
 @Component
@@ -61,7 +61,7 @@ class ActionEntityMapper(
             evaluatorDto = RecordEvaluatorDto()
             evaluatorDto.id = evaluator.evaluatorId
             evaluatorDto.type = evaluator.type
-            evaluatorDto.isInverse = evaluator.inverse
+            evaluatorDto.inverse = evaluator.inverse
             configJson = evaluator.configJson
             if (configJson != null) {
                 evaluatorDto.config = mapper.convert(configJson, ObjectData::class.java)
@@ -108,7 +108,7 @@ class ActionEntityMapper(
             evaluatorEntity.configJson = mapper.toString(evaluator.config)
             evaluatorEntity.evaluatorId = evaluator.id
             evaluatorEntity.type = evaluator.type
-            evaluatorEntity.inverse = evaluator.isInverse
+            evaluatorEntity.inverse = evaluator.inverse
             actionEntity.evaluator = evaluatorEntity
         } else {
             actionEntity.evaluator = null

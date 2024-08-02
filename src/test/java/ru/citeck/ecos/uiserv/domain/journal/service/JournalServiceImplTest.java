@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import ru.citeck.ecos.records2.RecordsService;
+import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.journal.service.mapper.JournalMapper;
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
@@ -37,8 +37,8 @@ public class JournalServiceImplTest {
 
         //  arrange
 
-        RecordRef typeRef = RecordRef.create("emodel", "type", "test_type_id");
-        RecordRef journalRef = RecordRef.create("uiserv", "journal", "test_journal_id");
+        EntityRef typeRef = EntityRef.create("emodel", "type", "test_type_id");
+        EntityRef journalRef = EntityRef.create("uiserv", "journal", "test_journal_id");
 
         JournalServiceImpl.TypeJournalMeta typeWithJournalMeta = new JournalServiceImpl.TypeJournalMeta();
         typeWithJournalMeta.setJournalRef(journalRef);
@@ -68,17 +68,17 @@ public class JournalServiceImplTest {
 
         //  arrange
 
-        RecordRef journalRef = RecordRef.create("uiserv", "journal", "test_journal_id");
+        EntityRef journalRef = EntityRef.create("uiserv", "journal", "test_journal_id");
 
-        List<RecordRef> parentsRefs = Collections.singletonList(
-            RecordRef.create("emodel", "type", "parent_id_1")
+        List<EntityRef> parentsRefs = Collections.singletonList(
+            EntityRef.create("emodel", "type", "parent_id_1")
         );
 
         JournalServiceImpl.TypeJournalMeta typeWithJournalMeta = new JournalServiceImpl.TypeJournalMeta();
         typeWithJournalMeta.setJournalRef(null);
         typeWithJournalMeta.setParentsRefs(parentsRefs);
 
-        RecordRef typeRef = RecordRef.create("emodel", "type", "test_type_id");
+        EntityRef typeRef = EntityRef.create("emodel", "type", "test_type_id");
 
         Mockito.when(recordsService.getMeta(typeRef, JournalServiceImpl.TypeJournalMeta.class))
             .thenReturn(typeWithJournalMeta);
@@ -112,7 +112,7 @@ public class JournalServiceImplTest {
 
         //  arrange
 
-        RecordRef typeRef = RecordRef.create("emodel", "type", "test_type_id");
+        EntityRef typeRef = EntityRef.create("emodel", "type", "test_type_id");
 
         JournalDto journalDto = new JournalDto();
         journalDto.setId("test_journal_id");
@@ -143,13 +143,13 @@ public class JournalServiceImplTest {
 
         //  arrange
 
-        RecordRef typeRef = RecordRef.create("emodel", "type", "test_type_id");
+        EntityRef typeRef = EntityRef.create("emodel", "type", "test_type_id");
 
         JournalDto journalDto = new JournalDto();
         journalDto.setId("test_journal_id");
 
-        List<RecordRef> parentsRefs = Collections.singletonList(
-            RecordRef.create("emodel", "type", "parent_id_1")
+        List<EntityRef> parentsRefs = Collections.singletonList(
+            EntityRef.create("emodel", "type", "parent_id_1")
         );
 
         JournalEntity journalEntity = journalMapper.dtoToEntity(journalDto);
@@ -185,7 +185,7 @@ public class JournalServiceImplTest {
 
         //  arrange
 
-        RecordRef typeRef = RecordRef.create("emodel", "type", "test_type_id");
+        EntityRef typeRef = EntityRef.create("emodel", "type", "test_type_id");
 
         JournalDto journalDto = new JournalDto();
         journalDto.setId("test_journal_id");

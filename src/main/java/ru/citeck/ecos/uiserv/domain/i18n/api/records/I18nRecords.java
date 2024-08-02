@@ -1,47 +1,42 @@
 package ru.citeck.ecos.uiserv.domain.i18n.api.records;
 
-import ecos.com.fasterxml.jackson210.annotation.JsonIgnore;
-import ecos.com.fasterxml.jackson210.annotation.JsonProperty;
-import ecos.com.fasterxml.jackson210.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.json.YamlUtils;
 import ru.citeck.ecos.events2.type.RecordEventsService;
-import ru.citeck.ecos.records2.RecordMeta;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.graphql.meta.value.MetaField;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
-import ru.citeck.ecos.records2.request.delete.RecordsDelResult;
-import ru.citeck.ecos.records2.request.delete.RecordsDeletion;
-import ru.citeck.ecos.records2.request.mutation.RecordsMutResult;
-import ru.citeck.ecos.records2.request.query.RecordsQuery;
-import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
-import ru.citeck.ecos.records2.source.dao.local.LocalRecordsDao;
-import ru.citeck.ecos.records2.source.dao.local.MutableRecordsLocalDao;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsMetaDao;
-import ru.citeck.ecos.records2.source.dao.local.v2.LocalRecordsQueryWithMetaDao;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
+import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
+import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
+import ru.citeck.ecos.records3.record.dao.delete.DelStatus;
+import ru.citeck.ecos.records3.record.dao.delete.RecordsDeleteDao;
+import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao;
+import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
+import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.uiserv.domain.i18n.dto.I18nDto;
 import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService;
-import ru.citeck.ecos.uiserv.domain.utils.LegacyRecordsUtils;
-import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class I18nRecords extends LocalRecordsDao implements LocalRecordsQueryWithMetaDao<I18nRecords.I18nRecord>,
-    LocalRecordsMetaDao<I18nRecords.I18nRecord>,
-    MutableRecordsLocalDao<I18nRecords.I18nRecord> {
+public class I18nRecords extends AbstractRecordsDao implements RecordsQueryDao,
+    RecordAttsDao,
+    RecordMutateDtoDao<I18nRecords.I18nRecord>,
+    RecordsDeleteDao {
 
     private final I18nService i18nService;
     private final RecordEventsService recordEventsService;
@@ -53,11 +48,11 @@ public class I18nRecords extends LocalRecordsDao implements LocalRecordsQueryWit
         );
     }
 
+    @Nullable
     @Override
-    public RecordsQueryResult<I18nRecord> queryLocalRecords(@NotNull RecordsQuery recordsQuery,
-                                                                 @NotNull MetaField metaField) {
+    public Object queryRecords(@NotNull RecordsQuery recordsQuery) throws Exception {
 
-        RecordsQueryResult<I18nDto> result = new RecordsQueryResult<>();
+        RecsQueryRes<I18nDto> result = new RecsQueryRes<>();
 
         if (recordsQuery.getLanguage().equals(PredicateService.LANGUAGE_PREDICATE)) {
 
@@ -65,9 +60,9 @@ public class I18nRecords extends LocalRecordsDao implements LocalRecordsQueryWit
 
             List<I18nDto> i18nDtos = i18nService.getAll(
                 predicate,
-                recordsQuery.getMaxItems(),
-                recordsQuery.getSkipCount(),
-                LegacyRecordsUtils.mapLegacySortBy(recordsQuery.getSortBy())
+                recordsQuery.getPage().getMaxItems(),
+                recordsQuery.getPage().getSkipCount(),
+                recordsQuery.getSortBy()
             );
 
             result.setRecords(new ArrayList<>(i18nDtos));
@@ -75,78 +70,53 @@ public class I18nRecords extends LocalRecordsDao implements LocalRecordsQueryWit
 
         } else {
             result.setRecords(new ArrayList<>(
-                i18nService.getAll(recordsQuery.getMaxItems(), recordsQuery.getSkipCount()))
+                i18nService.getAll(recordsQuery.getPage().getMaxItems(), recordsQuery.getPage().getSkipCount()))
             );
             result.setTotalCount(i18nService.getCount());
         }
 
-        return new RecordsQueryResult<>(result, I18nRecord::new);
+        return result.withRecords(I18nRecord::new);
     }
 
+    @Nullable
     @Override
-    public List<I18nRecord> getLocalRecordsMeta(@NotNull List<EntityRef> list,
-                                                     @NotNull MetaField metaField) {
-
-        return list.stream()
-            .map(ref -> {
-                I18nDto dto;
-                if (EntityRef.isEmpty(ref)) {
-                    dto = new I18nDto();
-                } else {
-                    dto = i18nService.getById(ref.getLocalId());
-                    if (dto == null) {
-                        dto = new I18nDto();
-                    }
-                }
-                return new I18nRecord(dto);
-            }).collect(Collectors.toList());
-    }
-
-    @Override
-    public RecordsDelResult delete(RecordsDeletion deletion) {
-
-        List<RecordMeta> resultRecords = new ArrayList<>();
-
-        deletion.getRecords()
-            .forEach(r -> {
-                i18nService.delete(r.getLocalId());
-                resultRecords.add(new RecordMeta(r));
-            });
-
-        RecordsDelResult result = new RecordsDelResult();
-        result.setRecords(resultRecords);
-        return result;
-    }
-
-    @NotNull
-    @Override
-    public List<I18nRecord> getValuesToMutate(@NotNull List<EntityRef> records) {
-
-        return records.stream()
-            .map(EntityRef::getLocalId)
-            .map(id -> {
-                I18nDto dto = i18nService.getById(id);
-                if (dto == null) {
-                    dto = new I18nDto();
-                    dto.setId(id);
-                }
-                return new I18nRecord(dto);
-            })
-            .collect(Collectors.toList());
-    }
-
-    @NotNull
-    @Override
-    public RecordsMutResult save(@NotNull List<I18nRecord> values) {
-
-        RecordsMutResult result = new RecordsMutResult();
-
-        for (final I18nRecord model : values) {
-            result.addRecord(new RecordMeta(i18nService.upload(model).getId()));
+    public Object getRecordAtts(@NotNull String recordId) throws Exception {
+        I18nDto dto;
+        if (recordId.isEmpty()) {
+            dto = new I18nDto();
+        } else {
+            dto = i18nService.getById(recordId);
+            if (dto == null) {
+                dto = new I18nDto();
+            }
         }
-
-        return result;
+        return new I18nRecord(dto);
     }
+
+    @NotNull
+    @Override
+    public List<DelStatus> delete(@NotNull List<String> records) throws Exception {
+        records.forEach(i18nService::delete);
+        return records.stream().map(r -> DelStatus.OK).toList();
+    }
+
+    @Override
+    public I18nRecord getRecToMutate(@NotNull String recordId) {
+        I18nDto dto = i18nService.getById(recordId);
+        if (dto == null) {
+            dto = new I18nDto();
+            dto.setId(recordId);
+        }
+        return new I18nRecord(dto);
+    }
+
+    @NotNull
+    @Override
+    public String saveMutatedRec(I18nRecord i18nRecord) {
+        return i18nService.upload(i18nRecord).getId();
+    }
+
+
 
     @Data
     public static class QueryWithTypeRef {
@@ -158,6 +128,7 @@ public class I18nRecords extends LocalRecordsDao implements LocalRecordsQueryWit
         private String listId;
     }
 
+    @NotNull
     @Override
     public String getId() {
         return "i18n";
@@ -182,7 +153,7 @@ public class I18nRecords extends LocalRecordsDao implements LocalRecordsQueryWit
         }
 
         @JsonIgnore
-        @AttName(".disp")
+        @AttName("?disp")
         public String getDisplayName() {
             return super.getId();
         }
@@ -190,14 +161,13 @@ public class I18nRecords extends LocalRecordsDao implements LocalRecordsQueryWit
         @JsonProperty("_content")
         public void setContent(List<ObjectData> content) {
 
-            String dataUriContent = content.get(0).get("url", "");
+            String dataUriContent = content.getFirst().get("url", "");
             ObjectData data = Json.getMapper().read(dataUriContent, ObjectData.class);
 
             Json.getMapper().applyData(this, data);
         }
 
         @JsonValue
-        @com.fasterxml.jackson.annotation.JsonValue
         public I18nDto toJson() {
             return new I18nDto(this);
         }

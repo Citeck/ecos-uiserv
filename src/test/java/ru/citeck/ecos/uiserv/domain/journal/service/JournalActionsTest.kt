@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.uiserv.Application
 import ru.citeck.ecos.uiserv.domain.action.dto.ExecForQueryConfig
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalActionDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension
 
 @ExtendWith(EcosSpringExtension::class)
@@ -43,12 +43,12 @@ class JournalActionsTest {
         )
 
         val actionRefs = recordsService.getAtt(
-            RecordRef.create("rjournal", "some-journal"),
+            EntityRef.create("rjournal", "some-journal"),
             "actionsDef[].id"
         ).asStrList()
 
         assertThat(actionRefs).containsExactly("journal\$some-journal\$some-action")
-        val actionRef = RecordRef.create("action", actionRefs[0])
+        val actionRef = EntityRef.create("action", actionRefs[0])
         val execForQueryConfig = recordsService.getAtt(actionRef, "execForQueryConfig?json")
 
         assertTrue(execForQueryConfig.get("execAsForRecords").asBoolean())

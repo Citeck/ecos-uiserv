@@ -1,6 +1,6 @@
 package ru.citeck.ecos.uiserv.app.application.config
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.config.lib.dto.ConfigValueType
 import ru.citeck.ecos.config.lib.service.EcosConfigService

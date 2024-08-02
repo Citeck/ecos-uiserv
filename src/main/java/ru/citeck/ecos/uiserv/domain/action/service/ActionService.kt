@@ -1,15 +1,9 @@
 package ru.citeck.ecos.uiserv.domain.action.service
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import ru.citeck.ecos.commons.data.ObjectData
-import ru.citeck.ecos.records2.RecordRef
-import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto
-import ru.citeck.ecos.records2.evaluator.RecordEvaluatorService
-import ru.citeck.ecos.records2.evaluator.evaluators.AlwaysFalseEvaluator
-import ru.citeck.ecos.records2.evaluator.evaluators.AlwaysTrueEvaluator
-import ru.citeck.ecos.records2.evaluator.evaluators.PredicateEvaluator
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
@@ -17,6 +11,12 @@ import ru.citeck.ecos.uiserv.domain.action.dao.ActionDao
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto
 import ru.citeck.ecos.uiserv.domain.action.dto.RecordsActionsDto
 import ru.citeck.ecos.uiserv.domain.action.repo.ActionEntity
+import ru.citeck.ecos.uiserv.domain.evaluator.RecordEvaluatorDto
+import ru.citeck.ecos.uiserv.domain.evaluator.RecordEvaluatorService
+import ru.citeck.ecos.uiserv.domain.evaluator.evaluators.AlwaysFalseEvaluator
+import ru.citeck.ecos.uiserv.domain.evaluator.evaluators.AlwaysTrueEvaluator
+import ru.citeck.ecos.uiserv.domain.evaluator.evaluators.PredicateEvaluator
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
@@ -104,12 +104,12 @@ class ActionService(
         }
     }
 
-    private fun getActionArtifacts(actionRefs: List<RecordRef>): List<ActionDto> {
+    private fun getActionArtifacts(actionRefs: List<EntityRef>): List<ActionDto> {
         val result: MutableList<ActionDto> = ArrayList()
         for (ref in actionRefs) {
-            val actionDto = getAction(ref.id)
+            val actionDto = getAction(ref.getLocalId())
             if (actionDto == null) {
-                log.error("Action doesn't exists: $ref")
+                log.error { "Action doesn't exists: $ref" }
             } else {
                 result.add(actionDto)
             }
@@ -117,21 +117,21 @@ class ActionService(
         return result
     }
 
-    fun getActions(recordRefs: List<RecordRef>, actions: List<RecordRef>): Map<RecordRef, List<ActionDto>> {
+    fun getActions(recordRefs: List<EntityRef>, actions: List<EntityRef>): Map<EntityRef, List<ActionDto>> {
 
         val actionsForRecords = getActionsForRecords(recordRefs, actions)
-        val result: MutableMap<RecordRef, List<ActionDto>> = HashMap()
+        val result: MutableMap<EntityRef, List<ActionDto>> = HashMap()
         val actionById: MutableMap<String, ActionDto> = HashMap()
 
         actionsForRecords.actions.forEach(Consumer { a: ActionDto -> actionById[a.id] = a })
-        actionsForRecords.recordActions.forEach { (recordRef: RecordRef, refActions: Set<String>) ->
+        actionsForRecords.recordActions.forEach { (recordRef: EntityRef, refActions: Set<String>) ->
             result[recordRef] = refActions.mapNotNull { actionById[it] }
         }
 
         return result
     }
 
-    fun getActionsForRecords(recordRefs: List<RecordRef>, actions: List<RecordRef>): RecordsActionsDto {
+    fun getActionsForRecords(recordRefs: List<EntityRef>, actions: List<EntityRef>): RecordsActionsDto {
 
         val actionArtifacts = getActionArtifacts(actions)
 
@@ -158,17 +158,17 @@ class ActionService(
                 recordEvaluatorDto.type = recordEvaluatorDto.id
             }
             if (recordEvaluatorDto.type == null) {
-                log.error(
+                log.error {
                     "Evaluator type is null: '" + recordEvaluatorDto + "'. " +
                         "Replace it with Always False Evaluator. Action: " + actionDto
-                )
+                }
                 recordEvaluatorDto.type = AlwaysFalseEvaluator.TYPE
             }
             recordEvaluatorDto
         }
 
         val evalResultByRecord = evaluatorsService.evaluate(recordRefs, evaluators)
-        val recordActionsByRef: MutableMap<RecordRef, Set<String>> = HashMap()
+        val recordActionsByRef: MutableMap<EntityRef, Set<String>> = HashMap()
 
         for (recordRef in recordRefs) {
             val evalResult = evalResultByRecord[recordRef] ?: emptyList()

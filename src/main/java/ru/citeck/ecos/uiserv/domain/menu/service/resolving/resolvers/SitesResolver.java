@@ -1,11 +1,12 @@
 package ru.citeck.ecos.uiserv.domain.menu.service.resolving.resolvers;
 
+import kotlin.Unit;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.StringUtils;
-import ru.citeck.ecos.records2.RecordsService;
-import ru.citeck.ecos.records2.request.query.QueryConsistency;
-import ru.citeck.ecos.records2.request.query.RecordsQuery;
-import ru.citeck.ecos.records2.request.query.RecordsQueryResult;
+import org.apache.commons.lang3.StringUtils;
+import ru.citeck.ecos.records3.RecordsService;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.Consistency;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
+import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.uiserv.domain.menu.service.resolving.ResolvedMenuItemDto;
 
 import java.util.Collection;
@@ -80,13 +81,14 @@ public class SitesResolver {
     }
 
     private Collection<SiteInfo> getUserSites() {
-        RecordsQuery query = new RecordsQuery();
-        query.setSourceId("alfresco/");
-        query.setQuery("TYPE:\"st:site\" AND NOT ASPECT:\"etype:tenantSite\"");
-        query.setLanguage("fts-alfresco");
-        query.setConsistency(QueryConsistency.TRANSACTIONAL);
-
-        RecordsQueryResult<SiteInfo> result = recordsService.queryRecords(query, SiteInfo.class);
+        RecordsQuery query = RecordsQuery.create(b -> {
+            b.withSourceId("alfresco/");
+            b.withQuery("TYPE:\"st:site\" AND NOT ASPECT:\"etype:tenantSite\"");
+            b.withLanguage("fts-alfresco");
+            b.withConsistency(Consistency.TRANSACTIONAL);
+            return Unit.INSTANCE;
+        });
+        RecsQueryRes<SiteInfo> result = recordsService.query(query, SiteInfo.class);
         return result.getRecords();
     }
 }

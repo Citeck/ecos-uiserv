@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.evaluator.repo
 
+import jakarta.persistence.*
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @Table(name = "evaluators")

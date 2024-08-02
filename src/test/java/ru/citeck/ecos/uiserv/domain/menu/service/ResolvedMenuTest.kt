@@ -5,11 +5,11 @@ import org.junit.jupiter.api.Test
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.model.lib.type.dto.CreateVariantDef
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDef
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
 import ru.citeck.ecos.uiserv.domain.menu.service.testutils.MenuTestBase
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 class ResolvedMenuTest : MenuTestBase() {
 
@@ -21,15 +21,15 @@ class ResolvedMenuTest : MenuTestBase() {
             listOf(
                 CreateVariantDef.create()
                     .withId("DEFAULT")
-                    .withFormRef(RecordRef.valueOf("test-form"))
+                    .withFormRef(EntityRef.valueOf("test-form"))
                     .withName(MLText("test-name"))
-                    .withTypeRef(RecordRef.valueOf("emodel/type@test-type"))
+                    .withTypeRef(EntityRef.valueOf("emodel/type@test-type"))
                     .build(),
                 CreateVariantDef.create()
                     .withId("DEFAULT")
-                    .withFormRef(RecordRef.valueOf("custom-test-form"))
+                    .withFormRef(EntityRef.valueOf("custom-test-form"))
                     .withName(MLText("custom-test-name"))
-                    .withTypeRef(RecordRef.valueOf("emodel/type@custom-test-type"))
+                    .withTypeRef(EntityRef.valueOf("emodel/type@custom-test-type"))
                     .build()
             )
         )
@@ -52,8 +52,8 @@ class ResolvedMenuTest : MenuTestBase() {
                 .withConfig(
                     ObjectData.create(
                         CreateCaseConfig(
-                            typeRef = RecordRef.valueOf("test-type-ref"),
-                            variantTypeRef = RecordRef.valueOf("emodel/type@test-type"),
+                            typeRef = EntityRef.valueOf("test-type-ref"),
+                            variantTypeRef = EntityRef.valueOf("emodel/type@test-type"),
                             variantId = "DEFAULT"
                         )
                     )
@@ -65,8 +65,8 @@ class ResolvedMenuTest : MenuTestBase() {
                 .withConfig(
                     ObjectData.create(
                         CreateCaseConfig(
-                            typeRef = RecordRef.valueOf("test-type-ref"),
-                            variantTypeRef = RecordRef.valueOf("emodel/type@custom-test-type"),
+                            typeRef = EntityRef.valueOf("test-type-ref"),
+                            variantTypeRef = EntityRef.valueOf("emodel/type@custom-test-type"),
                             variantId = "DEFAULT"
                         )
                     )
@@ -78,8 +78,8 @@ class ResolvedMenuTest : MenuTestBase() {
                 .withConfig(
                     ObjectData.create(
                         CreateCaseConfig(
-                            typeRef = RecordRef.valueOf("test-type-ref"),
-                            variantTypeRef = RecordRef.valueOf("emodel/type@unknown-type"),
+                            typeRef = EntityRef.valueOf("test-type-ref"),
+                            variantTypeRef = EntityRef.valueOf("emodel/type@unknown-type"),
                             variantId = "DEFAULT"
                         )
                     )
@@ -97,7 +97,7 @@ class ResolvedMenuTest : MenuTestBase() {
         menuService.save(menu)
 
         val resolvedSubMenu = records.getAtt(
-            RecordRef.valueOf("uiserv/rmenu@test-menu"),
+            EntityRef.valueOf("uiserv/rmenu@test-menu"),
             "subMenu.left?json"
         ).getAs(SubMenuDef::class.java)!!
 
@@ -115,8 +115,8 @@ class ResolvedMenuTest : MenuTestBase() {
     }
 
     class CreateCaseConfig(
-        val typeRef: RecordRef,
-        val variantTypeRef: RecordRef,
+        val typeRef: EntityRef,
+        val variantTypeRef: EntityRef,
         val variantId: String
     )
 

@@ -7,11 +7,12 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.model.lib.type.dto.CreateVariantDef;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.RecordsService;
+import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +24,7 @@ public class EcosTypeUtils {
 
     private final RecordsService recordsService;
 
-    private LoadingCache<RecordRef, Optional<TypeMeta>> typesMetaCache;
+    private LoadingCache<EntityRef, Optional<TypeMeta>> typesMetaCache;
 
     @PostConstruct
     public void init() {
@@ -33,28 +34,27 @@ public class EcosTypeUtils {
             .build(CacheLoader.from(this::getTypeMetaImpl));
     }
 
-    public List<RecordRef> getActions(RecordRef typeRef) {
+    public List<EntityRef> getActions(EntityRef typeRef) {
         return getTypeMeta(typeRef)
             .map(TypeMeta::getActions)
             .orElse(Collections.emptyList());
     }
 
-    public List<CreateVariantDef> getCreateVariants(RecordRef typeRef) {
+    public List<CreateVariantDef> getCreateVariants(EntityRef typeRef) {
         return getTypeMeta(typeRef)
             .map(TypeMeta::getCreateVariants)
             .orElse(Collections.emptyList());
     }
 
-    private Optional<TypeMeta> getTypeMeta(RecordRef typeRef) {
-        if (RecordRef.isEmpty(typeRef)) {
+    private Optional<TypeMeta> getTypeMeta(EntityRef typeRef) {
+        if (EntityRef.isEmpty(typeRef)) {
             return Optional.empty();
         }
         return typesMetaCache.getUnchecked(typeRef);
     }
 
-    private Optional<TypeMeta> getTypeMetaImpl(RecordRef typeRef) {
-        // Do not remove Optional. Interface can be changed with @Nullable
-        return Optional.ofNullable(recordsService.getMeta(typeRef, TypeMeta.class));
+    private Optional<TypeMeta> getTypeMetaImpl(EntityRef typeRef) {
+        return Optional.of(recordsService.getAtts(typeRef, TypeMeta.class));
     }
 
     @Data
@@ -62,7 +62,7 @@ public class EcosTypeUtils {
         @AttName("inhCreateVariants[]?json")
         private List<CreateVariantDef> createVariants;
         @AttName("_actions[]?id")
-        private List<RecordRef> actions;
+        private List<EntityRef> actions;
     }
 }
 

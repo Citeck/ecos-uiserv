@@ -1,14 +1,13 @@
 package ru.citeck.ecos.uiserv.domain.action.dto;
 
-import ecos.com.fasterxml.jackson210.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
-import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.records2.RecordRef;
-import ru.citeck.ecos.records2.evaluator.RecordEvaluatorDto;
+import ru.citeck.ecos.uiserv.domain.evaluator.RecordEvaluatorDto;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +22,7 @@ public class ActionDto {
     private MLText pluralName;
 
     private String icon;
-    private RecordRef typeRef;
+    private EntityRef typeRef;
 
     private String preActionModule;
 
@@ -102,11 +101,11 @@ public class ActionDto {
         this.icon = icon;
     }
 
-    public RecordRef getTypeRef() {
+    public EntityRef getTypeRef() {
         return typeRef;
     }
 
-    public void setTypeRef(RecordRef typeRef) {
+    public void setTypeRef(EntityRef typeRef) {
         this.typeRef = typeRef;
     }
 

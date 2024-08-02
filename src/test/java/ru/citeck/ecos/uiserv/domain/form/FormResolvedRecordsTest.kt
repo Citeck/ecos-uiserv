@@ -7,8 +7,8 @@ import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.type.dto.TypeModelDef
 import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
-import ru.citeck.ecos.records2.RecordRef
 import ru.citeck.ecos.uiserv.domain.form.api.records.EcosFormRecordsDao
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import java.util.*
 
@@ -46,13 +46,13 @@ class FormResolvedRecordsTest : FormsTestBase() {
             )
         }
 
-        val formRef = RecordRef.create("uiserv", "form", "test-form")
+        val formRef = EntityRef.create("uiserv", "form", "test-form")
         typeByForm[formRef] = TypeUtils.getTypeRef("test-type")
 
         recordsService.create(
             EcosFormRecordsDao.ID,
             mapOf(
-                "moduleId" to formRef.id,
+                "moduleId" to formRef.getLocalId(),
                 "definition" to mapOf(
                     "components" to listOf(
                         mapOf(
@@ -75,7 +75,7 @@ class FormResolvedRecordsTest : FormsTestBase() {
             )
         )
 
-        val components = recordsService.getAtt("rform@${formRef.id}", "definition.components[]?json")
+        val components = recordsService.getAtt("rform@${formRef.getLocalId()}", "definition.components[]?json")
 
         val id0Comp = components.first { it.get("id").asText() == "id0" }
         assertThat(id0Comp.get("label").getAs(MLText::class.java)).isEqualTo(titleForSomeKey0)

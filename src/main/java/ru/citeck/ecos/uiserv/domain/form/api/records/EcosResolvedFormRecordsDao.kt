@@ -5,8 +5,7 @@ import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
-import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
-import ru.citeck.ecos.records2.RecordRef
+import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
@@ -57,8 +56,8 @@ class EcosResolvedFormRecordsDao(
 
     private fun mapToResolvedRecord(form: EcosFormRecord): ResolvedFormRecord {
         var typeRef = form.def.typeRef
-        if (RecordRef.isEmpty(typeRef)) {
-            typeRef = ecosTypeService.getTypeRefByForm(RecordRef.create("uiserv", "form", form.def.id))
+        if (EntityRef.isEmpty(typeRef)) {
+            typeRef = ecosTypeService.getTypeRefByForm(EntityRef.create("uiserv", "form", form.def.id))
         }
         val typeInfo = ecosTypeService.getTypeInfo(typeRef)
         return ResolvedFormRecord(form, typeInfo, formService)
@@ -75,7 +74,7 @@ class EcosResolvedFormRecordsDao(
     ) {
 
         fun getTypeRef(): EntityRef {
-            return form.def.typeRef.ifEmpty { TypeUtils.getTypeRef(typeInfo?.id ?: "base") }
+            return form.def.typeRef.ifEmpty { ModelUtils.getTypeRef(typeInfo?.id ?: "base") }
         }
 
         fun getDefinition(): ObjectData {
@@ -90,14 +89,14 @@ class EcosResolvedFormRecordsDao(
         private fun mapComponent(component: DataValue, attributes: Map<String, AttributeDef>): DataValue? {
 
             if (component["type"].asText() == "includeForm") {
-                val formRef = RecordRef.valueOf(component["formRef"].asText())
-                if (formRef.id.isBlank()) {
+                val formRef = EntityRef.valueOf(component["formRef"].asText())
+                if (formRef.getLocalId().isBlank()) {
                     return null
                 }
                 if (component["conditionalForm"].asBoolean(false)) {
                     return component
                 }
-                val formDef = formService.getFormById(formRef.id).orElse(null)
+                val formDef = formService.getFormById(formRef.getLocalId()).orElse(null)
                 if (formDef?.definition != null) {
                     val components = formDef.definition["components"]
                     if (components.isArray()) {

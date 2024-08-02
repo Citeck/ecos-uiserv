@@ -1,12 +1,10 @@
 package ru.citeck.ecos.uiserv.domain.board.api.records;
 
-import ecos.com.fasterxml.jackson210.annotation.JsonValue;
-import ecos.com.fasterxml.jackson210.databind.JsonNode;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.json.YamlUtils;
-import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
@@ -38,7 +36,6 @@ public class BoardRecord {
     }
 
     @JsonValue
-    @com.fasterxml.jackson.annotation.JsonValue
     public JsonNode toNonDefaultJson() {
         return Json.getMapper().toNonDefaultJson(boardDefWithMeta.getBoardDef());
     }

@@ -23,16 +23,15 @@ internal class JournalSettingsPermissionsServiceImplTest {
             assertFalse(service.canRead(createEntity("anotherUser", "admin")))
             assertFalse(service.canRead(createEntity("admin", "admin")))
 
-
             assertTrue(service.canRead(createEntity("user1", listOf("user1", "anotherUser"), "user1")))
             assertTrue(service.canRead(createEntity("", listOf("user1"), "anotherUser")))
             assertTrue(service.canRead(createEntity("anotherUser", listOf("anotherUser", "GROUP_all"), "user1")))
             assertTrue(service.canRead(createEntity("", listOf("GROUP_all", "admin"), "anotherUser")))
 
-            assertFalse(service.canRead(createEntity("anotherUser", listOf("anotherUser"),"anotherUser")))
-            assertFalse(service.canRead(createEntity("admin", listOf("admin", "anotherUser"),"anotherUser")))
-            assertFalse(service.canRead(createEntity("anotherUser", listOf("admin", "anotherUser"),"admin")))
-            assertFalse(service.canRead(createEntity("admin", listOf("admin"),"admin")))
+            assertFalse(service.canRead(createEntity("anotherUser", listOf("anotherUser"), "anotherUser")))
+            assertFalse(service.canRead(createEntity("admin", listOf("admin", "anotherUser"), "anotherUser")))
+            assertFalse(service.canRead(createEntity("anotherUser", listOf("admin", "anotherUser"), "admin")))
+            assertFalse(service.canRead(createEntity("admin", listOf("admin"), "admin")))
         }
     }
 
@@ -48,7 +47,6 @@ internal class JournalSettingsPermissionsServiceImplTest {
             assertTrue(service.canRead(createEntity("admin", "anotherUser")))
             assertTrue(service.canRead(createEntity("anotherUser", "admin")))
             assertTrue(service.canRead(createEntity("admin", "admin")))
-
 
             assertTrue(service.canRead(createEntity("", listOf("user1"), "user1")))
             assertTrue(service.canRead(createEntity("user1", "anotherUser")))
@@ -129,7 +127,6 @@ internal class JournalSettingsPermissionsServiceImplTest {
                     }
                 )
             )
-
 
             assertTrue(
                 service.canRead(
@@ -267,7 +264,6 @@ internal class JournalSettingsPermissionsServiceImplTest {
                 )
             )
 
-
             assertTrue(
                 service.canRead(
                     JournalSettingsDto.create {
@@ -348,7 +344,6 @@ internal class JournalSettingsPermissionsServiceImplTest {
             assertFalse(service.canWrite(createEntity("anotherUser", "admin")))
             assertFalse(service.canWrite(createEntity("admin", "admin")))
 
-
             assertTrue(service.canWrite(createEntity("user1", listOf("user1"), "user1")))
             assertTrue(service.canWrite(createEntity("", listOf("anotherUser", "user1"), "user1")))
 
@@ -373,7 +368,6 @@ internal class JournalSettingsPermissionsServiceImplTest {
             assertTrue(service.canWrite(createEntity("admin", "anotherUser")))
             assertTrue(service.canWrite(createEntity("anotherUser", "admin")))
             assertTrue(service.canWrite(createEntity("admin", "admin")))
-
 
             assertTrue(service.canWrite(createEntity("user1", listOf("user1"), "user1")))
             assertTrue(service.canWrite(createEntity("", listOf("anotherUser", "user1"), "user1")))
@@ -454,7 +448,6 @@ internal class JournalSettingsPermissionsServiceImplTest {
                     }
                 )
             )
-
 
             assertTrue(
                 service.canWrite(
@@ -592,7 +585,6 @@ internal class JournalSettingsPermissionsServiceImplTest {
                 )
             )
 
-
             assertTrue(
                 service.canWrite(
                     JournalSettingsDto.create {
@@ -686,7 +678,6 @@ internal class JournalSettingsPermissionsServiceImplTest {
                 )
             )
 
-
             assertTrue(
                 service.canWriteNew(
                     JournalSettingsDto.create {
@@ -750,7 +741,6 @@ internal class JournalSettingsPermissionsServiceImplTest {
                     }
                 )
             )
-
 
             assertTrue(
                 service.canWriteNew(

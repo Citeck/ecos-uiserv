@@ -6,9 +6,9 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.apps.app.domain.handler.EcosArtifactHandler;
 import ru.citeck.ecos.commons.data.MLText;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.domain.theme.dto.ThemeDto;
 import ru.citeck.ecos.uiserv.domain.theme.service.ThemeService;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +59,7 @@ public class ThemeArtifactHandler implements EcosArtifactHandler<ThemeArtifactHa
     @Data
     public static class DeployModuleMeta {
         private MLText name;
-        private RecordRef parentRef;
+        private EntityRef parentRef;
         private Map<String, String> images = new HashMap<>();
     }
 }

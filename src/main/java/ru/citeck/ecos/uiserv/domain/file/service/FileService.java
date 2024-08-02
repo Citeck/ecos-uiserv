@@ -15,7 +15,7 @@ import ru.citeck.ecos.uiserv.domain.file.repo.FileVersion;
 import ru.citeck.ecos.uiserv.domain.file.repo.File_;
 import ru.citeck.ecos.uiserv.domain.file.repo.FileRepository;
 
-import javax.persistence.criteria.*;
+import jakarta.persistence.criteria.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

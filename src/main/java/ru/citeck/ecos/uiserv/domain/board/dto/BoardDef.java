@@ -1,11 +1,11 @@
 package ru.citeck.ecos.uiserv.domain.board.dto;
 
-import ecos.com.fasterxml.jackson210.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import ru.citeck.ecos.commons.data.MLText;
-import ru.citeck.ecos.records2.RecordRef;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.board.api.records.BoardRecordsDao;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.List;
 
@@ -14,15 +14,15 @@ public class BoardDef {
 
     private String id;
 
-    private RecordRef typeRef;
-    private RecordRef journalRef;
-    private RecordRef cardFormRef;
+    private EntityRef typeRef;
+    private EntityRef journalRef;
+    private EntityRef cardFormRef;
 
     private Boolean readOnly;
     private Boolean disableTitle;
 
     private MLText name;
-    private List<RecordRef> actions;
+    private List<EntityRef> actions;
     private List<BoardColumnDef> columns;
 
     public BoardDef() {
@@ -45,15 +45,15 @@ public class BoardDef {
     }
 
     @JsonIgnore
-    public RecordRef getRef() {
-        return RecordRef.create(Application.NAME, BoardRecordsDao.ID, id);
+    public EntityRef getRef() {
+        return EntityRef.create(Application.NAME, BoardRecordsDao.ID, id);
     }
 
-    public static RecordRef createRef(String localId) {
-        return RecordRef.create(Application.NAME, BoardRecordsDao.ID, localId);
+    public static EntityRef createRef(String localId) {
+        return EntityRef.create(Application.NAME, BoardRecordsDao.ID, localId);
     }
 
-    public RecordRef getTypeRef() {
+    public EntityRef getTypeRef() {
         return typeRef;
     }
 }
