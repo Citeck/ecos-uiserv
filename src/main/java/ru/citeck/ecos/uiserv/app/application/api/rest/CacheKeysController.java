@@ -27,7 +27,7 @@ public class CacheKeysController {
     private final RecordsService recordsService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public HttpEntity<byte[]> getCache(@RequestParam(required = false) String types) {
+    public HttpEntity<byte[]> getCache(@RequestParam(required = false, name = "types") String types) {
 
         if (types == null) {
             types = "";

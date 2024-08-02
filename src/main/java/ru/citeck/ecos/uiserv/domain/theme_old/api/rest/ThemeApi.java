@@ -17,7 +17,7 @@ public class ThemeApi {
     private ThemeService themeService;
 
     @GetMapping("/current")
-    public String getUserTheme(@RequestParam(required = false) String siteId) {
+    public String getUserTheme(@RequestParam(required = false, name = "siteId") String siteId) {
         return themeService.getActiveTheme();
     }
 }

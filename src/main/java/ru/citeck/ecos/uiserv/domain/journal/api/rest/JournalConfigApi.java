@@ -18,7 +18,10 @@ public class JournalConfigApi {
     private JournalConfigService journalConfigService;
 
     @GetMapping
-    public JournalConfigService.JournalConfigDownstream getJournalConfig(@RequestParam String journalId, Locale locale) {
+    public JournalConfigService.JournalConfigDownstream getJournalConfig(
+        @RequestParam(name = "journalId") String journalId,
+        Locale locale
+    ) {
         return journalConfigService.getJournalConfig(journalId).orElseThrow();
     }
 }

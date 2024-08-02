@@ -40,7 +40,7 @@ public class JournalPrefApi {
      */
     @Deprecated
     @GetMapping
-    public JsonNode getJournalPrefs(@RequestParam String id) {
+    public JsonNode getJournalPrefs(@RequestParam(name = "id") String id) {
 
         String username = AuthContext.getCurrentUser();
         JournalSettingsDto settings = journalSettingsService.getDtoById(id);
@@ -59,7 +59,7 @@ public class JournalPrefApi {
      */
     @Deprecated
     @PutMapping
-    public void putJournalPrefs(@RequestParam String id,
+    public void putJournalPrefs(@RequestParam(name = "id") String id,
                                 @RequestBody byte[] bytes) {
         validateBody(bytes);
 
@@ -100,12 +100,12 @@ public class JournalPrefApi {
             }
         } else {
             fileService.deployFileOverride(FileType.JOURNALPREFS, journalViewPrefsId, null, null,
-                    Collections.emptyMap());
+                Collections.emptyMap());
         }
     }
 
     @PostMapping
-    public String postJournalPrefs(@RequestParam String journalId,
+    public String postJournalPrefs(@RequestParam(name = "journalId") String journalId,
                                    @RequestBody byte[] bytes) {
 
         String username = AuthContext.getCurrentUser();
@@ -115,9 +115,9 @@ public class JournalPrefApi {
 
         ObjectData settings = Json.getMapper().read(bytes, ObjectData.class);
         JournalSettingsDto.Builder builder = JournalSettingsDto.create()
-                .withSettings(settings)
-                .withJournalId(journalId)
-                .withAuthority(username);
+            .withSettings(settings)
+            .withJournalId(journalId)
+            .withAuthority(username);
         if (settings != null) {
             String title = settings.get("title").asText();
             builder.withName(Json.getMapper().read(title, MLText.class));
@@ -128,19 +128,21 @@ public class JournalPrefApi {
     }
 
     @GetMapping("/list")
-    public List<JournalPrefService.JournalPreferences> getJournalPrefs(@RequestParam String journalId,
-                                                                       @RequestParam(defaultValue = "true")
-                                                                           Boolean includeUserLocal) {
+    public List<JournalPrefService.JournalPreferences> getJournalPrefs(
+        @RequestParam(name = "journalId") String journalId,
+        @RequestParam(defaultValue = "true", name = "includeUserLocal")
+        Boolean includeUserLocal
+    ) {
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
         List<JournalSettingsDto> settings = journalSettingsService.getSettings(username, journalId);
         List<JournalPrefService.JournalPreferences> preferences =
-                journalPrefService.find(journalId, username, includeUserLocal);
+            journalPrefService.find(journalId, username, includeUserLocal);
 
         preferences = preferences == null ? new ArrayList<>() : new ArrayList<>(preferences);
         settings.stream().map(s ->
-                new JournalPrefService.JournalPreferences(s.getId(), s.getSettings().getAs(JsonNode.class))
+            new JournalPrefService.JournalPreferences(s.getId(), s.getSettings().getAs(JsonNode.class))
         ).forEach(preferences::add);
 
         return preferences;

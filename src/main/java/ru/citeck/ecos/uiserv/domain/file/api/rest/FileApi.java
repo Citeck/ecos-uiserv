@@ -24,7 +24,7 @@ public class FileApi {
     private final FileService fileService;
 
     @GetMapping
-    public HttpEntity<byte[]> get(@PathVariable FileType fileType, @RequestParam String fileId) {
+    public HttpEntity<byte[]> get(@PathVariable FileType fileType, @RequestParam(name = "fileId") String fileId) {
         //todo optionally extract as zip bundle, body plus translations
         return fileService.loadFile(fileType, fileId).map(f -> ResponseEntity.ok(f.getFileVersion().getBytes()))
             .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -32,9 +32,9 @@ public class FileApi {
 
     @PostMapping("/{fileId}/deployForm")
     public void deploy(@PathVariable FileType fileType, @PathVariable String fileId,
-                       @RequestParam long productVersion,
-                       @RequestParam(required = false) MultipartFile zip,
-                       @RequestParam(required = false) MultipartFile file) throws IOException {
+                       @RequestParam(name = "productVersion") long productVersion,
+                       @RequestParam(required = false, name = "zip") MultipartFile zip,
+                       @RequestParam(required = false, name = "file") MultipartFile file) throws IOException {
         if ((zip == null) != (file == null))
             throw new IllegalArgumentException("Upload requires either single file as 'file' parameter or zipped bundle as 'zip'");
         if (zip != null) {
@@ -51,8 +51,8 @@ public class FileApi {
 
     @PostMapping("/{fileId}/deploy")
     public void deploy(@PathVariable FileType fileType, @PathVariable String fileId,
-                       @RequestParam long productVersion,
-                       @RequestParam(defaultValue = "false") boolean bundle,
+                       @RequestParam(name = "productVersion") long productVersion,
+                       @RequestParam(defaultValue = "false", name = "bundle") boolean bundle,
                        @RequestHeader("content-type") String contentType,
                        @RequestBody byte[] bytes) throws IOException {
         if (bundle) {
@@ -67,7 +67,7 @@ public class FileApi {
     }
 
     private void deploy(@PathVariable FileType fileType, String fileId,
-                        @RequestParam long productVersion, String contentType,
+                        @RequestParam(name = "productVersion") long productVersion, String contentType,
                         byte[] bytes, Map<String, byte[]> translations) throws IOException {
         //final String fileId = fileService.getFileMetadataExtractor(fileType).getFileId(bytes);
         final File deployed = fileService.deployStandardFile(fileType,
@@ -96,8 +96,8 @@ public class FileApi {
 
     @PostMapping("/{fileId}/overrideForm")
     public void override(@PathVariable FileType fileType, @PathVariable String fileId,
-                         @RequestParam(required = false) MultipartFile zip,
-                         @RequestParam(required = false) MultipartFile file) throws IOException {
+                         @RequestParam(required = false, name = "zip") MultipartFile zip,
+                         @RequestParam(required = false, name = "file") MultipartFile file) throws IOException {
         if ((zip == null) == (file == null))
             throw new IllegalArgumentException("Upload requires either single file as 'file' parameter or zipped bundle as 'zip'");
 
@@ -114,7 +114,7 @@ public class FileApi {
 
     @PostMapping("/{fileId}/override")
     public void override(@PathVariable FileType fileType, @PathVariable String fileId,
-                         @RequestParam(defaultValue = "false") boolean bundle,
+                         @RequestParam(defaultValue = "false", name = "bundle") boolean bundle,
                          @RequestHeader("content-type") String contentType,
                          @RequestBody byte[] bytes) throws IOException {
         if (bundle) {

@@ -20,8 +20,8 @@ public class I18nController {
 
     private final I18nService i18nService;
 
-    @GetMapping(path = "/locale", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public HttpEntity<byte[]> getMessagesByLocale(@RequestParam(required = false) String id) {
+    @GetMapping(path = "/locale", produces = MediaType.APPLICATION_JSON_VALUE)
+    public HttpEntity<byte[]> getMessagesByLocale(@RequestParam(required = false, name = "id") String id) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setCacheControl(CacheControl.maxAge(4, TimeUnit.HOURS)
