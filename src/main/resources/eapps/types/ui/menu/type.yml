@@ -1,7 +1,7 @@
-
+---
 modelVersion: "1.0"
 
-source-id: "menu"
+sourceId: "menu"
 
 name:
   ru: Меню

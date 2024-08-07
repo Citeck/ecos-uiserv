@@ -1,7 +1,7 @@
-
+---
 modelVersion: "1.0"
 
-source-id: form
+sourceId: form
 
 name:
   ru: Форма

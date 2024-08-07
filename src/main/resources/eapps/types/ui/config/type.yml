@@ -1,3 +1,4 @@
+---
 # Deprecated. Use app/config instead
 modelVersion: "1.0"
 
@@ -5,7 +6,7 @@ name:
   ru: Конфигурация
   en: Config
 
-source-id: "config"
+sourceId: "config"
 
 internal: true
 

@@ -1,11 +1,11 @@
-
+---
 modelVersion: "1.0"
 
 name:
   ru: Журнал
   en: Journal
 
-source-id: "journal"
+sourceId: "journal"
 
 controller:
   type: json

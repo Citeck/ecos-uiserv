@@ -4,6 +4,8 @@ name:
   en: Form
   ru: Форма
 
+parentRef: emodel/type@ecos-vcs-object
+
 sourceId: uiserv/form
 
 system: true

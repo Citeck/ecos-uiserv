@@ -4,6 +4,8 @@ name:
   en: Menu
   ru: Меню
 
+parentRef: emodel/type@ecos-vcs-object
+
 system: true
 
 sourceId: uiserv/menu

@@ -4,6 +4,8 @@ name:
   en: Dashboard
   ru: Дашборд
 
+parentRef: emodel/type@ecos-vcs-object
+
 system: true
 
 sourceId: uiserv/dashboard

@@ -1,11 +1,11 @@
-
+---
 modelVersion: "1.0"
 
 name:
   ru: Канбан-доска
   en: Kanban board
 
-source-id: "board"
+sourceId: "board"
 
 controller:
   type: json

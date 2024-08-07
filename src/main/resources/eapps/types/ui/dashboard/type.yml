@@ -1,11 +1,11 @@
-
+---
 modelVersion: "1.0"
 
 name:
   ru: Дашборд
   en: Dashboard
 
-source-id: "dashboard"
+sourceId: "dashboard"
 
 controller:
   type: json

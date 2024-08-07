@@ -4,6 +4,8 @@ name:
   en: UI Action
   ru: UI Действие
 
+parentRef: emodel/type@ecos-vcs-object
+
 system: true
 
 sourceId: uiserv/action

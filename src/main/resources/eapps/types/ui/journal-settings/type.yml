@@ -1,11 +1,11 @@
-
+---
 modelVersion: "1.0"
 
 name:
   ru: Настройки журнала
   en: Journal settings
 
-source-id: "journal-settings"
+sourceId: "journal-settings"
 
 controller:
   type: json

@@ -1,11 +1,11 @@
-
+---
 modelVersion: "1.0"
 
 name:
   ru: Иконка
   en: Icon
 
-source-id: "icon"
+sourceId: "icon"
 
 controller:
   type: bin

@@ -4,6 +4,8 @@ name:
   en: Journal
   ru: Журнал
 
+parentRef: emodel/type@ecos-vcs-object
+
 sourceId: uiserv/journal
 
 system: true

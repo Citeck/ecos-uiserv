@@ -4,6 +4,8 @@ name:
   en: Journal settings
   ru: Настройки журнала
 
+parentRef: emodel/type@ecos-vcs-object
+
 system: true
 
 sourceId: uiserv/journal-settings
