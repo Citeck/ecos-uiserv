@@ -9,17 +9,19 @@ import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
-import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.context.SecurityContextImpl
 import org.springframework.security.core.userdetails.User
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.context.lib.auth.AuthContext
+import ru.citeck.ecos.context.lib.auth.data.AuthState
+import ru.citeck.ecos.context.lib.auth.data.SimpleAuthData
+import ru.citeck.ecos.context.lib.auth.data.UndefinedAuth
+import ru.citeck.ecos.context.lib.ctx.CtxScope
+import ru.citeck.ecos.context.lib.ctx.EcosContext
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.record.atts.dto.RecordAtts
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
@@ -70,6 +72,10 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
     @Autowired
     lateinit var jpaSearchConverterFactory: JpaSearchConverterFactory
 
+    @Autowired
+    private lateinit var ecosContext: EcosContext
+    private lateinit var testScope: CtxScope
+
     @BeforeEach
     fun setUp() {
         repo.deleteAll()
@@ -79,6 +85,8 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
         for (file in files) {
             fileService.delete(FileType.JOURNALPREFS, file.fileId)
         }
+
+        testScope = ecosContext.newScope()
 
         clearContext()
     }
@@ -92,6 +100,7 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
         for (file in files) {
             fileService.delete(FileType.JOURNALPREFS, file.fileId)
         }
+        testScope.close()
 
         clearContext()
     }
@@ -897,7 +906,7 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
 
     private fun setContext(username: String) {
         val (user, authorities) = fetchUserByUsername(username)
-        SecurityContextHolder.setContext(SecurityContextImpl(TestingAuthenticationToken(user, "creds", authorities)))
+        AuthContext.set(testScope, user.username, SimpleAuthData(user.username, authorities.map { it.authority }))
     }
 
     private fun fetchUserByUsername(username: String): Pair<User, List<GrantedAuthority>> {
@@ -932,6 +941,6 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
     }
 
     private fun clearContext() {
-        SecurityContextHolder.clearContext()
+        AuthContext.set(testScope, AuthState(UndefinedAuth, UndefinedAuth))
     }
 }

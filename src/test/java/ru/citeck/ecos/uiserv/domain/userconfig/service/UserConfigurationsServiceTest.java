@@ -1,6 +1,9 @@
 package ru.citeck.ecos.uiserv.domain.userconfig.service;
 
+import lombok.SneakyThrows;
+import lombok.val;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +13,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.context.lib.auth.AuthContext;
+import ru.citeck.ecos.context.lib.auth.data.EmptyAuth;
+import ru.citeck.ecos.context.lib.auth.data.SimpleAuthData;
+import ru.citeck.ecos.context.lib.ctx.CtxScope;
+import ru.citeck.ecos.context.lib.ctx.EcosContext;
+import ru.citeck.ecos.context.lib.i18n.I18nContext;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.userconfig.dto.UserConfigurationDto;
 import ru.citeck.ecos.uiserv.domain.userconfig.repo.UserConfigurationEntity;
@@ -38,12 +47,21 @@ public class UserConfigurationsServiceTest {
     @Autowired
     private UserConfigurationsService userConfigurationsService;
 
+    @Autowired
+    private EcosContext ecosContext;
+    private CtxScope testScope;
+
     @BeforeEach
     public void prepare() {
         userConfigurationsRepository.deleteAll();
-        SecurityContextHolder.getContext().setAuthentication(
-            new UsernamePasswordAuthenticationToken(USER_NAME, null, Collections.emptyList())
-        );
+        testScope = ecosContext.newScope();
+        AuthContext.INSTANCE.set(testScope, USER_NAME, new SimpleAuthData(USER_NAME, Collections.emptyList()));
+    }
+
+    @AfterEach
+    @SneakyThrows
+    public void tearDown() {
+        testScope.close();
     }
 
     @Test

@@ -9,16 +9,18 @@ import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
-import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.context.SecurityContextImpl
 import org.springframework.security.core.userdetails.User
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.utils.io.IOUtils
 import ru.citeck.ecos.context.lib.auth.AuthContext
+import ru.citeck.ecos.context.lib.auth.data.AuthState
+import ru.citeck.ecos.context.lib.auth.data.SimpleAuthData
+import ru.citeck.ecos.context.lib.auth.data.UndefinedAuth
+import ru.citeck.ecos.context.lib.ctx.CtxScope
+import ru.citeck.ecos.context.lib.ctx.EcosContext
 import ru.citeck.ecos.uiserv.Application
 import ru.citeck.ecos.uiserv.domain.file.repo.FileRepository
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType
@@ -58,6 +60,10 @@ internal class JournalSettingsServiceImplTest {
     @Autowired
     lateinit var journalSettingsDao: JournalSettingsDao
 
+    @Autowired
+    private lateinit var ecosContext: EcosContext
+    private lateinit var testScope: CtxScope
+
     @BeforeEach
     fun setUp() {
         repo.deleteAll()
@@ -67,6 +73,8 @@ internal class JournalSettingsServiceImplTest {
         for (file in files) {
             fileService.delete(FileType.JOURNALPREFS, file.fileId)
         }
+
+        testScope = ecosContext.newScope()
 
         clearContext()
     }
@@ -80,6 +88,7 @@ internal class JournalSettingsServiceImplTest {
         for (file in files) {
             fileService.delete(FileType.JOURNALPREFS, file.fileId)
         }
+        testScope.close()
 
         clearContext()
     }
@@ -1181,7 +1190,7 @@ internal class JournalSettingsServiceImplTest {
 
     private fun setContext(username: String) {
         val (user, authorities) = fetchUserByUsername(username)
-        SecurityContextHolder.setContext(SecurityContextImpl(TestingAuthenticationToken(user, "creds", authorities)))
+        AuthContext.set(testScope, user.username, SimpleAuthData(user.username, authorities.map { it.authority }))
     }
 
     private fun fetchUserByUsername(username: String): Pair<User, List<GrantedAuthority>> {
@@ -1235,6 +1244,6 @@ internal class JournalSettingsServiceImplTest {
     }
 
     private fun clearContext() {
-        SecurityContextHolder.clearContext()
+        AuthContext.set(testScope, AuthState(UndefinedAuth, UndefinedAuth))
     }
 }
