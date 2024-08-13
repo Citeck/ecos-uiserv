@@ -293,14 +293,18 @@
                       "ru": "Настройки",
                       "en": "Settings"
                     },
-                    "key": "submit2",
+                    "key": "settings",
                     "action": "custom",
                     "state": "",
                     "showValidations": false,
-                    "custom": "var currentRow = row;\nvar config = row || {}; \nvar formData = config;\n\nvar hideItemsOlderThan = _.get(formData, 'hideItemsOlderThan');\nif (hideItemsOlderThan) {\n  var duration = moment.duration(hideItemsOlderThan);\n  \n  formData = {\n    ...formData,\n    hideItemsOlderThan: duration.asDays()\n  }\n\n}\n\nCiteck.EcosFormUtils.getFormById('board-column-settings-form', {\n    definition: 'definition?json'\n}).then(function(formConfig) {\n    \n    var inputs = Citeck.EcosFormUtils.getFormInputs(formConfig.definition);\n\n    Citeck.Dialogs.showFormDialog({\n        title: { ru: \"Настройки колонки\", en: \"Column settings\" },\n        showDefaultButtons: true,\n        formDefinition: formConfig.definition,\n        formData: formData,\n        onSubmit: submission => {\n            var data = submission.data || {};\n            var configData = {};\n            for (var i in inputs) {\n                var att = inputs[i].attribute;\n                if (att === \"hideItemsOlderThan\") {\n                  var duration = moment.duration(data[att], 'days');\n                  var isoString = duration.toISOString();\n                  currentRow[att] = isoString;\n                } else {\n                  currentRow[att] = data[att];\n                }\n            }\n        }\n    })\n    \n});",
+                    "custom": "var currentRow = row;\nvar config = row || {}; \nvar formData = config;\n\nvar hideItemsOlderThan = _.get(formData, 'hideItemsOlderThan');\nif (hideItemsOlderThan) {\n  var duration = moment.duration(hideItemsOlderThan);\n  \n  formData = {\n    ...formData,\n    hideItemsOlderThan: duration.asDays()\n  }\n\n}\n\nCiteck.EcosFormUtils.getFormById('board-column-settings-form', {\n    definition: 'definition?json'\n}).then(function(formConfig) {\n    \n    var inputs = Citeck.EcosFormUtils.getFormInputs(formConfig.definition);\n\n    Citeck.Dialogs.showFormDialog({\n        title: { ru: \"Настройки колонки\", en: \"Column settings\" },\n        showDefaultButtons: true,\n        formDefinition: formConfig.definition,\n        currentForm: form,\n        formData: formData,\n        onSubmit: submission => {\n            var data = submission.data || {};\n            var configData = {};\n            for (var i in inputs) {\n                var att = inputs[i].attribute;\n                if (att === \"hideItemsOlderThan\") {\n                  var duration = moment.duration(data[att], 'days');\n                  var isoString = duration.toISOString();\n                  currentRow[att] = isoString;\n                } else {\n                  currentRow[att] = data[att];\n                }\n            }\n        }\n    })\n    \n});",
                     "block": true,
+                    "clearOnHide": false,
                     "refreshOn": [],
                     "optionalWhenDisabled": false,
+                    "conditional": {
+                      "show": "true"
+                    },
                     "type": "button",
                     "input": true,
                     "headers": [
