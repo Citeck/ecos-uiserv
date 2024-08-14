@@ -3,7 +3,7 @@ modelVersion: "1.0"
 
 sourceId: admin-sections-group
 
-internal: true
+internal: false
 
 name:
   ru: Группа разделов администратора

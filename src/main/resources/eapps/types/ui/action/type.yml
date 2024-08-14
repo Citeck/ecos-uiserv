@@ -3,7 +3,7 @@ modelVersion: "1.0"
 
 sourceId: "action"
 
-internal: true
+internal: false
 
 name:
   ru: UI Действие
