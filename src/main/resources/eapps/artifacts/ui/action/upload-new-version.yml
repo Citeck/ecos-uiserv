@@ -13,11 +13,6 @@ predicate:
     - t: eq
       att: permissions._has.Write?bool!true
       val: true
-    - t: or
-      val:
-        - t: eq
-          att: dict._has.cm:document?bool
-          val: true
 # uncomment when records outside alfresco will support versioning
 #        - t: not-empty
 #          att: _type.attributeById.content.id
