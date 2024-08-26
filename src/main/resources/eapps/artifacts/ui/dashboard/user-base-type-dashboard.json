@@ -20,21 +20,25 @@
               "elementsDisplayCondition": {}
             }
           },
-          "description": "Основное"
+          "description": {
+            "ru": "Основное",
+            "en": "General"
+          }
         },
         {
-          "dndId": "9b8f6180-1a68-4c8f-9e21-249ef2f1143d",
-          "name": "properties",
-          "label": "dashboard-settings.widget.properties",
-          "id": "ecbede90-a55d-423a-9b6b-3ac523600335",
+          "name": "doc-preview",
+          "label": "dashboard-settings.widget.preview",
+          "additionalProps": {},
+          "dndId": "e4d0ac0e-2207-40da-9b23-178fec477642",
+          "id": "5cb0dd2f-ca43-466f-a9ce-b4668f57cfd8",
           "props": {
-            "id": "ecbede90-a55d-423a-9b6b-3ac523600335",
+            "id": "5cb0dd2f-ca43-466f-a9ce-b4668f57cfd8",
             "config": {
-              "widgetDisplayCondition": "",
-              "elementsDisplayCondition": {}
+              "widgetDisplayCondition": null,
+              "elementsDisplayCondition": {},
+              "link": ""
             }
-          },
-          "description": "Основное"
+          }
         },
         {
           "dndId": "aa0deb44-527e-4244-85cc-89757c0e07eb",
@@ -48,7 +52,10 @@
               "elementsDisplayCondition": {}
             }
           },
-          "description": "Основное"
+          "description": {
+            "ru": "Основное",
+            "en": "General"
+          }
         },
         {
           "dndId": "38403ec8-6589-4747-beef-53e182ea14a5",
@@ -62,7 +69,10 @@
               "elementsDisplayCondition": {}
             }
           },
-          "description": "Основное"
+          "description": {
+            "ru": "Основное",
+            "en": "General"
+          }
         },
         {
           "dndId": "68d2228b-5972-4b90-b465-d317e5f3d0a6",
@@ -76,7 +86,10 @@
               "elementsDisplayCondition": {}
             }
           },
-          "description": "Основное"
+          "description": {
+            "ru": "Основное",
+            "en": "General"
+          }
         },
         {
           "dndId": "8ecb125c-7a47-4d3b-b871-5868fbe76498",
@@ -90,7 +103,27 @@
               "elementsDisplayCondition": {}
             }
           },
-          "description": "Основное"
+          "description": {
+            "ru": "Основное",
+            "en": "General"
+          }
+        },
+        {
+          "dndId": "9b8f6180-1a68-4c8f-9e21-249ef2f1143d",
+          "name": "properties",
+          "label": "dashboard-settings.widget.properties",
+          "id": "ecbede90-a55d-423a-9b6b-3ac523600335",
+          "props": {
+            "id": "ecbede90-a55d-423a-9b6b-3ac523600335",
+            "config": {
+              "widgetDisplayCondition": "",
+              "elementsDisplayCondition": {}
+            }
+          },
+          "description": {
+            "ru": "Основное",
+            "en": "General"
+          }
         },
         {
           "dndId": "951e31ba-70c0-4cab-988b-9d271cfa3632",
@@ -104,22 +137,10 @@
               "elementsDisplayCondition": {}
             }
           },
-          "description": "Основное"
-        },
-        {
-          "name": "doc-preview",
-          "label": "dashboard-settings.widget.preview",
-          "dndId": "f13d2acd-fc25-4fce-9901-e4b8e7c60f6f",
-          "id": "579e37df-8dae-4f08-abb0-da6bb5f57bf1",
-          "props": {
-            "id": "579e37df-8dae-4f08-abb0-da6bb5f57bf1",
-            "config": {
-              "widgetDisplayCondition": "",
-              "elementsDisplayCondition": {},
-              "link": ""
-            }
-          },
-          "description": "Предпросмотр"
+          "description": {
+            "ru": "Основное",
+            "en": "General"
+          }
         },
         {
           "name": "events-history",
@@ -133,7 +154,10 @@
               "elementsDisplayCondition": {}
             }
           },
-          "description": "История"
+          "description": {
+            "ru": "История",
+            "en": "History"
+          }
         },
         {
           "name": "versions-journal",
@@ -147,7 +171,10 @@
               "elementsDisplayCondition": {}
             }
           },
-          "description": "История"
+          "description": {
+            "ru": "История",
+            "en": "History"
+          }
         },
         {
           "dndId": "9818c1d8-bc41-464f-9824-8d3cd2cf03f2",
@@ -181,7 +208,10 @@
               ]
             }
           },
-          "description": "Документы"
+          "description": {
+            "ru": "Документы",
+            "en": "Documents"
+          }
         }
       ],
       "desktop": [
@@ -199,7 +229,7 @@
             {
               "widgets": [
                 "d5b4372a-cb41-4370-b66e-5580a52aaa6f",
-                "ecbede90-a55d-423a-9b6b-3ac523600335",
+                "5cb0dd2f-ca43-466f-a9ce-b4668f57cfd8",
                 "291afa3a-50c1-4a3a-9700-8b85767926af"
               ]
             },
@@ -208,27 +238,10 @@
                 "b4bcb077-ed4f-498a-b152-97798fddd8fb",
                 "6d9d1e54-0c77-4990-9aed-228bec1614f4",
                 "6cb0726f-07c2-4388-84bc-6651823e2ba9",
+                "ecbede90-a55d-423a-9b6b-3ac523600335",
                 "c0a9aeee-a536-400d-ae80-326e77ce5202"
               ],
               "width": "25%"
-            }
-          ]
-        },
-        {
-          "id": "layout_bf4ddf5b-d22d-40aa-afc3-1ddebe28cfba",
-          "tab": {
-            "label": {
-              "ru": "Предпросмотр",
-              "en": "Preview"
-            },
-            "idLayout": "layout_bf4ddf5b-d22d-40aa-afc3-1ddebe28cfba"
-          },
-          "type": "1-column",
-          "columns": [
-            {
-              "widgets": [
-                "579e37df-8dae-4f08-abb0-da6bb5f57bf1"
-              ]
             }
           ]
         },
@@ -309,7 +322,7 @@
           "columns": [
             {
               "widgets": [
-                "579e37df-8dae-4f08-abb0-da6bb5f57bf1"
+                "5cb0dd2f-ca43-466f-a9ce-b4668f57cfd8"
               ]
             }
           ]
@@ -435,7 +448,7 @@
           "columns": [
             {
               "widgets": [
-                "579e37df-8dae-4f08-abb0-da6bb5f57bf1"
+                "5cb0dd2f-ca43-466f-a9ce-b4668f57cfd8"
               ]
             }
           ]
