@@ -16,7 +16,7 @@ predicate:
     - t: or
       val:
         - t: eq
-          att: dict._has.cm:document?bool
+          att: _has._content?bool
           val: true
 # uncomment when records outside alfresco will support versioning
 #        - t: not-empty
