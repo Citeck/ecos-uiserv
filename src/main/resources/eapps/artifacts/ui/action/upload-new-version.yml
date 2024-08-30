@@ -13,8 +13,6 @@ predicate:
     - t: eq
       att: permissions._has.Write?bool!true
       val: true
-    - t: or
-      val:
-        - t: eq
-          att: _has._content?bool
-          val: true
+    - t: eq
+      att: _has._content?bool
+      val: true
