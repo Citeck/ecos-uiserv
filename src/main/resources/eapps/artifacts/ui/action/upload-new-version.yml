@@ -18,6 +18,3 @@ predicate:
         - t: eq
           att: _has._content?bool
           val: true
-# uncomment when records outside alfresco will support versioning
-#        - t: not-empty
-#          att: _type.attributeById.content.id
