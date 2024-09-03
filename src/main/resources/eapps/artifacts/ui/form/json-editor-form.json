@@ -129,7 +129,7 @@
           "type": "custom",
           "custom": {
             "syncData": "let contentAtt = instance.options.contentAttribute || '?json';\nif (contentAtt.indexOf('?') === -1) {\n  contentAtt += \"?json\";\n}\nvalue = {\n  recId: instance.options.recordId,\n  contentAtt: contentAtt\n}\n",
-            "asyncData": "console.log('Request:', data);\nvalue = Citeck.Records.get(data.recId).load({\"_config\": data.contentAtt});"
+            "asyncData": "value = Citeck.Records.get(data.recId).load({\"_config\": data.contentAtt});"
           },
           "forceLoad": false
         },
