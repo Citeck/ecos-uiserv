@@ -1,0 +1,6 @@
+---
+id: new-journal-enable
+name:
+  ru: Включит новый вид журналов
+  en: Enable a new type of journals
+value: false
