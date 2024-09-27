@@ -100,7 +100,7 @@ internal class JournalSettingsServiceImplTest {
             journalSettingsEntity.extId = "searchable-id"
             journalSettingsEntity.name = "some-name"
             journalSettingsEntity.authority = "user-1"
-            journalSettingsEntity.authorities = listOf("user-1", "user-3")
+            journalSettingsEntity.setAuthoritiesForEntity(listOf("user-1", "user-3"))
             journalSettingsEntity.journalId = "some-journal"
             journalSettingsEntity.settings = "{}"
             repo.save(journalSettingsEntity)
@@ -694,7 +694,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-1"
                 name = "name-1"
-                authorities = listOf("user1")
+                setAuthoritiesForEntity(listOf("user1"))
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -703,7 +703,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-2"
                 name = "name-2"
-                authorities = listOf("user1")
+                setAuthoritiesForEntity(listOf("user1"))
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -712,7 +712,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-3"
                 name = "name-3"
-                authorities = listOf("user2")
+                setAuthoritiesForEntity(listOf("user2"))
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -721,7 +721,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-4"
                 name = "name-4"
-                authorities = listOf("user2", "user1")
+                setAuthoritiesForEntity(listOf("user2", "user1"))
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -730,7 +730,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-5"
                 name = "name-5"
-                authorities = listOf("user1", "user2")
+                setAuthoritiesForEntity(listOf("user1", "user2"))
                 journalId = "journal-2"
                 settings = "{}"
             }
@@ -739,7 +739,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-6"
                 name = "name-6"
-                authorities = listOf("GROUP_all")
+                setAuthoritiesForEntity(listOf("GROUP_all"))
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -874,7 +874,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-1"
                 name = "name-1"
-                authorities = listOf("user1")
+                setAuthoritiesForEntity(listOf("user1"))
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -883,7 +883,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-2"
                 name = "name-2"
-                authorities = listOf("user1")
+                setAuthoritiesForEntity(listOf("user1"))
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -892,7 +892,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-3"
                 name = "name-3"
-                authorities = listOf("user2")
+                setAuthoritiesForEntity(listOf("user2"))
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -901,7 +901,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-4"
                 name = "name-4"
-                authorities = listOf("user1")
+                setAuthoritiesForEntity(listOf("user1"))
                 journalId = "journal-2"
                 settings = "{}"
             }
@@ -910,7 +910,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-5"
                 name = "name-5"
-                authorities = listOf("GROUP_all")
+                setAuthoritiesForEntity(listOf("GROUP_all"))
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -919,7 +919,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-6"
                 name = "name-6"
-                authorities = listOf("admin")
+                setAuthoritiesForEntity(listOf("admin"))
                 journalId = "journal-1"
                 settings = "{}"
             }

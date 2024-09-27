@@ -130,7 +130,7 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
                 JournalSettingsEntity().apply {
                     extId = "ext-id-1"
                     name = "some-name-1"
-                    authorities = listOf("user-1", "user-3")
+                    authorities = mutableListOf("user-1", "user-3")
                     journalId = "journal-1"
                     settings = "{\"foo1\":\"bar\"}"
                 }
@@ -139,7 +139,7 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
                 JournalSettingsEntity().apply {
                     extId = "ext-id-2"
                     name = "some-name-2"
-                    authorities = listOf("user-2", "user-3")
+                    authorities = mutableListOf("user-2", "user-3")
                     journalId = "journal-1"
                     settings = "{\"foo2\":\"bar\"}"
                 }
@@ -653,7 +653,7 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
             JournalSettingsEntity().apply {
                 extId = "id1"
                 name = "name1"
-                authorities = listOf("admin")
+                authorities = mutableListOf("admin")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -694,7 +694,7 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
             JournalSettingsEntity().apply {
                 extId = "id1"
                 name = "name1"
-                authorities = listOf("user1")
+                authorities = mutableListOf("user1")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -735,7 +735,7 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
             JournalSettingsEntity().apply {
                 extId = "id1"
                 name = "name1"
-                authorities = listOf("user1")
+                authorities = mutableListOf("user1")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -767,7 +767,7 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
             JournalSettingsEntity().apply {
                 extId = "id1"
                 name = "name1"
-                authorities = listOf("user1")
+                authorities = mutableListOf("user1")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -799,7 +799,7 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
             JournalSettingsEntity().apply {
                 extId = "id1"
                 name = "name1"
-                authorities = listOf("GROUP_all")
+                authorities = mutableListOf("GROUP_all")
                 journalId = "journal-1"
                 settings = "{}"
             }

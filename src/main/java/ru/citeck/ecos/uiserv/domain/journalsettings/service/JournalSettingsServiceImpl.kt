@@ -250,7 +250,7 @@ class JournalSettingsServiceImpl(
         settingsEntity.settings = Json.mapper.toString(dto.settings)
         settingsEntity.journalId = dto.journalId
         settingsEntity.authority = dto.getAuthority()
-        settingsEntity.authorities = dto.authorities
+        settingsEntity.setAuthoritiesForEntity(dto.authorities)
         return Pair(settingsEntity, isNew)
     }
 

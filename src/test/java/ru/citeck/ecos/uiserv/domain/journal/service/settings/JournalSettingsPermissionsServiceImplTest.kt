@@ -783,7 +783,7 @@ internal class JournalSettingsPermissionsServiceImplTest {
     private fun createEntity(authority: String, authorities: List<String>, creator: String): JournalSettingsEntity {
         val result = JournalSettingsEntity()
         result.authority = authority
-        result.authorities = authorities
+        result.setAuthoritiesForEntity(authorities)
         result.createdBy = creator
         return result
     }
