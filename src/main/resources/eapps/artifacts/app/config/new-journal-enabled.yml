@@ -1,6 +1,6 @@
 ---
 id: new-journal-enabled
 name:
-  ru: Включит новый вид журналов
-  en: Enable a new type of journals
+  ru: Включить/Выключить Новый вид журнала (2.0)
+  en: Turn on/Switch off New type of journal (2.0)
 value: false
