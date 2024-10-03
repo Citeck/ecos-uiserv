@@ -264,7 +264,7 @@ public class MenuService {
     }
 
     private void checkWorkspaceAccess(String workspaceId, boolean newMenu) {
-        if (workspaceId.isEmpty() || AuthContext.isRunAsSystem()) {
+        if (workspaceId == null || workspaceId.isEmpty() || AuthContext.isRunAsSystem()) {
             return;
         }
         var user = AuthContext.getCurrentRunAsUser();
