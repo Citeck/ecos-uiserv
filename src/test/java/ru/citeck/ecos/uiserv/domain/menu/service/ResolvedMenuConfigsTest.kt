@@ -56,37 +56,39 @@ class ResolvedMenuConfigsTest : MenuTestBase() {
             DataValue::class.java
         ) ?: error("Output file reading failed")
 
-        menuDto.copy().withSubMenu(inSubMenu.asMap(String::class.java, SubMenuDef::class.java)).build()
-        menuService.save(menuDto)
+        val menuToSave = menuDto.copy()
+            .withSubMenu(inSubMenu.asMap(String::class.java, SubMenuDef::class.java))
+            .build()
+        menuService.save(menuToSave)
 
         val resolvedMenu = records.getAtt(MENU_RESOLVED_REF, "subMenu?json")
 
         try {
-            compare("", outSubMenu, resolvedMenu)
+            compare("", outSubMenu, resolvedMenu, testName)
         } catch (e: Throwable) {
             log.info { "Resolved menu: \n${Json.mapper.toPrettyString(resolvedMenu)}" }
             throw e
         }
     }
 
-    private fun compare(path: String, expected: DataValue, actual: DataValue) {
+    private fun compare(path: String, expected: DataValue, actual: DataValue, testRootName: String) {
         when {
             expected.isArray() -> {
-                assertThat(expected.size())
-                    .describedAs("Array size doesn't match. Path: '$path'")
-                    .isEqualTo(actual.size())
+                assertThat(actual.size())
+                    .describedAs("Array size doesn't match. Root: $testRootName Path: '$path'")
+                    .isEqualTo(expected.size())
 
                 for (item in expected.withIndex()) {
-                    compare("$path[${item.index}]", item.value, actual.get(item.index))
+                    compare("$path[${item.index}]", item.value, actual[item.index], testRootName)
                 }
             }
             expected.isObject() -> {
                 expected.forEach { k, v ->
-                    compare("$path/$k", v, actual[k])
+                    compare("$path/$k", v, actual[k], testRootName)
                 }
             }
             else -> {
-                assertThat(actual).describedAs("Path: '$path'").isEqualTo(expected)
+                assertThat(actual).describedAs("Root: $testRootName Path: '$path'").isEqualTo(expected)
             }
         }
     }

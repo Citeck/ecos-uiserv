@@ -273,7 +273,15 @@ class ResolvedMenuRecords(
                     result.addAll(evalCreateVariants(section))
                 }
             } else {
-                result.add(item)
+                if (item.type == "SECTION") {
+                    val newItems = ArrayList<MenuItemDef>()
+                    item.items.forEach {
+                        internalIncludesMenuItemProcess(context, it, newItems)
+                    }
+                    result.add(item.copy().withItems(newItems).build())
+                } else {
+                    result.add(item)
+                }
             }
         }
 
