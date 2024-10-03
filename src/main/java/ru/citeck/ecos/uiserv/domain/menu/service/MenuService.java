@@ -9,6 +9,7 @@ import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.config.lib.records.CfgRecordsDao;
 import ru.citeck.ecos.context.lib.auth.AuthContext;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
@@ -20,6 +21,7 @@ import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef;
 import ru.citeck.ecos.uiserv.domain.menu.service.format.MenuReaderService;
 
 import jakarta.annotation.PostConstruct;
+import ru.citeck.ecos.webapp.api.constants.AppName;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.time.Instant;
@@ -37,6 +39,8 @@ public class MenuService {
     private static final String DEFAULT_AUTHORITY = "GROUP_EVERYONE";
     private static final String DEFAULT_MENU_ID = "default-menu";
     private static final String DEFAULT_MENU_V1_ID = "default-menu-v1";
+    private static final String DEFAULT_PERSONAL_WS_MENU_ID = "default-personal-ws-menu";
+    private static final String DEFAULT_WS_MENU_ID = "default-ws-menu";
 
     private final List<String> CONFIGS_TO_REMOVE = Collections.singletonList(
         "default-menu-for-admin-v1"
@@ -44,11 +48,14 @@ public class MenuService {
 
     public static final List<String> DEFAULT_MENUS = Arrays.asList(
         DEFAULT_MENU_ID,
-        DEFAULT_MENU_V1_ID
+        DEFAULT_MENU_V1_ID,
+        DEFAULT_PERSONAL_WS_MENU_ID,
+        DEFAULT_WS_MENU_ID
     );
 
     private final MenuDao menuDao;
     private final MenuReaderService readerService;
+    private final WorkspaceService workspaceService;
 
     private final RecordsService recordsService;
 
@@ -130,15 +137,10 @@ public class MenuService {
 
         entity.setTenant("");
         entity.setType(menuDto.getType());
-
-        List<String> authorities = menuDto.getAuthorities();
-        if (authorities == null) {
-            authorities = Collections.emptyList();
-        }
-
-        entity.setAuthorities(new ArrayList<>(authorities));
+        entity.setAuthorities(new ArrayList<>(menuDto.getAuthorities()));
         entity.setVersion(menuDto.getVersion());
         entity.setItems(Json.getMapper().toString(menuDto.getSubMenu()));
+        entity.setWorkspace(menuDto.getWorkspaceRef().getLocalId());
 
         return entity;
     }
@@ -149,23 +151,31 @@ public class MenuService {
             return null;
         }
 
-        MenuDto dto = new MenuDto();
+        EntityRef workspace = EntityRef.EMPTY;
+        if (StringUtils.isNotBlank(entity.getWorkspace())) {
+            workspace = EntityRef.create(AppName.EMODEL, "workspace", entity.getWorkspace());
+        }
 
-        dto.setId(entity.getExtId());
-        dto.setType(entity.getType());
-        dto.setAuthorities(new ArrayList<>(entity.getAuthorities()));
-        dto.setSubMenu(Json.getMapper().read(entity.getItems(), SubMenus.class));
-        dto.setVersion(entity.getVersion());
-
-        return dto;
+        return MenuDto.create()
+            .withId(entity.getExtId())
+            .withType(entity.getType())
+            .withAuthorities(new ArrayList<>(entity.getAuthorities()))
+            .withSubMenu(Json.getMapper().read(entity.getItems(), SubMenus.class))
+            .withVersion(entity.getVersion())
+            .withWorkspaceRef(workspace)
+            .build();
     }
 
     public MenuDto getMenuForCurrentUser(Integer version) {
+        return getMenuForCurrentUser(version, "");
+    }
+
+    public MenuDto getMenuForCurrentUser(Integer version, String workspace) {
 
         String userName = AuthContext.getCurrentUser();
         List<String> userNameVariants = Collections.singletonList(userName.toLowerCase());
 
-        MenuDto menu = findFirstByAuthorities(userNameVariants, version)
+        MenuDto menu = findFirstByAuthorities(userNameVariants, version, workspace)
             .orElseGet(() -> {
 
                 Set<String> authToRequest = new HashSet<>(AuthContext.getCurrentUserWithAuthorities());
@@ -175,10 +185,10 @@ public class MenuService {
                     .map(String::toLowerCase)
                     .collect(Collectors.toList());
 
-                return findFirstByAuthorities(orderedAuthorities, version).orElse(null);
+                return findFirstByAuthorities(orderedAuthorities, version, workspace).orElse(null);
             });
         if (menu == null) {
-            menu = findDefaultMenu(version);
+            menu = findDefaultMenu(version, workspace);
         }
         return menu;
     }
@@ -197,9 +207,13 @@ public class MenuService {
         return id != null && DEFAULT_MENUS.contains(id);
     }
 
-    private Optional<MenuDto> findFirstByAuthorities(List<String> authorities, Integer version) {
+    private Optional<MenuDto> findFirstByAuthorities(
+        List<String> authorities,
+        Integer version,
+        String workspace
+    ) {
         return authorities.stream()
-            .map(menuDao::findAllByAuthoritiesContains)
+            .map(it -> menuDao.findAllByAuthoritiesContains(it, workspace))
             .flatMap(List::stream)
             .filter(menu -> compareVersion(menu.getVersion(), version))
             .filter(entity -> !isDefaultMenu(entity.getExtId()))
@@ -233,15 +247,32 @@ public class MenuService {
         return orderedAuthorities;
     }
 
-    private MenuDto findDefaultMenu(Integer version) {
+    private MenuDto findDefaultMenu(Integer version, String workspace) {
         int intVersion = version != null ? version : 0;
         Optional<MenuDto> result;
-        if (intVersion == 1) {
-            result = getMenu(DEFAULT_MENU_V1_ID);
+        if (workspace.isEmpty()) {
+            if (intVersion == 1) {
+                result = getMenu(DEFAULT_MENU_V1_ID);
+            } else {
+                result = getMenu(DEFAULT_MENU_ID);
+            }
+        } else if (workspace.startsWith("user$")) {
+            result = getMenu(DEFAULT_PERSONAL_WS_MENU_ID);
         } else {
-            result = getMenu(DEFAULT_MENU_ID);
+            result = getMenu(DEFAULT_WS_MENU_ID);
         }
         return result.orElseThrow(() -> new RuntimeException("Cannot load default menu. Version: " + version));
+    }
+
+    private void checkWorkspaceAccess(String workspaceId, boolean newMenu) {
+        if (workspaceId.isEmpty() || AuthContext.isRunAsSystem()) {
+            return;
+        }
+        var user = AuthContext.getCurrentRunAsUser();
+        if (!workspaceService.isUserManagerOf(user, workspaceId)) {
+            var action = newMenu ? "create" : "change";
+            throw new RuntimeException("You can't " + action + " menu in workspace " + workspaceId);
+        }
     }
 
     public MenuDto save(MenuDto dto) {
@@ -250,15 +281,14 @@ public class MenuService {
             throw new IllegalArgumentException("Dto cannot be null");
         }
 
+
         MenuDto valueBefore = null;
-        if (StringUtils.isBlank(dto.getId())) {
-            dto.setId(UUID.randomUUID().toString());
-        } else {
-            MenuEntity entityBefore = menuDao.findByExtId(dto.getId());
-            if (entityBefore != null) {
-                valueBefore = mapToDto(entityBefore);
-            }
+        MenuEntity entityBefore = menuDao.findByExtId(dto.getId());
+        if (entityBefore != null) {
+            checkWorkspaceAccess(entityBefore.getWorkspace(), false);
+            valueBefore = mapToDto(entityBefore);
         }
+        checkWorkspaceAccess(dto.getWorkspaceRef().getLocalId(), entityBefore == null);
 
         MenuDto result = mapToDto(menuDao.save(mapToEntity(dto)));
         for (BiConsumer<MenuDto, MenuDto> listener : onChangeListeners) {

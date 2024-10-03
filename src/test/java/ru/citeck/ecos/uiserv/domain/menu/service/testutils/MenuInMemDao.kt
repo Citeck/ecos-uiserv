@@ -20,7 +20,7 @@ class MenuInMemDao : MenuDao {
         return data[extId]
     }
 
-    override fun findAllByAuthoritiesContains(authority: String): List<MenuEntity> {
+    override fun findAllByAuthoritiesContains(authority: String, workspace: String): List<MenuEntity> {
         return data.values.filter { menu ->
             menu.authorities?.map { it.lowercase() }?.contains(authority) ?: false
         }

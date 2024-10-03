@@ -38,6 +38,8 @@ public class MenuEntity extends AbstractAuditingEntity {
 
     private Integer version;
 
+    private String workspace;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

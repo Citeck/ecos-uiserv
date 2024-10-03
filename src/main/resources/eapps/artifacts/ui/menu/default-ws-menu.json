@@ -1,0 +1,118 @@
+{
+  "id": "default-ws-menu",
+  "type": "LEFT_MENU",
+  "system": true,
+  "authorities": [],
+  "version": 1,
+  "subMenu": {
+    "create": {
+      "items": []
+    },
+    "left": {
+      "items": [
+        {
+          "id": "tasks",
+          "label": {
+            "ru": "Задачи",
+            "en": "Tasks"
+          },
+          "hidden": false,
+          "type": "INCLUDE_MENU",
+          "config": {
+            "menuRef": "uiserv/menu@default-tasks"
+          }
+        },
+        {
+          "id": "sections",
+          "label": {
+            "ru": "Разделы",
+            "en": "Sections"
+          },
+          "hidden": false,
+          "type": "SECTION",
+          "config": {},
+          "items": [
+            {
+              "id": "workspace-files",
+              "label": {
+                "ru": "Файлы рабочей области",
+                "en": "Workspace files"
+              },
+              "icon": "ui/icon@i-leftmenu-controlled",
+              "hidden": false,
+              "type": "DOCLIB",
+              "config": {
+                "recordRef": "uiserv/journal@type$workspace-file"
+              },
+              "items": [],
+              "allowedFor": []
+            }
+          ]
+        },
+        {
+          "id": "data-lists",
+          "hidden": false,
+          "type": "INCLUDE_MENU",
+          "config": {
+            "menuRef": "uiserv/menu@default-data-lists"
+          },
+          "items": []
+        },
+        {
+          "id": "admin-tools",
+          "label": {
+            "ru": "Инструменты администратора",
+            "en": "Admin tools"
+          },
+          "hidden": false,
+          "type": "SECTION",
+          "config": {},
+          "items": [
+            {
+              "id": "c3f0a948-bebf-4bae-9646-41acece5f3f9",
+              "label": {
+                "ru": "Группы",
+                "en": "Groups"
+              },
+              "icon": "ui/icon@i-leftmenu-groups",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/v2/admin?journalId=authority-groups&type=JOURNAL"
+              }
+            },
+            {
+              "id": "c161291d-09c5-488c-b375-4bb8138afc32",
+              "label": {
+                "ru": "Пользователи",
+                "en": "Users"
+              },
+              "icon": "ui/icon@i-leftmenu-users",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/v2/admin?journalId=persons&type=JOURNAL"
+              }
+            },
+            {
+              "id": "5635b794-4158-4c97-9961-7e38852a14a4",
+              "label": {
+                "ru": "Инструменты",
+                "en": "Tools"
+              },
+              "icon": "ui/icon@i-leftmenu-tools",
+              "hidden": false,
+              "type": "ARBITRARY",
+              "config": {
+                "url": "/v2/dev-tools"
+              }
+            }
+          ],
+          "allowedFor": [
+            "GROUP_ECOS_ADMINISTRATORS"
+          ]
+        }
+      ]
+    }
+  }
+}

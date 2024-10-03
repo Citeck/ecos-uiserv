@@ -16,6 +16,7 @@ import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDef
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
 import ru.citeck.ecos.webapp.api.entity.EntityRef
+import ru.citeck.ecos.webapp.api.entity.toEntityRef
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -30,6 +31,10 @@ class ResolvedMenuRecords(
         const val ID = "rmenu"
 
         private val log = KotlinLogging.logger {}
+
+        private const val ITEM_TYPE_LINK_CREATE_CASE = "LINK-CREATE-CASE"
+        private const val ITEM_TYPE_INCLUDE_MENU = "INCLUDE_MENU"
+        private const val ITEM_TYPE_CREATE_IN_SECTION = "CREATE_IN_SECTION"
     }
 
     override fun getId() = ID
@@ -64,7 +69,7 @@ class ResolvedMenuRecords(
     ) {
 
         fun getSubMenu(): SubMenus {
-            return SubMenus(menu.subMenu)
+            return SubMenus(menu.model.subMenu)
         }
     }
 
@@ -86,55 +91,7 @@ class ResolvedMenuRecords(
         }
 
         fun getCreate(): SubMenuDef {
-
-            val currentCreateMenu = subMenus["create"]
-
-            return if (currentCreateMenu == null) {
-
-                val createMenu = SubMenuDef()
-                createMenu.items = emptyList()
-                createMenu
-            } else {
-
-                val createMenu = SubMenuDef()
-                createMenu.items = preProcessSubMenuItems(currentCreateMenu.items)
-                createMenu
-            }
-        }
-
-        private fun preProcessSubMenuItems(items: List<MenuItemDef>): List<MenuItemDef> {
-
-            val resultItems = ArrayList<MenuItemDef>()
-
-            items.forEach { createMenuItem ->
-
-                if (createMenuItem.type == "CREATE_IN_SECTION") {
-
-                    val sectionId = createMenuItem.config.get("sectionId").asText()
-                    if (sectionId.isNotBlank()) {
-
-                        val section = findMenuItemById(subMenus["left"]?.items, sectionId)
-                        if (section == null) {
-                            log.warn { "Section is not found by id: $sectionId" }
-                        }
-                        evalCreateVariants(section).forEach {
-                            resultItems.add(it)
-                        }
-                    } else {
-                        log.warn { "CREATE_IN_SECTION item without sectionId: $createMenuItem" }
-                    }
-                } else if (createMenuItem.type == "SECTION") {
-
-                    resultItems.add(
-                        createMenuItem.copy()
-                            .withItems(preProcessSubMenuItems(createMenuItem.items))
-                            .build()
-                    )
-                } else {
-                    resultItems.add(createMenuItem)
-                }
-            }
-            return resultItems
+            return subMenus["create"] ?: SubMenuDef()
         }
 
         private fun findMenuItemById(items: List<MenuItemDef>?, id: String): MenuItemDef? {
@@ -191,16 +148,16 @@ class ResolvedMenuRecords(
 
                         val config = ObjectData.create()
 
-                        config.set("typeRef", it.typeRef.toString())
-                        config.set("variantId", it.id)
-                        config.set("recordRef", it.typeRef)
-                        config.set("variantTypeRef", it.typeRef)
+                        config["typeRef"] = it.typeRef.toString()
+                        config["variantId"] = it.id
+                        config["recordRef"] = it.typeRef
+                        config["variantTypeRef"] = it.typeRef
 
-                        config.set("variant", it)
+                        config["variant"] = it
 
                         cvItemDef.withConfig(config)
 
-                        cvItemDef.withType("LINK-CREATE-CASE")
+                        cvItemDef.withType(ITEM_TYPE_LINK_CREATE_CASE)
                         cvItemDef.withLabel(it.name)
                         cvItemDef.build()
                     }
@@ -226,7 +183,7 @@ class ResolvedMenuRecords(
                 }
             } else if (item.type == "JOURNAL") {
 
-                val journalRef = item.config.get("recordRef").asText()
+                val journalRef = item.config["recordRef"].asText()
 
                 if (journalRef.isNotBlank()) {
                     val typeRef = ecosTypeService.getTypeRefByJournal(EntityRef.valueOf(journalRef))
@@ -244,35 +201,99 @@ class ResolvedMenuRecords(
         ): Map<String, SubMenuDef> {
 
             val result = HashMap<String, SubMenuDef>()
+            val contextsWithInternalIncludes = ArrayList<SubMenuProcessingContext>()
+
             subMenu.forEach { (menuType, menu) ->
-                result[menuType] = processMenuItems(menu, authorities)
+                val context = SubMenuProcessingContext(result, menuType)
+                result[menuType] = processMenuItems(context, menu, authorities)
+                if (context.internalIncludeItemsPaths.isNotEmpty()) {
+                    contextsWithInternalIncludes.add(context)
+                }
             }
+
+            for (context in contextsWithInternalIncludes) {
+                val subMenuData = result[context.subMenuType] ?: continue
+                context.phase = SubMenuProcessingContext.ProcessingPhase.INTERNAL_INCLUDES
+                result[context.subMenuType] = processMenuItems(context, subMenuData, authorities)
+            }
+
             return result
         }
 
-        private fun processMenuItems(menu: SubMenuDef, authorities: Set<String>): SubMenuDef {
+        private fun processMenuItems(
+            context: SubMenuProcessingContext,
+            menu: SubMenuDef,
+            authorities: Set<String>
+        ): SubMenuDef {
             val result = SubMenuDef()
             result.config = menu.config
-            result.items = processMenuItems(menu.items, authorities)
+            result.items = processMenuItems(context, menu.items, authorities)
             return result
         }
 
-        private fun processMenuItems(items: List<MenuItemDef>, authorities: Set<String>): List<MenuItemDef> {
-            return items.mapNotNull { processMenuItem(it, authorities) }
+        private fun processMenuItems(
+            context: SubMenuProcessingContext,
+            items: List<MenuItemDef>,
+            authorities: Set<String>
+        ): List<MenuItemDef> {
+            val result = ArrayList<MenuItemDef>()
+            for (item in items) {
+                context.doWithinSubPath(item.id) {
+                    when (context.phase) {
+                        SubMenuProcessingContext.ProcessingPhase.INITIAL -> {
+                            initialMenuItemProcess(context, item, authorities, result)
+                        }
+                        SubMenuProcessingContext.ProcessingPhase.INTERNAL_INCLUDES -> {
+                            internalIncludesMenuItemProcess(context, item, result)
+                        }
+                    }
+                }
+            }
+            return result
         }
 
-        private fun processMenuItem(item: MenuItemDef, authorities: Set<String>): MenuItemDef? {
+        private fun internalIncludesMenuItemProcess(
+            context: SubMenuProcessingContext,
+            item: MenuItemDef,
+            result: MutableList<MenuItemDef>
+        ) {
+
+            if (item.type == ITEM_TYPE_CREATE_IN_SECTION) {
+
+                val sectionId = item.config["sectionId"].asText()
+                if (sectionId.isBlank()) {
+                    log.warn { "$ITEM_TYPE_CREATE_IN_SECTION item without sectionId: $item" }
+                    return
+                }
+
+                val section = findMenuItemById(context.subMenus["left"]?.items, sectionId)
+                if (section == null) {
+                    log.warn { "Section is not found by id: $sectionId" }
+                } else {
+                    result.addAll(evalCreateVariants(section))
+                }
+            } else {
+                result.add(item)
+            }
+        }
+
+        private fun initialMenuItemProcess(
+            context: SubMenuProcessingContext,
+            item: MenuItemDef,
+            authorities: Set<String>,
+            result: MutableList<MenuItemDef>
+        ) {
 
             if (item.hidden) {
-                return null
+                return
             }
             if (item.allowedFor.isNotEmpty() && !item.allowedFor.any { authorities.contains(it.lowercase()) }) {
-                return null
+                return
             }
 
             val newItem = item.copy()
 
-            if (item.type == "LINK-CREATE-CASE") {
+            if (item.type == ITEM_TYPE_LINK_CREATE_CASE) {
                 val typeRef = EntityRef.valueOf(item.config["typeRef"].asText())
                 var variantTypeRef = EntityRef.valueOf(item.config["variantTypeRef"].asText())
                 if (EntityRef.isEmpty(variantTypeRef)) {
@@ -293,11 +314,59 @@ class ResolvedMenuRecords(
                         }
                     }
                 }
+            } else if (item.type == ITEM_TYPE_INCLUDE_MENU) {
+
+                val menuRef = item.config["menuRef"].asText().toEntityRef()
+                if (menuRef.isEmpty()) {
+                    log.warn { "$ITEM_TYPE_INCLUDE_MENU item without menuRef: $item" }
+                    return
+                }
+
+                val configToInclude = recordsService.getAtt(
+                    menuRef.withAppName(ID),
+                    "subMenu.${context.subMenuType}?json"
+                )
+
+                configToInclude.getAs(SubMenuDef::class.java)?.items?.let {
+                    result.addAll(it)
+                }
+                return
+
+            } else if (item.type == ITEM_TYPE_CREATE_IN_SECTION) {
+                context.internalIncludeItemsPaths.add(context.path)
+                result.add(item)
+                return
             }
 
-            newItem.withItems(processMenuItems(newItem.items, authorities))
+            newItem.withItems(processMenuItems(context, newItem.items, authorities))
 
-            return newItem.build()
+            result.add(newItem.build())
+        }
+    }
+
+    private class SubMenuProcessingContext(
+        val subMenus: Map<String, SubMenuDef>,
+        val subMenuType: String,
+        var path: List<String> = emptyList(),
+        var internalIncludeItemsPaths: MutableList<List<String>> = ArrayList(),
+        var phase: ProcessingPhase = ProcessingPhase.INITIAL
+    ) {
+        inline fun <T> doWithinSubPath(subPath: String, action: () -> T): T {
+            val newPath = ArrayList<String>(path.size + 1)
+            newPath.addAll(path)
+            newPath.add(subPath)
+            val prevPath = path
+            this.path = newPath
+            try {
+                return action.invoke()
+            } finally {
+                this.path = prevPath
+            }
+        }
+
+        enum class ProcessingPhase {
+            INITIAL,
+            INTERNAL_INCLUDES
         }
     }
 }

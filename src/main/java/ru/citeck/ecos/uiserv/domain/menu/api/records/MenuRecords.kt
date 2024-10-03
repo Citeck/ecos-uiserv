@@ -12,6 +12,7 @@ import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.commons.json.YamlUtils.toNonDefaultString
 import ru.citeck.ecos.events2.type.RecordEventsService
+import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
@@ -25,7 +26,7 @@ import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.domain.i18n.service.MessageResolver
-import ru.citeck.ecos.uiserv.domain.menu.api.records.MenuRecords.MenuRecord
+import ru.citeck.ecos.uiserv.domain.menu.api.records.MenuRecords.MenuMutRecord
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService
@@ -41,7 +42,7 @@ class MenuRecords(
 ) : AbstractRecordsDao(),
     RecordAttsDao,
     RecordsQueryDao,
-    RecordMutateDtoDao<MenuRecord>,
+    RecordMutateDtoDao<MenuMutRecord>,
     RecordDeleteDao {
 
     companion object {
@@ -54,19 +55,19 @@ class MenuRecords(
     @PostConstruct
     fun init() {
         menuService.addOnChangeListener { before, after ->
-            recordEventsService?.emitRecChanged(before, after, getId()) { MenuRecord(it) }
+            recordEventsService?.emitRecChanged(before, after, getId()) { MenuMutRecord(it) }
         }
     }
 
     override fun getId() = ID
 
     override fun getRecordAtts(recordId: String): MenuRecord {
-        val menuDto = menuService.getMenu(recordId).orElseGet { MenuDto("") }
+        val menuDto = menuService.getMenu(recordId).orElseGet { MenuDto.EMPTY }
         return MenuRecord(menuDto)
     }
 
-    override fun getRecToMutate(recordId: String): MenuRecord {
-        return getRecordAtts(recordId)
+    override fun getRecToMutate(recordId: String): MenuMutRecord {
+        return MenuMutRecord(getRecordAtts(recordId).model)
     }
 
     override fun queryRecords(recsQuery: RecordsQuery): RecsQueryRes<Any> {
@@ -92,7 +93,10 @@ class MenuRecords(
             val menuQuery = recsQuery.getQueryOrNull(MenuQuery::class.java)
 
             if (menuQuery != null && StringUtils.isNotBlank(menuQuery.user)) {
-                val menuDto = menuService.getMenuForCurrentUser(/*menuQuery.user, */menuQuery.version)
+                val menuDto = menuService.getMenuForCurrentUser(
+                    menuQuery.version,
+                    menuQuery.workspace ?: ""
+                )
                 return RecsQueryRes.of(MenuRecord(menuDto))
             }
         }
@@ -101,19 +105,18 @@ class MenuRecords(
         result.setRecords(
             menuService.allMenus
                 .stream()
-                .map { model: MenuDto? -> MenuRecord(model) }
+                .map { model: MenuDto -> MenuRecord(model) }
                 .collect(Collectors.toList())
         )
         return result
     }
 
-    override fun saveMutatedRec(dto: MenuRecord): String {
-
+    override fun saveMutatedRec(dto: MenuMutRecord): String {
         require(!StringUtils.isBlank(dto.id)) { "Parameter 'id' is mandatory for menu record" }
-        if (dto.id == "default-menu" || dto.id == "default-menu-v1") {
+        if (MenuService.DEFAULT_MENUS.contains(dto.id)) {
             dto.id = UUID.randomUUID().toString()
         }
-        val saved = menuService.save(dto)
+        val saved = menuService.save(dto.build())
         return saved.id
     }
 
@@ -131,16 +134,16 @@ class MenuRecords(
     class MenuQuery {
         val user: String? = null
         val version: Int? = null
+        val workspace: String? = null
     }
 
-    inner class MenuRecord(model: MenuDto?) : MenuDto(model) {
+    inner class MenuRecord(
+        @AttName("...") val model: MenuDto
+    ) {
 
-        override fun setSubMenu(subMenu: MutableMap<String, SubMenuDef>?) {
-            val newSubMenu = HashMap(this.subMenu)
-            subMenu?.forEach { (k, v) ->
-                newSubMenu[k] = v
-            }
-            super.setSubMenu(newSubMenu)
+        @AttName(RecordConstants.ATT_NOT_EXISTS)
+        fun isNotExists(): Boolean {
+            return model.id.isBlank()
         }
 
         fun getEcosType(): String {
@@ -148,7 +151,7 @@ class MenuRecords(
         }
 
         fun isDefaultMenu(): Boolean {
-            return menuService.isDefaultMenu(id)
+            return menuService.isDefaultMenu(model.id)
         }
 
         fun getDefaultMenuForJournal(): String {
@@ -159,28 +162,42 @@ class MenuRecords(
             return MenuPermissions(!isDefaultMenu())
         }
 
-        fun getModuleId(): String? {
-            return id
+        fun getModuleId(): String {
+            return model.id
         }
 
-        fun setModuleId(moduleId: String) {
-            id = moduleId
-        }
-
-        override fun getVersion(): Int {
-            val result = super.getVersion()
-            return result ?: 0
-        }
-
-        @AttName("?disp")
         fun getDisplayName(): String {
-            return id
+            return model.id
         }
 
         fun getAuthoritiesForJournal(): String {
-            val authorities = authorities ?: return ""
+            val authorities = model.authorities
             return authorities.stream().filter { "GROUP_EVERYONE" != it }
                 .collect(Collectors.joining(", "))
+        }
+
+        @JsonValue
+        fun toJson(): Any {
+            return model
+        }
+
+        fun getData(): ByteArray {
+            return toNonDefaultString(toJson()).toByteArray(StandardCharsets.UTF_8)
+        }
+    }
+
+    inner class MenuMutRecord(model: MenuDto?) : MenuDto.Builder(model ?: MenuDto.EMPTY) {
+
+        override fun withSubMenu(subMenu: Map<String, SubMenuDef>?): MenuDto.Builder {
+            val newSubMenu = HashMap(this.subMenu)
+            subMenu?.forEach { (k, v) ->
+                newSubMenu[k] = v
+            }
+            return super.withSubMenu(newSubMenu)
+        }
+
+        fun setModuleId(moduleId: String) {
+            withId(moduleId)
         }
 
         @JsonProperty("_content")
@@ -188,16 +205,6 @@ class MenuRecords(
             val dataUriContent = content[0].get("url", "")
             val data = mapper.read(dataUriContent, ObjectData::class.java)!!
             mapper.applyData(this, data)
-        }
-
-        @JsonValue
-        fun toJson(): Any? {
-            return MenuDto(this)
-        }
-
-        fun getData(): ByteArray? {
-            val json = toJson() ?: return null
-            return toNonDefaultString(json).toByteArray(StandardCharsets.UTF_8)
         }
     }
 

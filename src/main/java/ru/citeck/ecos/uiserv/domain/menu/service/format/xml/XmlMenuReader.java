@@ -42,20 +42,18 @@ public class XmlMenuReader implements MenuReader {
     }
 
     private MenuDto configToDto(MenuConfig config) {
-        MenuDto dto = new MenuDto();
-
-        dto.setId(config.getId());
-        dto.setType(config.getType());
 
         List<String> authorities = Arrays.stream(config.getAuthorities().split(","))
             .filter(StringUtils::isNotBlank)
             .collect(Collectors.toList());
-        dto.setAuthorities(authorities);
 
-        dto.setVersion(null);
-        dto.setSubMenu(parseSubMenusFromItems(config.getItems()));
-
-        return dto;
+        return MenuDto.create()
+            .withId(config.getId())
+            .withType(config.getType())
+            .withAuthorities(authorities)
+            .withVersion(null)
+            .withSubMenu(parseSubMenusFromItems(config.getItems()))
+            .build();
     }
 
     private Map<String, SubMenuDef> parseSubMenusFromItems(Items items) {

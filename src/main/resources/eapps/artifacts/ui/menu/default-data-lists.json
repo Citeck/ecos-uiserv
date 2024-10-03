@@ -1,0 +1,24 @@
+{
+  "id": "default-data-lists",
+  "type": "LEFT_MENU",
+  "system": true,
+  "authorities": [],
+  "version": 1,
+  "subMenu": {
+    "left": {
+      "items": [
+        {
+          "id": "data-lists",
+          "label": {
+            "ru": "Справочники",
+            "en": "Data lists"
+          },
+          "hidden": false,
+          "type": "SECTION",
+          "config": {},
+          "items": []
+        }
+      ]
+    }
+  }
+}

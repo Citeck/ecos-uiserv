@@ -9,7 +9,7 @@ interface MenuDao {
 
     fun findByExtId(extId: String): MenuEntity?
 
-    fun findAllByAuthoritiesContains(authority: String): List<MenuEntity>
+    fun findAllByAuthoritiesContains(authority: String, workspace: String): List<MenuEntity>
 
     fun deleteByExtId(extId: String)
 

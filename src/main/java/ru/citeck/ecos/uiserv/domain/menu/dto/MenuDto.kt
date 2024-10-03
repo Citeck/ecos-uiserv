@@ -1,77 +1,93 @@
-package ru.citeck.ecos.uiserv.domain.menu.dto;
+package ru.citeck.ecos.uiserv.domain.menu.dto
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import ru.citeck.ecos.commons.data.DataValue;
-import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder
+import ru.citeck.ecos.commons.data.DataValue
+import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 
-import java.util.List;
-import java.util.Map;
-
-@Data
-@ToString(exclude = {"subMenu"})
-@NoArgsConstructor
 @IncludeNonDefault
-public class MenuDto {
+@JsonDeserialize(builder = MenuDto.Builder::class)
+open class MenuDto(
+    val id: String,
+    val type: String,
+    val authorities: List<String>,
+    val version: Int,
+    val workspaceRef: EntityRef,
+    val subMenu: Map<String, SubMenuDef>
+) {
+    companion object {
+        val EMPTY = create().build()
 
-    private String id;
-    private String type;
-    private List<String> authorities;
-    private Integer version;
-
-    private Map<String, SubMenuDef> subMenu;
-
-    public MenuDto(String id) {
-        this.id = id;
+        @JvmStatic
+        fun create(): Builder {
+            return Builder()
+        }
     }
 
-    public MenuDto(MenuDto other) {
-        this.id = other.id;
-        this.type = other.type;
-        this.version = other.version;
-        this.authorities = DataValue.create(other.authorities).toStrList();
-        this.subMenu = DataValue.create(other.subMenu).asMap(String.class, SubMenuDef.class);
+    fun copy(): Builder {
+        return Builder(this)
     }
 
-    public String getId() {
-        return id;
-    }
+    @JsonPOJOBuilder
+    open class Builder() {
 
-    public void setId(String id) {
-        this.id = id;
-    }
+        var id: String = ""
+        var type: String = ""
+        var authorities: List<String> = emptyList()
+        var version: Int = 0
+        var workspaceRef: EntityRef = EntityRef.EMPTY
+        var subMenu: Map<String, SubMenuDef> = emptyMap()
 
-    public String getType() {
-        return type;
-    }
+        constructor(base: MenuDto) : this() {
+            this.id = base.id
+            this.type = base.type
+            this.authorities = base.authorities
+            this.version = base.version
+            this.workspaceRef = base.workspaceRef
+            this.subMenu = DataValue.create(base.subMenu).asMap(String::class.java, SubMenuDef::class.java)
+        }
 
-    public void setType(String type) {
-        this.type = type;
-    }
+        fun withId(id: String?): Builder {
+            this.id = id ?: ""
+            return this
+        }
 
-    public List<String> getAuthorities() {
-        return authorities;
-    }
+        fun withType(type: String?): Builder {
+            this.type = type ?: ""
+            return this
+        }
 
-    public void setAuthorities(List<String> authorities) {
-        this.authorities = authorities;
-    }
+        fun withAuthorities(authorities: List<String>?): Builder {
+            this.authorities = authorities ?: emptyList()
+            return this
+        }
 
-    public Integer getVersion() {
-        return version;
-    }
+        fun withVersion(version: Int?): Builder {
+            this.version = version ?: EMPTY.version
+            return this
+        }
 
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
+        fun withWorkspaceRef(workspaceRef: EntityRef?): Builder {
+            this.workspaceRef = workspaceRef ?: EntityRef.EMPTY
+            return this
+        }
 
-    public Map<String, SubMenuDef> getSubMenu() {
-        return subMenu;
-    }
+        open fun withSubMenu(subMenu: Map<String, SubMenuDef>?): Builder {
+            this.subMenu = subMenu ?: emptyMap()
+            return this
+        }
 
-    public void setSubMenu(Map<String, SubMenuDef> subMenu) {
-        this.subMenu = subMenu;
+        fun build(): MenuDto {
+            return MenuDto(
+                id = id,
+                type = type,
+                authorities = authorities,
+                version = version,
+                workspaceRef = workspaceRef,
+                subMenu = subMenu
+            )
+        }
     }
 }
 

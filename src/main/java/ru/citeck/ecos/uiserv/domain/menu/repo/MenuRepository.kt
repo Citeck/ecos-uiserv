@@ -15,10 +15,19 @@ interface MenuRepository : JpaRepository<MenuEntity, Long>, JpaSpecificationExec
         "SELECT menu " +
             "FROM MenuEntity menu " +
             "JOIN menu.authorities authority " +
-            "WHERE lower(authority) = ?1 " +
+            "WHERE lower(authority) = ?1 AND menu.workspaceRef IS NULL OR menu.workspaceRef = '' " +
             "ORDER BY menu.priority DESC"
     )
     fun findAllByAuthoritiesContains(authority: String): List<MenuEntity>
+
+    @Query(
+        "SELECT menu " +
+            "FROM MenuEntity menu " +
+            "JOIN menu.authorities authority " +
+            "WHERE lower(authority) = ?1 AND menu.workspaceRef = ?2" +
+            "ORDER BY menu.priority DESC"
+    )
+    fun findAllByAuthoritiesContains(authority: String, workspaceRef: String): List<MenuEntity>
 
     fun deleteByExtId(extId: String)
 

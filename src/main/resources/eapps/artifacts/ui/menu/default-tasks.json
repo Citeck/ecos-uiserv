@@ -1,0 +1,67 @@
+{
+  "id": "default-tasks",
+  "type": "LEFT_MENU",
+  "system": true,
+  "authorities": [],
+  "version": 1,
+  "subMenu": {
+    "left": {
+      "items": [
+        {
+          "id": "tasks",
+          "label": {
+            "ru": "Задачи",
+            "en": "Tasks"
+          },
+          "hidden": false,
+          "type": "SECTION",
+          "config": {},
+          "items": [
+            {
+              "id": "0fa6410f-0155-4a04-b001-c8f159f183a5",
+              "label": {
+                "ru": "Текущие задачи",
+                "en": "Active tasks"
+              },
+              "icon": "ui/icon@i-leftmenu-current-tasks",
+              "hidden": false,
+              "type": "JOURNAL",
+              "config": {
+                "recordRef": "uiserv/journal@bpmn-active-tasks",
+                "displayCount": true
+              }
+            },
+            {
+              "id": "1af6c697-6d67-4170-a2ee-ee56bb9e8d73",
+              "label": {
+                "ru": "Завершенные задачи",
+                "en": "Completed tasks"
+              },
+              "icon": "ui/icon@i-leftmenu-completed-tasks",
+              "hidden": false,
+              "type": "JOURNAL",
+              "config": {
+                "recordRef": "uiserv/journal@bpmn-historic-tasks",
+                "displayCount": false
+              }
+            },
+            {
+              "id": "61388ecc-5c1c-45f2-bccd-1e3c13cdda92",
+              "label": {
+                "ru": "Задачи подчиненных",
+                "en": "Subordinates tasks"
+              },
+              "icon": "ui/icon@i-leftmenu-organizational-structure",
+              "hidden": false,
+              "type": "JOURNAL",
+              "config": {
+                "recordRef": "uiserv/journal@bpmn-subordinates-tasks",
+                "displayCount": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
