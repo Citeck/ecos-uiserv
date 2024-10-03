@@ -1,9 +1,11 @@
 package ru.citeck.ecos.uiserv.domain.menu.dto
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
+import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 @IncludeNonDefault
@@ -13,7 +15,7 @@ open class MenuDto(
     val type: String,
     val authorities: List<String>,
     val version: Int,
-    val workspaceRef: EntityRef,
+    val workspace: String,
     val subMenu: Map<String, SubMenuDef>
 ) {
     companion object {
@@ -22,6 +24,15 @@ open class MenuDto(
         @JvmStatic
         fun create(): Builder {
             return Builder()
+        }
+    }
+
+    @JsonIgnore
+    fun getWorkspaceRef(): EntityRef {
+        return if (workspace.isEmpty()) {
+            EntityRef.EMPTY
+        } else {
+            EntityRef.create(AppName.EMODEL, "workspace", workspace)
         }
     }
 
@@ -36,7 +47,7 @@ open class MenuDto(
         var type: String = ""
         var authorities: List<String> = emptyList()
         var version: Int = 0
-        var workspaceRef: EntityRef = EntityRef.EMPTY
+        var workspace: String = ""
         var subMenu: Map<String, SubMenuDef> = emptyMap()
 
         constructor(base: MenuDto) : this() {
@@ -44,7 +55,7 @@ open class MenuDto(
             this.type = base.type
             this.authorities = base.authorities
             this.version = base.version
-            this.workspaceRef = base.workspaceRef
+            this.workspace = base.workspace
             this.subMenu = DataValue.create(base.subMenu).asMap(String::class.java, SubMenuDef::class.java)
         }
 
@@ -68,9 +79,13 @@ open class MenuDto(
             return this
         }
 
-        fun withWorkspaceRef(workspaceRef: EntityRef?): Builder {
-            this.workspaceRef = workspaceRef ?: EntityRef.EMPTY
+        fun withWorkspace(workspace: String?): Builder {
+            this.workspace = workspace ?: ""
             return this
+        }
+
+        fun withWorkspaceRef(workspaceRef: EntityRef?): Builder {
+            return withWorkspace(workspaceRef?.getLocalId())
         }
 
         open fun withSubMenu(subMenu: Map<String, SubMenuDef>?): Builder {
@@ -84,7 +99,7 @@ open class MenuDto(
                 type = type,
                 authorities = authorities,
                 version = version,
-                workspaceRef = workspaceRef,
+                workspace = workspace,
                 subMenu = subMenu
             )
         }

@@ -21,7 +21,6 @@ import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef;
 import ru.citeck.ecos.uiserv.domain.menu.service.format.MenuReaderService;
 
 import jakarta.annotation.PostConstruct;
-import ru.citeck.ecos.webapp.api.constants.AppName;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.time.Instant;
@@ -145,7 +144,7 @@ public class MenuService {
         entity.setAuthorities(new ArrayList<>(menuDto.getAuthorities()));
         entity.setVersion(menuDto.getVersion());
         entity.setItems(Json.getMapper().toString(menuDto.getSubMenu()));
-        entity.setWorkspace(menuDto.getWorkspaceRef().getLocalId());
+        entity.setWorkspace(menuDto.getWorkspace());
 
         return entity;
     }
@@ -156,18 +155,13 @@ public class MenuService {
             return null;
         }
 
-        EntityRef workspace = EntityRef.EMPTY;
-        if (StringUtils.isNotBlank(entity.getWorkspace())) {
-            workspace = EntityRef.create(AppName.EMODEL, "workspace", entity.getWorkspace());
-        }
-
         return MenuDto.create()
             .withId(entity.getExtId())
             .withType(entity.getType())
             .withAuthorities(new ArrayList<>(entity.getAuthorities()))
             .withSubMenu(Json.getMapper().read(entity.getItems(), SubMenus.class))
             .withVersion(entity.getVersion())
-            .withWorkspaceRef(workspace)
+            .withWorkspace(entity.getWorkspace())
             .build();
     }
 
