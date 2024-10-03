@@ -6,8 +6,6 @@ import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
 import ru.citeck.ecos.uiserv.domain.menu.repo.MenuEntity
 import ru.citeck.ecos.uiserv.domain.menu.repo.MenuRepository
-import ru.citeck.ecos.webapp.api.constants.AppName
-import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory
 import java.time.Instant
@@ -33,8 +31,7 @@ class MenuRepoDao(
         return if (workspace.isEmpty()) {
             repo.findAllByAuthoritiesContains(authority)
         } else {
-            val wsRef = EntityRef.create(AppName.EMODEL, "workspace", workspace)
-            repo.findAllByAuthoritiesContains(authority, wsRef.toString())
+            repo.findAllByAuthoritiesContains(authority, workspace)
         }
     }
 

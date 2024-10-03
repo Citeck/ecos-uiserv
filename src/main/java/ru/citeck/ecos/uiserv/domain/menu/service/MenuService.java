@@ -42,6 +42,9 @@ public class MenuService {
     private static final String DEFAULT_PERSONAL_WS_MENU_ID = "default-personal-ws-menu";
     private static final String DEFAULT_WS_MENU_ID = "default-ws-menu";
 
+    private static final String DEFAULT_DATA_LISTS_ID = "default-data-lists";
+    private static final String DEFAULT_TASKS_ID = "default-tasks";
+
     private final List<String> CONFIGS_TO_REMOVE = Collections.singletonList(
         "default-menu-for-admin-v1"
     );
@@ -50,7 +53,9 @@ public class MenuService {
         DEFAULT_MENU_ID,
         DEFAULT_MENU_V1_ID,
         DEFAULT_PERSONAL_WS_MENU_ID,
-        DEFAULT_WS_MENU_ID
+        DEFAULT_WS_MENU_ID,
+        DEFAULT_DATA_LISTS_ID,
+        DEFAULT_TASKS_ID
     );
 
     private final MenuDao menuDao;
@@ -280,7 +285,6 @@ public class MenuService {
         if (dto == null) {
             throw new IllegalArgumentException("Dto cannot be null");
         }
-
 
         MenuDto valueBefore = null;
         MenuEntity entityBefore = menuDao.findByExtId(dto.getId());

@@ -29,11 +29,11 @@ class UserWithLowerCaseTest : MenuTestBase() {
 
     fun testImpl(menuAuthorities: List<String>, searchUser: String, searchUserGroups: List<String>) {
 
-        val userMenu = MenuDto("test-user-menu")
-        userMenu.authorities = menuAuthorities
-        userMenu.version = 1
+        val userMenu = MenuDto.create().withId("test-user-menu")
+        userMenu.withAuthorities(menuAuthorities)
+        userMenu.withVersion(1)
 
-        menuService.save(userMenu)
+        menuService.save(userMenu.build())
 
         val userMenuFromService = AuthContext.runAs(searchUser, searchUserGroups) {
             menuService.getMenuForCurrentUser(1)

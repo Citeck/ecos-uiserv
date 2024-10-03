@@ -331,7 +331,6 @@ class ResolvedMenuRecords(
                     result.addAll(it)
                 }
                 return
-
             } else if (item.type == ITEM_TYPE_CREATE_IN_SECTION) {
                 context.internalIncludeItemsPaths.add(context.path)
                 result.add(item)

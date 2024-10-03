@@ -20,11 +20,11 @@ class UserOrGroupMenuTest : MenuTestBase() {
                 .build()
         )*/
 
-        val userMenu = MenuDto("test-user-menu")
-        userMenu.authorities = listOf("user")
-        userMenu.version = 1
+        val userMenu = MenuDto.create().withId("test-user-menu")
+        userMenu.withAuthorities(listOf("user"))
+        userMenu.withVersion(1)
 
-        menuService.save(userMenu)
+        menuService.save(userMenu.build())
 
         val userMenuFromService = AuthContext.runAs("user", listOf("user-group")) {
             menuService.getMenuForCurrentUser(1)
@@ -32,11 +32,11 @@ class UserOrGroupMenuTest : MenuTestBase() {
 
         assertThat(userMenuFromService?.id).isEqualTo("test-user-menu")
 
-        val userGroupMenu = MenuDto("test-user-group-menu")
-        userGroupMenu.authorities = listOf("user-group")
-        userGroupMenu.version = 1
+        val userGroupMenu = MenuDto.create().withId("test-user-group-menu")
+        userGroupMenu.withAuthorities(listOf("user-group"))
+        userGroupMenu.withVersion(1)
 
-        menuService.save(userGroupMenu)
+        menuService.save(userGroupMenu.build())
 
         val userGroupMenuFromService = AuthContext.runAs("user", listOf("user-group")) {
             menuService.getMenuForCurrentUser(1)

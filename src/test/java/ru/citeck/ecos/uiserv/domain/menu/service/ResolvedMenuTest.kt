@@ -41,8 +41,8 @@ class ResolvedMenuTest : MenuTestBase() {
         )
         registerType(testType2)
 
-        val menu = MenuDto()
-        menu.id = "test-menu"
+        val menu = MenuDto.create()
+        menu.withId("test-menu")
 
         val leftMenu = SubMenuDef()
         leftMenu.items = listOf(
@@ -92,9 +92,9 @@ class ResolvedMenuTest : MenuTestBase() {
                 .build()
         )
 
-        menu.subMenu = mapOf("left" to leftMenu)
+        menu.withSubMenu(mapOf("left" to leftMenu))
 
-        menuService.save(menu)
+        menuService.save(menu.build())
 
         val resolvedSubMenu = records.getAtt(
             EntityRef.valueOf("uiserv/rmenu@test-menu"),
@@ -106,11 +106,11 @@ class ResolvedMenuTest : MenuTestBase() {
         assertThat(resolvedSubMenu.items[0].type).isEqualTo(leftMenu.items[0].type)
 
         assertThat(
-            resolvedSubMenu.items[0].config.get("variant").getAs(CreateVariantDef::class.java)
+            resolvedSubMenu.items[0].config["variant"].getAs(CreateVariantDef::class.java)
         ).isEqualTo(testType.createVariants[0])
 
         assertThat(
-            resolvedSubMenu.items[1].config.get("variant").getAs(CreateVariantDef::class.java)
+            resolvedSubMenu.items[1].config["variant"].getAs(CreateVariantDef::class.java)
         ).isEqualTo(testType2.createVariants[0])
     }
 

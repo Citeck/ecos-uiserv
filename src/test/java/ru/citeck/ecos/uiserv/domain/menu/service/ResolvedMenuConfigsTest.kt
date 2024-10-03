@@ -23,8 +23,7 @@ class ResolvedMenuConfigsTest : MenuTestBase() {
 
     private fun init() {
         loadAndRegisterAllTypes("types")
-        menuDto = MenuDto()
-        menuDto.id = MENU_RESOLVED_REF.getLocalId()
+        menuDto = MenuDto.create().withId(MENU_RESOLVED_REF.getLocalId()).build()
     }
 
     @Test
@@ -57,7 +56,7 @@ class ResolvedMenuConfigsTest : MenuTestBase() {
             DataValue::class.java
         ) ?: error("Output file reading failed")
 
-        menuDto.subMenu = inSubMenu.asMap(String::class.java, SubMenuDef::class.java)
+        menuDto.copy().withSubMenu(inSubMenu.asMap(String::class.java, SubMenuDef::class.java)).build()
         menuService.save(menuDto)
 
         val resolvedMenu = records.getAtt(MENU_RESOLVED_REF, "subMenu?json")

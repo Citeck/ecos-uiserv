@@ -10,7 +10,8 @@ import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.config.lib.provider.InMemConfigProvider
 import ru.citeck.ecos.config.lib.records.CfgRecordsDao
 import ru.citeck.ecos.config.lib.service.EcosConfigServiceFactory
-import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils
+import ru.citeck.ecos.model.lib.ModelServiceFactory
+import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.RecordsServiceFactory
 import ru.citeck.ecos.test.commons.EcosWebAppApiMock
@@ -49,7 +50,7 @@ open class MenuTestBase {
         val webAppContext = EcosWebAppApiMock(Application.NAME)
 
         val recordsServices = object : RecordsServiceFactory() {
-            override fun getEcosWebAppApi(): EcosWebAppApi? {
+            override fun getEcosWebAppApi(): EcosWebAppApi {
                 return webAppContext
             }
         }
@@ -59,7 +60,14 @@ open class MenuTestBase {
         configs = configServiceFactory.inMemConfigProvider
         records.register(CfgRecordsDao(configServiceFactory))
 
-        menuService = MenuService(menuDao, menuReaderService, recordsServices.recordsService)
+        val modelServices = ModelServiceFactory()
+
+        menuService = MenuService(
+            menuDao,
+            menuReaderService,
+            modelServices.workspaceService,
+            recordsServices.recordsService
+        )
 
         val menuRecords = MenuRecords(
             menuService,
@@ -80,7 +88,7 @@ open class MenuTestBase {
         Mockito.`when`(ecosTypeService.getTypeRefByJournal(Mockito.any())).thenAnswer { invocation ->
             typesInfo.values.firstOrNull {
                 it.journalRef == invocation.getArgument(0)
-            }?.id?.let { TypeUtils.getTypeRef(it) }
+            }?.id?.let { ModelUtils.getTypeRef(it) }
         }
 
         resolvedMenuRecords = ResolvedMenuRecords(menuRecords, ecosTypeService)
