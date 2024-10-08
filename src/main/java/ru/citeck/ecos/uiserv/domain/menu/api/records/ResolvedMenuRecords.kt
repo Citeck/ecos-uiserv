@@ -331,7 +331,7 @@ class ResolvedMenuRecords(
                 }
 
                 val configToInclude = recordsService.getAtt(
-                    menuRef.withAppName(ID),
+                    menuRef.withSourceId(ID),
                     "subMenu.${context.subMenuType}?json"
                 )
 
