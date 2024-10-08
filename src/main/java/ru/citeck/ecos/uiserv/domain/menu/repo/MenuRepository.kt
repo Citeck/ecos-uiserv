@@ -24,7 +24,7 @@ interface MenuRepository : JpaRepository<MenuEntity, Long>, JpaSpecificationExec
         "SELECT menu " +
             "FROM MenuEntity menu " +
             "JOIN menu.authorities authority " +
-            "WHERE lower(authority) = ?1 AND menu.workspace = ?2" +
+            "WHERE lower(authority) = ?1 AND menu.workspace = ?2 " +
             "ORDER BY menu.priority DESC"
     )
     fun findAllByAuthoritiesContains(authority: String, workspace: String): List<MenuEntity>
