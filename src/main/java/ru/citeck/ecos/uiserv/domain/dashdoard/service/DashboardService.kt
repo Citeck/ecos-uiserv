@@ -39,8 +39,8 @@ class DashboardService(
 
     companion object {
         private val DEFAULT_WORKSPACES = setOf(
-            "personal-workspace-dashboard-default",
-            "workspace-dashboard-default",
+            "personal-ws-dashboard-default",
+            "ws-dashboard-default",
             "user-dashboard",
             "user-base-type-dashboard",
             "site-dashboard",

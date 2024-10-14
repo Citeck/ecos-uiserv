@@ -1,5 +1,5 @@
 {
-  "id": "workspace-dashboard-default",
+  "id": "ws-dashboard-default",
   "typeRef": "emodel/type@workspace-dashboard",
   "appliedToRef": "",
   "authority": null,
