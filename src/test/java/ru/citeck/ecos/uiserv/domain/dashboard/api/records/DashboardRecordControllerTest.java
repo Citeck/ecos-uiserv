@@ -109,7 +109,7 @@ public class DashboardRecordControllerTest {
     }
 
     private DashboardDto getTestDtoForQueryWithId(String id) throws IOException {
-        DashboardDto dto = new DashboardDto();
+        DashboardDto.Builder dto = DashboardDto.create();
         dto.setTypeRef(EntityRef.create("emodel", "type", "main-dashboard"));
         dto.setId(id);
 
@@ -162,8 +162,8 @@ public class DashboardRecordControllerTest {
             "  }\n" +
             "}";
         JsonNode config = mapper.readValue(configJson, JsonNode.class);
-        dto.setConfig(Json.getMapper().convert(config, ObjectData.class));
-        return dto;
+        dto.withConfig(Json.getMapper().convert(config, ObjectData.class));
+        return dto.build();
     }
 
 }

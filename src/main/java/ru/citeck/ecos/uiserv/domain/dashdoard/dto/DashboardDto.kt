@@ -2,17 +2,14 @@ package ru.citeck.ecos.uiserv.domain.dashdoard.dto
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder
-import lombok.Data
-import lombok.ToString
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
-import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 @IncludeNonDefault
 @JsonDeserialize(builder = DashboardDto.Builder::class)
-class DashboardDto(
+data class DashboardDto(
     var id: String,
     var name: MLText,
     var typeRef: EntityRef,

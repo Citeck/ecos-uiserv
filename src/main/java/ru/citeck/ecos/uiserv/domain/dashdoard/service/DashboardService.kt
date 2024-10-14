@@ -11,7 +11,6 @@ import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.context.lib.auth.AuthContext.getCurrentUser
 import ru.citeck.ecos.context.lib.auth.AuthContext.isRunAsSystemOrAdmin
-import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.Predicates
@@ -53,7 +52,6 @@ class DashboardService(
     }
 
     private lateinit var searchConv: JpaSearchConverter<DashboardEntity>
-
 
     private val changeListeners: MutableList<BiConsumer<DashboardDto?, DashboardDto>> = CopyOnWriteArrayList()
 
@@ -105,10 +103,10 @@ class DashboardService(
     fun saveDashboard(dashboard: DashboardDto): DashboardDto {
         updateAuthority(dashboard)
 
-        if (dashboard.workspace.isEmpty()
-            && dashboard.authority.isEmpty()
-            && DEFAULT_WORKSPACES.contains(dashboard.id)
-            && AuthContext.isNotRunAsSystemOrAdmin()
+        if (dashboard.workspace.isEmpty() &&
+            dashboard.authority.isEmpty() &&
+            DEFAULT_WORKSPACES.contains(dashboard.id) &&
+            AuthContext.isNotRunAsSystemOrAdmin()
         ) {
             error("Permission denied. You can't change default dashboard ${dashboard.id}")
         }

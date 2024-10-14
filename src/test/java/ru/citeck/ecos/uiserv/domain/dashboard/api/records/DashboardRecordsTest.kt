@@ -194,14 +194,14 @@ class DashboardRecordsTest {
         assertNotNull(expected)
         assertNotNull(actual)
 
-        val expectedConfig = DashboardDto(expected)
+        val expectedConfig = DashboardDto.Builder(expected!!)
         if (EntityRef.isNotEmpty(expectedConfig.appliedToRef) && expectedConfig.appliedToRef.getAppName().isBlank()) {
-            expectedConfig.appliedToRef = expectedConfig.appliedToRef.withAppName("alfresco")
+            expectedConfig.withAppliedToRef(expectedConfig.appliedToRef.withAppName("alfresco"))
         }
-        if (!expectedConfig.authority.isNullOrBlank()) {
-            expectedConfig.authority = expectedConfig.authority.lowercase()
+        if (expectedConfig.authority.isNotBlank()) {
+            expectedConfig.withAuthority(expectedConfig.authority.lowercase())
         }
 
-        assertEquals(expectedConfig, actual)
+        assertEquals(expectedConfig.build(), actual)
     }
 }
