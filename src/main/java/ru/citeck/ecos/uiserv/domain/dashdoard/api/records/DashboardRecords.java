@@ -101,7 +101,7 @@ public class DashboardRecords extends AbstractRecordsDao
             throw new RuntimeException("Record with id '" + toMutate.getId() + "' already exists");
         }
 
-        return dashboardService.saveDashboard(toMutate).getId();
+        return dashboardService.saveDashboard(toMutate.build()).getId();
     }
 
     @Nullable
@@ -171,6 +171,7 @@ public class DashboardRecords extends AbstractRecordsDao
             query.getTypeRef(),
             query.getAuthority(),
             query.scope,
+            query.workspace,
             query.expandType,
             query.includeForAll
         ).map(DashboardRecord::new);
@@ -178,7 +179,7 @@ public class DashboardRecords extends AbstractRecordsDao
         return dashboard.map(RecsQueryRes::of).orElseGet(RecsQueryRes::new);
     }
 
-    public static class DashboardRecord extends DashboardDto {
+    public static class DashboardRecord extends DashboardDto.Builder {
 
         DashboardRecord() {
         }
@@ -199,7 +200,7 @@ public class DashboardRecords extends AbstractRecordsDao
         @AttName("?disp")
         public String getDisplayName() {
             String result = getId();
-            return result != null ? result : "Dashboard";
+            return !result.isEmpty() ? result : "Dashboard";
         }
 
         public String getEcosType() {
@@ -209,7 +210,7 @@ public class DashboardRecords extends AbstractRecordsDao
         @JsonProperty("_content")
         public void setContent(List<ObjectData> content) {
 
-            String dataUriContent = content.get(0).get("url", "");
+            String dataUriContent = content.getFirst().get("url", "");
             ObjectData data = Json.getMapper().read(dataUriContent, ObjectData.class);
 
             Json.getMapper().applyData(this, data);
@@ -217,7 +218,7 @@ public class DashboardRecords extends AbstractRecordsDao
 
         @JsonValue
         public DashboardDto toJson() {
-            return new DashboardDto(this);
+            return build();
         }
 
         public byte[] getData() {
@@ -231,6 +232,7 @@ public class DashboardRecords extends AbstractRecordsDao
         private EntityRef typeRef;
         private String authority;
         private String scope;
+        private String workspace = "";
         private boolean expandType = true;
         private boolean includeForAll = true;
     }

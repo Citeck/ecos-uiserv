@@ -62,5 +62,6 @@
     <include file="changelog/20240202000000_update_actions.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20240427000000_update_journal_settings.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20240927000000_add_ws_to_menu.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20241009000000_add_ws_to_dashboards.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

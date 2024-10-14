@@ -1,6 +1,5 @@
 package ru.citeck.ecos.uiserv.domain.dashdoard.repo;
 
-import lombok.Data;
 import org.hibernate.annotations.ColumnTransformer;
 import org.jetbrains.annotations.NotNull;
 import ru.citeck.ecos.uiserv.app.common.repo.AbstractAuditingEntity;
@@ -8,7 +7,6 @@ import ru.citeck.ecos.uiserv.app.common.repo.AbstractAuditingEntity;
 import jakarta.persistence.*;
 import java.util.Objects;
 
-@Data
 @Entity
 @Table(name = "dashboards")
 public class DashboardEntity extends AbstractAuditingEntity {
@@ -28,6 +26,85 @@ public class DashboardEntity extends AbstractAuditingEntity {
     private String scope = "";
     private float priority;
     private byte[] config;
+
+    private String workspace;
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getExtId() {
+        return extId;
+    }
+
+    public void setExtId(String extId) {
+        this.extId = extId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getTypeRef() {
+        return typeRef;
+    }
+
+    public void setTypeRef(String typeRef) {
+        this.typeRef = typeRef;
+    }
+
+    public String getAuthority() {
+        return authority;
+    }
+
+    public void setAuthority(String authority) {
+        this.authority = authority;
+    }
+
+    public String getAppliedToRef() {
+        return appliedToRef;
+    }
+
+    public void setAppliedToRef(String appliedToRef) {
+        this.appliedToRef = appliedToRef;
+    }
+
+    @NotNull
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(@NotNull String scope) {
+        this.scope = scope;
+    }
+
+    public float getPriority() {
+        return priority;
+    }
+
+    public void setPriority(float priority) {
+        this.priority = priority;
+    }
+
+    public byte[] getConfig() {
+        return config;
+    }
+
+    public void setConfig(byte[] config) {
+        this.config = config;
+    }
+
+    public String getWorkspace() {
+        return workspace;
+    }
+
+    public void setWorkspace(String workspace) {
+        this.workspace = workspace;
+    }
 
     @Override
     public boolean equals(Object o) {

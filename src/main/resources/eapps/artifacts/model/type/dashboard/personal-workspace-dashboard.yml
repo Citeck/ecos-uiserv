@@ -1,0 +1,10 @@
+---
+id: personal-workspace-dashboard
+
+name:
+  en: Personal workspace dashboard
+  ru: Дашборд персонального рабочего пространства
+
+system: true
+
+dashboardType: user-dashboard

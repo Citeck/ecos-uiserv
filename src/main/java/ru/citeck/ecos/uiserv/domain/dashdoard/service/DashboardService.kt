@@ -1,353 +1,421 @@
-package ru.citeck.ecos.uiserv.domain.dashdoard.service;
+package ru.citeck.ecos.uiserv.domain.dashdoard.service
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.stereotype.Service;
-import ru.citeck.ecos.commons.data.MLText;
-import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.context.lib.auth.AuthContext;
-import ru.citeck.ecos.records2.predicate.model.Predicate;
-import ru.citeck.ecos.records3.RecordsService;
-import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
-import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
-import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
-import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardEntity;
-import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardRepository;
-import ru.citeck.ecos.webapp.api.constants.AppName;
-import ru.citeck.ecos.webapp.api.entity.EntityRef;
-import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter;
-import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory;
-
-import jakarta.annotation.PostConstruct;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
+import jakarta.annotation.PostConstruct
+import org.apache.commons.lang3.StringUtils
+import org.springframework.data.domain.PageRequest
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.stereotype.Service
+import ru.citeck.ecos.commons.data.MLText
+import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.commons.json.Json.mapper
+import ru.citeck.ecos.context.lib.auth.AuthContext
+import ru.citeck.ecos.context.lib.auth.AuthContext.getCurrentUser
+import ru.citeck.ecos.context.lib.auth.AuthContext.isRunAsSystemOrAdmin
+import ru.citeck.ecos.model.lib.utils.ModelUtils
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
+import ru.citeck.ecos.records2.predicate.model.Predicate
+import ru.citeck.ecos.records2.predicate.model.Predicates
+import ru.citeck.ecos.records3.RecordsService
+import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
+import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto
+import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardEntity
+import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardRepository
+import ru.citeck.ecos.webapp.api.constants.AppName
+import ru.citeck.ecos.webapp.api.entity.EntityRef
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory
+import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.function.BiConsumer
+import java.util.stream.Collectors
 
 @Service
-@RequiredArgsConstructor
-public class DashboardService {
+class DashboardService(
+    private val repo: DashboardRepository,
+    private val recordsService: RecordsService,
+    private val jpaSearchConverterFactory: JpaSearchConverterFactory,
+    private val workspaceService: WorkspaceService
+) {
 
-    private final DashboardRepository repo;
-    private final RecordsService recordsService;
-    private final JpaSearchConverterFactory jpaSearchConverterFactory;
+    companion object {
+        private val DEFAULT_WORKSPACES = setOf(
+            "personal-workspace-dashboard-default",
+            "workspace-dashboard-default",
+            "user-dashboard",
+            "user-base-type-dashboard",
+            "site-dashboard",
+            "person-dashboard",
+            "orgstructure-person-dashboard",
+            "default-doclib-dashboard",
+            "base-type-dashboard"
+        )
+    }
 
-    private JpaSearchConverter<DashboardEntity> searchConv;
+    private lateinit var searchConv: JpaSearchConverter<DashboardEntity>
 
-    private final List<BiConsumer<DashboardDto, DashboardDto>> changeListeners = new CopyOnWriteArrayList<>();
+
+    private val changeListeners: MutableList<BiConsumer<DashboardDto?, DashboardDto>> = CopyOnWriteArrayList()
 
     @PostConstruct
-    public void init() {
-        searchConv = jpaSearchConverterFactory.createConverter(DashboardEntity.class).build();
+    fun init() {
+        searchConv = jpaSearchConverterFactory.createConverter(DashboardEntity::class.java).build()
     }
 
-    public long getCount(Predicate predicate) {
-        return searchConv.getCount(repo, predicate);
+    fun getCount(predicate: Predicate): Long {
+        return searchConv.getCount(repo, predicate)
     }
 
-    public List<DashboardDto> findAll(Predicate predicate, int max, int skip, List<SortBy> sort) {
+    fun findAll(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<DashboardDto> {
         return searchConv.findAll(repo, predicate, max, skip, sort).stream()
-            .map(this::mapToDto)
-            .collect(Collectors.toList());
+            .map { entity: DashboardEntity -> this.mapToDto(entity) }
+            .collect(Collectors.toList())
     }
 
-    public List<DashboardDto> getAllDashboards() {
-        return repo.findAll()
-            .stream()
-            .map(this::mapToDto)
-            .collect(Collectors.toList());
+    fun getAllDashboards(): List<DashboardDto> {
+        return findAll(Predicates.alwaysTrue(), 1000, 0, emptyList())
     }
 
-    public void addChangeListener(BiConsumer<DashboardDto, DashboardDto> changeListener) {
-        changeListeners.add(changeListener);
+    fun getDashboardById(id: String?): Optional<DashboardDto> {
+        return repo.findByExtId(id).map { entity: DashboardEntity -> this.mapToDto(entity) }
     }
 
-    public Optional<DashboardDto> getDashboardById(String id) {
-        return repo.findByExtId(id).map(this::mapToDto);
+    fun getForAuthority(
+        recordRef: EntityRef?,
+        type: EntityRef?,
+        user: String?,
+        scope: String?,
+        workspace: String?,
+        expandType: Boolean?,
+        includeForAll: Boolean?
+    ): Optional<DashboardDto> {
+        return findOneForWorkspace(workspace ?: "") { ws ->
+            getEntityForUser(
+                recordRef ?: EntityRef.EMPTY,
+                type ?: EntityRef.EMPTY,
+                user ?: "",
+                scope ?: "",
+                ws,
+                expandType ?: true,
+                includeForAll ?: true
+            )
+        }.map { entity: DashboardEntity -> this.mapToDto(entity) }
     }
 
-    public Optional<DashboardDto> getForAuthority(EntityRef recordRef,
-                                                  EntityRef type,
-                                                  String user,
-                                                  String scope,
-                                                  boolean expandType,
-                                                  boolean includeForAll) {
+    fun saveDashboard(dashboard: DashboardDto): DashboardDto {
+        updateAuthority(dashboard)
 
-        return getEntityForUser(
-            recordRef,
-            type,
-            user,
-            StringUtils.defaultString(scope),
-            expandType,
-            includeForAll
-        ).map(this::mapToDto);
-    }
-
-    public DashboardDto saveDashboard(DashboardDto dashboard) {
-        updateAuthority(dashboard);
-
-        DashboardEntity entityBefore = findEntityForDto(dashboard);
-        DashboardDto valueBefore = Optional.ofNullable(entityBefore)
-            .map(this::mapToDto)
-            .orElse(null);
-
-        DashboardEntity entity = mapToEntity(dashboard, entityBefore);
-        DashboardDto result = mapToDto(repo.save(entity));
-
-        for (BiConsumer<DashboardDto, DashboardDto> listener : changeListeners) {
-            listener.accept(valueBefore, result);
+        if (dashboard.workspace.isEmpty()
+            && dashboard.authority.isEmpty()
+            && DEFAULT_WORKSPACES.contains(dashboard.id)
+            && AuthContext.isNotRunAsSystemOrAdmin()
+        ) {
+            error("Permission denied. You can't change default dashboard ${dashboard.id}")
         }
-        return result;
+
+        val entityBefore = findEntityForDto(dashboard)
+        val valueBefore = Optional.ofNullable(entityBefore)
+            .map { entity: DashboardEntity -> this.mapToDto(entity) }
+            .orElse(null)
+
+        val entity = mapToEntity(dashboard, entityBefore)
+        val result = mapToDto(repo.save(entity))
+
+        for (listener in changeListeners) {
+            listener.accept(valueBefore, result)
+        }
+        return result
     }
 
-    private void updateAuthority(DashboardDto dashboard) {
+    private fun updateAuthority(dashboard: DashboardDto) {
 
-        String currentUserLogin = getCurrentUserLogin();
-        String authority = dashboard.getAuthority();
+        val currentUserLogin = getCurrentUserLogin()
+        val authority = dashboard.authority
 
-        if (AuthContext.isRunAsSystem() || AuthContext.isRunAsAdmin() || currentUserLogin.equals(authority)) {
-            return;
+        if (isRunAsSystemOrAdmin() || currentUserLogin == authority) {
+            return
         }
 
         if (StringUtils.isBlank(authority)) {
-            dashboard.setAuthority(currentUserLogin);
-            return;
+            val ws = dashboard.workspace
+            if (ws.isEmpty() || !workspaceService.isUserManagerOf(currentUserLogin, ws)) {
+                dashboard.authority = currentUserLogin
+            }
+            return
         }
-        throw new AccessDeniedException(
+        throw AccessDeniedException(
             "User '" + currentUserLogin + "' can only change his dashboard. " +
-            "But tried to change dashboard for authority '" + authority + "'"
-        );
+                "But tried to change dashboard for authority '" + authority + "'"
+        )
     }
 
-    @NotNull
-    private String getCurrentUserLogin() {
-        String currentUserLogin = AuthContext.getCurrentUser();
+    private fun getCurrentUserLogin(): String {
+        val currentUserLogin = getCurrentUser()
         if (currentUserLogin.isEmpty()) {
-            throw new RuntimeException("User is not authenticated");
+            throw RuntimeException("User is not authenticated")
         }
-        return currentUserLogin;
+        return currentUserLogin
     }
 
-    public void removeDashboard(String id) {
-        repo.findByExtId(id).ifPresent(repo::delete);
+    fun removeDashboard(id: String?) {
+        if (DEFAULT_WORKSPACES.contains(id ?: "")) {
+            error("You can't delete default dashboard '$id'")
+        }
+        repo.findByExtId(id).ifPresent { entity: DashboardEntity -> repo.delete(entity) }
     }
 
-    private Optional<DashboardEntity> getEntityForUser(EntityRef recordRef,
-                                                       EntityRef type,
-                                                       String user,
-                                                       @NotNull String scope,
-                                                       boolean expandType,
-                                                       boolean includeForAll) {
+    private fun getEntityForUser(
+        recordRef: EntityRef,
+        type: EntityRef,
+        user: String,
+        scope: String,
+        workspace: String,
+        expandType: Boolean,
+        includeForAll: Boolean
+    ): Optional<DashboardEntity> {
 
-        List<String> authorities = StringUtils.isNotBlank(user) ?
-            Collections.singletonList(user) : Collections.emptyList();
+        var authorities = if (StringUtils.isNotBlank(user)) {
+            listOf(user)
+        } else {
+            emptyList()
+        }
 
         authorities = authorities.stream()
-            .map(String::toLowerCase)
-            .collect(Collectors.toList());
+            .map { obj: String -> obj.lowercase(Locale.ENGLISH) }
+            .collect(Collectors.toList())
 
-        List<DashboardEntity> dashboards;
+        var dashboards: List<DashboardEntity>
         if (!EntityRef.isEmpty(recordRef)) {
 
-            if (recordRef.getAppName().isEmpty()) {
-                recordRef = recordRef.withAppName(AppName.ALFRESCO);
+            var refForQuery = recordRef
+            if (refForQuery.getAppName().isEmpty()) {
+                refForQuery = recordRef.withAppName(AppName.ALFRESCO)
             }
 
-            dashboards = findDashboardsByRecordRef(recordRef.toString(), authorities, scope, includeForAll);
-            if (!dashboards.isEmpty()) {
-                return dashboards.stream().findFirst();
+            dashboards = findDashboardsByRecordRef(
+                refForQuery.toString(),
+                authorities,
+                scope,
+                workspace,
+                includeForAll
+            )
+            if (dashboards.isNotEmpty()) {
+                return dashboards.stream().findFirst()
             }
         }
 
-        dashboards = findDashboardsByType(type.toString(), authorities, scope, includeForAll);
-
+        dashboards = findDashboardsByType(type.toString(), authorities, scope, workspace, includeForAll)
         if (dashboards.isEmpty() && expandType) {
-
-            ExpandedTypeMeta typeMeta = recordsService.getAtts(type, ExpandedTypeMeta.class);
-            for (ParentMeta parent : typeMeta.getParents()) {
-                if (!Objects.equals(parent.inhDashboardType, typeMeta.inhDashboardType)) {
-                    return Optional.empty();
+            val typeMeta = recordsService.getAtts(type, ExpandedTypeMeta::class.java)
+            for (parent in typeMeta.getParents()) {
+                if (parent.inhDashboardType != typeMeta.inhDashboardType) {
+                    break
                 }
-                dashboards = findDashboardsByType(parent.id, authorities, scope, includeForAll);
-                if (!dashboards.isEmpty()) {
-                    break;
+                dashboards = findDashboardsByType(
+                    parent.id,
+                    authorities,
+                    scope,
+                    workspace,
+                    includeForAll
+                )
+                if (dashboards.isNotEmpty()) {
+                    break
                 }
             }
         }
 
-        return dashboards.stream().findFirst();
+        return dashboards.stream().findFirst()
     }
 
-    private List<DashboardEntity> findDashboardsByRecordRef(String recordRef,
-                                                            List<String> authorities,
-                                                            @NotNull String scope,
-                                                            boolean includeForAll) {
-
-        if (!authorities.isEmpty()) {
-
-            PageRequest page = PageRequest.of(0, 1);
-            List<DashboardEntity> dashboards = repo.findForRefAndAuthorities(recordRef, authorities, scope, page);
+    private fun findDashboardsByRecordRef(
+        recordRef: String,
+        authorities: List<String>,
+        scope: String,
+        workspace: String,
+        includeForAll: Boolean
+    ): List<DashboardEntity> {
+        if (authorities.isNotEmpty()) {
+            val page = PageRequest.of(0, 1)
+            var dashboards = repo.findForRefAndAuthorities(recordRef, authorities, scope, workspace, page)
             if (dashboards.isEmpty() && includeForAll) {
-                dashboards = repo.findByRecordRefForAll(recordRef, scope)
-                    .map(Collections::singletonList)
-                    .orElse(Collections.emptyList());
+                dashboards = repo.findByRecordRefForAll(recordRef, scope, workspace)
+                    .map { listOf(it) }
+                    .orElse(emptyList())
             }
-            return dashboards;
-
+            return dashboards
         } else {
-
-            Optional<DashboardEntity> entity = repo.findByRecordRefForAll(recordRef, scope);
-            return entity.map(Collections::singletonList).orElse(Collections.emptyList());
+            val entity = repo.findByRecordRefForAll(recordRef, scope, workspace)
+            return entity.map { listOf(it) }.orElse(emptyList())
         }
     }
 
-    private List<DashboardEntity> findDashboardsByType(String type,
-                                                       List<String> authorities,
-                                                       @NotNull String scope,
-                                                       boolean includeForAll) {
-
-        if (!authorities.isEmpty()) {
-
-            PageRequest page = PageRequest.of(0, 1);
-            List<DashboardEntity> dashboards = repo.findForAuthorities(type, authorities, scope, page);
+    private fun findDashboardsByType(
+        type: String,
+        authorities: List<String>,
+        scope: String,
+        workspace: String,
+        includeForAll: Boolean
+    ): List<DashboardEntity> {
+        val dashboards = if (authorities.isNotEmpty()) {
+            val page = PageRequest.of(0, 1)
+            var dashboards = repo.findForAuthorities(type, authorities, scope, workspace, page)
             if (dashboards.isEmpty() && includeForAll) {
-                dashboards = repo.findByTypeRefForAll(type, scope)
-                    .map(Collections::singletonList)
-                    .orElse(Collections.emptyList());
+                dashboards = repo.findByTypeRefForAll(type, scope, workspace)
+                    .map { o: DashboardEntity? -> listOf(o) }
+                    .orElse(emptyList())
             }
-            return dashboards;
-
+            dashboards
         } else {
-
-            Optional<DashboardEntity> entity = repo.findByTypeRefForAll(type, scope);
-            return entity.map(Collections::singletonList).orElse(Collections.emptyList());
+            val entity = repo.findByTypeRefForAll(type, scope, workspace)
+            entity.map { listOf(it) }.orElse(emptyList())
         }
+        return dashboards
     }
 
-    private DashboardDto mapToDto(DashboardEntity entity) {
-
-        DashboardDto dto = new DashboardDto();
-
-        dto.setId(entity.getExtId());
-        dto.setName(Json.getMapper().read(entity.getName(), MLText.class));
-        dto.setAuthority(entity.getAuthority());
-        dto.setConfig(Json.getMapper().read(entity.getConfig(), ObjectData.class));
-        dto.setPriority(entity.getPriority());
-        dto.setScope(StringUtils.defaultString(entity.getScope()));
-        dto.setTypeRef(EntityRef.valueOf(entity.getTypeRef()));
-        dto.setAppliedToRef(EntityRef.valueOf(entity.getAppliedToRef()));
-
-        return dto;
+    private inline fun findOneForWorkspace(
+        workspace: String,
+        findAction: (String) -> Optional<DashboardEntity>
+    ): Optional<DashboardEntity> {
+        val result = findAction(workspace)
+        if (result.isPresent || workspace.isEmpty()) {
+            return result
+        }
+        return findAction("")
     }
 
-    @Nullable
-    private DashboardEntity findEntityForDto(DashboardDto dto) {
+    private fun mapToDto(entity: DashboardEntity): DashboardDto {
+        return DashboardDto.create()
+            .withId(entity.extId)
+            .withName(mapper.read(entity.name, MLText::class.java))
+            .withAuthority(entity.authority)
+            .withConfig(
+                mapper.read(
+                    entity.config,
+                    ObjectData::class.java
+                )
+            )
+            .withPriority(entity.priority)
+            .withScope(entity.scope)
+            .withTypeRef(EntityRef.valueOf(entity.typeRef))
+            .withAppliedToRef(EntityRef.valueOf(entity.appliedToRef))
+            .withWorkspace(StringUtils.defaultString(entity.workspace))
+            .build()
+    }
 
-        Optional<DashboardEntity> optEntity;
-        String authority = getAuthorityFromDto(dto);
-        EntityRef recordRef = dto.getAppliedToRef();
+    private fun findEntityForDto(dto: DashboardDto): DashboardEntity? {
+
+        val optEntity: Optional<DashboardEntity?>
+        val authority = getAuthorityFromDto(dto)
+        var recordRef = dto.appliedToRef
 
         if (EntityRef.isNotEmpty(recordRef) && recordRef.getAppName().isEmpty()) {
-            recordRef = recordRef.withAppName(AppName.ALFRESCO);
+            recordRef = recordRef.withAppName(AppName.ALFRESCO)
         }
 
-        if (EntityRef.isEmpty(dto.getTypeRef()) && EntityRef.isEmpty(dto.getAppliedToRef())) {
-            optEntity = repo.findByExtId(dto.getId());
+        if (EntityRef.isEmpty(dto.typeRef) && EntityRef.isEmpty(dto.appliedToRef)) {
+            optEntity = repo.findByExtId(dto.id)
         } else {
-            String scope = StringUtils.defaultString(dto.getScope());
-            if (authority == null) {
+            val scope = StringUtils.defaultString(dto.scope)
+            optEntity = if (authority == null) {
                 if (EntityRef.isEmpty(recordRef)) {
-                    optEntity = repo.findByTypeRefForAll(dto.getTypeRef().toString(), scope);
+                    repo.findByTypeRefForAll(dto.typeRef.toString(), scope, dto.workspace)
                 } else {
-                    optEntity = repo.findByRecordRefForAll(recordRef.toString(), scope);
+                    repo.findByRecordRefForAll(recordRef.toString(), scope, dto.workspace)
                 }
             } else {
                 if (EntityRef.isEmpty(recordRef)) {
-                    optEntity = repo.findByAuthorityAndTypeRefAndScope(authority, dto.getTypeRef().toString(), scope);
+                    repo.findByAuthorityAndTypeRefAndScopeAndWorkspace(
+                        authority,
+                        dto.typeRef.toString(),
+                        scope,
+                        dto.workspace
+                    )
                 } else {
-                    optEntity = repo.findByAuthorityAndAppliedToRefAndScope(authority, recordRef.toString(), scope);
+                    repo.findByAuthorityAndAppliedToRefAndScopeAndWorkspace(
+                        authority,
+                        recordRef.toString(),
+                        scope,
+                        dto.workspace
+                    )
                 }
             }
         }
 
-        return optEntity.orElse(null);
+        return optEntity.orElse(null)
     }
 
-    @Nullable
-    private String getAuthorityFromDto(DashboardDto dto) {
-        return StringUtils.isBlank(dto.getAuthority()) ? null : dto.getAuthority();
+    private fun getAuthorityFromDto(dto: DashboardDto): String? {
+        return if (StringUtils.isBlank(dto.authority)) null else dto.authority
     }
 
-    @Nullable
-    private EntityRef getAppliedToRefFromDto(DashboardDto dto) {
-        EntityRef recordRef = dto.getAppliedToRef();
+    private fun getAppliedToRefFromDto(dto: DashboardDto): EntityRef {
+        var recordRef = dto.appliedToRef
         if (EntityRef.isNotEmpty(recordRef) && recordRef.getAppName().isEmpty()) {
-            recordRef = recordRef.withAppName(AppName.ALFRESCO);
+            recordRef = recordRef.withAppName(AppName.ALFRESCO)
         }
-        return recordRef;
+        return recordRef
     }
 
-    private DashboardEntity mapToEntity(DashboardDto dto) {
-        return mapToEntity(dto, findEntityForDto(dto));
-    }
+    private fun mapToEntity(dto: DashboardDto, entity: DashboardEntity?): DashboardEntity {
 
-    private DashboardEntity mapToEntity(DashboardDto dto, @Nullable DashboardEntity entity) {
+        var entityRes = entity ?: findEntityForDto(dto)
 
-        EntityRef appliedToRef = getAppliedToRefFromDto(dto);
+        val appliedToRef = getAppliedToRefFromDto(dto)
 
-        if (entity == null) {
+        if (entityRes == null) {
+            val newDashboard = DashboardEntity()
 
-            DashboardEntity newDashboard = new DashboardEntity();
-
-            String extId = dto.getId();
+            var extId = dto.id
             if (StringUtils.isNotBlank(extId)) {
-                if (repo.findByExtId(extId).isPresent()) {
-                    extId = null;
+                if (repo.findByExtId(extId).isPresent) {
+                    extId = ""
                 }
             }
             if (StringUtils.isBlank(extId)) {
-                extId = UUID.randomUUID().toString();
+                extId = UUID.randomUUID().toString()
             }
 
-            newDashboard.setExtId(extId);
-            newDashboard.setAuthority(getAuthorityFromDto(dto));
-            newDashboard.setTypeRef(EntityRef.toString(dto.getTypeRef()));
+            newDashboard.extId = extId
+            newDashboard.authority = getAuthorityFromDto(dto)
+            newDashboard.typeRef = EntityRef.toString(dto.typeRef)
             if (EntityRef.isNotEmpty(appliedToRef)) {
-                newDashboard.setAppliedToRef(EntityRef.toString(appliedToRef));
+                newDashboard.appliedToRef = EntityRef.toString(appliedToRef)
             }
-            newDashboard.setScope(StringUtils.defaultString(dto.getScope()));
-            entity = newDashboard;
+            newDashboard.scope = StringUtils.defaultString(dto.scope)
+            newDashboard.workspace = dto.workspace
+            entityRes = newDashboard
         }
 
-        if (dto.getConfig() != null && !dto.getConfig().isEmpty()) {
-            entity.setConfig(Json.getMapper().toBytes(dto.getConfig()));
+        if (!dto.config.isEmpty()) {
+            entityRes.config = mapper.toBytes(dto.config)
         }
-        if (!MLText.isEmpty(dto.getName())) {
-            entity.setName(Json.getMapper().toString(dto.getName()));
+        if (!MLText.isEmpty(dto.name)) {
+            entityRes.name = mapper.toString(dto.name)
         }
-        if (StringUtils.isNotBlank(dto.getScope())) {
-            entity.setScope(dto.getScope());
+        if (StringUtils.isNotBlank(dto.scope)) {
+            entityRes.scope = dto.scope
         }
 
-        return entity;
+        return entityRes
     }
 
-    @Data
-    private static class ExpandedTypeMeta {
-        private List<ParentMeta> parents;
-        private String inhDashboardType;
+    fun addChangeListener(changeListener: BiConsumer<DashboardDto?, DashboardDto>) {
+        changeListeners.add(changeListener)
     }
 
-    @Data
-    public static class ParentMeta {
+    private class ExpandedTypeMeta(
+        private val parents: List<ParentMeta>? = null,
+        val inhDashboardType: String? = null
+    ) {
+
+        fun getParents(): List<ParentMeta> {
+            return parents ?: emptyList()
+        }
+    }
+
+    class ParentMeta(
         @AttName("?id")
-        private String id;
-        private String inhDashboardType;
-    }
+        val id: String,
+        val inhDashboardType: String? = null
+    )
 }

@@ -1,0 +1,10 @@
+---
+id: workspace-dashboard
+
+name:
+  en: Workspace dashboard
+  ru: Дашборд рабочего пространства
+
+system: true
+
+dashboardType: user-dashboard
