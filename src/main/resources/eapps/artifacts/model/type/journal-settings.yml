@@ -13,6 +13,11 @@ sourceId: uiserv/journal-settings
 #formRef: uiserv/form@journal-settings
 journalRef: uiserv/journal@journal-settings
 
+createVariants:
+  - id: upload-journal-settings
+    name: { ru: Загрузить, en: Upload }
+    formRef: 'uiserv/form@ecos-artifact-upload'
+
 model:
   attributes:
     - id: name
