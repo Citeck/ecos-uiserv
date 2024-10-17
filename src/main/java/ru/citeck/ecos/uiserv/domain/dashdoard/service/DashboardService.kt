@@ -156,7 +156,7 @@ class DashboardService(
     }
 
     fun removeDashboard(id: String?) {
-        if (DEFAULT_WORKSPACES.contains(id ?: "")) {
+        if (DEFAULT_WORKSPACES.contains(id ?: "") && AuthContext.isNotRunAsSystem()) {
             error("You can't delete default dashboard '$id'")
         }
         repo.findByExtId(id).ifPresent { entity: DashboardEntity -> repo.delete(entity) }

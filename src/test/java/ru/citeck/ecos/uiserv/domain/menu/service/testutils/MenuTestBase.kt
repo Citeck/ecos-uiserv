@@ -21,13 +21,17 @@ import ru.citeck.ecos.uiserv.domain.i18n.service.MessageResolver
 import ru.citeck.ecos.uiserv.domain.menu.api.records.MenuRecords
 import ru.citeck.ecos.uiserv.domain.menu.api.records.ResolvedMenuRecords
 import ru.citeck.ecos.uiserv.domain.menu.dao.MenuDao
+import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDeployArtifact
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
+import ru.citeck.ecos.uiserv.domain.menu.eapps.MenuArtifactHandler
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService
 import ru.citeck.ecos.uiserv.domain.menu.service.format.MenuReaderService
+import ru.citeck.ecos.uiserv.domain.menu.service.format.json.JsonMenuReader
 import ru.citeck.ecos.webapp.api.EcosWebAppApi
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
+import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
 open class MenuTestBase {
@@ -36,6 +40,8 @@ open class MenuTestBase {
     protected lateinit var menuService: MenuService
     protected lateinit var resolvedMenuRecords: ResolvedMenuRecords
     protected lateinit var records: RecordsService
+
+    protected lateinit var menuArtifactHandler: MenuArtifactHandler
 
     private val typesInfo = ConcurrentHashMap<String, TypeDef>()
 
@@ -46,6 +52,7 @@ open class MenuTestBase {
 
         menuDao = MenuInMemDao()
         val menuReaderService = MenuReaderService()
+        menuReaderService.setReaders(listOf(JsonMenuReader()))
 
         val webAppContext = EcosWebAppApiMock(Application.NAME)
 
@@ -94,7 +101,23 @@ open class MenuTestBase {
         resolvedMenuRecords = ResolvedMenuRecords(menuRecords, ecosTypeService)
         records.register(resolvedMenuRecords)
 
+        menuArtifactHandler = MenuArtifactHandler(menuService)
+
         typesInfo.clear()
+    }
+
+    fun deployMenuArtifacts() {
+        val configs = File("./src/main/resources/eapps/artifacts/ui/menu").listFiles() ?: emptyArray()
+        for (file in configs) {
+            if (!file.name.endsWith(".json")) {
+                continue
+            }
+            val artifact = MenuDeployArtifact()
+            artifact.filename = file.name
+            artifact.data = file.readBytes()
+            artifact.id = Json.mapper.readDataNotNull(artifact.data)["id"].asText()
+            menuArtifactHandler.deployArtifact(artifact)
+        }
     }
 
     fun registerType(data: Any) {

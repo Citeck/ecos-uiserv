@@ -17,18 +17,11 @@ data class SearchByText(
     val innerQueryAttribute: String
 ) {
     companion object {
-        val EMPTY = create {}
+        val EMPTY = create().build()
 
         @JvmStatic
         fun create(): Builder {
             return Builder()
-        }
-
-        @JvmStatic
-        fun create(builder: Builder.() -> Unit): SearchByText {
-            val builderObj = Builder()
-            builder.invoke(builderObj)
-            return builderObj.build()
         }
     }
 

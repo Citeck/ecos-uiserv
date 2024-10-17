@@ -12,16 +12,10 @@ data class JournalSearchConfig(
 
     companion object {
 
-        val EMPTY = create {}
+        val EMPTY = create().build()
 
         fun create(): Builder {
             return Builder()
-        }
-
-        fun create(builder: Builder.() -> Unit): JournalSearchConfig {
-            val builderObj = Builder()
-            builder.invoke(builderObj)
-            return builderObj.build()
         }
     }
 

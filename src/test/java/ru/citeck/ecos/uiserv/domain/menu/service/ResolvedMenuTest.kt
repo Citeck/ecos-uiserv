@@ -41,6 +41,9 @@ class ResolvedMenuTest : MenuTestBase() {
         )
         registerType(testType2)
 
+        val menuToInclude = createMenuToInclude("include-menu")
+        menuService.save(menuToInclude)
+
         val menu = MenuDto.create()
         menu.withId("test-menu")
 
@@ -89,29 +92,111 @@ class ResolvedMenuTest : MenuTestBase() {
                 .withId("4")
                 .withType("LINK-CREATE-CASE")
                 .withHidden(true)
+                .build(),
+            MenuItemDef.create()
+                .withId("5")
+                .withType("INCLUDE_MENU")
+                .withConfig(ObjectData.create().set("menuRef", "uiserv/menu@${menuToInclude.id}"))
                 .build()
         )
 
-        menu.withSubMenu(mapOf("left" to leftMenu))
+        val createMenu = SubMenuDef()
+        createMenu.items = listOf(
+            MenuItemDef.create()
+                .withId("create-1")
+                .withType("INCLUDE_MENU")
+                .withConfig(ObjectData.create().set("menuRef", "uiserv/menu@${menuToInclude.id}"))
+                .build()
+        )
+
+        menu.withSubMenu(
+            mapOf(
+                "left" to leftMenu,
+                "create" to createMenu
+            )
+        )
 
         menuService.save(menu.build())
 
-        val resolvedSubMenu = records.getAtt(
+        val resolvedLeftSubMenu = records.getAtt(
             EntityRef.valueOf("uiserv/rmenu@test-menu"),
             "subMenu.left?json"
         ).getAs(SubMenuDef::class.java)!!
 
-        assertThat(resolvedSubMenu.items).hasSize(3)
-        assertThat(resolvedSubMenu.items[0].id).isEqualTo(leftMenu.items[0].id)
-        assertThat(resolvedSubMenu.items[0].type).isEqualTo(leftMenu.items[0].type)
+        val resolvedCreateSubMenu = records.getAtt(
+            EntityRef.valueOf("uiserv/rmenu@test-menu"),
+            "subMenu.create?json"
+        ).getAs(SubMenuDef::class.java)!!
+
+        assertThat(resolvedLeftSubMenu.items).hasSize(5)
+        assertThat(resolvedLeftSubMenu.items[0].id).isEqualTo(leftMenu.items[0].id)
+        assertThat(resolvedLeftSubMenu.items[0].type).isEqualTo(leftMenu.items[0].type)
 
         assertThat(
-            resolvedSubMenu.items[0].config["variant"].getAs(CreateVariantDef::class.java)
+            resolvedLeftSubMenu.items[0].config["variant"].getAs(CreateVariantDef::class.java)
         ).isEqualTo(testType.createVariants[0])
 
         assertThat(
-            resolvedSubMenu.items[1].config["variant"].getAs(CreateVariantDef::class.java)
+            resolvedLeftSubMenu.items[1].config["variant"].getAs(CreateVariantDef::class.java)
         ).isEqualTo(testType2.createVariants[0])
+
+        fun assertItems(itemsToCheck: List<MenuItemDef>, expected: List<MenuItemDef>, unexpected: List<MenuItemDef>) {
+            expected.forEach { expectedItem ->
+                assertThat(itemsToCheck.find { it.id == expectedItem.id })
+                    .describedAs("item-id: " + expectedItem.id)
+                    .isEqualTo(expectedItem)
+            }
+            unexpected.forEach { unexpectedItem ->
+                assertThat(itemsToCheck.find { it.id == unexpectedItem.id })
+                    .describedAs("item-id: " + unexpectedItem.id)
+                    .isNull()
+            }
+        }
+        assertItems(
+            itemsToCheck = resolvedLeftSubMenu.items,
+            expected = menuToInclude.subMenu["left"]!!.items,
+            unexpected = menuToInclude.subMenu["create"]!!.items
+        )
+        assertItems(
+            itemsToCheck = resolvedCreateSubMenu.items,
+            expected = menuToInclude.subMenu["create"]!!.items,
+            unexpected = menuToInclude.subMenu["left"]!!.items
+        )
+    }
+
+    private fun createMenuToInclude(id: String): MenuDto {
+
+        val leftMenu = SubMenuDef()
+        leftMenu.items = listOf(
+            MenuItemDef.create()
+                .withId("$id-left-1")
+                .withType("LINK")
+                .build(),
+            MenuItemDef.create()
+                .withId("$id-left-2")
+                .withType("LINK")
+                .build()
+        )
+        val createMenu = SubMenuDef()
+        createMenu.items = listOf(
+            MenuItemDef.create()
+                .withId("$id-create-1")
+                .withType("LINK")
+                .build(),
+            MenuItemDef.create()
+                .withId("$id-create-2")
+                .withType("LINK")
+                .build()
+        )
+
+        return MenuDto.create()
+            .withId(id)
+            .withSubMenu(
+                mapOf(
+                    "left" to leftMenu,
+                    "create" to createMenu
+                )
+            ).build()
     }
 
     class CreateCaseConfig(

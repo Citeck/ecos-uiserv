@@ -265,11 +265,10 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
             assertEquals("test-id", it.arguments[0])
             return@doAnswer journalSettingsRecordsDao.JournalSettingsRecord(
                 EntityWithMeta(
-                    JournalSettingsDto.create {
-                        withName(MLText("test-name"))
-                    }
+                    JournalSettingsDto.create()
+                        .withName(MLText("test-name"))
+                        .build()
                 )
-
             )
         }.`when`(journalSettingsRecordsDao).getRecordAtts(any(String::class.java))
 
@@ -839,16 +838,16 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
         Mockito.doReturn(
             listOf(
                 EntityWithMeta(
-                    JournalSettingsDto.create {
-                        withId("id1")
-                        withName(MLText("name1"))
-                    }
+                    JournalSettingsDto.create()
+                        .withId("id1")
+                        .withName(MLText("name1"))
+                        .build()
                 ),
                 EntityWithMeta(
-                    JournalSettingsDto.create {
-                        withId("id2")
-                        withName(MLText("name2"))
-                    }
+                    JournalSettingsDto.create()
+                        .withId("id2")
+                        .withName(MLText("name2"))
+                        .build()
                 )
             )
         ).`when`(journalSettingsService).searchSettings("journal1")
@@ -866,8 +865,8 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
         )
         assertEquals(2, queryRecords1.getTotalCount())
         assertEquals(false, queryRecords1.getHasMore())
-        assertTrue(queryRecords1.getRecords().stream().anyMatch({ it.id == "id1" }))
-        assertTrue(queryRecords1.getRecords().stream().anyMatch({ it.id == "id2" }))
+        assertTrue(queryRecords1.getRecords().stream().anyMatch { it.id == "id1" })
+        assertTrue(queryRecords1.getRecords().stream().anyMatch { it.id == "id2" })
 
         Mockito.verify(journalSettingsService, Mockito.times(1)).searchSettings(any(String::class.java))
 

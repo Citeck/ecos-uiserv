@@ -65,131 +65,131 @@ internal class JournalSettingsPermissionsServiceImplTest {
             val service = JournalSettingsPermissionsServiceImpl()
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthority("user1")
-                        withCreator("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("user1")
+                        .withCreator("user1")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthority("user1")
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("user1")
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthority("anotherUser")
-                        withCreator("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("anotherUser")
+                        .withCreator("user1")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthority("GROUP_all")
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("GROUP_all")
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertFalse(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthority("anotherUser")
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("anotherUser")
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertFalse(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthority("admin")
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("admin")
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertFalse(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthority("anotherUser")
-                        withCreator("admin")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("anotherUser")
+                        .withCreator("admin")
+                        .build()
                 )
             )
             assertFalse(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthority("admin")
-                        withCreator("admin")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("admin")
+                        .withCreator("admin")
+                        .build()
                 )
             )
 
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("user1"))
-                        withCreator("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("user1"))
+                        .withCreator("user1")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("anotherUser", "user1"))
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("anotherUser", "user1"))
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("anotherUser", "admin"))
-                        withCreator("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("anotherUser", "admin"))
+                        .withCreator("user1")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("GROUP_all"))
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("GROUP_all"))
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertFalse(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("anotherUser", "admin"))
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("anotherUser", "admin"))
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertFalse(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("admin"))
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("admin"))
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertFalse(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("anotherUser", "admin"))
-                        withCreator("admin")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("anotherUser", "admin"))
+                        .withCreator("admin")
+                        .build()
                 )
             )
             assertFalse(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("admin"))
-                        withCreator("admin")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("admin"))
+                        .withCreator("admin")
+                        .build()
                 )
             )
         }
@@ -201,131 +201,131 @@ internal class JournalSettingsPermissionsServiceImplTest {
             val service = JournalSettingsPermissionsServiceImpl()
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthority("user1")
-                        withCreator("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("user1")
+                        .withCreator("user1")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthority("user1")
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("user1")
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthority("anotherUser")
-                        withCreator("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("anotherUser")
+                        .withCreator("user1")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthority("GROUP_all")
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("GROUP_all")
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthority("anotherUser")
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("anotherUser")
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthority("admin")
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("admin")
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthority("anotherUser")
-                        withCreator("admin")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("anotherUser")
+                        .withCreator("admin")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthority("admin")
-                        withCreator("admin")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("admin")
+                        .withCreator("admin")
+                        .build()
                 )
             )
 
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("user1", "admin"))
-                        withCreator("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("user1", "admin"))
+                        .withCreator("user1")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("anotherUser", "user1"))
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("anotherUser", "user1"))
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("anotherUser"))
-                        withCreator("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("anotherUser"))
+                        .withCreator("user1")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("GROUP_all"))
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("GROUP_all"))
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("anotherUser"))
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("anotherUser"))
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("admin", "user1"))
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("admin", "user1"))
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("anotherUser"))
-                        withCreator("admin")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("anotherUser"))
+                        .withCreator("admin")
+                        .build()
                 )
             )
             assertTrue(
                 service.canRead(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("admin"))
-                        withCreator("admin")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("admin"))
+                        .withCreator("admin")
+                        .build()
                 )
             )
         }
@@ -386,131 +386,131 @@ internal class JournalSettingsPermissionsServiceImplTest {
             val service = JournalSettingsPermissionsServiceImpl()
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthority("user1")
-                        withCreator("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("user1")
+                        .withCreator("user1")
+                        .build()
                 )
             )
             assertFalse(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthority("user1")
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("user1")
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthority("anotherUser")
-                        withCreator("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("anotherUser")
+                        .withCreator("user1")
+                        .build()
                 )
             )
             assertFalse(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthority("GROUP_all")
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("GROUP_all")
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertFalse(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthority("anotherUser")
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("anotherUser")
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertFalse(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthority("admin")
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("admin")
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertFalse(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthority("anotherUser")
-                        withCreator("admin")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("anotherUser")
+                        .withCreator("admin")
+                        .build()
                 )
             )
             assertFalse(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthority("admin")
-                        withCreator("admin")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("admin")
+                        .withCreator("admin")
+                        .build()
                 )
             )
 
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("user1"))
-                        withCreator("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("user1"))
+                        .withCreator("user1")
+                        .build()
                 )
             )
             assertFalse(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("user1", "anotherUser"))
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("user1", "anotherUser"))
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("anotherUser"))
-                        withCreator("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("anotherUser"))
+                        .withCreator("user1")
+                        .build()
                 )
             )
             assertFalse(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("GROUP_all", "anotherUser"))
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("GROUP_all", "anotherUser"))
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertFalse(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("anotherUser", "admin"))
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("anotherUser", "admin"))
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertFalse(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("admin"))
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("admin"))
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertFalse(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("anotherUser"))
-                        withCreator("admin")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("anotherUser"))
+                        .withCreator("admin")
+                        .build()
                 )
             )
             assertFalse(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("admin"))
-                        withCreator("admin")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("admin"))
+                        .withCreator("admin")
+                        .build()
                 )
             )
         }
@@ -522,131 +522,131 @@ internal class JournalSettingsPermissionsServiceImplTest {
             val service = JournalSettingsPermissionsServiceImpl()
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthority("user1")
-                        withCreator("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("user1")
+                        .withCreator("user1")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthority("user1")
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("user1")
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthority("anotherUser")
-                        withCreator("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("anotherUser")
+                        .withCreator("user1")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthority("GROUP_all")
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("GROUP_all")
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthority("anotherUser")
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("anotherUser")
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthority("admin")
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("admin")
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthority("anotherUser")
-                        withCreator("admin")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("anotherUser")
+                        .withCreator("admin")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthority("admin")
-                        withCreator("admin")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("admin")
+                        .withCreator("admin")
+                        .build()
                 )
             )
 
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("user1"))
-                        withCreator("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("user1"))
+                        .withCreator("user1")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("user1", "anotherUser"))
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("user1", "anotherUser"))
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("anotherUser"))
-                        withCreator("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("anotherUser"))
+                        .withCreator("user1")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("GROUP_all", "user1"))
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("GROUP_all", "user1"))
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("anotherUser"))
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("anotherUser"))
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("admin"))
-                        withCreator("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("admin"))
+                        .withCreator("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("anotherUser"))
-                        withCreator("admin")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("anotherUser"))
+                        .withCreator("admin")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWrite(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("admin", "anotherUser"))
-                        withCreator("admin")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("admin", "anotherUser"))
+                        .withCreator("admin")
+                        .build()
                 )
             )
         }
@@ -658,52 +658,52 @@ internal class JournalSettingsPermissionsServiceImplTest {
             val service = JournalSettingsPermissionsServiceImpl()
             assertTrue(
                 service.canWriteNew(
-                    JournalSettingsDto.create {
-                        withAuthority("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("user1")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWriteNew(
-                    JournalSettingsDto.create {
-                        withAuthority("GROUP_all")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("GROUP_all")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWriteNew(
-                    JournalSettingsDto.create {
-                        withAuthority("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("anotherUser")
+                        .build()
                 )
             )
 
             assertTrue(
                 service.canWriteNew(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("user1"))
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("user1"))
+                        .build()
                 )
             )
             assertTrue(
                 service.canWriteNew(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("user1", "anotherUser"))
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("user1", "anotherUser"))
+                        .build()
                 )
             )
             assertTrue(
                 service.canWriteNew(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("GROUP_all"))
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("GROUP_all"))
+                        .build()
                 )
             )
             assertTrue(
                 service.canWriteNew(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("anotherUser"))
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("anotherUser"))
+                        .build()
                 )
             )
         }
@@ -715,59 +715,59 @@ internal class JournalSettingsPermissionsServiceImplTest {
             val service = JournalSettingsPermissionsServiceImpl()
             assertTrue(
                 service.canWriteNew(
-                    JournalSettingsDto.create {
-                        withAuthority("user1")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("user1")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWriteNew(
-                    JournalSettingsDto.create {
-                        withAuthority("anotherUser")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("anotherUser")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWriteNew(
-                    JournalSettingsDto.create {
-                        withAuthority("GROUP_all")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("GROUP_all")
+                        .build()
                 )
             )
             assertTrue(
                 service.canWriteNew(
-                    JournalSettingsDto.create {
-                        withAuthority("admin")
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthority("admin")
+                        .build()
                 )
             )
 
             assertTrue(
                 service.canWriteNew(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("user1"))
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("user1"))
+                        .build()
                 )
             )
             assertTrue(
                 service.canWriteNew(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("anotherUser", "admin"))
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("anotherUser", "admin"))
+                        .build()
                 )
             )
             assertTrue(
                 service.canWriteNew(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("GROUP_all"))
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("GROUP_all"))
+                        .build()
                 )
             )
             assertTrue(
                 service.canWriteNew(
-                    JournalSettingsDto.create {
-                        withAuthorities(listOf("admin"))
-                    }
+                    JournalSettingsDto.create()
+                        .withAuthorities(listOf("admin"))
+                        .build()
                 )
             )
         }

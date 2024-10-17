@@ -50,6 +50,10 @@ class ResolvedMenuConfigsTest : MenuTestBase() {
 
         log.info { "===== Test: '$testName' =====" }
 
+        testRoot.findFiles("input-*.json").forEach {
+            menuService.save(Json.mapper.readNotNull(it, MenuDto::class.java))
+        }
+
         val inSubMenu = Json.mapper.read(testRoot.getFile("input.json")!!, DataValue::class.java)!!
         val outSubMenu = Json.mapper.read(
             testRoot.getFile("output.json") ?: error("Output file doesn't found"),

@@ -112,12 +112,6 @@ class JournalColumnDef(
         fun create(): Builder {
             return Builder()
         }
-
-        fun create(builder: Builder.() -> Unit): JournalColumnDef {
-            val builderObj = Builder()
-            builder.invoke(builderObj)
-            return builderObj.build()
-        }
     }
 
     fun copy(): Builder {

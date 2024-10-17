@@ -28,9 +28,9 @@ class JournalActionsTest {
     fun test() {
 
         journalsService.save(
-            JournalDef.create {
-                withId("some-journal")
-                withActionsDef(
+            JournalDef.create()
+                .withId("some-journal")
+                .withActionsDef(
                     listOf(
                         JournalActionDef.create()
                             .withId("some-action")
@@ -39,7 +39,7 @@ class JournalActionsTest {
                             .build()
                     )
                 )
-            }
+                .build()
         )
 
         val actionRefs = recordsService.getAtt(

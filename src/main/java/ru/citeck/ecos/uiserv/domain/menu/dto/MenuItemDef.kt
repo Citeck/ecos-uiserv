@@ -9,7 +9,7 @@ import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 @IncludeNonDefault
 @JsonDeserialize(builder = MenuItemDef.Builder::class)
-class MenuItemDef(
+data class MenuItemDef(
     val id: String,
     val label: MLText,
     val icon: EntityRef,
@@ -23,18 +23,11 @@ class MenuItemDef(
 
     companion object {
         @JvmField
-        val EMPTY = create {}
+        val EMPTY = create().build()
 
         @JvmStatic
         fun create(): Builder {
             return Builder()
-        }
-
-        @JvmStatic
-        fun create(builder: Builder.() -> Unit): MenuItemDef {
-            val builderObj = Builder()
-            builder.invoke(builderObj)
-            return builderObj.build()
         }
     }
 

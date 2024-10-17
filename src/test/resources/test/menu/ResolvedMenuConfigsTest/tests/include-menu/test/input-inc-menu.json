@@ -1,0 +1,53 @@
+{
+  "id": "inc-menu",
+  "subMenu": {
+    "create": {
+      "items": [
+        {
+          "id": "inc-create-section-0",
+          "type": "SECTION",
+          "items": [
+            {
+              "id": "inc-create-link-0",
+              "type": "LINK",
+              "config": {
+                "custom": "value"
+              }
+            }
+          ]
+        },
+        {
+          "id": "inc-create-link-1",
+          "type": "LINK",
+          "config": {
+            "custom-1": "value-1"
+          }
+        }
+      ]
+    },
+    "left": {
+      "items": [
+        {
+          "id": "inc-left-section-0",
+          "type": "SECTION",
+          "items": [
+            {
+              "id": "inc-left-link-0",
+              "type": "LINK",
+              "config": {
+                "custom": "value"
+              }
+            }
+          ]
+        },
+        {
+          "id": "inc-left-link-1",
+          "type": "LINK",
+          "config": {
+            "custom-1": "value-1"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -60,11 +60,11 @@ class TypeJournalsProvider(
             }
         )
 
-        return JournalDef.create {
-            withName(typeDef.name)
-            withTypeRef(ModelUtils.getTypeRef(typeDef.id))
-            withColumns(columns)
-        }
+        return JournalDef.create()
+            .withName(typeDef.name)
+            .withTypeRef(ModelUtils.getTypeRef(typeDef.id))
+            .withColumns(columns)
+            .build()
     }
 
     override fun getType(): String {

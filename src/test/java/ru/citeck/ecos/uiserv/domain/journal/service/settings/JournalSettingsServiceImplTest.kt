@@ -163,13 +163,13 @@ internal class JournalSettingsServiceImplTest {
 
         AuthContext.runAs("some-authority") {
             val createdDto = service.save(
-                JournalSettingsDto.create {
-                    withId("some-id")
-                    withName(MLText("some-name"))
-                    withAuthority("some-authority")
-                    withJournalId("some-journal")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("some-id")
+                    .withName(MLText("some-name"))
+                    .withAuthority("some-authority")
+                    .withJournalId("some-journal")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
 
             assertEquals("some-id", createdDto.id)
@@ -183,13 +183,13 @@ internal class JournalSettingsServiceImplTest {
             Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
 
             val updatedDto = service.save(
-                JournalSettingsDto.create {
-                    withId("some-id")
-                    withName(MLText("updated-name"))
-                    withAuthority("some-authority")
-                    withJournalId("some-journal")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("some-id")
+                    .withName(MLText("updated-name"))
+                    .withAuthority("some-authority")
+                    .withJournalId("some-journal")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
 
             assertEquals("some-id", updatedDto.id)
@@ -211,13 +211,13 @@ internal class JournalSettingsServiceImplTest {
 
         AuthContext.runAs("some-authority-1") {
             val createdDto = service.save(
-                JournalSettingsDto.create {
-                    withId("some-id")
-                    withName(MLText("some-name"))
-                    withAuthorities(listOf("some-authority-1", "some-authority-2"))
-                    withJournalId("some-journal")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("some-id")
+                    .withName(MLText("some-name"))
+                    .withAuthorities(listOf("some-authority-1", "some-authority-2"))
+                    .withJournalId("some-journal")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
 
             assertEquals("some-id", createdDto.id)
@@ -231,13 +231,13 @@ internal class JournalSettingsServiceImplTest {
             Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
 
             val updatedDto = service.save(
-                JournalSettingsDto.create {
-                    withId("some-id")
-                    withName(MLText("updated-name"))
-                    withAuthorities(listOf("some-authority-1", "some-authority-2"))
-                    withJournalId("some-journal")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("some-id")
+                    .withName(MLText("updated-name"))
+                    .withAuthorities(listOf("some-authority-1", "some-authority-2"))
+                    .withJournalId("some-journal")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
 
             assertEquals("some-id", updatedDto.id)
@@ -259,13 +259,13 @@ internal class JournalSettingsServiceImplTest {
 
         AuthContext.runAs("some-authority", listOf("some-authority", "GROUP_all", "ROLE_USER")) {
             val createdDto = service.save(
-                JournalSettingsDto.create {
-                    withId("some-id")
-                    withName(MLText("some-name"))
-                    withAuthority("some-authority")
-                    withJournalId("some-journal")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("some-id")
+                    .withName(MLText("some-name"))
+                    .withAuthority("some-authority")
+                    .withJournalId("some-journal")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
 
             assertEquals("some-id", createdDto.id)
@@ -282,13 +282,13 @@ internal class JournalSettingsServiceImplTest {
         AuthContext.runAs("another-authority", listOf("another-authority", "GROUP_all", "ROLE_USER")) {
             val exception1 = assertThrows(IllegalAccessException::class.java) {
                 service.save(
-                    JournalSettingsDto.create {
-                        withId("some-id")
-                        withName(MLText("updated-name"))
-                        withAuthority("some-authority")
-                        withJournalId("some-journal")
-                        withSettings(ObjectData.create("{}"))
-                    }
+                    JournalSettingsDto.create()
+                        .withId("some-id")
+                        .withName(MLText("updated-name"))
+                        .withAuthority("some-authority")
+                        .withJournalId("some-journal")
+                        .withSettings(ObjectData.create("{}"))
+                        .build()
                 )
             }
 
@@ -301,13 +301,13 @@ internal class JournalSettingsServiceImplTest {
 
         AuthContext.runAs("admin", listOf("admin", "GROUP_all", "ROLE_USER", "ROLE_ADMIN")) {
             service.save(
-                JournalSettingsDto.create {
-                    withId("some-id")
-                    withName(MLText("updated-name"))
-                    withAuthority("some-authority")
-                    withJournalId("some-journal")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("some-id")
+                    .withName(MLText("updated-name"))
+                    .withAuthority("some-authority")
+                    .withJournalId("some-journal")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
 
             Mockito.verify(spyPermService, Mockito.times(2)).canWrite(any(JournalSettingsEntity::class.java))
@@ -323,13 +323,13 @@ internal class JournalSettingsServiceImplTest {
             assertEquals("some-authority", updatedDto?.entity?.creator)
 
             service.save(
-                JournalSettingsDto.create {
-                    withId("another-id")
-                    withName(MLText("another-name"))
-                    withAuthority("some-authority")
-                    withJournalId("some-journal")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("another-id")
+                    .withName(MLText("another-name"))
+                    .withAuthority("some-authority")
+                    .withJournalId("some-journal")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
 
             val createdForAnotherDto = service.getById("another-id")
@@ -353,13 +353,13 @@ internal class JournalSettingsServiceImplTest {
 
         AuthContext.runAs("some-authority", listOf("some-authority", "GROUP_all", "ROLE_USER")) {
             val createdDto = service.save(
-                JournalSettingsDto.create {
-                    withId("some-id")
-                    withName(MLText("some-name"))
-                    withAuthorities(listOf("some-authority", "some-authority-1"))
-                    withJournalId("some-journal")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("some-id")
+                    .withName(MLText("some-name"))
+                    .withAuthorities(listOf("some-authority", "some-authority-1"))
+                    .withJournalId("some-journal")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
 
             assertEquals("some-id", createdDto.id)
@@ -376,13 +376,13 @@ internal class JournalSettingsServiceImplTest {
         AuthContext.runAs("another-authority", listOf("another-authority", "GROUP_all", "ROLE_USER")) {
             val exception1 = assertThrows(IllegalAccessException::class.java) {
                 service.save(
-                    JournalSettingsDto.create {
-                        withId("some-id")
-                        withName(MLText("updated-name"))
-                        withAuthorities(listOf("some-authority", "some-authority-1"))
-                        withJournalId("some-journal")
-                        withSettings(ObjectData.create("{}"))
-                    }
+                    JournalSettingsDto.create()
+                        .withId("some-id")
+                        .withName(MLText("updated-name"))
+                        .withAuthorities(listOf("some-authority", "some-authority-1"))
+                        .withJournalId("some-journal")
+                        .withSettings(ObjectData.create("{}"))
+                        .build()
                 )
             }
 
@@ -395,13 +395,13 @@ internal class JournalSettingsServiceImplTest {
 
         AuthContext.runAs("admin", listOf("admin", "GROUP_all", "ROLE_USER", "ROLE_ADMIN")) {
             service.save(
-                JournalSettingsDto.create {
-                    withId("some-id")
-                    withName(MLText("updated-name"))
-                    withAuthorities(listOf("some-authority", "some-authority-1"))
-                    withJournalId("some-journal")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("some-id")
+                    .withName(MLText("updated-name"))
+                    .withAuthorities(listOf("some-authority", "some-authority-1"))
+                    .withJournalId("some-journal")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
 
             Mockito.verify(spyPermService, Mockito.times(2)).canWrite(any(JournalSettingsEntity::class.java))
@@ -417,13 +417,13 @@ internal class JournalSettingsServiceImplTest {
             assertEquals("some-authority", updatedDto?.entity?.creator)
 
             service.save(
-                JournalSettingsDto.create {
-                    withId("another-id")
-                    withName(MLText("another-name"))
-                    withAuthorities(listOf("some-authority", "some-authority-1"))
-                    withJournalId("some-journal")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("another-id")
+                    .withName(MLText("another-name"))
+                    .withAuthorities(listOf("some-authority", "some-authority-1"))
+                    .withJournalId("some-journal")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
 
             val createdForAnotherDto = service.getById("another-id")
@@ -447,13 +447,13 @@ internal class JournalSettingsServiceImplTest {
 
         AuthContext.runAs("some-authority") {
             service.save(
-                JournalSettingsDto.create {
-                    withId("some-id")
-                    withName(MLText("some-name"))
-                    withAuthority("some-authority")
-                    withJournalId("some-journal")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("some-id")
+                    .withName(MLText("some-name"))
+                    .withAuthority("some-authority")
+                    .withJournalId("some-journal")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
             assertNotNull(service.getById("some-id"))
 
@@ -477,13 +477,13 @@ internal class JournalSettingsServiceImplTest {
 
         AuthContext.runAs("some-authority") {
             service.save(
-                JournalSettingsDto.create {
-                    withId("some-id")
-                    withName(MLText("some-name"))
-                    withAuthorities(listOf("some-authority", "some-authority-1"))
-                    withJournalId("some-journal")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("some-id")
+                    .withName(MLText("some-name"))
+                    .withAuthorities(listOf("some-authority", "some-authority-1"))
+                    .withJournalId("some-journal")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
             assertNotNull(service.getById("some-id"))
 
@@ -529,13 +529,13 @@ internal class JournalSettingsServiceImplTest {
         AuthContext.runAs("some-authority", listOf("some-authority", "GROUP_all", "ROLE_USER")) {
 
             service.save(
-                JournalSettingsDto.create {
-                    withId("some-id")
-                    withName(MLText("some-name"))
-                    withAuthority("some-authority")
-                    withJournalId("some-journal")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("some-id")
+                    .withName(MLText("some-name"))
+                    .withAuthority("some-authority")
+                    .withJournalId("some-journal")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
 
             Mockito.verify(spyPermService, Mockito.times(0)).canWrite(any(JournalSettingsEntity::class.java))
@@ -569,13 +569,13 @@ internal class JournalSettingsServiceImplTest {
         AuthContext.runAs("some-authority", listOf("some-authority", "GROUP_all", "ROLE_USER")) {
 
             service.save(
-                JournalSettingsDto.create {
-                    withId("some-id")
-                    withName(MLText("some-name"))
-                    withAuthorities(listOf("some-authority", "some-authority-1"))
-                    withJournalId("some-journal")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("some-id")
+                    .withName(MLText("some-name"))
+                    .withAuthorities(listOf("some-authority", "some-authority-1"))
+                    .withJournalId("some-journal")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
 
             Mockito.verify(spyPermService, Mockito.times(0)).canWrite(any(JournalSettingsEntity::class.java))
@@ -1055,43 +1055,43 @@ internal class JournalSettingsServiceImplTest {
     fun getSettingsByAuthorityAndJournalId() {
         AuthContext.runAs("auth-1") {
             journalSettingsService.save(
-                JournalSettingsDto.create {
-                    withId("id-1")
-                    withName(MLText("name-1"))
-                    withAuthority("auth-1")
-                    withJournalId("journal-1")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("id-1")
+                    .withName(MLText("name-1"))
+                    .withAuthority("auth-1")
+                    .withJournalId("journal-1")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
             journalSettingsService.save(
-                JournalSettingsDto.create {
-                    withId("id-2")
-                    withName(MLText("name-2"))
-                    withAuthority("auth-1")
-                    withJournalId("journal-1")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("id-2")
+                    .withName(MLText("name-2"))
+                    .withAuthority("auth-1")
+                    .withJournalId("journal-1")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
             journalSettingsService.save(
-                JournalSettingsDto.create {
-                    withId("id-4")
-                    withName(MLText("name-4"))
-                    withAuthority("auth-1")
-                    withJournalId("journal-2")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("id-4")
+                    .withName(MLText("name-4"))
+                    .withAuthority("auth-1")
+                    .withJournalId("journal-2")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
         }
 
         AuthContext.runAs("auth-2") {
             journalSettingsService.save(
-                JournalSettingsDto.create {
-                    withId("id-3")
-                    withName(MLText("name-3"))
-                    withAuthority("auth-2")
-                    withJournalId("journal-1")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("id-3")
+                    .withName(MLText("name-3"))
+                    .withAuthority("auth-2")
+                    .withJournalId("journal-1")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
         }
 
@@ -1104,79 +1104,79 @@ internal class JournalSettingsServiceImplTest {
     fun getSettingsByAuthorityAndJournalIdWithAuthorities() {
         AuthContext.runAs("auth-1") {
             journalSettingsService.save(
-                JournalSettingsDto.create {
-                    withId("id-1")
-                    withName(MLText("name-1"))
-                    withAuthorities(listOf("auth-1", "auth-2"))
-                    withJournalId("journal-1")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("id-1")
+                    .withName(MLText("name-1"))
+                    .withAuthorities(listOf("auth-1", "auth-2"))
+                    .withJournalId("journal-1")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
             journalSettingsService.save(
-                JournalSettingsDto.create {
-                    withId("id-2")
-                    withName(MLText("name-2"))
-                    withAuthorities(listOf("auth-1", "auth-2"))
-                    withJournalId("journal-1")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("id-2")
+                    .withName(MLText("name-2"))
+                    .withAuthorities(listOf("auth-1", "auth-2"))
+                    .withJournalId("journal-1")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
             journalSettingsService.save(
-                JournalSettingsDto.create {
-                    withId("id-3")
-                    withName(MLText("name-4"))
-                    withAuthorities(listOf("auth-1", "auth-2"))
-                    withJournalId("journal-2")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("id-3")
+                    .withName(MLText("name-4"))
+                    .withAuthorities(listOf("auth-1", "auth-2"))
+                    .withJournalId("journal-2")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
             journalSettingsService.save(
-                JournalSettingsDto.create {
-                    withId("id-4")
-                    withName(MLText("name-1"))
-                    withAuthorities(listOf("auth-1"))
-                    withJournalId("journal-1")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("id-4")
+                    .withName(MLText("name-1"))
+                    .withAuthorities(listOf("auth-1"))
+                    .withJournalId("journal-1")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
             journalSettingsService.save(
-                JournalSettingsDto.create {
-                    withId("id-5")
-                    withName(MLText("name-2"))
-                    withAuthorities(listOf("auth-1"))
-                    withJournalId("journal-1")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("id-5")
+                    .withName(MLText("name-2"))
+                    .withAuthorities(listOf("auth-1"))
+                    .withJournalId("journal-1")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
             journalSettingsService.save(
-                JournalSettingsDto.create {
-                    withId("id-6")
-                    withName(MLText("name-4"))
-                    withAuthorities(listOf("auth-1"))
-                    withJournalId("journal-2")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("id-6")
+                    .withName(MLText("name-4"))
+                    .withAuthorities(listOf("auth-1"))
+                    .withJournalId("journal-2")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
         }
 
         AuthContext.runAs("auth-2") {
             journalSettingsService.save(
-                JournalSettingsDto.create {
-                    withId("id-7")
-                    withName(MLText("name-3"))
-                    withAuthorities(listOf("auth-1", "auth-2"))
-                    withJournalId("journal-1")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("id-7")
+                    .withName(MLText("name-3"))
+                    .withAuthorities(listOf("auth-1", "auth-2"))
+                    .withJournalId("journal-1")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
             journalSettingsService.save(
-                JournalSettingsDto.create {
-                    withId("id-8")
-                    withName(MLText("name-3"))
-                    withAuthorities(listOf("auth-2"))
-                    withJournalId("journal-1")
-                    withSettings(ObjectData.create("{}"))
-                }
+                JournalSettingsDto.create()
+                    .withId("id-8")
+                    .withName(MLText("name-3"))
+                    .withAuthorities(listOf("auth-2"))
+                    .withJournalId("journal-1")
+                    .withSettings(ObjectData.create("{}"))
+                    .build()
             )
         }
 

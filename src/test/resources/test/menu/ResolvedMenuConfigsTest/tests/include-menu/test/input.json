@@ -1,0 +1,31 @@
+{
+  "create": {
+    "items": [
+      {
+        "id": "inc-menu-create-0",
+        "type": "INCLUDE_MENU",
+        "config": {
+          "menuRef": "uiserv/menu@inc-menu"
+        }
+      }
+    ]
+  },
+  "left": {
+    "items": [
+      {
+        "id": "main-inc-menu-left-0",
+        "type": "INCLUDE_MENU",
+        "config": {
+          "menuRef": "uiserv/menu@inc-menu"
+        }
+      },
+      {
+        "id": "main-inc-menu-left-1",
+        "type": "INCLUDE_MENU",
+        "config": {
+          "menuRef": "uiserv/menu@empty-inc-menu"
+        }
+      }
+    ]
+  }
+}

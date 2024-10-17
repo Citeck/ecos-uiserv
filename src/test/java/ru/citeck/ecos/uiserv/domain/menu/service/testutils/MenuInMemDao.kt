@@ -21,8 +21,16 @@ class MenuInMemDao : MenuDao {
     }
 
     override fun findAllByAuthoritiesContains(authority: String, workspace: String): List<MenuEntity> {
-        return data.values.filter { menu ->
-            menu.authorities?.map { it.lowercase() }?.contains(authority) ?: false
+        return if (workspace.isEmpty()) {
+            data.values.filter { menu ->
+                menu.authorities?.map { it.lowercase() }?.contains(authority) ?: false &&
+                    menu.workspace == ""
+            }
+        } else {
+            data.values.filter { menu ->
+                menu.authorities?.map { it.lowercase() }?.contains(authority) ?: false &&
+                    menu.workspace == workspace
+            }
         }
     }
 

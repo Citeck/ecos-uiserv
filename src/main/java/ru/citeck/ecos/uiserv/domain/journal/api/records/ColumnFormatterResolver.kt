@@ -32,15 +32,15 @@ class ColumnFormatterResolver(
                 if (typeRef.isNotBlank()) {
                     val typeInfo = ecosTypeService.getTypeInfo(EntityRef.valueOf(typeRef))
                     if (ecosTypesRegistry.getParents(typeInfo).contains(TYPE_CASE)) {
-                        column.withFormatter(ColumnFormatterDef.create { withType("assoc") })
+                        column.withFormatter(ColumnFormatterDef.create().withType("assoc").build())
                     }
                 }
             }
             AttributeType.DATE -> {
-                column.withFormatter(ColumnFormatterDef.create { withType("date") })
+                column.withFormatter(ColumnFormatterDef.create().withType("date").build())
             }
             AttributeType.DATETIME -> {
-                column.withFormatter(ColumnFormatterDef.create { withType("datetime") })
+                column.withFormatter(ColumnFormatterDef.create().withType("datetime").build())
             }
             else -> {
                 // do nothing
@@ -49,7 +49,7 @@ class ColumnFormatterResolver(
 
         if (column.formatter.type.isBlank()) {
             if (column.id == "cm:title" || column.id == "_disp") {
-                column.withFormatter(ColumnFormatterDef.create { withType("link") })
+                column.withFormatter(ColumnFormatterDef.create().withType("link").build())
             }
         }
     }

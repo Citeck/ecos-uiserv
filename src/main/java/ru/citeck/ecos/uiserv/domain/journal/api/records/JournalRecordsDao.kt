@@ -131,7 +131,7 @@ class JournalRecordsDao(
     @Secured(AuthRole.ADMIN, AuthRole.SYSTEM)
     override fun getRecToMutate(recordId: String): JournalMutateRec {
         val dto = journalService.getJournalById(recordId)
-        return JournalMutateRec(dto?.journalDef ?: JournalDef.create { withId(recordId) })
+        return JournalMutateRec(dto?.journalDef ?: JournalDef.create().withId(recordId).build())
     }
 
     override fun saveMutatedRec(record: JournalMutateRec): String {

@@ -45,7 +45,7 @@ class JournalSettingsRecordsDao(
     @Override
     override fun getRecordAtts(recordId: String): JournalSettingsRecord {
         val dto = journalSettingsService.getById(recordId)
-            ?: EntityWithMeta(JournalSettingsDto.create { withId(recordId) })
+            ?: EntityWithMeta(JournalSettingsDto.create().withId(recordId).build())
         return JournalSettingsRecord(dto)
     }
 

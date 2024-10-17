@@ -18,18 +18,11 @@ data class ActionConfirmDef(
 ) {
     companion object {
 
-        val EMPTY = create {}
+        val EMPTY = create().build()
 
         @JvmStatic
         fun create(): Builder {
             return Builder()
-        }
-
-        @JvmStatic
-        fun create(builder: Builder.() -> Unit): ActionConfirmDef {
-            val builderObj = Builder()
-            builder.invoke(builderObj)
-            return builderObj.build()
         }
     }
 

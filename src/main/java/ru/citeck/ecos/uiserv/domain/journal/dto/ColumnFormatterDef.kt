@@ -17,12 +17,6 @@ data class ColumnFormatterDef(
         fun create(): Builder {
             return Builder()
         }
-
-        fun create(builder: Builder.() -> Unit): ColumnFormatterDef {
-            val builderObj = Builder()
-            builder.invoke(builderObj)
-            return builderObj.build()
-        }
     }
 
     class Builder() {

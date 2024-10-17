@@ -216,6 +216,7 @@ class JournalSettingsServiceImpl(
     }
 
     @Override
+    @Deprecated("use searchSettings method instead of this")
     override fun getSettings(authority: String?, journalId: String?): List<JournalSettingsDto> {
         var configsSet: Set<JournalSettingsEntity> = repo.findAllByAuthorityAndJournalId(authority, journalId).toSet()
         configsSet = configsSet.plus(repo.findAllByAuthoritiesInAndJournalId(authority, journalId))
@@ -296,14 +297,14 @@ class JournalSettingsServiceImpl(
     private fun toDto(pref: JournalPrefService.JournalPreferences, journalId: String?): JournalSettingsDto {
         val currentUsername = getCurrentUsername()
         val prefSettings = ObjectData.create(pref.data)
-        return JournalSettingsDto.create {
-            withId(pref.fileId)
-            withName(Json.mapper.read(prefSettings["title"].asText(), MLText::class.java))
-            withAuthorities(listOf(currentUsername))
-            withJournalId(journalId)
-            withSettings(prefSettings)
-            withCreator(currentUsername)
-        }
+        return JournalSettingsDto.create()
+            .withId(pref.fileId)
+            .withName(Json.mapper.read(prefSettings["title"].asText(), MLText::class.java))
+            .withAuthorities(listOf(currentUsername))
+            .withJournalId(journalId)
+            .withSettings(prefSettings)
+            .withCreator(currentUsername)
+            .build()
     }
 
     private fun getCurrentUsername(): String {

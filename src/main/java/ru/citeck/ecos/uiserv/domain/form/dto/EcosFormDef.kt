@@ -29,18 +29,11 @@ data class EcosFormDef(
 
     companion object {
 
-        val EMPTY = create {}
+        val EMPTY = create().build()
 
         @JvmStatic
         fun create(): Builder {
             return Builder()
-        }
-
-        @JvmStatic
-        fun create(builder: Builder.() -> Unit): EcosFormDef {
-            val builderObj = Builder()
-            builder.invoke(builderObj)
-            return builderObj.build()
         }
     }
 

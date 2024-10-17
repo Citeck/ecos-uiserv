@@ -1,0 +1,11 @@
+{
+  "id": "empty-inc-menu",
+  "subMenu": {
+    "create": {
+      "items": []
+    },
+    "left": {
+      "items": []
+    }
+  }
+}
