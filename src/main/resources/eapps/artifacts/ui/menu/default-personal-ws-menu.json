@@ -39,9 +39,20 @@
               "type": "DOCLIB",
               "config": {
                 "recordRef": "uiserv/journal@type$workspace-file"
+              }
+            },
+            {
+              "id": "personal-kanban-tasks",
+              "label": {
+                "ru": "Персональные канбан задачи",
+                "en": "Personal kanban tasks"
               },
-              "items": [],
-              "allowedFor": []
+              "icon": "ui/icon@i-leftmenu-completed-processes",
+              "hidden": false,
+              "type": "KANBAN",
+              "config": {
+                "recordRef": "uiserv/board@kanban-task-board"
+              }
             }
           ]
         },

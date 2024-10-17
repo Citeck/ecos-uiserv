@@ -46,6 +46,19 @@
               },
               "items": [],
               "allowedFor": []
+            },
+            {
+              "id": "workspace-kanban-tasks",
+              "label": {
+                "ru": "Канбан задачи",
+                "en": "Kanban tasks"
+              },
+              "icon": "ui/icon@i-leftmenu-completed-processes",
+              "hidden": false,
+              "type": "KANBAN",
+              "config": {
+                "recordRef": "uiserv/board@kanban-task-board"
+              }
             }
           ]
         },
