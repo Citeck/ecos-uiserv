@@ -91,6 +91,8 @@ public class ThemeController {
             return MediaType.IMAGE_PNG;
         } else if (fileName.endsWith("ico")) {
             return MediaType.valueOf("image/x-icon");
+        } else if (fileName.endsWith("svg")) {
+            return MediaType.valueOf("image/svg+xml");
         } else {
             throw new IllegalStateException("Unknown image type: " + fileName);
         }
