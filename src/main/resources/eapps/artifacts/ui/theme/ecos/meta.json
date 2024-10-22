@@ -6,9 +6,9 @@
   "system": true,
   "images": {
     "favicon": "/image/favicon.ico",
-    "logo": "/image/logo.png",
-    "login-logo": "/image/login-logo.png",
-    "menu-left-logo-large": "/image/menu-left-logo-large.png",
-    "menu-left-logo-small": "/image/menu-left-logo-small.png"
+    "logo": "/image/logo.svg",
+    "login-logo": "/image/login-logo.svg",
+    "menu-left-logo-large": "/image/menu-left-logo-large.svg",
+    "menu-left-logo-small": "/image/menu-left-logo-small.svg"
   }
 }
