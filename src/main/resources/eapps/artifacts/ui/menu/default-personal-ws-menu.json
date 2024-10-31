@@ -44,8 +44,8 @@
             {
               "id": "personal-kanban-tasks",
               "label": {
-                "ru": "Персональные канбан задачи",
-                "en": "Personal kanban tasks"
+                "ru": "Канбан задачи",
+                "en": "Kanban tasks"
               },
               "icon": "ui/icon@i-leftmenu-completed-processes",
               "hidden": false,
