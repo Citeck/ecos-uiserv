@@ -1,0 +1,105 @@
+---
+id: add-uiserv-admin-menu-section
+name:
+  ru: Добавить раздел администратора uiserv
+  en: Add uiserv admin section
+
+target: 'ui/menu$admin-workspace-menu'
+system: true
+order: 300
+
+type: json
+config:
+  operations:
+    - op: add
+      path: '$.subMenu.left.items'
+      value:
+        id: uiserv-section
+        label:
+          en: UI configuration
+          ru: Конфигурация UI
+        hidden: false
+        type: SECTION
+        config: { }
+        items:
+          - id: uiserv-ecos-journals
+            label:
+              ru: Журналы
+              en: Journals
+            icon: ui/icon@i-leftmenu-tools
+            hidden: false
+            type: JOURNAL
+            config:
+              recordRef: uiserv/journal@ecos-journals
+          - id: uiserv-journal-settings
+            label:
+              en: Journal settings
+              ru: Настройки журнала
+            icon: ui/icon@i-leftmenu-tools
+            hidden: false
+            type: JOURNAL
+            config:
+              recordRef: uiserv/journal@journal-settings
+          - id: uiserv-ecos-forms
+            label:
+              ru: Формы
+              en: Forms
+            icon: ui/icon@i-leftmenu-tools
+            hidden: false
+            type: JOURNAL
+            config:
+              recordRef: uiserv/journal@ecos-forms
+          - id: uiserv-ui-actions
+            label:
+              ru: Действия
+              en: Actions
+            icon: ui/icon@i-leftmenu-tools
+            hidden: false
+            type: JOURNAL
+            config:
+              recordRef: uiserv/journal@ui-actions
+          - id: uiserv-ecos-dashboards
+            label:
+              ru: Дашборды
+              en: Dashboards
+            icon: ui/icon@i-leftmenu-tools
+            hidden: false
+            type: JOURNAL
+            config:
+              recordRef: uiserv/journal@ecos-dashboards
+          - id: uiserv-ecos-theme
+            label:
+              ru: Темы
+              en: Themes
+            icon: ui/icon@i-leftmenu-tools
+            hidden: false
+            type: JOURNAL
+            config:
+              recordRef: uiserv/journal@ecos-theme
+          - id: uiserv-ecos-i18n
+            label:
+              ru: Локализация
+              en: Localization
+            icon: ui/icon@i-leftmenu-tools
+            hidden: false
+            type: JOURNAL
+            config:
+              recordRef: uiserv/journal@ecos-i18n
+          - id: uiserv-ecos-menus
+            label:
+              ru: Меню
+              en: Menu
+            icon: ui/icon@i-leftmenu-tools
+            hidden: false
+            type: JOURNAL
+            config:
+              recordRef: uiserv/journal@ecos-menus
+          - id: uiserv-ecos-boards
+            label:
+              ru: Канбан-доски
+              en: Kanban boards
+            icon: ui/icon@i-leftmenu-tools
+            hidden: false
+            type: JOURNAL
+            config:
+              recordRef: uiserv/journal@ecos-boards
