@@ -35,8 +35,8 @@
             {
               "id": "workspace-files",
               "label": {
-                "ru": "Файлы рабочей области",
-                "en": "Workspace files"
+                "ru": "Библиотека документов",
+                "en": "Documents library"
               },
               "icon": "ui/icon@i-leftmenu-controlled",
               "hidden": false,
