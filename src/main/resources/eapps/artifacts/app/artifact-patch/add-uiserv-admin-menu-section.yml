@@ -12,6 +12,27 @@ type: json
 config:
   operations:
     - op: add
+      path: '$.subMenu.create.items'
+      value:
+        - id: uiserv-create-form
+          label:
+            en: Create form
+            ru: Создать форму
+          type: LINK-CREATE-CASE
+          config:
+            typeRef: emodel/type@form
+            variantId: create-new-form
+            variantTypeRef: emodel/type@form
+        - id: uiserv-create-journal
+          label:
+            en: Create journal
+            ru: Создать журнал
+          type: LINK-CREATE-CASE
+          config:
+            typeRef: emodel/type@journal
+            variantId: create-new-journal
+            variantTypeRef: emodel/type@journal
+    - op: add
       path: '$.subMenu.left.items'
       value:
         id: uiserv-section
