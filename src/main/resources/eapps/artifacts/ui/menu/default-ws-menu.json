@@ -6,7 +6,15 @@
   "version": 1,
   "subMenu": {
     "create": {
-      "items": []
+      "items": [
+        {
+          "id": "create-123",
+          "type": "CREATE_IN_SECTION",
+          "config": {
+            "sectionId": "sections"
+          }
+        }
+      ]
     },
     "left": {
       "items": [
