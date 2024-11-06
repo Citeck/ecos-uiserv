@@ -4,6 +4,7 @@ import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 
 enum class EcosFormInputType(val typeId: String) {
 
+    ECOS_SELECT("ecosSelect"),
     TEXT_FIELD("textfield"),
     ML_TEXT("mlText"),
     TEXT_AREA("textarea"),
@@ -28,6 +29,7 @@ enum class EcosFormInputType(val typeId: String) {
         fun getFromAttributeType(type: AttributeType): EcosFormInputType {
             return when (type) {
                 AttributeType.TEXT -> TEXT_FIELD
+                AttributeType.OPTIONS -> ECOS_SELECT
                 AttributeType.MLTEXT -> ML_TEXT
                 AttributeType.NUMBER -> NUMBER
                 AttributeType.BOOLEAN -> CHECKBOX

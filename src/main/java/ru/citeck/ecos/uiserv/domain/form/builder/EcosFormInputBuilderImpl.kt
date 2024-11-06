@@ -53,6 +53,10 @@ open class EcosFormInputBuilderImpl<T>(
             EcosFormInputType.ORGSTRUCT_PERSON -> data[ALLOWED_AUTHORITY_TYPE] = "USER"
             EcosFormInputType.ORGSTRUCT_GROUP -> data[ALLOWED_AUTHORITY_TYPE] = "GROUP"
             EcosFormInputType.JSON -> data["editor"] = "ace"
+            EcosFormInputType.ECOS_SELECT -> {
+                data["dataSrc"] = "url"
+                data["$.data.url"] = "/citeck/ecos/records/query"
+            }
             else -> {}
         }
     }

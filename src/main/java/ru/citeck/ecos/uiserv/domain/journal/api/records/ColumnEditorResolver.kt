@@ -1,10 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.journal.api.records
 
 import org.springframework.stereotype.Component
-import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
-import ru.citeck.ecos.context.lib.i18n.I18nContext
-import ru.citeck.ecos.model.lib.attributes.dto.AttOptionDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 import ru.citeck.ecos.model.lib.status.constants.StatusConstants
@@ -24,24 +21,9 @@ class ColumnEditorResolver(
             return
         }
 
-        if (column.id == StatusConstants.ATT_STATUS) {
+        if (column.id == StatusConstants.ATT_STATUS || typeAtt?.type == AttributeType.OPTIONS) {
             column.withEditor(ColumnEditorDef("select", ObjectData.create()))
             return
-        }
-
-        val attOptions = emptyList<AttOptionDef>() // typeAtt?.options ?: emptyList()
-        if (attOptions.isNotEmpty()) {
-            val config = ObjectData.create()
-            config.set(
-                "options",
-                attOptions.map {
-                    val option = ObjectData.create()
-                    option.set("label", MLText.getClosestValue(it.label, I18nContext.getLocale()))
-                    option.set("value", it.value)
-                    option
-                }
-            )
-            column.withEditor(ColumnEditorDef("select", config))
         }
 
         val columnType = column.type ?: return
