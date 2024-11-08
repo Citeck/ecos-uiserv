@@ -1,0 +1,17 @@
+---
+id: icon
+name:
+  ru: Иконка
+  en: Icon
+
+sourceId: 'uiserv/icon'
+
+model:
+  attributes:
+    - id: family
+    - id: type
+    - id: config
+      type: JSON
+    - id: data
+      type: BINARY
+    - id: mimetype

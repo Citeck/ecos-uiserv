@@ -9,4 +9,6 @@ sourceId: "icon"
 
 controller:
   type: bin
-
+  config:
+    includes:
+      - '**.{jpg,jpeg,png,svg}'

@@ -98,7 +98,7 @@ public class ThemeController {
         }
     }
 
-    private HttpEntity<byte[]> getNotFoundImageEntity(HttpHeaders headers) {
+    public HttpEntity<byte[]> getNotFoundImageEntity(HttpHeaders headers) {
         headers.setContentType(notFoundImageType);
         return new HttpEntity<>(notFoundImageData, headers);
     }

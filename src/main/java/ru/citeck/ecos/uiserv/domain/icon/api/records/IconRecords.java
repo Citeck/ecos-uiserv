@@ -1,9 +1,11 @@
 package ru.citeck.ecos.uiserv.domain.icon.api.records;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
 import ru.citeck.ecos.records3.record.dao.delete.DelStatus;
@@ -15,6 +17,8 @@ import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.uiserv.domain.icon.service.IconService;
 import ru.citeck.ecos.uiserv.domain.icon.dto.IconDto;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
@@ -64,7 +68,15 @@ public class IconRecords extends AbstractRecordsDao
 
     @Override
     public IconDto getRecToMutate(@NotNull String recordId) throws Exception {
-        return getRecordAtts(recordId);
+
+        if (recordId.isEmpty()) {
+            return new IconDto();
+        }
+        IconDto dto = iconService.findById(recordId).orElse(null);
+        if (dto == null) {
+            throw new RuntimeException("Record doesn't found by id " + recordId);
+        }
+        return dto;
     }
 
     @NotNull
@@ -75,8 +87,16 @@ public class IconRecords extends AbstractRecordsDao
 
     @Nullable
     @Override
-    public IconDto getRecordAtts(@NotNull String recordId) throws Exception {
-        return iconService.findById(recordId).orElseGet(IconDto::new);
+    public Object getRecordAtts(@NotNull String recordId) throws Exception {
+        if (recordId.isEmpty()) {
+            return new IconRecord(new IconDto());
+        }
+        IconDto dto = iconService.findById(recordId).orElse(null);
+        if (dto == null) {
+            return null;
+        } else {
+            return new IconRecord(dto);
+        }
     }
 
     @NotNull
@@ -89,5 +109,22 @@ public class IconRecords extends AbstractRecordsDao
     private static class TypeQuery {
         private String type;
         private String family;
+    }
+
+    @RequiredArgsConstructor
+    public static class IconRecord {
+        @AttName("...")
+        private final IconDto dto;
+
+        public String getEcosType() {
+            return "icon";
+        }
+
+        public String getUrl() {
+            String result = "/gateway/uiserv/api/icon/";
+            result += URLEncoder.encode(dto.getId(), StandardCharsets.UTF_8);
+            result += "?cb=" + dto.getModified().toEpochMilli();
+            return result;
+        }
     }
 }

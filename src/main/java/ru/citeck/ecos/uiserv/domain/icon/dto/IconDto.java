@@ -34,6 +34,14 @@ public class IconDto {
         this.data = Base64.getDecoder().decode(matcher.group(2));
     }
 
+    public ObjectData getConfig() {
+        return config;
+    }
+
+    public MimeType getMimetype() {
+        return mimetype;
+    }
+
     public void setData(byte[] data) {
         this.data = data;
     }
