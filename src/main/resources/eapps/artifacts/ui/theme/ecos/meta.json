@@ -9,6 +9,8 @@
     "logo": "/image/logo.svg",
     "login-logo": "/image/login-logo.svg",
     "menu-left-logo-large": "/image/menu-left-logo-large.svg",
-    "menu-left-logo-small": "/image/menu-left-logo-small.svg"
+    "menu-left-logo-small": "/image/menu-left-logo-small.svg",
+    "apple-touch-icon": "/image/apple-touch-icon.png",
+    "apple-touch-icon-precomposed": "/image/apple-touch-icon-precomposed.png"
   }
 }
