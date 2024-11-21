@@ -1,0 +1,6 @@
+---
+id: default-workspace
+name:
+  ru: Рабочая область по умолчанию (если пусто, то персональная область)
+  en: Default workspace (if empty, then personal workspace)
+value: ''
