@@ -10,16 +10,16 @@ import ru.citeck.ecos.webapp.api.entity.EntityRef
 @IncludeNonDefault
 @JsonDeserialize(builder = DashboardDto.Builder::class)
 data class DashboardDto(
-    var id: String,
-    var name: MLText,
-    var typeRef: EntityRef,
-    var appliedToRef: EntityRef,
-    var authority: String,
-    var scope: String,
-    var priority: Float,
-    var workspace: String,
-    var config: ObjectData,
-    var attributes: ObjectData
+    val id: String,
+    val name: MLText,
+    val typeRef: EntityRef,
+    val appliedToRef: EntityRef,
+    val authority: String,
+    val scope: String,
+    val priority: Float,
+    val workspace: String,
+    val config: ObjectData,
+    val attributes: ObjectData
 ) {
 
     companion object {
@@ -27,6 +27,10 @@ data class DashboardDto(
         fun create(): Builder {
             return Builder()
         }
+    }
+
+    fun copy(): Builder {
+        return Builder(this)
     }
 
     @JsonPOJOBuilder

@@ -38,6 +38,9 @@ class DashboardService(
 ) {
 
     companion object {
+
+        private const val DEFAULT_WORKSPACE_ID = "default"
+
         private val DEFAULT_WORKSPACES = setOf(
             "personal-ws-dashboard-default",
             "ws-dashboard-default",
@@ -101,22 +104,26 @@ class DashboardService(
     }
 
     fun saveDashboard(dashboard: DashboardDto): DashboardDto {
-        updateAuthority(dashboard)
+        var fixedDto = updateAuthority(dashboard)
 
-        if (dashboard.workspace.isEmpty() &&
-            dashboard.authority.isEmpty() &&
-            DEFAULT_WORKSPACES.contains(dashboard.id) &&
+        if (fixedDto.workspace.isEmpty() &&
+            fixedDto.authority.isEmpty() &&
+            DEFAULT_WORKSPACES.contains(fixedDto.id) &&
             AuthContext.isNotRunAsSystemOrAdmin()
         ) {
-            error("Permission denied. You can't change default dashboard ${dashboard.id}")
+            error("Permission denied. You can't change default dashboard ${fixedDto.id}")
         }
 
-        val entityBefore = findEntityForDto(dashboard)
+        if (fixedDto.workspace == DEFAULT_WORKSPACE_ID) {
+            fixedDto = fixedDto.copy().withWorkspace("").build()
+        }
+
+        val entityBefore = findEntityForDto(fixedDto)
         val valueBefore = Optional.ofNullable(entityBefore)
             .map { entity: DashboardEntity -> this.mapToDto(entity) }
             .orElse(null)
 
-        val entity = mapToEntity(dashboard, entityBefore)
+        val entity = mapToEntity(fixedDto, entityBefore)
         val result = mapToDto(repo.save(entity))
 
         for (listener in changeListeners) {
@@ -125,21 +132,21 @@ class DashboardService(
         return result
     }
 
-    private fun updateAuthority(dashboard: DashboardDto) {
+    private fun updateAuthority(dashboard: DashboardDto): DashboardDto {
 
         val currentUserLogin = getCurrentUserLogin()
         val authority = dashboard.authority
 
         if (isRunAsSystemOrAdmin() || currentUserLogin == authority) {
-            return
+            return dashboard
         }
 
         if (StringUtils.isBlank(authority)) {
             val ws = dashboard.workspace
             if (ws.isEmpty() || !workspaceService.isUserManagerOf(currentUserLogin, ws)) {
-                dashboard.authority = currentUserLogin
+                return dashboard.copy().withAuthority(currentUserLogin).build()
             }
-            return
+            return dashboard
         }
         throw AccessDeniedException(
             "User '" + currentUserLogin + "' can only change his dashboard. " +
@@ -274,8 +281,9 @@ class DashboardService(
         workspace: String,
         findAction: (String) -> Optional<DashboardEntity>
     ): Optional<DashboardEntity> {
-        val result = findAction(workspace)
-        if (result.isPresent || workspace.isEmpty()) {
+        val fixedWs = if (workspace == DEFAULT_WORKSPACE_ID) "" else workspace
+        val result = findAction(fixedWs)
+        if (result.isPresent || fixedWs.isEmpty()) {
             return result
         }
         return findAction("")

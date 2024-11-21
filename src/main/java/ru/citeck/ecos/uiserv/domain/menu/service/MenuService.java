@@ -35,6 +35,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MenuService {
 
+    private static final String DEFAULT_WORKSPACE_ID = "default";
+
     private static final String DEFAULT_AUTHORITY = "GROUP_EVERYONE";
     private static final String DEFAULT_MENU_ID = "default-menu";
     private static final String DEFAULT_MENU_V1_ID = "default-menu-v1";
@@ -171,10 +173,12 @@ public class MenuService {
 
     public MenuDto getMenuForCurrentUser(Integer version, String workspace) {
 
+        String fixedWorkspace = DEFAULT_WORKSPACE_ID.equals(workspace) ? "" : workspace;
+
         String userName = AuthContext.getCurrentUser();
         List<String> userNameVariants = Collections.singletonList(userName.toLowerCase());
 
-        MenuDto menu = findFirstByAuthorities(userNameVariants, version, workspace)
+        MenuDto menu = findFirstByAuthorities(userNameVariants, version, fixedWorkspace)
             .orElseGet(() -> {
 
                 Set<String> authToRequest = new HashSet<>(AuthContext.getCurrentUserWithAuthorities());
@@ -184,10 +188,10 @@ public class MenuService {
                     .map(String::toLowerCase)
                     .collect(Collectors.toList());
 
-                return findFirstByAuthorities(orderedAuthorities, version, workspace).orElse(null);
+                return findFirstByAuthorities(orderedAuthorities, version, fixedWorkspace).orElse(null);
             });
         if (menu == null) {
-            menu = findDefaultMenu(version, workspace);
+            menu = findDefaultMenu(version, fixedWorkspace);
         }
         return menu;
     }
@@ -264,7 +268,7 @@ public class MenuService {
     }
 
     private void checkWorkspaceAccess(String workspaceId, boolean newMenu) {
-        if (workspaceId == null || workspaceId.isEmpty() || AuthContext.isRunAsSystem()) {
+        if (workspaceId == null || workspaceId.isEmpty() || AuthContext.isRunAsSystemOrAdmin()) {
             return;
         }
         var user = AuthContext.getCurrentRunAsUser();
@@ -280,15 +284,26 @@ public class MenuService {
             throw new IllegalArgumentException("Dto cannot be null");
         }
 
+        MenuDto fixedDto = dto;
+        if (DEFAULT_WORKSPACE_ID.equals(fixedDto.getWorkspace())) {
+            fixedDto = fixedDto.copy().withWorkspace("").build();
+        }
+
         MenuDto valueBefore = null;
-        MenuEntity entityBefore = menuDao.findByExtId(dto.getId());
+        MenuEntity entityBefore = menuDao.findByExtId(fixedDto.getId());
+        if (entityBefore != null
+            && !Objects.equals(entityBefore.getWorkspace(), fixedDto.getWorkspace())
+            && !AuthContext.isRunAsSystem()
+        ) {
+            fixedDto = fixedDto.copy().withId(UUID.randomUUID().toString()).build();
+            entityBefore = null;
+        }
         if (entityBefore != null) {
-            checkWorkspaceAccess(entityBefore.getWorkspace(), false);
             valueBefore = mapToDto(entityBefore);
         }
-        checkWorkspaceAccess(dto.getWorkspaceRef().getLocalId(), entityBefore == null);
+        checkWorkspaceAccess(fixedDto.getWorkspace(), entityBefore == null);
 
-        MenuDto result = mapToDto(menuDao.save(mapToEntity(dto)));
+        MenuDto result = mapToDto(menuDao.save(mapToEntity(fixedDto)));
         for (BiConsumer<MenuDto, MenuDto> listener : onChangeListeners) {
             listener.accept(valueBefore, result);
         }
