@@ -160,7 +160,10 @@
           {
             "components": [
               {
-                "label": "Cancel",
+                "label": {
+                  "ru": "Отменить",
+                  "en": "Cancel"
+                },
                 "action": "event",
                 "state": "",
                 "showValidations": false,
@@ -357,7 +360,10 @@
             "label": "Column",
             "components": [
               {
-                "label": "Submit",
+                "label": {
+                  "ru": "Создать",
+                  "en": "Submit"
+                },
                 "state": "",
                 "theme": "primary",
                 "shortcut": "",
