@@ -59,7 +59,7 @@ data class JournalDef(
     /**
      * Hide import data actions
      */
-    val hideImportDataActions: Boolean?,
+    val hideImportDataActions: Boolean,
     /**
      * Include actions from typeDef
      */
@@ -133,7 +133,7 @@ data class JournalDef(
         var typeRef: EntityRef = EntityRef.EMPTY
         var groupBy: List<String> = emptyList()
         var defaultSortBy: List<JournalSortByDef> = emptyList()
-        var hideImportDataActions: Boolean? = null
+        var hideImportDataActions: Boolean = false
         var actionsFromType: Boolean? = null
         var actions: List<EntityRef> = emptyList()
         var actionsDef: List<JournalActionDef> = emptyList()
@@ -232,7 +232,7 @@ data class JournalDef(
         }
 
         fun withHideImportDataActions(hideImportDataActions: Boolean?): Builder {
-            this.hideImportDataActions = hideImportDataActions
+            this.hideImportDataActions = hideImportDataActions ?: false
             return this
         }
 
