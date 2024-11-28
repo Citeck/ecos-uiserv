@@ -30,6 +30,7 @@ class JournalEntity : AbstractAuditingEntity() {
     var searchConfig: String? = null
     var editable: Boolean? = null
     var attributes: String? = null
+    var hideImportDataActions: Boolean? = null
     var actionsFromType: Boolean? = null
     var actions: String? = null
     var actionsDef: String? = null

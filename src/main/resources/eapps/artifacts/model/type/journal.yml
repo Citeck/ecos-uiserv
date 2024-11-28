@@ -47,6 +47,8 @@ model:
     - id: sortBy
       type: JSON
       multiple: true
+    - id: hideImportDataActions
+      type: BOOLEAN
     - id: actionsFromType
       type: BOOLEAN
     - id: actionsDef
