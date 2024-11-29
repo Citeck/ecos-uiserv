@@ -38,6 +38,7 @@
       "Sort by": "Сортировка",
       "Case Type": "Тип кейса",
       "Source ID": "Идентификатор источника данных",
+      "HideImportDataActions": "Скрывать действия импорта данных",
       "ActionsFromType": "Добавить действия из типа",
       "Attribute": "Атрибут",
       "Ascending": "По возрастанию",
@@ -90,6 +91,7 @@
       "Sort by": "Sort by",
       "Case Type": "Case Type",
       "Source ID": "Data source ID",
+      "HideImportDataActions": "Hide import data actions",
       "ActionsFromType": "Add actions form type",
       "Attribute": "Attribute",
       "Ascending": "Ascending",
@@ -232,6 +234,14 @@
                         "input": false,
                         "key": "column",
                         "components": [
+                          {
+                            "label": "HideImportDataActions",
+                            "key": "hideImportDataActions",
+                            "refreshOn": [],
+                            "optionalWhenDisabled": false,
+                            "type": "checkbox",
+                            "input": true
+                          },
                           {
                             "label": "ActionsFromType",
                             "tooltip": "tooltip.actionsFromType",

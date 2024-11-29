@@ -57,6 +57,10 @@ data class JournalDef(
     val defaultSortBy: List<JournalSortByDef>,
 
     /**
+     * Hide import data actions
+     */
+    val hideImportDataActions: Boolean,
+    /**
      * Include actions from typeDef
      */
     val actionsFromType: Boolean?,
@@ -129,6 +133,7 @@ data class JournalDef(
         var typeRef: EntityRef = EntityRef.EMPTY
         var groupBy: List<String> = emptyList()
         var defaultSortBy: List<JournalSortByDef> = emptyList()
+        var hideImportDataActions: Boolean = false
         var actionsFromType: Boolean? = null
         var actions: List<EntityRef> = emptyList()
         var actionsDef: List<JournalActionDef> = emptyList()
@@ -150,6 +155,7 @@ data class JournalDef(
             typeRef = base.typeRef
             groupBy = base.groupBy.let { DataValue.create(it).asStrList() }
             withDefaultSortBy(base.defaultSortBy)
+            hideImportDataActions = base.hideImportDataActions
             actionsFromType = base.actionsFromType
             actions = base.actions.let { DataValue.create(it).asList(EntityRef::class.java) }
             actionsDef = base.actionsDef.let { DataValue.create(it).asList(JournalActionDef::class.java) }
@@ -225,6 +231,11 @@ data class JournalDef(
             return this
         }
 
+        fun withHideImportDataActions(hideImportDataActions: Boolean?): Builder {
+            this.hideImportDataActions = hideImportDataActions ?: false
+            return this
+        }
+
         fun withActionsFromType(actionsFromType: Boolean?): Builder {
             this.actionsFromType = actionsFromType
             return this
@@ -279,6 +290,7 @@ data class JournalDef(
                 typeRef = typeRef,
                 groupBy = groupBy,
                 defaultSortBy = defaultSortBy,
+                hideImportDataActions = hideImportDataActions,
                 actionsFromType = actionsFromType,
                 actions = actions,
                 actionsDef = actionsDef,

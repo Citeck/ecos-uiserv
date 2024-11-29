@@ -32,6 +32,7 @@ class JournalMapper(
             .withDefaultFilters(mapper.readList(entity.defaultFilters, Predicate::class.java))
             .withQueryData(mapper.read(entity.queryData, ObjectData::class.java))
             .withSearchConfig(mapper.read(entity.searchConfig, JournalSearchConfig::class.java))
+            .withHideImportDataActions(entity.hideImportDataActions)
             .withActionsFromType(entity.actionsFromType)
             .withActions(mapper.readList(entity.actions, EntityRef::class.java))
             .withActionsDef(mapper.readList(entity.actionsDef, JournalActionDef::class.java))
@@ -69,6 +70,7 @@ class JournalMapper(
         entity.defaultFilters = mapper.toString(journal.defaultFilters)
         entity.queryData = mapper.toString(journal.queryData)
         entity.searchConfig = mapper.toString(journal.searchConfig)
+        entity.hideImportDataActions = journal.hideImportDataActions
         entity.actionsFromType = journal.actionsFromType
         entity.actions = mapper.toString(journal.actions)
         entity.actionsDef = mapper.toString(journal.actionsDef)
