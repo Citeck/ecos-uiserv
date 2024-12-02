@@ -67,6 +67,10 @@ class DashboardService(
         return searchConv.getCount(repo, predicate)
     }
 
+    fun findAllForWorkspace(workspace: String): List<DashboardDto> {
+        return findAll(Predicates.eq("workspace", workspace), 1000, 0, emptyList())
+    }
+
     fun findAll(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<DashboardDto> {
         return searchConv.findAll(repo, predicate, max, skip, sort).stream()
             .map { entity: DashboardEntity -> this.mapToDto(entity) }

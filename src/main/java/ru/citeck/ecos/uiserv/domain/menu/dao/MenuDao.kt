@@ -7,6 +7,8 @@ import java.time.Instant
 
 interface MenuDao {
 
+    fun findAllForWorkspace(workspace: String): List<MenuEntity>
+
     fun findByExtId(extId: String): MenuEntity?
 
     fun findAllByAuthoritiesContains(authority: String, workspace: String): List<MenuEntity>

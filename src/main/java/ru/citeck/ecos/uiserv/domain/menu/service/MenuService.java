@@ -79,6 +79,13 @@ public class MenuService {
         });
     }
 
+    public List<MenuDto> findAllForWorkspace(String workspace) {
+        return menuDao.findAllForWorkspace(workspace)
+            .stream()
+            .map(this::mapToDto)
+            .collect(Collectors.toList());
+    }
+
     public long getLastModifiedTimeMs() {
         return Optional.of(menuDao.getLastModifiedTime())
             .map(Instant::toEpochMilli)

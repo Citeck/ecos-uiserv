@@ -23,6 +23,10 @@ class MenuRepoDao(
         searchConv = jpaSearchConverterFactory.createConverter(MenuEntity::class.java).build()
     }
 
+    override fun findAllForWorkspace(workspace: String): List<MenuEntity> {
+        return repo.findByWorkspace(workspace)
+    }
+
     override fun findByExtId(extId: String): MenuEntity? {
         return repo.findByExtId(extId)
     }

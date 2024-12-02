@@ -12,6 +12,12 @@ class MenuInMemDao : MenuDao {
     private val data = ConcurrentHashMap<String, MenuEntity>()
     private var lastModified = Instant.EPOCH
 
+    override fun findAllForWorkspace(workspace: String): List<MenuEntity> {
+        return data.values.filter {
+            it.workspace == workspace
+        }
+    }
+
     override fun getCount(predicate: Predicate): Long {
         return data.size.toLong()
     }

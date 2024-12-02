@@ -11,6 +11,8 @@ interface MenuRepository : JpaRepository<MenuEntity, Long>, JpaSpecificationExec
 
     fun findByExtId(extId: String): MenuEntity?
 
+    fun findByWorkspace(workspace: String): List<MenuEntity>
+
     @Query(
         "SELECT menu " +
             "FROM MenuEntity menu " +
