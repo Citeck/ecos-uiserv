@@ -11,6 +11,7 @@ import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.context.lib.auth.AuthContext.getCurrentUser
 import ru.citeck.ecos.context.lib.auth.AuthContext.isRunAsSystemOrAdmin
+import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.Predicates
@@ -36,12 +37,13 @@ class DashboardService(
     private val jpaSearchConverterFactory: JpaSearchConverterFactory,
     private val workspaceService: WorkspaceService
 ) {
-
     companion object {
 
         private const val DEFAULT_WORKSPACE_ID = "default"
+        private val WORKSPACE_HOME_PAGE_TYPE = ModelUtils.getTypeRef("workspace-dashboard")
+        private val DEFAULT_WS_HOME_PAGE_TYPE = ModelUtils.getTypeRef("user-dashboard")
 
-        private val DEFAULT_WORKSPACES = setOf(
+        private val DEFAULT_DASHBOARDS = setOf(
             "personal-ws-dashboard-default",
             "ws-dashboard-default",
             "user-dashboard",
@@ -94,10 +96,14 @@ class DashboardService(
         expandType: Boolean?,
         includeForAll: Boolean?
     ): Optional<DashboardDto> {
+        var typeForSearch = type
+        if (workspace == DEFAULT_WORKSPACE_ID && typeForSearch == WORKSPACE_HOME_PAGE_TYPE) {
+            typeForSearch = DEFAULT_WS_HOME_PAGE_TYPE
+        }
         return findOneForWorkspace(workspace ?: "") { ws ->
             getEntityForUser(
                 recordRef ?: EntityRef.EMPTY,
-                type ?: EntityRef.EMPTY,
+                typeForSearch ?: EntityRef.EMPTY,
                 user ?: "",
                 scope ?: "",
                 ws,
@@ -112,7 +118,7 @@ class DashboardService(
 
         if (fixedDto.workspace.isEmpty() &&
             fixedDto.authority.isEmpty() &&
-            DEFAULT_WORKSPACES.contains(fixedDto.id) &&
+            DEFAULT_DASHBOARDS.contains(fixedDto.id) &&
             AuthContext.isNotRunAsSystemOrAdmin()
         ) {
             error("Permission denied. You can't change default dashboard ${fixedDto.id}")
@@ -167,7 +173,7 @@ class DashboardService(
     }
 
     fun removeDashboard(id: String?) {
-        if (DEFAULT_WORKSPACES.contains(id ?: "") && AuthContext.isNotRunAsSystem()) {
+        if (DEFAULT_DASHBOARDS.contains(id ?: "") && AuthContext.isNotRunAsSystem()) {
             error("You can't delete default dashboard '$id'")
         }
         repo.findByExtId(id).ifPresent { entity: DashboardEntity -> repo.delete(entity) }
