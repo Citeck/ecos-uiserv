@@ -16,6 +16,7 @@ import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.RecordsServiceFactory
 import ru.citeck.ecos.test.commons.EcosWebAppApiMock
 import ru.citeck.ecos.uiserv.Application
+import ru.citeck.ecos.uiserv.CustomWorkspaceApi
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.i18n.service.MessageResolver
 import ru.citeck.ecos.uiserv.domain.menu.api.records.MenuRecords
@@ -42,6 +43,7 @@ open class MenuTestBase {
     protected lateinit var records: RecordsService
 
     protected lateinit var menuArtifactHandler: MenuArtifactHandler
+    protected lateinit var workspacesApi: CustomWorkspaceApi
 
     private val typesInfo = ConcurrentHashMap<String, TypeDef>()
 
@@ -68,6 +70,8 @@ open class MenuTestBase {
         records.register(CfgRecordsDao(configServiceFactory))
 
         val modelServices = ModelServiceFactory()
+        workspacesApi = CustomWorkspaceApi()
+        modelServices.setWorkspaceApi(workspacesApi)
 
         menuService = MenuService(
             menuDao,

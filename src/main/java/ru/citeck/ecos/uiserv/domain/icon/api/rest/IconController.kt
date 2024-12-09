@@ -21,7 +21,7 @@ class IconController(
 
     @GetMapping(path = ["/icon/{iconId}"], produces = ["text/css;charset=UTF-8"])
     fun getThemeStyle(
-        @PathVariable("iconId") iconId : String
+        @PathVariable("iconId") iconId: String
     ): HttpEntity<ByteArray> {
 
         val headers = HttpHeaders()
@@ -37,7 +37,7 @@ class IconController(
         val mimeType = icon.mimetype?.let { MediaType(it) } ?: run {
             val format = icon.config["format"].asText()
             when (format) {
-                "jpg","jpeg" -> MediaType.IMAGE_JPEG
+                "jpg", "jpeg" -> MediaType.IMAGE_JPEG
                 "svg" -> MediaType.valueOf("image/svg+xml")
                 "ico" -> MediaType.valueOf("image/x-icon")
                 "png" -> MediaType.IMAGE_PNG

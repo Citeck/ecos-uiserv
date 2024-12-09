@@ -1,9 +1,9 @@
 package ru.citeck.ecos.uiserv.domain.evaluator.service
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import jakarta.annotation.PostConstruct
 import ru.citeck.ecos.uiserv.domain.evaluator.RecordEvaluator
 import ru.citeck.ecos.uiserv.domain.evaluator.RecordEvaluatorService
 

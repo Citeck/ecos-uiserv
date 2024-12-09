@@ -17,16 +17,22 @@ class MenuWorkspaceTest : MenuTestBase() {
 
         fun assertDefaultConfigsForUser(user: String, authorities: List<String> = emptyList()) {
             assertThat(findMenuId(user, authorities, "")).isEqualTo("default-menu-v1")
-            assertThat(findMenuId(user, authorities, "user\$admin")).isEqualTo("default-personal-ws-menu")
+            assertThat(findMenuId(user, authorities, "user\$$user")).isEqualTo("default-personal-ws-menu")
+            assertThat(findMenuId(user, authorities, "user\$unknown")).isNotEqualTo("default-personal-ws-menu")
             assertThat(findMenuId(user, authorities, "custom-ws")).isEqualTo("default-ws-menu")
         }
+
+        workspacesApi.addMember("custom-ws", "admin")
         assertDefaultConfigsForUser("admin")
 
         menuService.save(createMenu("test-ws-0", "ws-0", listOf("admin")))
 
         assertDefaultConfigsForUser("admin")
+
+        workspacesApi.addMember("custom-ws", "pushkin")
         assertDefaultConfigsForUser("pushkin")
 
+        workspacesApi.addMember("ws-0", "admin")
         assertThat(findMenuId("admin", emptyList(), "ws-0")).isEqualTo("test-ws-0")
     }
 

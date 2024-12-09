@@ -115,7 +115,7 @@ class DashboardService(
     }
 
     private fun canUserSearchDashboardsInWorkspace(user: String, workspace: String?): Boolean {
-        if (workspace.isNullOrEmpty()) {
+        if (workspace.isNullOrEmpty() || AuthContext.SYSTEM_AUTH.getUser() == user) {
             return true
         }
         return workspaceService.isUserMemberOf(user, workspace)

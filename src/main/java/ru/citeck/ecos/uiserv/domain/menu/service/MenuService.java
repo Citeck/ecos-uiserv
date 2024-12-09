@@ -210,7 +210,7 @@ public class MenuService {
     }
 
     private boolean canUserSearchMenuInWorkspace(@NotNull String user, @Nullable String workspace) {
-        if (StringUtils.isEmpty(workspace)) {
+        if (StringUtils.isEmpty(workspace) || AuthContext.SYSTEM_AUTH.getUser().equals(user)) {
             return true;
         }
         return workspaceService.isUserMemberOf(user, workspace);

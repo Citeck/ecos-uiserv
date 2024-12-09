@@ -83,7 +83,6 @@ class UserEventActionRecords(
         }.filterNotNull().toMap()
     }
 
-
     private fun allowFireEventForRecord(record: EntityRef): Boolean {
         return record.isEmpty() || recordsService.getAtt(record, PERMISSIONS_READ_ATT).asBoolean()
     }
