@@ -1,5 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.menu.service;
 
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -180,9 +182,13 @@ public class MenuService {
 
     public MenuDto getMenuForCurrentUser(Integer version, String workspace) {
 
+        String userName = AuthContext.getCurrentUser();
+        if (!canUserSearchMenuInWorkspace(userName, workspace)) {
+            return MenuDto.EMPTY;
+        }
+
         String fixedWorkspace = DEFAULT_WORKSPACE_ID.equals(workspace) ? "" : workspace;
 
-        String userName = AuthContext.getCurrentUser();
         List<String> userNameVariants = Collections.singletonList(userName.toLowerCase());
 
         MenuDto menu = findFirstByAuthorities(userNameVariants, version, fixedWorkspace)
@@ -201,6 +207,13 @@ public class MenuService {
             menu = findDefaultMenu(version, fixedWorkspace);
         }
         return menu;
+    }
+
+    private boolean canUserSearchMenuInWorkspace(@NotNull String user, @Nullable String workspace) {
+        if (StringUtils.isEmpty(workspace)) {
+            return true;
+        }
+        return workspaceService.isUserMemberOf(user, workspace);
     }
 
     private boolean compareVersion(Integer v0, Integer v1) {

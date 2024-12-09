@@ -111,12 +111,12 @@ class MenuRecords(
         return result
     }
 
-    override fun saveMutatedRec(dto: MenuMutRecord): String {
-        require(!StringUtils.isBlank(dto.id)) { "Parameter 'id' is mandatory for menu record" }
-        if (MenuService.DEFAULT_MENUS.contains(dto.id)) {
-            dto.id = UUID.randomUUID().toString()
+    override fun saveMutatedRec(record: MenuMutRecord): String {
+        require(!StringUtils.isBlank(record.id)) { "Parameter 'id' is mandatory for menu record" }
+        if (MenuService.DEFAULT_MENUS.contains(record.id)) {
+            record.id = UUID.randomUUID().toString()
         }
-        val saved = menuService.save(dto.build())
+        val saved = menuService.save(record.build())
         return saved.id
     }
 

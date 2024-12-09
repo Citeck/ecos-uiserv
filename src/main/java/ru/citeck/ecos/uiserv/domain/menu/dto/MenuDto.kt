@@ -19,6 +19,7 @@ open class MenuDto(
     val subMenu: Map<String, SubMenuDef>
 ) {
     companion object {
+        @JvmField
         val EMPTY = create().build()
 
         @JvmStatic

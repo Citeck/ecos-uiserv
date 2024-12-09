@@ -9,8 +9,6 @@ import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.context.lib.auth.AuthContext
-import ru.citeck.ecos.context.lib.auth.AuthContext.getCurrentUser
-import ru.citeck.ecos.context.lib.auth.AuthContext.isRunAsSystemOrAdmin
 import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.predicate.model.Predicate
@@ -100,6 +98,9 @@ class DashboardService(
         if (workspace == DEFAULT_WORKSPACE_ID && typeForSearch == WORKSPACE_HOME_PAGE_TYPE) {
             typeForSearch = DEFAULT_WS_HOME_PAGE_TYPE
         }
+        if (!canUserSearchDashboardsInWorkspace(AuthContext.getCurrentUser(), workspace)) {
+            return Optional.empty()
+        }
         return findOneForWorkspace(workspace ?: "") { ws ->
             getEntityForUser(
                 recordRef ?: EntityRef.EMPTY,
@@ -111,6 +112,13 @@ class DashboardService(
                 includeForAll ?: true
             )
         }.map { entity: DashboardEntity -> this.mapToDto(entity) }
+    }
+
+    private fun canUserSearchDashboardsInWorkspace(user: String, workspace: String?): Boolean {
+        if (workspace.isNullOrEmpty()) {
+            return true
+        }
+        return workspaceService.isUserMemberOf(user, workspace)
     }
 
     fun saveDashboard(dashboard: DashboardDto): DashboardDto {
@@ -147,7 +155,7 @@ class DashboardService(
         val currentUserLogin = getCurrentUserLogin()
         val authority = dashboard.authority
 
-        if (isRunAsSystemOrAdmin() || currentUserLogin == authority) {
+        if (AuthContext.isRunAsSystemOrAdmin() || currentUserLogin == authority) {
             return dashboard
         }
 
@@ -165,7 +173,7 @@ class DashboardService(
     }
 
     private fun getCurrentUserLogin(): String {
-        val currentUserLogin = getCurrentUser()
+        val currentUserLogin = AuthContext.getCurrentUser()
         if (currentUserLogin.isEmpty()) {
             throw RuntimeException("User is not authenticated")
         }
