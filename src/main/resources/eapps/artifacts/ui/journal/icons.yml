@@ -1,0 +1,21 @@
+---
+id: icons
+name:
+  ru: Иконки
+  en: Icons
+
+system: true
+
+actions:
+  - uiserv/action@delete
+
+columns:
+
+  - id: id
+    name: { ru: Идентификатор, en: Id }
+
+  - id: type
+    name: { ru: Тип, en: Type }
+
+  - id: family
+    name: { ru: Семейство, en: Family }

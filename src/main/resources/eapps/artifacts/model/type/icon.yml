@@ -6,6 +6,8 @@ name:
 
 sourceId: 'uiserv/icon'
 
+journalRef: uiserv/journal@icons
+
 model:
   attributes:
     - id: family

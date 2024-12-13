@@ -126,5 +126,9 @@ public class IconRecords extends AbstractRecordsDao
             result += "?cb=" + dto.getModified().toEpochMilli();
             return result;
         }
+
+        public String getDisplayName() {
+            return dto.getId();
+        }
     }
 }
