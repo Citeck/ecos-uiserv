@@ -47,7 +47,6 @@ config:
             label:
               ru: Журналы
               en: Journals
-            icon: ui/icon@i-leftmenu-tools
             hidden: false
             type: JOURNAL
             config:
@@ -55,8 +54,7 @@ config:
           - id: uiserv-journal-settings
             label:
               en: Journal settings
-              ru: Настройки журнала
-            icon: ui/icon@i-leftmenu-tools
+              ru: Настройки журналов
             hidden: false
             type: JOURNAL
             config:
@@ -65,7 +63,6 @@ config:
             label:
               ru: Формы
               en: Forms
-            icon: ui/icon@i-leftmenu-tools
             hidden: false
             type: JOURNAL
             config:
@@ -74,7 +71,6 @@ config:
             label:
               ru: Действия
               en: Actions
-            icon: ui/icon@i-leftmenu-tools
             hidden: false
             type: JOURNAL
             config:
@@ -83,7 +79,6 @@ config:
             label:
               ru: Дашборды
               en: Dashboards
-            icon: ui/icon@i-leftmenu-tools
             hidden: false
             type: JOURNAL
             config:
@@ -92,7 +87,6 @@ config:
             label:
               ru: Темы
               en: Themes
-            icon: ui/icon@i-leftmenu-tools
             hidden: false
             type: JOURNAL
             config:
@@ -101,7 +95,6 @@ config:
             label:
               ru: Локализация
               en: Localization
-            icon: ui/icon@i-leftmenu-tools
             hidden: false
             type: JOURNAL
             config:
@@ -110,7 +103,6 @@ config:
             label:
               ru: Меню
               en: Menu
-            icon: ui/icon@i-leftmenu-tools
             hidden: false
             type: JOURNAL
             config:
@@ -119,7 +111,6 @@ config:
             label:
               ru: Канбан-доски
               en: Kanban boards
-            icon: ui/icon@i-leftmenu-tools
             hidden: false
             type: JOURNAL
             config:
