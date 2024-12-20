@@ -11,6 +11,7 @@ import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.config.lib.records.CfgRecordsDao;
 import ru.citeck.ecos.context.lib.auth.AuthContext;
+import ru.citeck.ecos.context.lib.auth.AuthGroup;
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.RecordsService;
@@ -311,10 +312,7 @@ public class MenuService {
 
         MenuDto valueBefore = null;
         MenuEntity entityBefore = menuDao.findByExtId(fixedDto.getId());
-        if (entityBefore != null
-            && !Objects.equals(entityBefore.getWorkspace(), fixedDto.getWorkspace())
-            && !AuthContext.isRunAsSystem()
-        ) {
+        if (entityBefore != null && isNewMenuRequired(entityBefore, fixedDto)) {
             fixedDto = fixedDto.copy().withId(UUID.randomUUID().toString()).build();
             entityBefore = null;
         }
@@ -328,6 +326,25 @@ public class MenuService {
             listener.accept(valueBefore, result);
         }
         return result;
+    }
+
+    private boolean isNewMenuRequired(@NotNull MenuEntity before, MenuDto newConfig) {
+        if (AuthContext.isRunAsSystem()) {
+            return false;
+        }
+        if (!Objects.equals(before.getWorkspace(), newConfig.getWorkspace())) {
+            return true;
+        }
+        return isMenuAuthoritiesForEveryone(before.getAuthorities())
+            && !isMenuAuthoritiesForEveryone(newConfig.getAuthorities());
+    }
+
+    private boolean isMenuAuthoritiesForEveryone(List<String> authorities) {
+        return authorities == null
+            || authorities.isEmpty()
+            || (authorities.size() == 1
+                && (authorities.getFirst() == null || AuthGroup.EVERYONE.equals(authorities.getFirst()))
+        );
     }
 
     public void deleteByExtId(String menuId) {
