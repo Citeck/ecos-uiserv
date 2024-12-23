@@ -69,15 +69,6 @@
               }
             }
           ]
-        },
-        {
-          "id": "data-lists",
-          "hidden": false,
-          "type": "INCLUDE_MENU",
-          "config": {
-            "menuRef": "uiserv/menu@default-data-lists"
-          },
-          "items": []
         }
       ]
     }
