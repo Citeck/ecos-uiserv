@@ -109,13 +109,15 @@
                   "values": [
                     {
                       "label": {
-                        "ru": "LEFT"
+                        "ru": "Слева",
+                        "en": "Left"
                       },
                       "value": "LEFT"
                     },
                     {
                       "label": {
-                        "ru": "TOP"
+                        "ru": "Сверху",
+                        "en": "Top"
                       },
                       "value": "TOP"
                     }
