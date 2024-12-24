@@ -64,5 +64,6 @@
     <include file="changelog/20240927000000_add_ws_to_menu.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20241009000000_add_ws_to_dashboards.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20241128000000_update_journal.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20241224000000_add_board_card_labels_layout.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

@@ -37,6 +37,16 @@ public class BoardMapper {
         if (entity.getActions() != null) {
             boardDto.setActions(Json.getMapper().readList(entity.getActions(), EntityRef.class));
         }
+        BoardDef.CardFieldsLabelLayout layout = BoardDef.DEFAULT_CARD_FIELDS_LABEL_LAYOUT;
+        if (StringUtils.isNotBlank(entity.getCardFieldsLabelLayout())) {
+            try {
+                layout = BoardDef.CardFieldsLabelLayout.valueOf(entity.getCardFieldsLabelLayout());
+            } catch (Throwable e) {
+                // do nothing
+            }
+        }
+        boardDto.setCardFieldsLabelLayout(layout);
+
         BoardWithMeta boardWithMeta = new BoardWithMeta();
         boardWithMeta.setBoardDef(boardDto);
         boardWithMeta.setModifier(entity.getLastModifiedBy());
@@ -63,6 +73,9 @@ public class BoardMapper {
         entity.setName(Json.getMapper().toString(board.getName()));
         entity.setReadOnly(board.getReadOnly());
         entity.setDisableTitle(board.getDisableTitle());
+        if (board.getCardFieldsLabelLayout() != null) {
+            entity.setCardFieldsLabelLayout(board.getCardFieldsLabelLayout().name());
+        }
 
         entity.setTypeRef(EntityRef.isNotEmpty(board.getTypeRef()) ? EntityRef.toString(board.getTypeRef()) : null);
 

@@ -99,6 +99,37 @@
                 "input" : true
               },
               {
+                "label": {
+                  "ru": "Положение названия полей карточки",
+                  "en": "Card fields label layout"
+                },
+                "key": "cardFieldsLabelLayout",
+                "dataSrc": "values",
+                "data": {
+                  "values": [
+                    {
+                      "label": {
+                        "ru": "LEFT"
+                      },
+                      "value": "LEFT"
+                    },
+                    {
+                      "label": {
+                        "ru": "TOP"
+                      },
+                      "value": "TOP"
+                    }
+                  ],
+                  "headers": [
+                    {}
+                  ]
+                },
+                "defaultValue": "TOP",
+                "optionalWhenDisabled": false,
+                "type": "ecosSelect",
+                "input": true
+              },
+              {
                 "key": "readOnly",
                 "refreshOn": [
                   "canDrag"
