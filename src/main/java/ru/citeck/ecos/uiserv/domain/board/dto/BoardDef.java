@@ -12,11 +12,15 @@ import java.util.List;
 @Data
 public class BoardDef {
 
+    public static final CardFieldsLabelLayout DEFAULT_CARD_FIELDS_LABEL_LAYOUT = CardFieldsLabelLayout.TOP;
+
     private String id;
 
     private EntityRef typeRef;
     private EntityRef journalRef;
     private EntityRef cardFormRef;
+
+    private CardFieldsLabelLayout cardFieldsLabelLayout = DEFAULT_CARD_FIELDS_LABEL_LAYOUT;
 
     private Boolean readOnly;
     private Boolean disableTitle;
@@ -37,6 +41,7 @@ public class BoardDef {
         this.typeRef = other.getTypeRef();
         this.journalRef = other.getJournalRef();
         this.cardFormRef = other.getCardFormRef();
+        this.cardFieldsLabelLayout = other.getCardFieldsLabelLayout();
         this.readOnly = other.getReadOnly();
         this.disableTitle = other.getDisableTitle();
         this.name = other.getName();
@@ -55,5 +60,16 @@ public class BoardDef {
 
     public EntityRef getTypeRef() {
         return typeRef;
+    }
+
+    public enum CardFieldsLabelLayout {
+        /**
+         * Indicates that the label should be displayed to the left of the input field.
+         */
+        LEFT,
+        /**
+         * Indicates that the label should be displayed above the input field.
+         */
+        TOP
     }
 }
