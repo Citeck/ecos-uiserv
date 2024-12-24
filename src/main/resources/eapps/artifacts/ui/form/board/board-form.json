@@ -126,6 +126,7 @@
                     {}
                   ]
                 },
+                "searchEnabled": false,
                 "defaultValue": "TOP",
                 "optionalWhenDisabled": false,
                 "type": "ecosSelect",
