@@ -1,0 +1,50 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="citeck" id="20250109000000">
+
+        <sql>
+            UPDATE actions SET ext_id = CONCAT(ext_id, '_', id)
+            WHERE id NOT IN (SELECT MIN(id) FROM actions GROUP BY ext_id);
+        </sql>
+
+        <addUniqueConstraint tableName="actions" columnNames="ext_id" />
+
+        <sql>
+            UPDATE dashboards SET ext_id = CONCAT(ext_id, '_', id)
+            WHERE id NOT IN (SELECT MIN(id) FROM dashboards GROUP BY ext_id);
+        </sql>
+
+        <addUniqueConstraint tableName="dashboards" columnNames="ext_id" />
+
+        <sql>
+            UPDATE ecos_forms SET ext_id = CONCAT(ext_id, '_', id)
+            WHERE id NOT IN (SELECT MIN(id) FROM ecos_forms GROUP BY ext_id);
+        </sql>
+
+        <addUniqueConstraint tableName="ecos_forms" columnNames="ext_id" />
+
+        <sql>
+            UPDATE ecos_menu SET ext_id = CONCAT(ext_id, '_', id)
+            WHERE id NOT IN (SELECT MIN(id) FROM ecos_menu GROUP BY ext_id);
+        </sql>
+
+        <addUniqueConstraint tableName="ecos_menu" columnNames="ext_id" />
+
+        <sql>
+            UPDATE ecos_theme SET ext_id = CONCAT(ext_id, '_', id)
+            WHERE id NOT IN (SELECT MIN(id) FROM ecos_theme GROUP BY ext_id);
+        </sql>
+
+        <addUniqueConstraint tableName="ecos_theme" columnNames="ext_id" />
+
+        <sql>
+            UPDATE internationalization SET ext_id = CONCAT(ext_id, '_', id)
+            WHERE id NOT IN (SELECT MIN(id) FROM internationalization GROUP BY ext_id);
+        </sql>
+
+        <addUniqueConstraint tableName="internationalization" columnNames="ext_id" />
+
+    </changeSet>
+
+</databaseChangeLog>
