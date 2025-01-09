@@ -16,7 +16,6 @@ ecos:
 
 application:
   default-theme-id: citeckTheme
-  #Раньше располагался в конфиге ecos под тем же названием
   menu-config-authority-order:
 
 uiserv:
