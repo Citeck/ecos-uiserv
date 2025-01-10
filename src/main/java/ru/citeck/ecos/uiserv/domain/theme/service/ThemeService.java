@@ -96,7 +96,17 @@ public class ThemeService {
     private String getActiveThemeImpl() {
 
         String theme = recordsService.getAtt(
-            EntityRef.create("cfg", CURRENT_THEME_CONFIG_KEY), "value?str").asText();
+            EntityRef.create("cfg", CURRENT_THEME_CONFIG_KEY), "value?str"
+        ).asText();
+
+        var fixedTheme = new StringBuilder(theme.length());
+        for (int i = 0; i < theme.length(); i++) {
+            var ch = theme.charAt(i);
+            if (!Character.isWhitespace(ch)) {
+                fixedTheme.append(ch);
+            }
+        }
+        theme = fixedTheme.toString();
 
         if (StringUtils.isBlank(theme)) {
             theme = DEFAULT_THEME_ID;
