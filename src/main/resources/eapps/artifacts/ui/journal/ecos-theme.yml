@@ -11,6 +11,7 @@ system: true
 actions:
   - uiserv/action@download-base64-data-zip
   - uiserv/action@delete
+  - uiserv/action@apply-theme
 
 columns:
 
@@ -21,3 +22,7 @@ columns:
   - id: name
     name: { ru: Имя, en: Name }
     type: TEXT
+
+  - id: isActiveTheme
+    name: { ru: Текущая тема, en: Current theme }
+    type: BOOLEAN

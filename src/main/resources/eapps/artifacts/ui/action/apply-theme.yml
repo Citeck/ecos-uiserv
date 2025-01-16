@@ -1,0 +1,23 @@
+---
+id: apply-theme
+name:
+  ru: Применить тему
+  en: Apply theme
+type: mutate
+confirm:
+  title:
+    ru: Применить тему
+    en: Apply theme
+config:
+  record:
+    id: uiserv/apply-theme@
+    attributes:
+      themeId: ${?localId}
+features:
+  execForQuery: false
+  execForRecord: true
+  execForRecords: false
+predicate:
+  t: eq
+  att: isActiveTheme?bool
+  val: false
