@@ -302,9 +302,6 @@ public class ThemeService {
         dto.setName(Json.getMapper().read(entity.getName(), MLText.class));
         dto.setParentRef(EntityRef.valueOf(entity.getParentRef()));
 
-        boolean isActiveTheme = getActiveTheme().equals(entity.getExtId());
-        dto.setIsActiveTheme(isActiveTheme);
-
         Map<String, byte[]> resources = new HashMap<>();
         dto.setResources(resources);
 
