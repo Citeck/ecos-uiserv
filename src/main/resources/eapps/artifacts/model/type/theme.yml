@@ -7,6 +7,7 @@ name:
 sourceId: uiserv/theme
 system: true
 
+formRef: uiserv/form@theme-form
 journalRef: uiserv/journal@ecos-theme
 
 createVariants:

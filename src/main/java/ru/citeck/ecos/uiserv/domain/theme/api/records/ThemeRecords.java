@@ -11,9 +11,9 @@ import ru.citeck.ecos.commons.io.file.EcosFile;
 import ru.citeck.ecos.commons.io.file.mem.EcosMemDir;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.utils.ZipUtils;
-import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
 import ru.citeck.ecos.records3.record.dao.delete.DelStatus;
@@ -66,7 +66,7 @@ public class ThemeRecords extends AbstractRecordsDao implements RecordsQueryDao,
             result.setTotalCount(themeService.getCount());
         }
 
-        return result.withRecords(ThemeRecord::new);
+        return result.withRecords(dto -> new ThemeRecord(dto, themeService));
     }
 
     @Nullable
@@ -81,7 +81,7 @@ public class ThemeRecords extends AbstractRecordsDao implements RecordsQueryDao,
                 dto = new ThemeDto();
             }
         }
-        return new ThemeRecord(dto);
+        return new ThemeRecord(dto, themeService);
     }
 
     @NotNull
@@ -98,7 +98,7 @@ public class ThemeRecords extends AbstractRecordsDao implements RecordsQueryDao,
             dto = new ThemeDto();
             dto.setId(recordId);
         }
-        return new ThemeRecord(dto);
+        return new ThemeRecord(dto, themeService);
     }
 
     @NotNull
@@ -115,8 +115,11 @@ public class ThemeRecords extends AbstractRecordsDao implements RecordsQueryDao,
 
     public static class ThemeRecord extends ThemeDto {
 
-        ThemeRecord(ThemeDto dto) {
+        private final ThemeService themeService;
+
+        ThemeRecord(ThemeDto dto, ThemeService themeService) {
             super(dto);
+            this.themeService = themeService;
         }
 
         public String getModuleId() {
@@ -135,6 +138,10 @@ public class ThemeRecords extends AbstractRecordsDao implements RecordsQueryDao,
         @AttName("?disp")
         public String getDisplayName() {
             return super.getId();
+        }
+
+        public Boolean getIsActiveTheme() {
+            return themeService.getActiveTheme().equals(getId());
         }
 
         @JsonProperty("_content")
