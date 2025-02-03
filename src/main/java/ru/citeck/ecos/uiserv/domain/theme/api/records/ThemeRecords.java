@@ -140,7 +140,6 @@ public class ThemeRecords extends AbstractRecordsDao implements RecordsQueryDao,
             return super.getId();
         }
 
-        @AttName("isActiveTheme")
         public Boolean getIsActiveTheme() {
             return themeService.getActiveTheme().equals(getId());
         }
