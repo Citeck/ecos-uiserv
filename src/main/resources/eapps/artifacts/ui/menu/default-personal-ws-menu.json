@@ -8,19 +8,6 @@
     "create": {
       "items": [
         {
-          "id": "create-kanban-task",
-          "label": {
-            "ru": "Kanban задача",
-            "en": "Kanban task"
-          },
-          "type": "LINK-CREATE-CASE",
-          "config": {
-            "typeRef": "emodel/type@kanban-task",
-            "variantId": "DEFAULT",
-            "variantTypeRef": "emodel/type@kanban-task"
-          }
-        },
-        {
           "id": "create-123",
           "type": "CREATE_IN_SECTION",
           "config": {
@@ -60,19 +47,6 @@
               "type": "DOCLIB",
               "config": {
                 "recordRef": "uiserv/journal@type$workspace-file"
-              }
-            },
-            {
-              "id": "personal-kanban-tasks",
-              "label": {
-                "ru": "Канбан задачи",
-                "en": "Kanban tasks"
-              },
-              "icon": "ui/icon@i-leftmenu-completed-processes",
-              "hidden": false,
-              "type": "KANBAN",
-              "config": {
-                "recordRef": "uiserv/board@kanban-task-board"
               }
             }
           ]
