@@ -1,0 +1,8 @@
+---
+id: none
+name:
+  ru: Действие отсутствует
+  en: No action
+type: script
+config:
+  fn: 'return true'
