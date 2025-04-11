@@ -2,25 +2,15 @@ package ru.citeck.ecos.uiserv.domain.journal.api.records
 
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
-import ru.citeck.ecos.commons.data.ObjectData
-import ru.citeck.ecos.records2.predicate.PredicateService
-import ru.citeck.ecos.records2.predicate.model.Predicate
-import ru.citeck.ecos.records2.predicate.model.VoidPredicate
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.record.atts.value.AttValueCtx
-import ru.citeck.ecos.records3.record.dao.query.dto.query.Consistency
-import ru.citeck.ecos.records3.record.dao.query.dto.query.QueryPage
-import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.mixin.AttMixin
-import ru.citeck.ecos.webapp.api.EcosWebAppApi
-import ru.citeck.ecos.webapp.api.constants.AppName
-import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 @Component
 class JournalsTotalCountMixin(
     val recordsService: RecordsService,
     val resolvedJournalRecordsDao: ResolvedJournalRecordsDao,
-    val ecosWebAppContext: EcosWebAppApi
+    val journalsServiceRecordsDao: JournalsServiceRecordsDao
 ) : AttMixin {
 
     companion object {
@@ -34,53 +24,8 @@ class JournalsTotalCountMixin(
     }
 
     override fun getAtt(path: String, value: AttValueCtx): Any? {
-        val predicate = value.getAtt("predicate").getAs(Predicate::class.java)
-        val sourceId = value.getAtt("sourceId").asText()
-
-        if (isAlfrescoNodeSourceIdWithEmptyPredicate(sourceId, predicate)) {
-            return 0
-        }
-
-        if (!ecosWebAppContext.getRemoteWebAppsApi().isAppAvailable(getAppName(sourceId))) {
-            return null
-        }
-
-        val qBuilder = RecordsQuery.create()
-            .withSourceId(sourceId)
-        val queryData = value.getAtt("queryData").asObjectData()
-
-        if (queryData.size() > 0) {
-
-            qBuilder.withLanguage(PredicateService.LANGUAGE_PREDICATE + "-with-data")
-
-            val query = ObjectData.create()
-            query["data"] = queryData
-            query["predicate"] = predicate
-
-            qBuilder.withQuery(query)
-        } else {
-
-            qBuilder.withLanguage(PredicateService.LANGUAGE_PREDICATE)
-            qBuilder.withQuery(predicate)
-        }
-
-        qBuilder.withConsistency(Consistency.EVENTUAL)
-        qBuilder.withPage(QueryPage.create { withMaxItems(0) })
-
-        return recordsService.query(qBuilder.build()).getTotalCount()
+        return journalsServiceRecordsDao.getTotalCountForJournal(value.getLocalId(), emptyList())
     }
 
     override fun getProvidedAtts() = PROVIDED_ATTS
-
-    private fun getAppName(sourceId: String): String {
-        if (sourceId.indexOf(EntityRef.APP_NAME_DELIMITER) == -1) {
-            return AppName.ALFRESCO
-        }
-        return sourceId.substringBefore(EntityRef.APP_NAME_DELIMITER)
-    }
-
-    private fun isAlfrescoNodeSourceIdWithEmptyPredicate(sourceId: String, predicate: Predicate?): Boolean {
-        return sourceId == AppName.ALFRESCO + EntityRef.APP_NAME_DELIMITER &&
-            (predicate == null || predicate == VoidPredicate.INSTANCE)
-    }
 }
