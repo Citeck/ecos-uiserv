@@ -1,15 +1,10 @@
 {
   "id": "board-form",
-  "formKey": "",
   "title": {
     "en": "Kanban board config"
   },
-  "description": {},
-  "customModule": "",
-  "typeRef": "",
   "width": "lg",
   "system": true,
-  "i18n": {},
   "definition": {
     "components": [
       {
@@ -88,15 +83,15 @@
                 "input": true
               },
               {
-                "label" : {
-                  "ru" : "Скрыть заголовок",
-                  "en" : "Hide the title"
+                "label": {
+                  "ru": "Скрыть заголовок",
+                  "en": "Hide the title"
                 },
-                "key" : "disableTitle",
-                "refreshOn" : [ ],
-                "optionalWhenDisabled" : false,
-                "type" : "checkbox",
-                "input" : true
+                "key": "disableTitle",
+                "refreshOn": [],
+                "optionalWhenDisabled": false,
+                "type": "checkbox",
+                "input": true
               },
               {
                 "label": {
@@ -331,7 +326,7 @@
                     "action": "custom",
                     "state": "",
                     "showValidations": false,
-                    "custom": "var currentRow = row;\nvar config = row || {}; \nvar formData = config;\n\nvar hideItemsOlderThan = _.get(formData, 'hideItemsOlderThan');\nif (hideItemsOlderThan) {\n  var duration = moment.duration(hideItemsOlderThan);\n  \n  formData = {\n    ...formData,\n    hideItemsOlderThan: duration.asDays()\n  }\n\n}\n\nCiteck.EcosFormUtils.getFormById('board-column-settings-form', {\n    definition: 'definition?json'\n}).then(function(formConfig) {\n    \n    var inputs = Citeck.EcosFormUtils.getFormInputs(formConfig.definition);\n\n    Citeck.Dialogs.showFormDialog({\n        title: { ru: \"Настройки колонки\", en: \"Column settings\" },\n        showDefaultButtons: true,\n        formDefinition: formConfig.definition,\n        currentForm: form,\n        formData: formData,\n        onSubmit: submission => {\n            var data = submission.data || {};\n            var configData = {};\n            for (var i in inputs) {\n                var att = inputs[i].attribute;\n                if (att === \"hideItemsOlderThan\") {\n                  var duration = moment.duration(data[att], 'days');\n                  var isoString = duration.toISOString();\n                  currentRow[att] = isoString;\n                } else {\n                  currentRow[att] = data[att];\n                }\n            }\n        }\n    })\n    \n});",
+                    "custom": "var currentRow = row;\nvar config = row || {}; \nvar formData = { ...config };\n\nvar hideItemsOlderThan = _.get(formData, 'hideItemsOlderThan');\n\nif (hideItemsOlderThan) {\n  var duration = moment.duration(hideItemsOlderThan);\n  formData['hideItemsOlderThan'] = duration.asDays();\n} \n\nlet hasSum = _.get(formData, 'hasSum') == \"true\";\nif (hasSum) {\n  formData['hasSum'] = true;\n  formData['sumAtt'] = formData['sumAtt'];   \n}\n\nCiteck.EcosFormUtils.getFormById('board-column-settings-form', {\n    definition: 'definition?json'\n}).then(function(formConfig) {\n    var inputs = Citeck.EcosFormUtils.getFormInputs(formConfig.definition);\n\n    Citeck.Dialogs.showFormDialog({\n        title: { ru: \"Настройки колонки\", en: \"Column settings\" },\n        showDefaultButtons: true,\n        formDefinition: formConfig.definition,\n        currentForm: form,\n        formData: {...formData, 'typeRef': data['typeRef']},\n        onSubmit: submission => {\n            var data = submission.data || {};\n            var configData = {};\n            for (var i in inputs) {\n                var att = inputs[i].attribute;\n                if (att === \"hideItemsOlderThan\") {\n                  var duration = moment.duration(data[att], 'days');\n                  var isoString = duration.toISOString();\n                  currentRow[att] = isoString;\n                } else {\n                  currentRow[att] = data[att];\n                }\n            }\n        }\n    })\n});",
                     "block": true,
                     "clearOnHide": false,
                     "refreshOn": [],
@@ -341,9 +336,13 @@
                     },
                     "type": "button",
                     "input": true,
+                    "event": "",
+                    "url": "",
                     "headers": [
                       {}
-                    ]
+                    ],
+                    "reorder": false,
+                    "dataGridLabel": false
                   },
                   {
                     "key": "hideOldItems",
@@ -366,6 +365,22 @@
                     },
                     "type": "hidden",
                     "input": true
+                  },
+                  {
+                    "key": "hasSum",
+                    "refreshOn": [],
+                    "optionalWhenDisabled": false,
+                    "properties": {},
+                    "type": "hidden",
+                    "input": true
+                  },
+                  {
+                    "key": "sumAtt",
+                    "refreshOn": [],
+                    "optionalWhenDisabled": false,
+                    "type": "hidden",
+                    "input": true,
+                    "reorder": false
                   }
                 ],
                 "type": "column",
@@ -400,8 +415,7 @@
                       "typeRef": "typeRef?id",
                       "_readOnly": "readOnly?bool"
                     }
-                  },
-                  "forceLoad": false
+                  }
                 },
                 "update": {
                   "type": "once"
@@ -420,8 +434,7 @@
                     "attributes": {
                       "values": "model.statuses{id,name,mlName:name?json}[]"
                     }
-                  },
-                  "forceLoad": false
+                  }
                 },
                 "update": {
                   "type": "any-change"
@@ -525,7 +538,5 @@
         "input": false
       }
     ]
-  },
-  "attributes": {},
-  "notExists": false
+  }
 }
