@@ -3,4 +3,4 @@ id: workspaces-enabled
 name:
   ru: Включить/Выключить режим рабочих пространств
   en: Turn on/Switch off workspaces mode
-value: false
+value: true

@@ -3,4 +3,4 @@ id: new-journal-enabled
 name:
   ru: Включить/Выключить Новый вид журнала (2.0)
   en: Turn on/Switch off New type of journal (2.0)
-value: false
+value: true
