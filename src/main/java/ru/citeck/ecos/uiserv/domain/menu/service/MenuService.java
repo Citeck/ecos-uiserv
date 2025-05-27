@@ -332,7 +332,11 @@ public class MenuService {
         if (AuthContext.isRunAsSystem()) {
             return false;
         }
-        if (!Objects.equals(before.getWorkspace(), newConfig.getWorkspace())) {
+        String workspaceBefore = before.getWorkspace();
+        if (StringUtils.isBlank(workspaceBefore)) {
+            workspaceBefore = "";
+        }
+        if (!Objects.equals(workspaceBefore, newConfig.getWorkspace())) {
             return true;
         }
         return isMenuAuthoritiesForEveryone(before.getAuthorities())
