@@ -20,7 +20,10 @@ data class BoardColumnDef(
      */
     val name: MLText,
     val hideOldItems: Boolean,
-    val hideItemsOlderThan: String? = null
+    val hideItemsOlderThan: String? = null,
+
+    val hasSum: Boolean,
+    val sumAtt: String
 ) {
     companion object {
 
@@ -43,11 +46,16 @@ data class BoardColumnDef(
         var hideOldItems: Boolean = false
         var hideItemsOlderThan: String? = null
 
+        var hasSum: Boolean = false
+        var sumAtt: String = ""
+
         constructor(base: BoardColumnDef) : this() {
             this.id = base.id
             this.name = base.name
             this.hideOldItems = base.hideOldItems
             this.hideItemsOlderThan = base.hideItemsOlderThan
+            this.hasSum = base.hasSum
+            this.sumAtt = base.sumAtt
         }
 
         fun withId(id: String): Builder {
@@ -77,12 +85,24 @@ data class BoardColumnDef(
             return this
         }
 
+        fun withHasSum(hasSum: Boolean?): Builder {
+            this.hasSum = hasSum ?: false
+            return this
+        }
+
+        fun withSumAtt(sumAtt: String?): Builder {
+            this.sumAtt = sumAtt ?: ""
+            return this
+        }
+
         fun build(): BoardColumnDef {
             return BoardColumnDef(
                 id,
                 name,
                 hideOldItems,
-                hideItemsOlderThan
+                hideItemsOlderThan,
+                hasSum,
+                sumAtt
             )
         }
     }

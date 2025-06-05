@@ -25,6 +25,7 @@ public class BoardEntity extends AbstractAuditingEntity {
     private String typeRef;
     private String journalRef;
     private String cardFormRef;
+    private String cardTitleTemplate;
     private String cardFieldsLabelLayout;
 
     private Boolean readOnly;

@@ -66,5 +66,6 @@
     <include file="changelog/20241128000000_update_journal.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20241224000000_add_board_card_labels_layout.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20250109000000_add_ext_id_constraints.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20250605000000_add_board_card_title_template.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

@@ -20,6 +20,8 @@ public class BoardDef {
     private EntityRef journalRef;
     private EntityRef cardFormRef;
 
+    private String cardTitleTemplate;
+
     private CardFieldsLabelLayout cardFieldsLabelLayout = DEFAULT_CARD_FIELDS_LABEL_LAYOUT;
 
     private Boolean readOnly;
@@ -41,6 +43,7 @@ public class BoardDef {
         this.typeRef = other.getTypeRef();
         this.journalRef = other.getJournalRef();
         this.cardFormRef = other.getCardFormRef();
+        this.cardTitleTemplate = other.getCardTitleTemplate();
         this.cardFieldsLabelLayout = other.getCardFieldsLabelLayout();
         this.readOnly = other.getReadOnly();
         this.disableTitle = other.getDisableTitle();

@@ -1,15 +1,9 @@
 {
   "id": "board-column-settings-form",
-  "formKey": "",
   "title": {
     "en": "Dashboard column settings"
   },
-  "description": {},
-  "customModule": "",
-  "typeRef": "",
-  "width": "",
-  "system": false,
-  "i18n": {},
+  "system": true,
   "definition": {
     "components": [
       {
@@ -82,10 +76,103 @@
             "input": true
           }
         ]
+      },
+      {
+        "addVerticalIndents": true,
+        "input": true,
+        "key": "horizontalLine2",
+        "type": "horizontalLine"
+      },
+      {
+        "label": {
+          "ru": "Сумма колонки",
+          "en": "Column amount"
+        },
+        "key": "hasSum",
+        "refreshOn": [],
+        "optionalWhenDisabled": false,
+        "type": "checkbox",
+        "input": true,
+        "reorder": false,
+        "dataGridLabel": false
+      },
+      {
+        "label": {
+          "ru": "Атрибут для суммы",
+          "en": "Sum attribute"
+        },
+        "key": "sumAtt",
+        "hidden": true,
+        "validate": {
+          "required": true,
+          "select": false
+        },
+        "dataSrc": "custom",
+        "data": {
+          "custom": "if (!data.typeRef) {\n  return;\n}\n\nconst attrs = _.get(data, 'model.attrs', []);\n\nvalues = attrs.filter(attr => attr.type === \"NUMBER\");",
+          "headers": [
+            {}
+          ]
+        },
+        "optionalWhenDisabled": false,
+        "logic": [
+          {
+            "name": "show-sum-attr-input",
+            "trigger": {
+              "type": "simple",
+              "simple": {
+                "show": true,
+                "when": "hasSum",
+                "eq": "true"
+              }
+            },
+            "actions": [
+              {
+                "name": "show-sum-attr-input-action",
+                "type": "property",
+                "property": {
+                  "label": "Hidden",
+                  "value": "hidden",
+                  "type": "boolean"
+                },
+                "state": "false"
+              }
+            ]
+          }
+        ],
+        "defaultValue": "",
+        "type": "ecosSelect",
+        "input": true,
+        "reorder": false,
+        "reference": false
+      },
+      {
+        "source": {
+          "type": "record",
+          "record": {
+            "id": "{{ data.typeRef }}",
+            "attributes": {
+              "attrs": "model.attributes[]{value:id,label:?disp,type}"
+            }
+          },
+          "forceLoad": false
+        },
+        "update": {
+          "type": "once"
+        },
+        "refreshOn": [
+          {
+            "label": "hasSum",
+            "value": "hasSum"
+          }
+        ],
+        "key": "model",
+        "type": "asyncData",
+        "input": true,
+        "triggerEventOnChange": false
       }
     ],
     "formId": "board-column-settings-form"
   },
-  "attributes": {},
   "notExists": false
 }
