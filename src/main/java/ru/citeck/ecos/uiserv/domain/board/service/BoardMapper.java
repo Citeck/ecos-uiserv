@@ -31,6 +31,9 @@ public class BoardMapper {
         if (entity.getCardFormRef() != null) {
             boardDto.setCardFormRef(EntityRef.valueOf(entity.getCardFormRef()));
         }
+        if (entity.getCardTitleTemplate() != null) {
+            boardDto.setCardTitleTemplate(entity.getCardTitleTemplate());
+        }
         if (entity.getColumns() != null) {
             boardDto.setColumns(Json.getMapper().readList(entity.getColumns(), BoardColumnDef.class));
         }
@@ -86,6 +89,8 @@ public class BoardMapper {
         } else {
             entity.setCardFormRef(null);
         }
+        entity.setCardTitleTemplate(board.getCardTitleTemplate());
+
         entity.setActions(Json.getMapper().toString(board.getActions()));
         entity.setColumns(Json.getMapper().toString(board.getColumns()));
         return entity;

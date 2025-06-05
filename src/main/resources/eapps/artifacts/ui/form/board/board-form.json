@@ -95,6 +95,32 @@
               },
               {
                 "label": {
+                  "ru": "Шаблон заголовка карточки",
+                  "en": "Card title template"
+                },
+                "key": "cardTitleTemplate",
+                "tooltip": {
+                  "ru": "Настройка вида \"№ ${numberAtt} - ${?disp}\", которая по шаблону меняет заголовок карточки в канбане.",
+                  "en": "The setting looks like \"no. ${numberAtt} - ${?disp}\", which changes the title of the card in kanban according to the template."
+                },
+                "defaultValue": "",
+                "refreshOn": [],
+                "optionalWhenDisabled": false,
+                "conditional": {
+                  "show": "false",
+                  "when": "disableTitle",
+                  "eq": "true"
+                },
+                "type": "textfield",
+                "input": true,
+                "inputMasks": [
+                  {}
+                ],
+                "reorder": false,
+                "dataSrc": ""
+              },
+              {
+                "label": {
                   "ru": "Положение названия полей карточки",
                   "en": "Card fields label layout"
                 },
@@ -370,7 +396,6 @@
                     "key": "hasSum",
                     "refreshOn": [],
                     "optionalWhenDisabled": false,
-                    "properties": {},
                     "type": "hidden",
                     "input": true
                   },
@@ -415,7 +440,8 @@
                       "typeRef": "typeRef?id",
                       "_readOnly": "readOnly?bool"
                     }
-                  }
+                  },
+                  "forceLoad": false
                 },
                 "update": {
                   "type": "once"
@@ -434,7 +460,8 @@
                     "attributes": {
                       "values": "model.statuses{id,name,mlName:name?json}[]"
                     }
-                  }
+                  },
+                  "forceLoad": false
                 },
                 "update": {
                   "type": "any-change"
