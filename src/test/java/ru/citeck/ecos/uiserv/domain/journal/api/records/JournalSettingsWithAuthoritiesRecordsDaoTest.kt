@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.domain.PageRequest
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
@@ -26,10 +25,6 @@ import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.record.atts.dto.RecordAtts
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.uiserv.Application
-import ru.citeck.ecos.uiserv.domain.file.repo.FileRepository
-import ru.citeck.ecos.uiserv.domain.file.repo.FileType
-import ru.citeck.ecos.uiserv.domain.file.service.FileService
-import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService
 import ru.citeck.ecos.uiserv.domain.journalsettings.api.records.JournalSettingsRecordsDao
 import ru.citeck.ecos.uiserv.domain.journalsettings.dao.JournalSettingsRepoDao
 import ru.citeck.ecos.uiserv.domain.journalsettings.dto.JournalSettingsDto
@@ -58,15 +53,6 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
     lateinit var recordsService: RecordsService
 
     @Autowired
-    lateinit var journalPrefService: JournalPrefService
-
-    @Autowired
-    lateinit var fileService: FileService
-
-    @Autowired
-    lateinit var fileRepository: FileRepository
-
-    @Autowired
     lateinit var authoritiesApi: EcosAuthoritiesApi
 
     @Autowired
@@ -81,11 +67,6 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
         repo.deleteAll()
         repo.flush()
 
-        val files = fileRepository.findByType(FileType.JOURNALPREFS, PageRequest.of(0, Integer.MAX_VALUE))
-        for (file in files) {
-            fileService.delete(FileType.JOURNALPREFS, file.fileId)
-        }
-
         testScope = ecosContext.newScope()
 
         clearContext()
@@ -96,10 +77,6 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
         repo.deleteAll()
         repo.flush()
 
-        val files = fileRepository.findByType(FileType.JOURNALPREFS, PageRequest.of(0, Integer.MAX_VALUE))
-        for (file in files) {
-            fileService.delete(FileType.JOURNALPREFS, file.fileId)
-        }
         testScope.close()
 
         clearContext()
@@ -113,8 +90,6 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
             JournalSettingsServiceImpl(
                 repo,
                 permService,
-                journalPrefService,
-                fileService,
                 journalSettingsRecordsDao
             ),
             permService,

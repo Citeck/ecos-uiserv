@@ -14,7 +14,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
-import ru.citeck.ecos.commons.utils.io.IOUtils
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.context.lib.auth.data.AuthState
 import ru.citeck.ecos.context.lib.auth.data.SimpleAuthData
@@ -25,7 +24,6 @@ import ru.citeck.ecos.uiserv.Application
 import ru.citeck.ecos.uiserv.domain.file.repo.FileRepository
 import ru.citeck.ecos.uiserv.domain.file.repo.FileType
 import ru.citeck.ecos.uiserv.domain.file.service.FileService
-import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService
 import ru.citeck.ecos.uiserv.domain.journalsettings.dao.JournalSettingsDao
 import ru.citeck.ecos.uiserv.domain.journalsettings.dto.JournalSettingsDto
 import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsEntity
@@ -44,9 +42,6 @@ internal class JournalSettingsServiceImplTest {
 
     @Autowired
     lateinit var permService: JournalSettingsPermissionsService
-
-    @Autowired
-    lateinit var journalPrefService: JournalPrefService
 
     @Autowired
     lateinit var fileService: FileService
@@ -128,32 +123,6 @@ internal class JournalSettingsServiceImplTest {
             assertNotNull(journalSettingsService.getById("searchable-id"))
             assertNull(journalSettingsService.getById("unknown-id"))
         }
-    }
-
-    @Test
-    fun getByIdLegacyTest() {
-        setContext("user1")
-        val readFully = IOUtils.readAsBytes(
-            Thread.currentThread().contextClassLoader.getResourceAsStream(
-                "test/settings/JournalSettingsServiceImplTest/old-prefs.json"
-            )
-        )
-        journalPrefService.deployOverride(
-            "old-prefs-id-test-3",
-            readFully,
-            "user1",
-            JournalPrefService.TargetType.USER,
-            "journal1"
-        )
-
-        val dto = journalSettingsService.getById("old-prefs-id-test-3")
-        assertEquals("old-prefs-id-test-3", dto?.entity?.id)
-        assertEquals("{\"en\":\"old-prefs-title\"}", dto?.entity?.name.toString())
-        assertEquals("user1", dto?.entity?.getAuthority())
-        assertEquals("", dto?.entity?.journalId)
-        assertEquals(ObjectData.create(String(readFully)), dto?.entity?.settings)
-        assertEquals("user1", dto?.entity?.creator)
-        clearContext()
     }
 
     @Test
@@ -498,27 +467,6 @@ internal class JournalSettingsServiceImplTest {
             Mockito.verify(spyPermService, Mockito.times(1)).canWrite(any(JournalSettingsEntity::class.java))
             Mockito.verify(spyPermService, Mockito.times(1)).canWriteNew(any(JournalSettingsDto::class.java))
         }
-    }
-
-    @Test
-    fun deleteLegacyRecordTest() {
-        setContext("user1")
-        val readFully = IOUtils.readAsBytes(
-            Thread.currentThread().contextClassLoader.getResourceAsStream(
-                "test/settings/JournalSettingsServiceImplTest/old-prefs.json"
-            )
-        )
-        journalPrefService.deployOverride(
-            "old-prefs-id-test-4",
-            readFully,
-            "user1",
-            JournalPrefService.TargetType.USER,
-            "journal1"
-        )
-
-        assertNotNull(journalSettingsService.getById("old-prefs-id-test-4"))
-        val dto = journalSettingsService.delete("old-prefs-id-test-4")
-        assertNull(journalSettingsService.getById("old-prefs-id-test-4"))
     }
 
     @Test
@@ -959,99 +907,6 @@ internal class JournalSettingsServiceImplTest {
     }
 
     @Test
-    fun searchSettingsWithLegacyPreferences() {
-        setContext("admin")
-        repo.save(
-            JournalSettingsEntity().apply {
-                extId = "id-1"
-                name = "name-1"
-                authority = "GROUP_all"
-                journalId = "journal1"
-                settings = "{}"
-            }
-        )
-        val readFully = IOUtils.readAsBytes(
-            Thread.currentThread().contextClassLoader.getResourceAsStream(
-                "test/settings/JournalSettingsServiceImplTest/old-prefs.json"
-            )
-        )
-        journalPrefService.deployOverride(
-            "old-prefs-id-test-1",
-            readFully,
-            "user1",
-            JournalPrefService.TargetType.USER,
-            "journal1"
-        )
-        clearContext()
-
-        setContext("user1")
-        val foundResult1 = journalSettingsService.searchSettings("journal1")
-        assertEquals(2, foundResult1.size)
-        assertEquals("old-prefs-id-test-1", foundResult1[0].entity.id)
-        assertEquals("{\"en\":\"old-prefs-title\"}", foundResult1[0].entity.name.toString())
-        assertEquals("user1", foundResult1[0].entity.getAuthority())
-        assertEquals("journal1", foundResult1[0].entity.journalId)
-        assertEquals(ObjectData.create(String(readFully)), foundResult1[0].entity.settings)
-        assertEquals("user1", foundResult1[0].entity.creator)
-        assertEquals("id-1", foundResult1[1].entity.id)
-        assertEquals("{\"en\":\"name-1\"}", foundResult1[1].entity.name.toString())
-        assertEquals("GROUP_all", foundResult1[1].entity.getAuthority())
-        assertEquals("journal1", foundResult1[1].entity.journalId)
-        assertEquals(ObjectData.create("{}"), foundResult1[1].entity.settings)
-        assertEquals("admin", foundResult1[1].entity.creator)
-        clearContext()
-
-        setContext("user2")
-        val foundResult2 = journalSettingsService.searchSettings("journal1")
-        assertEquals(1, foundResult2.size)
-        assertEquals("id-1", foundResult2[0].entity.id)
-        assertEquals("{\"en\":\"name-1\"}", foundResult2[0].entity.name.toString())
-        assertEquals("GROUP_all", foundResult2[0].entity.getAuthority())
-        assertEquals("journal1", foundResult2[0].entity.journalId)
-        assertEquals(ObjectData.create("{}"), foundResult2[0].entity.settings)
-        assertEquals("admin", foundResult2[0].entity.creator)
-        clearContext()
-    }
-
-    @Test
-    fun searchSettingsWithLegacyPreferencesWithCollision() {
-        setContext("admin")
-        repo.save(
-            JournalSettingsEntity().apply {
-                extId = "id-1-overriden"
-                name = "name-1"
-                authority = "GROUP_all"
-                journalId = "journal1"
-                settings = "{}"
-            }
-        )
-        val readFully = IOUtils.readAsBytes(
-            Thread.currentThread().contextClassLoader.getResourceAsStream(
-                "test/settings/JournalSettingsServiceImplTest/old-prefs.json"
-            )
-        )
-        journalPrefService.deployOverride(
-            "id-1-overriden",
-            readFully,
-            "user1",
-            JournalPrefService.TargetType.USER,
-            "journal1"
-        )
-        clearContext()
-
-        setContext("user1")
-        val foundResult1 = journalSettingsService.searchSettings("journal1")
-        assertEquals(1, foundResult1.size)
-        assertEquals("id-1-overriden", foundResult1[0].entity.id)
-        assertEquals("{\"en\":\"name-1\"}", foundResult1[0].entity.name.toString())
-        assertEquals("GROUP_all", foundResult1[0].entity.getAuthority())
-        assertEquals("journal1", foundResult1[0].entity.journalId)
-        assertEquals(ObjectData.create("{}"), foundResult1[0].entity.settings)
-        assertEquals("admin", foundResult1[0].entity.creator)
-        clearContext()
-    }
-
-    @Test
     fun getSettingsByAuthorityAndJournalId() {
         AuthContext.runAs("auth-1") {
             journalSettingsService.save(
@@ -1237,8 +1092,6 @@ internal class JournalSettingsServiceImplTest {
         return JournalSettingsServiceImpl(
             repo,
             spyPermService,
-            journalPrefService,
-            fileService,
             journalSettingsDao
         )
     }

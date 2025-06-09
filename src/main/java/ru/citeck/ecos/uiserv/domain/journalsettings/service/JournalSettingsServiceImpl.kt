@@ -15,9 +15,6 @@ import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.Predicates
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
-import ru.citeck.ecos.uiserv.domain.file.repo.FileType
-import ru.citeck.ecos.uiserv.domain.file.service.FileService
-import ru.citeck.ecos.uiserv.domain.journal.service.JournalPrefService
 import ru.citeck.ecos.uiserv.domain.journalsettings.dao.JournalSettingsDao
 import ru.citeck.ecos.uiserv.domain.journalsettings.dto.JournalSettingsDto
 import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsEntity
@@ -35,8 +32,6 @@ import java.util.stream.Collectors
 class JournalSettingsServiceImpl(
     private val repo: JournalSettingsRepository,
     private val permService: JournalSettingsPermissionsService,
-    private val journalPrefService: JournalPrefService,
-    private val fileService: FileService,
     private val journalSettingsDao: JournalSettingsDao
 ) : JournalSettingsService {
 
@@ -72,19 +67,10 @@ class JournalSettingsServiceImpl(
     @Override
     override fun getById(id: String): EntityWithMeta<JournalSettingsDto>? {
         val entity = repo.findByExtId(id)
-        if (entity != null) {
-            if (permService.canRead(entity)) {
-                return toDtoWithMeta(entity)
-            }
-            return null
+        if (entity != null && permService.canRead(entity)) {
+            return toDtoWithMeta(entity)
         }
-
-        val journalPrefs = journalPrefService.getJournalPrefs(id).orElse(null)
-        return if (journalPrefs != null) {
-            EntityWithMeta(toDto(journalPrefs, null))
-        } else {
-            null
-        }
+        return null
     }
 
     @Override
@@ -97,13 +83,6 @@ class JournalSettingsServiceImpl(
             repo.delete(entity)
             return true
         }
-
-        val oldPrefs = journalPrefService.getJournalPrefs(id).orElse(null)
-        if (oldPrefs != null) {
-            fileService.delete(FileType.JOURNALPREFS, id)
-            return true
-        }
-
         return false
     }
 
@@ -128,10 +107,7 @@ class JournalSettingsServiceImpl(
 
     @Override
     override fun searchSettings(journalId: String): List<EntityWithMeta<JournalSettingsDto>> {
-        val foundedJournalSettings = getJournalSettingsForCurrentUser(journalId)
-        val foundedJournalPrefs = searchJournalPrefs(journalId).map { EntityWithMeta(it) }
-
-        return mergeSettingsAndPrefs(foundedJournalSettings, foundedJournalPrefs)
+        return getJournalSettingsForCurrentUser(journalId)
     }
 
     fun getJournalSettingsForCurrentUser(journalId: String): List<EntityWithMeta<JournalSettingsDto>> {
@@ -187,32 +163,6 @@ class JournalSettingsServiceImpl(
             )
         }
         return specification
-    }
-
-    private fun searchJournalPrefs(journalId: String): List<JournalSettingsDto> {
-        val result = mutableListOf<JournalSettingsDto>()
-        val currentUsername = getCurrentUsername()
-        val prefs = journalPrefService.find(journalId, currentUsername, true)
-        for (pref in prefs) {
-            result.add(toDto(pref, journalId))
-        }
-        return result
-    }
-
-    private fun mergeSettingsAndPrefs(
-        settings: List<EntityWithMeta<JournalSettingsDto>>,
-        prefs: List<EntityWithMeta<JournalSettingsDto>>
-    ): List<EntityWithMeta<JournalSettingsDto>> {
-        val result = mutableListOf<EntityWithMeta<JournalSettingsDto>>()
-        val prefsMap = prefs.associateBy { it.entity.id }
-        val settingsMap = settings.associateBy { it.entity.id }
-        prefsMap.forEach { id, dto ->
-            if (!settingsMap.containsKey(id)) {
-                result.add(dto)
-            }
-        }
-        result.addAll(settings)
-        return result
     }
 
     @Override
@@ -292,24 +242,5 @@ class JournalSettingsServiceImpl(
         val meta = EntityMeta(entity.createdDate, entity.createdBy, entity.lastModifiedDate, entity.lastModifiedBy)
 
         return EntityWithMeta(dto, meta)
-    }
-
-    private fun toDto(pref: JournalPrefService.JournalPreferences, journalId: String?): JournalSettingsDto {
-        val currentUsername = getCurrentUsername()
-        val prefSettings = ObjectData.create(pref.data)
-        return JournalSettingsDto.create()
-            .withId(pref.fileId)
-            .withName(Json.mapper.read(prefSettings["title"].asText(), MLText::class.java))
-            .withAuthorities(listOf(currentUsername))
-            .withJournalId(journalId)
-            .withSettings(prefSettings)
-            .withCreator(currentUsername)
-            .build()
-    }
-
-    private fun getCurrentUsername(): String {
-        val username = AuthContext.getCurrentUser()
-        require(!StringUtils.isBlank(username)) { "Username cannot be empty" }
-        return username
     }
 }

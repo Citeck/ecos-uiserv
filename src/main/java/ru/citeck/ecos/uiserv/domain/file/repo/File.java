@@ -31,7 +31,6 @@ public class File implements Serializable {
 
     @NotNull
     @Column(name = "file_id", nullable = false)
-    @Getter @Setter
     private String fileId;
 
     /* This points to "active" (currently used) version of menu; however "active" does
@@ -40,7 +39,6 @@ public class File implements Serializable {
         those "standard" version are not becoming "active" until the custom override is reverted. */
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     //@JoinColumn(name = "menu_config_version_id")
-    @Getter @Setter
     private FileVersion fileVersion;
 
     @Column
@@ -56,8 +54,31 @@ public class File implements Serializable {
     @CollectionTable(name = "file_meta", joinColumns = {@JoinColumn(name = "file_id", referencedColumnName = "id")})
     @MapKeyColumn(name = "key")
     @Column(name = "value")
-    @Getter @Setter
     private Map<String, String> fileMeta;
+
+    public FileVersion getFileVersion() {
+        return fileVersion;
+    }
+
+    public void setFileVersion(FileVersion fileVersion) {
+        this.fileVersion = fileVersion;
+    }
+
+    public Map<String, String> getFileMeta() {
+        return fileMeta;
+    }
+
+    public void setFileMeta(Map<String, String> fileMeta) {
+        this.fileMeta = fileMeta;
+    }
+
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -62,10 +62,17 @@ public class FileVersion implements Serializable {
     @Setter
     private String contentType;
 
-
     public FileVersion translated(Translated translated) {
         this.translated = translated;
         return this;
+    }
+
+    public void setBytes(byte[] bytes) {
+        this.bytes = bytes;
+    }
+
+    public byte[] getBytes() {
+        return bytes;
     }
 
     @Override
