@@ -15,7 +15,8 @@ open class JournalSettingsDto(
     val authorities: List<String>,
     val journalId: String,
     val settings: ObjectData,
-    val creator: String
+    val creator: String,
+    val workspaces: List<String>
 ) {
     constructor(other: JournalSettingsDto) : this(
         other.id,
@@ -23,7 +24,8 @@ open class JournalSettingsDto(
         other.authorities,
         other.journalId,
         other.settings,
-        other.creator
+        other.creator,
+        other.workspaces
     )
 
     constructor() : this(
@@ -32,7 +34,8 @@ open class JournalSettingsDto(
         Collections.emptyList(),
         "",
         ObjectData.create(),
-        ""
+        "",
+        emptyList()
     )
 
     companion object {
@@ -70,6 +73,7 @@ open class JournalSettingsDto(
         if (journalId != other.journalId) return false
         if (settings != other.settings) return false
         if (creator != other.creator) return false
+        if (workspaces != other.workspaces) return false
 
         return true
     }
@@ -82,6 +86,7 @@ open class JournalSettingsDto(
         result = 31 * result + journalId.hashCode()
         result = 31 * result + settings.hashCode()
         result = 31 * result + creator.hashCode()
+        result = 31 * result + workspaces.hashCode()
         return result
     }
 
@@ -94,6 +99,7 @@ open class JournalSettingsDto(
         var journalId: String = ""
         var settings: ObjectData = ObjectData.create()
         var creator: String = ""
+        var workspaces: List<String> = listOf("default")
 
         constructor(base: JournalSettingsDto) : this() {
             id = base.id
@@ -102,6 +108,7 @@ open class JournalSettingsDto(
             journalId = base.journalId
             settings = base.settings.deepCopy()
             creator = base.creator
+            workspaces = base.workspaces
         }
 
         fun withId(id: String): Builder {
@@ -146,6 +153,11 @@ open class JournalSettingsDto(
             return this
         }
 
+        fun withWorkspaces(workspaces: List<String>?): Builder {
+            this.workspaces = workspaces?.filter { it.isNotBlank() } ?: listOf("default")
+            return this
+        }
+
         fun build(): JournalSettingsDto {
             return JournalSettingsDto(
                 id,
@@ -153,7 +165,8 @@ open class JournalSettingsDto(
                 authorities,
                 journalId,
                 settings,
-                creator
+                creator,
+                workspaces
             )
         }
     }

@@ -7,9 +7,9 @@ import ru.citeck.ecos.uiserv.domain.journalsettings.dto.JournalSettingsDto
 
 interface JournalSettingsService {
 
-    fun getCount(predicate: Predicate): Long
+    fun getCount(predicate: Predicate, workspaces: List<String>): Long
 
-    fun findAll(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<EntityWithMeta<JournalSettingsDto>>
+    fun findAll(predicate: Predicate, workspaces: List<String>, max: Int, skip: Int, sort: List<SortBy>): List<EntityWithMeta<JournalSettingsDto>>
 
     fun save(settings: JournalSettingsDto): JournalSettingsDto
 
@@ -19,10 +19,11 @@ interface JournalSettingsService {
 
     fun delete(id: String): Boolean
 
-    fun searchSettings(journalId: String): List<EntityWithMeta<JournalSettingsDto>>
+    fun searchSettings(journalId: String): List<EntityWithMeta<JournalSettingsDto>> {
+        return searchSettings(journalId, emptyList())
+    }
 
-    @Deprecated(message = "use searchSettings method instead of this")
-    fun getSettings(authority: String?, journalId: String?): List<JournalSettingsDto>
+    fun searchSettings(journalId: String, workspaces: List<String>): List<EntityWithMeta<JournalSettingsDto>>
 
     fun listenChanges(listener: (JournalSettingsDto?, JournalSettingsDto?) -> Unit)
 }

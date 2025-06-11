@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv
 
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.model.lib.workspace.api.WorkspaceApi
+import ru.citeck.ecos.model.lib.workspace.api.WsMembershipType
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -25,7 +26,7 @@ class CustomWorkspaceApi : WorkspaceApi {
         managersByWorkspace.clear()
     }
 
-    override fun getUserWorkspaces(user: String): Set<String> {
+    override fun getUserWorkspaces(user: String, membershipType: WsMembershipType): Set<String> {
         return workspacesByUser[user] ?: emptySet()
     }
 

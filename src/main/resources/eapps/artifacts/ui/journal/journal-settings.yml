@@ -4,14 +4,12 @@ name:
   ru: Настройки журналов
   en: Journal settings
 
-properties: {upd: true}
-
 system: true
 
 actions:
   - uiserv/action@download-base64-data-yml
   - uiserv/action@delete
-  # - uiserv/action@edit
+  - uiserv/action@edit-json
   - uiserv/action@module-copy
 
 columns:
@@ -22,5 +20,15 @@ columns:
 
   - id: name
     name: { ru: Название, en: Name }
-  - id: authority
+  - id: authorities
+  - id: workspacesRefs
+    name:
+      ru: Рабочие пространства
+      en: Workspaces
+    type: ASSOC
+    multiple: true
+    editor:
+      type: journal
+      config:
+        journalId: "workspaces-journal"
   - id: journalId

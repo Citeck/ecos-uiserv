@@ -8,22 +8,22 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.domain.PageRequest
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.context.lib.auth.AuthContext
+import ru.citeck.ecos.context.lib.auth.AuthRole
 import ru.citeck.ecos.context.lib.auth.data.AuthState
 import ru.citeck.ecos.context.lib.auth.data.SimpleAuthData
 import ru.citeck.ecos.context.lib.auth.data.UndefinedAuth
 import ru.citeck.ecos.context.lib.ctx.CtxScope
 import ru.citeck.ecos.context.lib.ctx.EcosContext
+import ru.citeck.ecos.model.lib.ModelServiceFactory
+import ru.citeck.ecos.model.lib.workspace.WorkspaceServiceImpl
 import ru.citeck.ecos.uiserv.Application
-import ru.citeck.ecos.uiserv.domain.file.repo.FileRepository
-import ru.citeck.ecos.uiserv.domain.file.repo.FileType
-import ru.citeck.ecos.uiserv.domain.file.service.FileService
 import ru.citeck.ecos.uiserv.domain.journalsettings.dao.JournalSettingsDao
 import ru.citeck.ecos.uiserv.domain.journalsettings.dto.JournalSettingsDto
 import ru.citeck.ecos.uiserv.domain.journalsettings.repo.JournalSettingsEntity
@@ -44,12 +44,6 @@ internal class JournalSettingsServiceImplTest {
     lateinit var permService: JournalSettingsPermissionsService
 
     @Autowired
-    lateinit var fileService: FileService
-
-    @Autowired
-    lateinit var fileRepository: FileRepository
-
-    @Autowired
     lateinit var journalSettingsService: JournalSettingsService
 
     @Autowired
@@ -64,11 +58,6 @@ internal class JournalSettingsServiceImplTest {
         repo.deleteAll()
         repo.flush()
 
-        val files = fileRepository.findByType(FileType.JOURNALPREFS, PageRequest.of(0, Integer.MAX_VALUE))
-        for (file in files) {
-            fileService.delete(FileType.JOURNALPREFS, file.fileId)
-        }
-
         testScope = ecosContext.newScope()
 
         clearContext()
@@ -79,10 +68,6 @@ internal class JournalSettingsServiceImplTest {
         repo.deleteAll()
         repo.flush()
 
-        val files = fileRepository.findByType(FileType.JOURNALPREFS, PageRequest.of(0, Integer.MAX_VALUE))
-        for (file in files) {
-            fileService.delete(FileType.JOURNALPREFS, file.fileId)
-        }
         testScope.close()
 
         clearContext()
@@ -94,7 +79,7 @@ internal class JournalSettingsServiceImplTest {
             val journalSettingsEntity = JournalSettingsEntity()
             journalSettingsEntity.extId = "searchable-id"
             journalSettingsEntity.name = "some-name"
-            journalSettingsEntity.authority = "user-1"
+            journalSettingsEntity.authorities = mutableListOf("user-1")
             journalSettingsEntity.setAuthoritiesForEntity(listOf("user-1", "user-3"))
             journalSettingsEntity.journalId = "some-journal"
             journalSettingsEntity.settings = "{}"
@@ -565,7 +550,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-1"
                 name = "name-1"
-                authority = "user1"
+                authorities = mutableListOf("user1")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -574,7 +559,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-2"
                 name = "name-2"
-                authority = "user1"
+                authorities = mutableListOf("user1")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -583,7 +568,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-3"
                 name = "name-3"
-                authority = "user2"
+                authorities = mutableListOf("user2")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -592,7 +577,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-4"
                 name = "name-4"
-                authority = "user1"
+                authorities = mutableListOf("user1")
                 journalId = "journal-2"
                 settings = "{}"
             }
@@ -601,7 +586,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-5"
                 name = "name-5"
-                authority = "GROUP_all"
+                authorities = mutableListOf("GROUP_all")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -731,7 +716,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-1"
                 name = "name-1"
-                authority = "user1"
+                authorities = mutableListOf("user1")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -740,7 +725,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-2"
                 name = "name-2"
-                authority = "user1"
+                authorities = mutableListOf("user1")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -749,7 +734,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-3"
                 name = "name-3"
-                authority = "user2"
+                authorities = mutableListOf("user2")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -758,7 +743,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-4"
                 name = "name-4"
-                authority = "user1"
+                authorities = mutableListOf("user1")
                 journalId = "journal-2"
                 settings = "{}"
             }
@@ -767,7 +752,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-5"
                 name = "name-5"
-                authority = "GROUP_all"
+                authorities = mutableListOf("GROUP_all")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -776,7 +761,7 @@ internal class JournalSettingsServiceImplTest {
             JournalSettingsEntity().apply {
                 extId = "id-6"
                 name = "name-6"
-                authority = "admin"
+                authorities = mutableListOf("admin")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -801,17 +786,13 @@ internal class JournalSettingsServiceImplTest {
 
         setContext("anotherAdmin")
         val foundResult3 = journalSettingsService.searchSettings("journal-1")
-        assertEquals(4, foundResult3.size)
-        assertTrue(foundResult3.stream().anyMatch { it.entity.id == "id-1" })
-        assertTrue(foundResult3.stream().anyMatch { it.entity.id == "id-2" })
-        assertTrue(foundResult3.stream().anyMatch { it.entity.id == "id-3" })
+        assertEquals(1, foundResult3.size)
         assertTrue(foundResult3.stream().anyMatch { it.entity.id == "id-5" })
         clearContext()
 
         setContext("anotherAdmin")
         val foundResult4 = journalSettingsService.searchSettings("journal-2")
-        assertEquals(1, foundResult4.size)
-        assertTrue(foundResult4.stream().anyMatch { it.entity.id == "id-4" })
+        assertEquals(0, foundResult4.size)
         clearContext()
     }
 
@@ -827,6 +808,7 @@ internal class JournalSettingsServiceImplTest {
                 settings = "{}"
             }
         )
+        setContext("anotherAdmin")
         repo.save(
             JournalSettingsEntity().apply {
                 extId = "id-2"
@@ -836,6 +818,7 @@ internal class JournalSettingsServiceImplTest {
                 settings = "{}"
             }
         )
+        setContext("admin")
         repo.save(
             JournalSettingsEntity().apply {
                 extId = "id-3"
@@ -876,9 +859,8 @@ internal class JournalSettingsServiceImplTest {
 
         setContext("admin")
         val foundResult1 = journalSettingsService.searchSettings("journal-1")
-        assertEquals(5, foundResult1.size)
+        assertEquals(4, foundResult1.size)
         assertTrue(foundResult1.stream().anyMatch { it.entity.id == "id-1" })
-        assertTrue(foundResult1.stream().anyMatch { it.entity.id == "id-2" })
         assertTrue(foundResult1.stream().anyMatch { it.entity.id == "id-3" })
         assertTrue(foundResult1.stream().anyMatch { it.entity.id == "id-5" })
         assertTrue(foundResult1.stream().anyMatch { it.entity.id == "id-6" })
@@ -892,17 +874,14 @@ internal class JournalSettingsServiceImplTest {
 
         setContext("anotherAdmin")
         val foundResult3 = journalSettingsService.searchSettings("journal-1")
-        assertEquals(4, foundResult3.size)
-        assertTrue(foundResult3.stream().anyMatch { it.entity.id == "id-1" })
+        assertEquals(2, foundResult3.size)
         assertTrue(foundResult3.stream().anyMatch { it.entity.id == "id-2" })
-        assertTrue(foundResult3.stream().anyMatch { it.entity.id == "id-3" })
         assertTrue(foundResult3.stream().anyMatch { it.entity.id == "id-5" })
         clearContext()
 
         setContext("anotherAdmin")
         val foundResult4 = journalSettingsService.searchSettings("journal-2")
-        assertEquals(1, foundResult4.size)
-        assertTrue(foundResult4.stream().anyMatch { it.entity.id == "id-4" })
+        assertEquals(0, foundResult4.size)
         clearContext()
     }
 
@@ -916,6 +895,7 @@ internal class JournalSettingsServiceImplTest {
                     .withAuthority("auth-1")
                     .withJournalId("journal-1")
                     .withSettings(ObjectData.create("{}"))
+                    .withWorkspaces(emptyList())
                     .build()
             )
             journalSettingsService.save(
@@ -925,6 +905,7 @@ internal class JournalSettingsServiceImplTest {
                     .withAuthority("auth-1")
                     .withJournalId("journal-1")
                     .withSettings(ObjectData.create("{}"))
+                    .withWorkspaces(emptyList())
                     .build()
             )
             journalSettingsService.save(
@@ -934,6 +915,7 @@ internal class JournalSettingsServiceImplTest {
                     .withAuthority("auth-1")
                     .withJournalId("journal-2")
                     .withSettings(ObjectData.create("{}"))
+                    .withWorkspaces(emptyList())
                     .build()
             )
         }
@@ -946,6 +928,7 @@ internal class JournalSettingsServiceImplTest {
                     .withAuthority("auth-2")
                     .withJournalId("journal-1")
                     .withSettings(ObjectData.create("{}"))
+                    .withWorkspaces(emptyList())
                     .build()
             )
         }
@@ -965,6 +948,7 @@ internal class JournalSettingsServiceImplTest {
                     .withAuthorities(listOf("auth-1", "auth-2"))
                     .withJournalId("journal-1")
                     .withSettings(ObjectData.create("{}"))
+                    .withWorkspaces(emptyList())
                     .build()
             )
             journalSettingsService.save(
@@ -974,6 +958,7 @@ internal class JournalSettingsServiceImplTest {
                     .withAuthorities(listOf("auth-1", "auth-2"))
                     .withJournalId("journal-1")
                     .withSettings(ObjectData.create("{}"))
+                    .withWorkspaces(emptyList())
                     .build()
             )
             journalSettingsService.save(
@@ -983,6 +968,7 @@ internal class JournalSettingsServiceImplTest {
                     .withAuthorities(listOf("auth-1", "auth-2"))
                     .withJournalId("journal-2")
                     .withSettings(ObjectData.create("{}"))
+                    .withWorkspaces(emptyList())
                     .build()
             )
             journalSettingsService.save(
@@ -992,6 +978,7 @@ internal class JournalSettingsServiceImplTest {
                     .withAuthorities(listOf("auth-1"))
                     .withJournalId("journal-1")
                     .withSettings(ObjectData.create("{}"))
+                    .withWorkspaces(emptyList())
                     .build()
             )
             journalSettingsService.save(
@@ -1001,6 +988,7 @@ internal class JournalSettingsServiceImplTest {
                     .withAuthorities(listOf("auth-1"))
                     .withJournalId("journal-1")
                     .withSettings(ObjectData.create("{}"))
+                    .withWorkspaces(emptyList())
                     .build()
             )
             journalSettingsService.save(
@@ -1010,6 +998,7 @@ internal class JournalSettingsServiceImplTest {
                     .withAuthorities(listOf("auth-1"))
                     .withJournalId("journal-2")
                     .withSettings(ObjectData.create("{}"))
+                    .withWorkspaces(emptyList())
                     .build()
             )
         }
@@ -1022,6 +1011,7 @@ internal class JournalSettingsServiceImplTest {
                     .withAuthorities(listOf("auth-1", "auth-2"))
                     .withJournalId("journal-1")
                     .withSettings(ObjectData.create("{}"))
+                    .withWorkspaces(emptyList())
                     .build()
             )
             journalSettingsService.save(
@@ -1031,6 +1021,7 @@ internal class JournalSettingsServiceImplTest {
                     .withAuthorities(listOf("auth-2"))
                     .withJournalId("journal-1")
                     .withSettings(ObjectData.create("{}"))
+                    .withWorkspaces(emptyList())
                     .build()
             )
         }
@@ -1092,11 +1083,16 @@ internal class JournalSettingsServiceImplTest {
         return JournalSettingsServiceImpl(
             repo,
             spyPermService,
-            journalSettingsDao
+            journalSettingsDao,
+            WorkspaceServiceImpl(ModelServiceFactory())
         )
     }
 
     private fun clearContext() {
         AuthContext.set(testScope, AuthState(UndefinedAuth, UndefinedAuth))
+    }
+
+    private fun JournalSettingsService.getSettings(user: String, journalId: String): List<EntityWithMeta<JournalSettingsDto>> {
+        return AuthContext.runAs(user, listOf(AuthRole.USER)) { searchSettings(journalId, emptyList()) }
     }
 }

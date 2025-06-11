@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
+import org.mockito.kotlin.eq
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.core.GrantedAuthority
@@ -21,6 +22,7 @@ import ru.citeck.ecos.context.lib.auth.data.SimpleAuthData
 import ru.citeck.ecos.context.lib.auth.data.UndefinedAuth
 import ru.citeck.ecos.context.lib.ctx.CtxScope
 import ru.citeck.ecos.context.lib.ctx.EcosContext
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.record.atts.dto.RecordAtts
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
@@ -56,6 +58,9 @@ internal class JournalSettingsRecordsDaoTest {
     lateinit var authoritiesApi: EcosAuthoritiesApi
 
     @Autowired
+    lateinit var workspaceService: WorkspaceService
+
+    @Autowired
     lateinit var jpaSearchConverterFactory: JpaSearchConverterFactory
 
     @Autowired
@@ -87,7 +92,8 @@ internal class JournalSettingsRecordsDaoTest {
             JournalSettingsServiceImpl(
                 repo,
                 permService,
-                journalSettingsRecordsDao
+                journalSettingsRecordsDao,
+                workspaceService
             ),
             permService,
             authoritiesApi
@@ -102,7 +108,7 @@ internal class JournalSettingsRecordsDaoTest {
                 JournalSettingsEntity().apply {
                     extId = "ext-id-1"
                     name = "some-name-1"
-                    authority = "user-1"
+                    authorities = mutableListOf("user-1")
                     journalId = "journal-1"
                     settings = "{\"foo1\":\"bar\"}"
                 }
@@ -111,7 +117,7 @@ internal class JournalSettingsRecordsDaoTest {
                 JournalSettingsEntity().apply {
                     extId = "ext-id-2"
                     name = "some-name-2"
-                    authority = "user-2"
+                    authorities = mutableListOf("user-2")
                     journalId = "journal-1"
                     settings = "{\"foo2\":\"bar\"}"
                 }
@@ -244,7 +250,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check1)
         assertEquals("id1", check1?.extId)
         assertEquals("{\"en\":\"name1\"}", check1?.name)
-        assertEquals("admin", check1?.authority)
+        assertEquals("admin", check1?.authorities?.firstOrNull())
         assertEquals("journal1", check1?.journalId)
         assertEquals("{}", check1?.settings)
         assertEquals("admin", check1?.createdBy)
@@ -282,7 +288,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check2)
         assertEquals("id1", check2?.extId)
         assertEquals("{\"en\":\"name1\"}", check2?.name)
-        assertEquals("admin", check2?.authority)
+        assertEquals("admin", check2?.authorities?.firstOrNull())
         assertEquals("journal1", check2?.journalId)
         assertEquals("{}", check2?.settings)
         assertEquals("admin", check2?.createdBy)
@@ -297,7 +303,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check3)
         assertEquals("id1", check3?.extId)
         assertEquals("{\"en\":\"anotherName\"}", check3?.name)
-        assertEquals("admin", check3?.authority)
+        assertEquals("admin", check3?.authorities?.firstOrNull())
         assertEquals("journal1", check3?.journalId)
         assertEquals("{}", check3?.settings)
         assertEquals("admin", check3?.createdBy)
@@ -322,7 +328,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check1)
         assertEquals("id1", check1?.extId)
         assertEquals("{\"en\":\"name1\"}", check1?.name)
-        assertEquals("user1", check1?.authority)
+        assertEquals("user1", check1?.authorities?.firstOrNull())
         assertEquals("journal1", check1?.journalId)
         assertEquals("{}", check1?.settings)
         assertEquals("user1", check1?.createdBy)
@@ -347,7 +353,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check2)
         assertEquals("id1", check2?.extId)
         assertEquals("{\"en\":\"name1\"}", check2?.name)
-        assertEquals("user1", check2?.authority)
+        assertEquals("user1", check2?.authorities?.firstOrNull())
         assertEquals("journal1", check2?.journalId)
         assertEquals("{}", check2?.settings)
         assertEquals("user1", check2?.createdBy)
@@ -362,7 +368,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check3)
         assertEquals("id1", check3?.extId)
         assertEquals("{\"en\":\"anotherNameUser1\"}", check3?.name)
-        assertEquals("user1", check3?.authority)
+        assertEquals("user1", check3?.authorities?.firstOrNull())
         assertEquals("journal1", check3?.journalId)
         assertEquals("{}", check3?.settings)
         assertEquals("user1", check3?.createdBy)
@@ -381,7 +387,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check4)
         assertEquals("id1", check4?.extId)
         assertEquals("{\"en\":\"anotherNameAdmin\"}", check4?.name)
-        assertEquals("user1", check4?.authority)
+        assertEquals("user1", check4?.authorities?.firstOrNull())
         assertEquals("journal1", check4?.journalId)
         assertEquals("{}", check4?.settings)
         assertEquals("user1", check4?.createdBy)
@@ -406,7 +412,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check1)
         assertEquals("id1", check1?.extId)
         assertEquals("{\"en\":\"name1\"}", check1?.name)
-        assertEquals("user1", check1?.authority)
+        assertEquals("user1", check1?.authorities?.firstOrNull())
         assertEquals("journal1", check1?.journalId)
         assertEquals("{}", check1?.settings)
         assertEquals("admin", check1?.createdBy)
@@ -444,7 +450,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check2)
         assertEquals("id1", check2?.extId)
         assertEquals("{\"en\":\"name1\"}", check2?.name)
-        assertEquals("user1", check2?.authority)
+        assertEquals("user1", check2?.authorities?.firstOrNull())
         assertEquals("journal1", check2?.journalId)
         assertEquals("{}", check2?.settings)
         assertEquals("admin", check2?.createdBy)
@@ -459,7 +465,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check3)
         assertEquals("id1", check3?.extId)
         assertEquals("{\"en\":\"anotherNameAdmin\"}", check3?.name)
-        assertEquals("user1", check3?.authority)
+        assertEquals("user1", check3?.authorities?.firstOrNull())
         assertEquals("journal1", check3?.journalId)
         assertEquals("{}", check3?.settings)
         assertEquals("admin", check3?.createdBy)
@@ -484,7 +490,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check1)
         assertEquals("id1", check1?.extId)
         assertEquals("{\"en\":\"name1\"}", check1?.name)
-        assertEquals("GROUP_all", check1?.authority)
+        assertEquals("GROUP_all", check1?.authorities?.firstOrNull())
         assertEquals("journal1", check1?.journalId)
         assertEquals("{}", check1?.settings)
         assertEquals("admin", check1?.createdBy)
@@ -522,7 +528,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check2)
         assertEquals("id1", check2?.extId)
         assertEquals("{\"en\":\"name1\"}", check2?.name)
-        assertEquals("GROUP_all", check2?.authority)
+        assertEquals("GROUP_all", check2?.authorities?.firstOrNull())
         assertEquals("journal1", check2?.journalId)
         assertEquals("{}", check2?.settings)
         assertEquals("admin", check2?.createdBy)
@@ -537,7 +543,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check3)
         assertEquals("id1", check3?.extId)
         assertEquals("{\"en\":\"anotherNameAdmin\"}", check3?.name)
-        assertEquals("GROUP_all", check3?.authority)
+        assertEquals("GROUP_all", check3?.authorities?.firstOrNull())
         assertEquals("journal1", check3?.journalId)
         assertEquals("{}", check3?.settings)
         assertEquals("admin", check3?.createdBy)
@@ -567,7 +573,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check1)
         assertEquals("id1", check1?.extId)
         assertEquals("{\"ru\":\"123\",\"en\":\"321\"}", check1?.name)
-        assertEquals("GROUP_all", check1?.authority)
+        assertEquals("GROUP_all", check1?.authorities?.firstOrNull())
         assertEquals("journal1", check1?.journalId)
         assertEquals("{}", check1?.settings)
         assertEquals("admin", check1?.createdBy)
@@ -583,7 +589,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertNotNull(check2)
         assertEquals("id1", check2?.extId)
         assertEquals("{\"ru\":\"some\",\"en\":\"body\"}", check2?.name)
-        assertEquals("GROUP_all", check2?.authority)
+        assertEquals("GROUP_all", check2?.authorities?.firstOrNull())
         assertEquals("journal1", check2?.journalId)
         assertEquals("{}", check2?.settings)
         assertEquals("admin", check2?.createdBy)
@@ -598,7 +604,7 @@ internal class JournalSettingsRecordsDaoTest {
             JournalSettingsEntity().apply {
                 extId = "id1"
                 name = "name1"
-                authority = "admin"
+                authorities = mutableListOf("admin")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -639,7 +645,7 @@ internal class JournalSettingsRecordsDaoTest {
             JournalSettingsEntity().apply {
                 extId = "id1"
                 name = "name1"
-                authority = "user1"
+                authorities = mutableListOf("user1")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -680,7 +686,7 @@ internal class JournalSettingsRecordsDaoTest {
             JournalSettingsEntity().apply {
                 extId = "id1"
                 name = "name1"
-                authority = "user1"
+                authorities = mutableListOf("user1")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -712,7 +718,7 @@ internal class JournalSettingsRecordsDaoTest {
             JournalSettingsEntity().apply {
                 extId = "id1"
                 name = "name1"
-                authority = "user1"
+                authorities = mutableListOf("user1")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -744,7 +750,7 @@ internal class JournalSettingsRecordsDaoTest {
             JournalSettingsEntity().apply {
                 extId = "id1"
                 name = "name1"
-                authority = "GROUP_all"
+                authorities = mutableListOf("GROUP_all")
                 journalId = "journal-1"
                 settings = "{}"
             }
@@ -796,13 +802,13 @@ internal class JournalSettingsRecordsDaoTest {
                         .build()
                 )
             )
-        ).`when`(journalSettingsService).searchSettings("journal1")
+        ).`when`(journalSettingsService).searchSettings(eq("journal1"), Mockito.anyList())
         Mockito.doReturn(emptyList<JournalSettingsDto>())
-            .`when`(journalSettingsService).searchSettings("journal2")
+            .`when`(journalSettingsService).searchSettings(eq("journal2"), Mockito.anyList())
 
         val recordsDao = JournalSettingsRecordsDao(journalSettingsService, permService, authoritiesApi)
 
-        Mockito.verify(journalSettingsService, Mockito.times(0)).searchSettings(any(String::class.java))
+        Mockito.verify(journalSettingsService, Mockito.times(0)).searchSettings(any(String::class.java), Mockito.anyList())
 
         val queryRecords1 = recordsDao.queryRecords(
             RecordsQuery.create {
@@ -814,7 +820,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertTrue(queryRecords1.getRecords().stream().anyMatch({ it.id == "id1" }))
         assertTrue(queryRecords1.getRecords().stream().anyMatch({ it.id == "id2" }))
 
-        Mockito.verify(journalSettingsService, Mockito.times(1)).searchSettings(any(String::class.java))
+        Mockito.verify(journalSettingsService, Mockito.times(1)).searchSettings(any(String::class.java), Mockito.anyList())
 
         val queryRecords2 = recordsDao.queryRecords(
             RecordsQuery.create {
@@ -824,7 +830,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertEquals(0, queryRecords2.getTotalCount())
         assertEquals(false, queryRecords2.getHasMore())
 
-        Mockito.verify(journalSettingsService, Mockito.times(2)).searchSettings(any(String::class.java))
+        Mockito.verify(journalSettingsService, Mockito.times(2)).searchSettings(any(String::class.java), Mockito.anyList())
 
         val queryRecords3 = recordsDao.queryRecords(
             RecordsQuery.create {
@@ -834,7 +840,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertEquals(0, queryRecords3.getTotalCount())
         assertEquals(false, queryRecords3.getHasMore())
 
-        Mockito.verify(journalSettingsService, Mockito.times(2)).searchSettings(any(String::class.java))
+        Mockito.verify(journalSettingsService, Mockito.times(2)).searchSettings(any(String::class.java), Mockito.anyList())
 
         val queryRecords4 = recordsDao.queryRecords(
             RecordsQuery.create {
@@ -844,7 +850,7 @@ internal class JournalSettingsRecordsDaoTest {
         assertEquals(0, queryRecords4.getTotalCount())
         assertEquals(false, queryRecords4.getHasMore())
 
-        Mockito.verify(journalSettingsService, Mockito.times(2)).searchSettings(any(String::class.java))
+        Mockito.verify(journalSettingsService, Mockito.times(2)).searchSettings(any(String::class.java), Mockito.anyList())
     }
 
     private fun <T> any(type: Class<T>): T = Mockito.any<T>(type)

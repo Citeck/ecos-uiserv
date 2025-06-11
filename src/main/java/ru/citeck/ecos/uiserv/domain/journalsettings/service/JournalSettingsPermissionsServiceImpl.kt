@@ -15,14 +15,12 @@ class JournalSettingsPermissionsServiceImpl : JournalSettingsPermissionsService 
         if (AuthContext.isRunAsAdmin() || AuthContext.isRunAsSystem()) {
             return true
         }
-        if (currentUser == entity.authority) {
-            return true
-        }
+
         if (entity.authorities?.contains(currentUser) == true) {
             return true
         }
         val isAuthority = AuthContext.getCurrentUserWithAuthorities().stream()
-            .anyMatch { it == entity.authority || entity.authorities?.contains(it) == true }
+            .anyMatch { entity.authorities?.contains(it) == true }
         if (isAuthority) {
             return true
         }

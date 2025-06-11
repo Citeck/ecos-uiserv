@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
+import org.mockito.kotlin.eq
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.core.GrantedAuthority
@@ -21,6 +22,7 @@ import ru.citeck.ecos.context.lib.auth.data.SimpleAuthData
 import ru.citeck.ecos.context.lib.auth.data.UndefinedAuth
 import ru.citeck.ecos.context.lib.ctx.CtxScope
 import ru.citeck.ecos.context.lib.ctx.EcosContext
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.record.atts.dto.RecordAtts
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
@@ -54,6 +56,9 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
 
     @Autowired
     lateinit var authoritiesApi: EcosAuthoritiesApi
+
+    @Autowired
+    lateinit var workspaceService: WorkspaceService
 
     @Autowired
     lateinit var jpaSearchConverterFactory: JpaSearchConverterFactory
@@ -90,7 +95,8 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
             JournalSettingsServiceImpl(
                 repo,
                 permService,
-                journalSettingsRecordsDao
+                journalSettingsRecordsDao,
+                workspaceService
             ),
             permService,
             authoritiesApi
@@ -825,13 +831,13 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
                         .build()
                 )
             )
-        ).`when`(journalSettingsService).searchSettings("journal1")
+        ).`when`(journalSettingsService).searchSettings(eq("journal1"), Mockito.anyList())
         Mockito.doReturn(emptyList<JournalSettingsDto>())
-            .`when`(journalSettingsService).searchSettings("journal2")
+            .`when`(journalSettingsService).searchSettings(eq("journal2"), Mockito.anyList())
 
         val recordsDao = JournalSettingsRecordsDao(journalSettingsService, permService, authoritiesApi)
 
-        Mockito.verify(journalSettingsService, Mockito.times(0)).searchSettings(any(String::class.java))
+        Mockito.verify(journalSettingsService, Mockito.times(0)).searchSettings(any(String::class.java), Mockito.anyList())
 
         val queryRecords1 = recordsDao.queryRecords(
             RecordsQuery.create {
@@ -843,7 +849,7 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
         assertTrue(queryRecords1.getRecords().stream().anyMatch { it.id == "id1" })
         assertTrue(queryRecords1.getRecords().stream().anyMatch { it.id == "id2" })
 
-        Mockito.verify(journalSettingsService, Mockito.times(1)).searchSettings(any(String::class.java))
+        Mockito.verify(journalSettingsService, Mockito.times(1)).searchSettings(any(String::class.java), Mockito.anyList())
 
         val queryRecords2 = recordsDao.queryRecords(
             RecordsQuery.create {
@@ -853,7 +859,7 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
         assertEquals(0, queryRecords2.getTotalCount())
         assertEquals(false, queryRecords2.getHasMore())
 
-        Mockito.verify(journalSettingsService, Mockito.times(2)).searchSettings(any(String::class.java))
+        Mockito.verify(journalSettingsService, Mockito.times(2)).searchSettings(any(String::class.java), Mockito.anyList())
 
         val queryRecords3 = recordsDao.queryRecords(
             RecordsQuery.create {
@@ -863,7 +869,7 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
         assertEquals(0, queryRecords3.getTotalCount())
         assertEquals(false, queryRecords3.getHasMore())
 
-        Mockito.verify(journalSettingsService, Mockito.times(2)).searchSettings(any(String::class.java))
+        Mockito.verify(journalSettingsService, Mockito.times(2)).searchSettings(any(String::class.java), Mockito.anyList())
 
         val queryRecords4 = recordsDao.queryRecords(
             RecordsQuery.create {
@@ -873,7 +879,7 @@ internal class JournalSettingsWithAuthoritiesRecordsDaoTest {
         assertEquals(0, queryRecords4.getTotalCount())
         assertEquals(false, queryRecords4.getHasMore())
 
-        Mockito.verify(journalSettingsService, Mockito.times(2)).searchSettings(any(String::class.java))
+        Mockito.verify(journalSettingsService, Mockito.times(2)).searchSettings(any(String::class.java), Mockito.anyList())
     }
 
     private fun <T> any(type: Class<T>): T = Mockito.any<T>(type)

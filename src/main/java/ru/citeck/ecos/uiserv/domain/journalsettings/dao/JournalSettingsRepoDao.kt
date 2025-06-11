@@ -26,14 +26,6 @@ class JournalSettingsRepoDao(
         return repo.findByExtId(extId)
     }
 
-    override fun findAllByAuthorities(authority: String): List<JournalSettingsEntity> {
-        return repo.findAllByAuthorities(authority)
-    }
-
-    override fun findAllByAuthoritiesInAndJournalId(authority: String, journalId: String): List<JournalSettingsEntity> {
-        return repo.findAllByAuthoritiesInAndJournalId(authority, journalId)
-    }
-
     override fun delete(entity: JournalSettingsEntity) {
         repo.delete(entity)
     }

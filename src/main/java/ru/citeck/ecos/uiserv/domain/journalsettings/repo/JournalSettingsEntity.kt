@@ -18,38 +18,50 @@ class JournalSettingsEntity : AbstractAuditingEntity() {
 
     var name: String? = null
     var journalId: String? = null
-    var authority: String? = null
 
     @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name = "journal_settings_id")
     @Column(name = "authority")
     @CollectionTable(name = "journal_settings_authority", joinColumns = [JoinColumn(name = "journal_settings_id")])
     var authorities: MutableList<String>? = null
+
+    @Column(name = "workspace")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "journal_settings_workspace", joinColumns = [JoinColumn(name = "journal_settings_id")])
+    var workspaces: MutableList<String> = mutableListOf()
+
     var settings: String? = null
 
-    // this method required because hibernate doesn't allow to directly override list in @CollectionTable field
     fun setAuthoritiesForEntity(authorities: List<String>) {
-        val currentAuthorities = this.authorities
-        if (currentAuthorities == null) {
-            this.authorities = authorities.toMutableList()
-            return
+        this.authorities = setListValues(this.authorities, authorities)
+    }
+
+    fun setWorkspacesForEntity(workspaces: List<String>) {
+        this.workspaces = setListValues(this.workspaces, workspaces)
+    }
+
+    // this method required because hibernate doesn't allow to directly override list in @CollectionTable field
+    private fun setListValues(currentList: MutableList<String>?, newList: List<String>): MutableList<String> {
+        if (currentList == null) {
+            return newList.toMutableList()
         }
-        val notEmptyValues = authorities.filter { it.isNotBlank() }
-        if (currentAuthorities.isEmpty()) {
-            currentAuthorities.addAll(notEmptyValues)
-            return
+        val notEmptyValues = newList.filter { it.isNotBlank() }
+        if (currentList.isEmpty()) {
+            currentList.addAll(notEmptyValues)
+            return currentList
         }
         var firstNotMatchIdx = 0
-        while (firstNotMatchIdx < min(notEmptyValues.size, currentAuthorities.size) &&
-            notEmptyValues[firstNotMatchIdx] == currentAuthorities[firstNotMatchIdx]
+        while (firstNotMatchIdx < min(notEmptyValues.size, currentList.size) &&
+            notEmptyValues[firstNotMatchIdx] == currentList[firstNotMatchIdx]
         ) {
             firstNotMatchIdx++
         }
-        while (currentAuthorities.size > firstNotMatchIdx) {
-            currentAuthorities.removeLast()
+        while (currentList.size > firstNotMatchIdx) {
+            currentList.removeLast()
         }
         for (i in firstNotMatchIdx until notEmptyValues.size) {
-            currentAuthorities.add(notEmptyValues[i])
+            currentList.add(notEmptyValues[i])
         }
+        return currentList
     }
 }

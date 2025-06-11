@@ -1,0 +1,44 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="citeck" id="20250609000000">
+
+        <createTable tableName="journal_settings_workspace">
+            <column name="journal_settings_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workspace" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="journal_settings_id"
+                                 baseTableName="journal_settings_workspace"
+                                 constraintName="fk_journal_settings_workspaces"
+                                 referencedColumnNames="id"
+                                 referencedTableName="journal_settings"/>
+
+        <sql>
+            UPDATE journal_settings_authority SET authority = LOWER(authority) WHERE authority NOT LIKE 'GROUP_%';
+        </sql>
+
+        <sql>
+            INSERT INTO journal_settings_authority (journal_settings_id, authority)
+            SELECT settings.id, settings.authority
+            FROM journal_settings settings
+            WHERE settings.authority IS NOT NULL AND settings.authority != '' AND NOT EXISTS (
+                SELECT 1
+                FROM journal_settings_authority sa
+                WHERE sa.journal_settings_id = settings.id AND sa.authority = settings.authority
+            );
+        </sql>
+
+        <sql>
+            INSERT INTO journal_settings_workspace (journal_settings_id, workspace)
+            SELECT settings.id, 'default'
+            FROM journal_settings settings;
+        </sql>
+
+    </changeSet>
+
+</databaseChangeLog>
