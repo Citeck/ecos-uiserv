@@ -38,6 +38,10 @@
               "elementsDisplayCondition": {},
               "link": ""
             }
+          },
+          "description": {
+            "ru": "Основное",
+            "en": "General"
           }
         },
         {
@@ -143,6 +147,20 @@
           }
         },
         {
+          "name": "versions-journal",
+          "label": "dashboard-settings.widget.versions-journal",
+          "additionalProps": {},
+          "dndId": "51b473e3-64d0-4eca-961a-e077a4f3662e",
+          "id": "b1c24d55-f53d-42fc-a1a1-d183b20e1148",
+          "props": {
+            "id": "b1c24d55-f53d-42fc-a1a1-d183b20e1148",
+            "config": {
+              "widgetDisplayCondition": null,
+              "elementsDisplayCondition": {}
+            }
+          }
+        },
+        {
           "name": "events-history",
           "label": "dashboard-settings.widget.events-history",
           "dndId": "57bd94df-7533-47ce-890a-5a83edce9614",
@@ -239,7 +257,8 @@
                 "6d9d1e54-0c77-4990-9aed-228bec1614f4",
                 "6cb0726f-07c2-4388-84bc-6651823e2ba9",
                 "ecbede90-a55d-423a-9b6b-3ac523600335",
-                "c0a9aeee-a536-400d-ae80-326e77ce5202"
+                "c0a9aeee-a536-400d-ae80-326e77ce5202",
+                "b1c24d55-f53d-42fc-a1a1-d183b20e1148"
               ],
               "width": "25%"
             }
