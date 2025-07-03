@@ -21,7 +21,10 @@ class ColumnEditorResolver(
             return
         }
 
-        if (column.id == StatusConstants.ATT_STATUS || typeAtt?.type == AttributeType.OPTIONS) {
+        if (column.id == StatusConstants.ATT_STATUS
+            || column.id == "_stage"
+            || typeAtt?.type == AttributeType.OPTIONS
+        ) {
             column.withEditor(ColumnEditorDef("select", ObjectData.create()))
             return
         }
