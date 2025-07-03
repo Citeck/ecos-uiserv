@@ -20,7 +20,7 @@ insert_final_newline = true
 
 trim_trailing_whitespace = false
 
-[{*.json,*.yaml,*.yml,Jenkinsfile}]
+[{*.json,*.yaml,*.yml,Jenkinsfile,*.css}]
 
 indent_size = 2
 

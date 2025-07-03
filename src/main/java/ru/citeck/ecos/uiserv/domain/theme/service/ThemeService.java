@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ThemeService {
 
-    public static final String DEFAULT_THEME_ID = "ecos";
+    public static final String DEFAULT_THEME_ID = "citeck-theme-default";
     public static final String NULL_THEME_ID = "null";
 
     public static final String CURRENT_THEME_CONFIG_KEY = "active-theme";
@@ -193,7 +193,7 @@ public class ThemeService {
 
     private String fixThemeId(String themeId) {
         if (StringUtils.isBlank(themeId)) {
-            themeId = "ecos";
+            themeId = "citeck-theme-default";
         } else if (themeId.equals(NULL_THEME_ID) || themeId.equals(ACTIVE_THEME_ID)) {
             themeId = getActiveTheme();
         }
