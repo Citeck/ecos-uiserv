@@ -10,6 +10,7 @@ import ru.citeck.ecos.records3.record.dao.RecordsDao
 import ru.citeck.ecos.records3.record.dao.impl.ext.ExtStorageRecordsDao
 import ru.citeck.ecos.records3.record.dao.impl.ext.ExtStorageRecordsDaoConfig
 import ru.citeck.ecos.records3.record.dao.impl.ext.impl.ReadOnlyMapExtStorage
+import ru.citeck.ecos.uiserv.app.common.utils.TypeBasedAutoArtifactUtils
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
 import ru.citeck.ecos.uiserv.domain.journal.service.provider.TypeJournalsProvider
@@ -56,15 +57,14 @@ class JournalsRegistryConfiguration(
             }
             typesRegistry.initializationPromise().get()
             typesRegistry.listenEventsWithMeta { _, before, after ->
-                val idBefore = before?.entity?.journalRef?.getLocalId() ?: ""
-                val idAfter = after?.entity?.journalRef?.getLocalId() ?: ""
-                if (idBefore != idAfter || before?.entity?.name != after?.entity?.name) {
-                    if (after != null && idAfter.startsWith(TYPE_AUTO_JOURNAL_PREFIX)) {
-                        setRegistryValue(registry, idAfter, createRegistryValue(after))
-                    } else if (idBefore.isNotBlank()) {
-                        registry.remove(idBefore)
-                    }
-                }
+                TypeBasedAutoArtifactUtils.processTypeChanged(
+                    registry,
+                    before,
+                    after,
+                    TYPE_AUTO_JOURNAL_PREFIX,
+                    { it.journalRef },
+                    { createRegistryValue(it) }
+                )
             }
             typesRegistry.getAllValues().values.filter {
                 it.entity.journalRef.getLocalId().startsWith(TYPE_AUTO_JOURNAL_PREFIX)

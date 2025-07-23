@@ -9,6 +9,7 @@ import ru.citeck.ecos.records3.record.dao.RecordsDao
 import ru.citeck.ecos.records3.record.dao.impl.ext.ExtStorageRecordsDao
 import ru.citeck.ecos.records3.record.dao.impl.ext.ExtStorageRecordsDaoConfig
 import ru.citeck.ecos.records3.record.dao.impl.ext.impl.ReadOnlyMapExtStorage
+import ru.citeck.ecos.uiserv.app.common.utils.TypeBasedAutoArtifactUtils
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
 import ru.citeck.ecos.uiserv.domain.form.service.provider.TypeFormsProvider
@@ -55,15 +56,14 @@ class FormsRegistryConfiguration(
             }
             typesRegistry.initializationPromise().get()
             typesRegistry.listenEventsWithMeta { _, before, after ->
-                val idBefore = before?.entity?.formRef?.getLocalId() ?: ""
-                val idAfter = after?.entity?.formRef?.getLocalId() ?: ""
-                if (idBefore != idAfter || before?.entity?.name != after?.entity?.name) {
-                    if (after != null && idAfter.startsWith(TYPE_AUTO_FORM_PREFIX)) {
-                        setRegistryValue(registry, idAfter, createRegistryValue(after))
-                    } else if (idBefore.isNotBlank()) {
-                        registry.remove(idBefore)
-                    }
-                }
+                TypeBasedAutoArtifactUtils.processTypeChanged(
+                    registry,
+                    before,
+                    after,
+                    TYPE_AUTO_FORM_PREFIX,
+                    { it.formRef },
+                    { createRegistryValue(it) }
+                )
             }
             typesRegistry.getAllValues().values.filter {
                 it.entity.formRef.getLocalId().startsWith(TYPE_AUTO_FORM_PREFIX)
