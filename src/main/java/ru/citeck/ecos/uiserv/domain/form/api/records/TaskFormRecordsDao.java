@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.form.api.records;
 
+import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,13 @@ import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.context.lib.i18n.I18nContext;
+import ru.citeck.ecos.records2.predicate.PredicateService;
+import ru.citeck.ecos.records2.predicate.PredicateUtils;
+import ru.citeck.ecos.records2.predicate.element.elematts.RecordAttsElement;
+import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records2.predicate.model.Predicates;
+import ru.citeck.ecos.records3.RecordsServiceFactory;
+import ru.citeck.ecos.records3.record.atts.dto.RecordAtts;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
@@ -39,6 +47,17 @@ public class TaskFormRecordsDao extends AbstractRecordsDao
     private static final String WF_TASK_SOURCE_ID = "wftask";
 
     private final EcosFormService formService;
+    private final RecordsServiceFactory recordsServices;
+    private final PredicateService predicateService;
+
+    private Map<String, String> taskInfoAttsToLoad;
+
+    @PostConstruct
+    public void init() {
+        taskInfoAttsToLoad = recordsServices.getAttSchemaWriter().writeToMap(
+            recordsServices.getDtoSchemaReader().read(TaskInfo.class)
+        );
+    }
 
     @Nullable
     @Override
@@ -91,11 +110,11 @@ public class TaskFormRecordsDao extends AbstractRecordsDao
         }
 
         return actionsQuery.getRecordRefs().stream().map(ref ->
-            new RecordTaskActionsInfo(ref, queryTasks(ref))
+            new RecordTaskActionsInfo(ref, queryTasks(ref, actionsQuery.evalOutcomesForTasks))
         ).collect(Collectors.toList());
     }
 
-    private List<TaskActionsInfo> queryTasks(EntityRef recordRef) {
+    private List<TaskActionsInfo> queryTasks(EntityRef recordRef, Predicate evalOutcomesForTasks) {
 
         if (recordRef == null || EntityRef.isEmpty(recordRef)) {
             return Collections.emptyList();
@@ -111,17 +130,25 @@ public class TaskFormRecordsDao extends AbstractRecordsDao
                 .withQuery(tasksQuery)
                 .build();
 
-        RecsQueryRes<TaskInfo> tasks = recordsService.query(tasksRecsQuery, TaskInfo.class);
+        Set<String> attsToLoad = new HashSet<>(taskInfoAttsToLoad.values());
+        attsToLoad.addAll(PredicateUtils.getAllPredicateAttributes(evalOutcomesForTasks));
 
-        List<TaskInfo> currentTasks = tasks.getRecords();
+        List<RecordAtts> tasksAtts = recordsService.query(tasksRecsQuery, attsToLoad).getRecords();
 
-        if (currentTasks.isEmpty()) {
+        if (tasksAtts.isEmpty()) {
             return Collections.emptyList();
         }
 
         List<TaskActionsInfo> actions = new ArrayList<>();
 
-        for (TaskInfo task : currentTasks) {
+        for (RecordAtts taskAtts : tasksAtts) {
+
+            ObjectData taskInfoDtoAtts = ObjectData.create();
+            taskInfoAttsToLoad.forEach((k, v) -> taskInfoDtoAtts.set(k, taskAtts.get(v)));
+            TaskInfo task = recordsServices.getDtoSchemaReader().instantiate(TaskInfo.class, taskInfoDtoAtts);
+            if (task == null) {
+                continue;
+            }
 
             EcosFormDef form = getEcosFormDef(task);
 
@@ -129,21 +156,13 @@ public class TaskFormRecordsDao extends AbstractRecordsDao
                 continue;
             }
 
-            ObjectData i18n = form.getI18n();
-            if (i18n.isNotEmpty()) {
-                Locale locale = I18nContext.getLocale();
-                DataValue messages = i18n.get(locale.getLanguage());
-                if (messages.isNotNull()) {
-                    i18n = messages.asObjectData();
-                } else {
-                    Iterator<String> names = i18n.fieldNames();
-                    if (names.hasNext()) {
-                        i18n = i18n.get(names.next()).asObjectData();
-                    }
-                }
+            List<Outcome> outcomes;
+            if (predicateService.isMatch(RecordAttsElement.create(taskAtts), evalOutcomesForTasks)) {
+                outcomes = getOutcomesForForm(form);
+            } else {
+                outcomes = Collections.emptyList();
             }
 
-            List<Outcome> outcomes = getOutcomes(form.getDefinition().getData(), i18n);
             String taskId = task.getId();
             if (StringUtils.isNotBlank(taskId)) {
                 EntityRef taskRef = EntityRef.valueOf(taskId);
@@ -212,6 +231,25 @@ public class TaskFormRecordsDao extends AbstractRecordsDao
         }
 
         return resultComponent;
+    }
+
+    private List<Outcome> getOutcomesForForm(@NotNull EcosFormDef form) {
+
+        ObjectData i18n = form.getI18n();
+        if (i18n.isNotEmpty()) {
+            Locale locale = I18nContext.getLocale();
+            DataValue messages = i18n.get(locale.getLanguage());
+            if (messages.isNotNull()) {
+                i18n = messages.asObjectData();
+            } else {
+                Iterator<String> names = i18n.fieldNames();
+                if (names.hasNext()) {
+                    i18n = i18n.get(names.next()).asObjectData();
+                }
+            }
+        }
+
+        return getOutcomes(form.getDefinition().getData(), i18n);
     }
 
     private List<Outcome> getOutcomes(DataValue definition, ObjectData i18n) {
@@ -332,5 +370,6 @@ public class TaskFormRecordsDao extends AbstractRecordsDao
     @Data
     public static class ActionsQuery {
         private List<EntityRef> recordRefs;
+        private Predicate evalOutcomesForTasks = Predicates.alwaysTrue();
     }
 }
