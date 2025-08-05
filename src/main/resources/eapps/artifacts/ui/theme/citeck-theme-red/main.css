@@ -1,11 +1,16 @@
 :root {
-  --main-bg-color: aliceblue;
-  --header-bg-color: #ef4444;
-  --header-component-color: #dc2626;
+  --main-bg-color: #fafafa;
+  --header-bg-color: #dc2622;
+  --header-component-color: #b91c1c;
+
   --primary-color: #ef4444;
   --dark-primary-color: #b91c1c;
   --light-primary-color: #f87171;
 }
 
 body {
+}
+
+.ecos-journal_new .ecos-grid__row_new:not(.ecos-grid__tr_selected):nth-child(odd) {
+  background-color: #fef2f2 !important;
 }

@@ -1,7 +1,7 @@
 {
   "name": {
-    "ru": "Тема ECOS",
-    "en": "ECOS theme"
+    "ru": "Тема Citeck Cold",
+    "en": "Citeck Cold Theme"
   },
   "parentRef": "uiserv/theme@citeck-theme-default"
 }

@@ -1,5 +1,5 @@
 :root {
-  --main-bg-color: #fff;
+  --main-bg-color: #fafafa;
   --header-bg-color: #6366f1;
   --header-component-color: #4f46e5;
 
@@ -9,4 +9,12 @@
 }
 
 body {
+}
+
+.ecos-sidebar {
+  background: #f8fafc;
+}
+
+.ecos-journal_new .ecos-grid__row_new:not(.ecos-grid__tr_selected):nth-child(odd) {
+  background-color: #eef2ff !important;
 }
