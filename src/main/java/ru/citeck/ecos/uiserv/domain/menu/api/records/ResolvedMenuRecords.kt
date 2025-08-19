@@ -203,7 +203,10 @@ class ResolvedMenuRecords(
             val result = HashMap<String, SubMenuDef>()
             val contextsWithInternalIncludes = ArrayList<SubMenuProcessingContext>()
 
-            subMenu.forEach { (menuType, menu) ->
+            for ((menuType, menu) in subMenu) {
+                if (menu.allowedFor.isNotEmpty() && !menu.allowedFor.any { authorities.contains(it.lowercase()) }) {
+                    continue
+                }
                 val context = SubMenuProcessingContext(result, menuType)
                 result[menuType] = processMenuItems(context, menu, authorities)
                 if (context.internalIncludeItemsPaths.isNotEmpty()) {
