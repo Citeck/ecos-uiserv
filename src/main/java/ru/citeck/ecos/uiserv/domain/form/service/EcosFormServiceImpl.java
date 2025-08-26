@@ -317,6 +317,7 @@ public class EcosFormServiceImpl implements EcosFormService {
             .withWidth(entity.getWidth())
             .withFormKey(entity.getFormKey())
             .withTypeRef(EntityRef.valueOf(entity.getTypeRef()))
+            .withWorkspace(entity.getWorkspace())
             .withCustomModule(entity.getCustomModule())
             .withI18n(Json.getMapper().read(entity.getI18n(), ObjectData.class))
             .withAttributes(Json.getMapper().read(entity.getAttributes(), ObjectData.class))
@@ -354,6 +355,7 @@ public class EcosFormServiceImpl implements EcosFormService {
         entity.setDescription(Json.getMapper().toString(model.getDescription()));
         entity.setFormKey(model.getFormKey());
         entity.setTypeRef(EntityRef.toString(model.getTypeRef()));
+        entity.setWorkspace(model.getWorkspace());
         entity.setCustomModule(model.getCustomModule());
         entity.setI18n(Json.getMapper().toString(model.getI18n()));
         entity.setDefinition(Json.getMapper().toString(model.getDefinition()));

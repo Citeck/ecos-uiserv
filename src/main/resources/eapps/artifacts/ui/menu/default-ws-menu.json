@@ -56,6 +56,63 @@
               "allowedFor": []
             }
           ]
+        },
+        {
+          "id": "administration",
+          "label": {
+            "ru": "Администрирование",
+            "en": "Administration"
+          },
+          "hidden": false,
+          "type": "SECTION",
+          "config": {},
+          "items": [
+            {
+              "id": "ecos-types-def",
+              "label": {
+                "ru": "Типы данных",
+                "en": "Data types"
+              },
+              "icon": "ui/icon@i-leftmenu-controlled",
+              "hidden": false,
+              "type": "JOURNAL",
+              "config": {
+                "recordRef": "uiserv/journal@ecos-types-def"
+              },
+              "items": [],
+              "allowedFor": []
+            },
+            {
+              "id": "ecos-journals",
+              "label": {
+                "ru": "Журналы",
+                "en": "Journals"
+              },
+              "icon": "ui/icon@i-leftmenu-controlled",
+              "hidden": false,
+              "type": "JOURNAL",
+              "config": {
+                "recordRef": "uiserv/journal@ecos-journals"
+              },
+              "items": [],
+              "allowedFor": []
+            },
+            {
+              "id": "ecos-forms",
+              "label": {
+                "ru": "Формы",
+                "en": "Forms"
+              },
+              "icon": "ui/icon@i-leftmenu-controlled",
+              "hidden": false,
+              "type": "JOURNAL",
+              "config": {
+                "recordRef": "uiserv/journal@ecos-forms"
+              },
+              "items": [],
+              "allowedFor": []
+            }
+          ]
         }
       ]
     }

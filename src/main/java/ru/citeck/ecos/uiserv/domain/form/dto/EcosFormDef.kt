@@ -17,6 +17,15 @@ data class EcosFormDef(
     val description: MLText,
     val customModule: String,
     val typeRef: EntityRef,
+
+    /**
+     * Workspace identifier to which this form belongs.
+     *
+     * If defined, the form is considered scoped and can only be used
+     * within the specified workspace. Forms without a workspace are treated
+     * as global and available across all workspaces.
+     */
+    val workspace: String,
     val width: String,
     val system: Boolean,
     val i18n: ObjectData,
@@ -56,6 +65,7 @@ data class EcosFormDef(
         var description: MLText = MLText.EMPTY
         var customModule: String = ""
         var typeRef: EntityRef = EntityRef.EMPTY
+        var workspace: String = ""
         var width: String = ""
         var system: Boolean = false
         var i18n: ObjectData = ObjectData.create()
@@ -69,6 +79,7 @@ data class EcosFormDef(
             description = base.description
             customModule = base.customModule
             typeRef = base.typeRef
+            workspace = base.workspace
             width = base.width
             system = base.system
             i18n = base.i18n.deepCopy()
@@ -106,6 +117,11 @@ data class EcosFormDef(
             return this
         }
 
+        fun withWorkspace(workspace: String?): Builder {
+            this.workspace = workspace ?: ""
+            return this
+        }
+
         fun withWidth(width: String?): Builder {
             this.width = width ?: EMPTY.width
             return this
@@ -140,6 +156,7 @@ data class EcosFormDef(
                 description = description,
                 customModule = customModule,
                 typeRef = typeRef,
+                workspace = workspace,
                 width = width,
                 system = system,
                 i18n = i18n,

@@ -1,0 +1,22 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="citeck" id="20250826000000">
+
+        <addColumn tableName="journal">
+            <column name="workspace" type="VARCHAR"/>
+        </addColumn>
+
+        <sql>UPDATE journal SET workspace='' where workspace is null</sql>
+        <addNotNullConstraint tableName="journal" columnName="workspace" />
+
+        <addColumn tableName="ecos_forms">
+            <column name="workspace" type="VARCHAR"/>
+        </addColumn>
+
+        <sql>UPDATE ecos_forms SET workspace='' where workspace is null</sql>
+        <addNotNullConstraint tableName="ecos_forms" columnName="workspace" />
+
+    </changeSet>
+
+</databaseChangeLog>
