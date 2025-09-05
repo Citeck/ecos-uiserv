@@ -56,6 +56,78 @@
               "allowedFor": []
             }
           ]
+        },
+        {
+          "id": "administration",
+          "label": {
+            "ru": "Администрирование",
+            "en": "Administration"
+          },
+          "hidden": false,
+          "type": "SECTION",
+          "config": {},
+          "items": [
+            {
+              "id": "ecos-types-def",
+              "label": {
+                "ru": "Типы данных",
+                "en": "Data types"
+              },
+              "icon": "ui/icon@i-leftmenu-app",
+              "hidden": false,
+              "type": "JOURNAL",
+              "config": {
+                "recordRef": "uiserv/journal@ecos-types-def"
+              },
+              "items": [],
+              "allowedFor": []
+            },
+            {
+              "id": "ecos-journals",
+              "label": {
+                "ru": "Журналы",
+                "en": "Journals"
+              },
+              "icon": "ui/icon@i-leftmenu-tax-report",
+              "hidden": false,
+              "type": "JOURNAL",
+              "config": {
+                "recordRef": "uiserv/journal@ecos-journals"
+              },
+              "items": [],
+              "allowedFor": []
+            },
+            {
+              "id": "ecos-forms",
+              "label": {
+                "ru": "Формы",
+                "en": "Forms"
+              },
+              "icon": "ui/icon@i-leftmenu-types",
+              "hidden": false,
+              "type": "JOURNAL",
+              "config": {
+                "recordRef": "uiserv/journal@ecos-forms"
+              },
+              "items": [],
+              "allowedFor": []
+            },
+            {
+              "id": "e5d967bc-4c7b-4abe-8b6f-8350ef98ec34",
+              "label": {
+                "ru": "Процессы BPMN",
+                "en": "BPMN Processes"
+              },
+              "icon": "ui/icon@i-leftmenu-running-processes",
+              "hidden": false,
+              "type": "JOURNAL",
+              "config": {
+                "recordRef": "uiserv/journal@bpmn-process-def"
+              },
+              "items": [],
+              "allowedFor": []
+            }
+          ]
         }
       ]
     }
