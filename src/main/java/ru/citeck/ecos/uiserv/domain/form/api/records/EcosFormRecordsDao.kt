@@ -8,6 +8,7 @@ import org.springframework.security.access.annotation.Secured
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.context.lib.auth.AuthRole
 import ru.citeck.ecos.events2.type.RecordEventsService
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.PredicateUtils
 import ru.citeck.ecos.records2.predicate.model.AttributePredicate
@@ -33,7 +34,8 @@ import java.util.stream.Collectors
 @Component
 class EcosFormRecordsDao(
     private val ecosFormService: EcosFormService,
-    private var recordEventsService: RecordEventsService?
+    private var recordEventsService: RecordEventsService?,
+    private val workspaceService: WorkspaceService
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordMutateDtoDao<EcosFormMutRecord>,
@@ -72,7 +74,9 @@ class EcosFormRecordsDao(
     fun init() {
         ecosFormService.addChangeListener { before: EcosFormDef?, after: EcosFormDef? ->
             if (after != null) {
-                recordEventsService?.emitRecChanged(before, after, getId()) { EcosFormRecord(AppName.UISERV, ID, it) }
+                recordEventsService?.emitRecChanged(before, after, getId()) {
+                    EcosFormRecord(AppName.UISERV, ID, it, workspaceService)
+                }
             }
         }
     }
@@ -88,7 +92,7 @@ class EcosFormRecordsDao(
     }
 
     private fun toRecord(model: EcosFormDef): EcosFormRecord {
-        return EcosFormRecord(AppName.UISERV, ID, model)
+        return EcosFormRecord(AppName.UISERV, ID, model, workspaceService)
     }
 
     override fun saveMutatedRec(record: EcosFormMutRecord): String {

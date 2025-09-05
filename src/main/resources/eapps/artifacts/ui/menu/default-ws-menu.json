@@ -73,7 +73,7 @@
                 "ru": "Типы данных",
                 "en": "Data types"
               },
-              "icon": "ui/icon@i-leftmenu-controlled",
+              "icon": "ui/icon@i-leftmenu-app",
               "hidden": false,
               "type": "JOURNAL",
               "config": {
@@ -88,7 +88,7 @@
                 "ru": "Журналы",
                 "en": "Journals"
               },
-              "icon": "ui/icon@i-leftmenu-controlled",
+              "icon": "ui/icon@i-leftmenu-tax-report",
               "hidden": false,
               "type": "JOURNAL",
               "config": {
@@ -103,11 +103,26 @@
                 "ru": "Формы",
                 "en": "Forms"
               },
-              "icon": "ui/icon@i-leftmenu-controlled",
+              "icon": "ui/icon@i-leftmenu-types",
               "hidden": false,
               "type": "JOURNAL",
               "config": {
                 "recordRef": "uiserv/journal@ecos-forms"
+              },
+              "items": [],
+              "allowedFor": []
+            },
+            {
+              "id": "e5d967bc-4c7b-4abe-8b6f-8350ef98ec34",
+              "label": {
+                "ru": "Процессы BPMN",
+                "en": "BPMN Processes"
+              },
+              "icon": "ui/icon@i-leftmenu-running-processes",
+              "hidden": false,
+              "type": "JOURNAL",
+              "config": {
+                "recordRef": "uiserv/journal@bpmn-process-def"
               },
               "items": [],
               "allowedFor": []

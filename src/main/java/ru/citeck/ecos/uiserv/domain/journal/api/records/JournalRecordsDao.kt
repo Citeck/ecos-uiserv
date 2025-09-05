@@ -35,6 +35,7 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
 import ru.citeck.ecos.uiserv.domain.journal.registry.JournalsRegistryConfiguration
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalServiceImpl
+import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.nio.charset.StandardCharsets
 
@@ -202,6 +203,16 @@ class JournalRecordsDao(
             return journalDef?.name ?: MLText.EMPTY
         }
 
+        fun getWorkspaceRef(): EntityRef? {
+            return journalDef?.workspace?.let {
+                if (it.isBlank()) {
+                    EntityRef.EMPTY
+                } else {
+                    EntityRef.create(AppName.EMODEL, "workspace", it)
+                }
+            }
+        }
+
         @JsonValue
         open fun toNonDefaultJson(): Any {
             return mapper.toNonDefaultJson(journalDef)
@@ -251,6 +262,10 @@ class JournalRecordsDao(
 
         fun withModuleId(id: String) {
             withId(id)
+        }
+
+        fun withWorkspaceRef(workspaceRef: EntityRef) {
+            withWorkspace(workspaceRef.getLocalId())
         }
     }
 }
