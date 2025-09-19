@@ -7,6 +7,7 @@ import ru.citeck.ecos.uiserv.domain.board.service.BoardService
 import ru.citeck.ecos.uiserv.domain.ecostype.config.EcosTypesComponent
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
+import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
@@ -30,7 +31,7 @@ class EcosTypeService(
         if (EntityRef.isNotEmpty(typeRefForForm)) {
             return typeRefForForm
         }
-        val ref = EntityRef.create("uiserv", "form", formRef.getLocalId())
+        val ref = EntityRef.create(AppName.UISERV, "form", formRef.getLocalId())
         return EntityRef.valueOf(typesComponent.getTypeRefByForm(ref))
     }
 
@@ -42,7 +43,7 @@ class EcosTypeService(
         if (boardData != null && EntityRef.isNotEmpty(boardData.boardDef.typeRef)) {
             return boardData.boardDef.typeRef
         }
-        val ref = EntityRef.create("uiserv", "board", boardId)
+        val ref = EntityRef.create(AppName.UISERV, "board", boardId)
         return EntityRef.valueOf(typesComponent.getTypeRefByBoard(ref))
     }
 
@@ -54,7 +55,7 @@ class EcosTypeService(
         if (journal != null && EntityRef.isNotEmpty(journal.journalDef.typeRef)) {
             return journal.journalDef.typeRef
         }
-        val ref = EntityRef.create("uiserv", "journal", journalRef.getLocalId())
+        val ref = EntityRef.create(AppName.UISERV, "journal", journalRef.getLocalId())
         return EntityRef.valueOf(typesComponent.getTypeRefByJournal(ref))
     }
 

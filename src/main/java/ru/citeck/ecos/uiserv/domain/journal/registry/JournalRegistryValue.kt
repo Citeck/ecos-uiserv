@@ -9,7 +9,7 @@ data class JournalRegistryValue(
     val name: MLText,
     val sourceId: String,
     val typeRef: EntityRef,
-    val system: Boolean,
+    val system: Boolean
 ) {
     companion object {
         private val TYPE = ModelUtils.getTypeRef("journal")

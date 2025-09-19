@@ -11,9 +11,14 @@ import ru.citeck.ecos.records3.record.dao.impl.ext.ExtStorageRecordsDao
 import ru.citeck.ecos.records3.record.dao.impl.ext.ExtStorageRecordsDaoConfig
 import ru.citeck.ecos.records3.record.dao.impl.ext.impl.ReadOnlyMapExtStorage
 import ru.citeck.ecos.uiserv.app.common.utils.TypeBasedAutoArtifactUtils
+import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
+import ru.citeck.ecos.uiserv.domain.journal.api.records.JournalRecordsDao
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
 import ru.citeck.ecos.uiserv.domain.journal.service.provider.TypeJournalsProvider
+import ru.citeck.ecos.webapp.api.constants.AppName
+import ru.citeck.ecos.webapp.api.entity.EntityRef
+import ru.citeck.ecos.webapp.api.entity.ifEmpty
 import ru.citeck.ecos.webapp.api.lock.EcosLockApi
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
@@ -25,6 +30,7 @@ class JournalsRegistryConfiguration(
     private val appLockService: EcosLockApi,
     private val journalsService: JournalService,
     private val typesRegistry: EcosTypesRegistry,
+    private val ecosTypeService: EcosTypeService,
     private val typeJournalsProvider: TypeJournalsProvider
 ) {
 
@@ -78,7 +84,9 @@ class JournalsRegistryConfiguration(
             .withEcosType("journal")
             .build()
 
-        return ExtStorageRecordsDao(config)
+        val dao = ExtStorageRecordsDao(config)
+        dao.addAttributesMixin(JournalRegistryRecordsAttMixin())
+        return dao
     }
 
     private fun initDataFromDb(registry: ReplicatedMap<String, EntityWithMeta<JournalRegistryValue>>) {
@@ -122,12 +130,21 @@ class JournalsRegistryConfiguration(
 
     private fun createRegistryValue(journal: JournalWithMeta?): EntityWithMeta<JournalRegistryValue>? {
         journal ?: return null
+        val typeRef = journal.journalDef.typeRef.ifEmpty {
+            ecosTypeService.getTypeRefByJournal(
+                EntityRef.create(
+                    AppName.UISERV,
+                    JournalRecordsDao.ID,
+                    journal.journalDef.id
+                )
+            )
+        }
         return EntityWithMeta(
             JournalRegistryValue(
                 journal.journalDef.id,
                 journal.journalDef.name,
                 journal.journalDef.sourceId,
-                journal.journalDef.typeRef,
+                typeRef,
                 journal.journalDef.system
             ),
             EntityMeta(
