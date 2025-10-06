@@ -1,0 +1,12 @@
+{
+  "id": "default-ws-admin-menu-items",
+  "type": "LEFT_MENU",
+  "system": true,
+  "authorities": [],
+  "version": 1,
+  "subMenu": {
+    "left": {
+      "items": []
+    }
+  }
+}
