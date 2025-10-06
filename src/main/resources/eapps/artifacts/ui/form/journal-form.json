@@ -280,6 +280,29 @@
                             ],
                             "type": "selectJournal",
                             "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "Настроить виджеты",
+                              "en": "Configure widgets"
+                            },
+                            "key": "configureWidgets",
+                            "action": "custom",
+                            "state": "",
+                            "showValidations": false,
+                            "custom": "utils.openSettingsWidgets();",
+                            "block": true,
+                            "refreshOn": [],
+                            "optionalWhenDisabled": false,
+                            "type": "button",
+                            "input": true,
+                            "event": "",
+                            "url": "",
+                            "headers": [
+                              {}
+                            ],
+                            "reorder": false,
+                            "dataGridLabel": false
                           }
                         ],
                         "type": "column",

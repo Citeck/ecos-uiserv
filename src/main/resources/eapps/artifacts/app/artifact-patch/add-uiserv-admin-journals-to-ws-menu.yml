@@ -1,0 +1,35 @@
+---
+id: add-uiserv-admin-journals-to-ws-menu
+name:
+  ru: Добавить журналы администрирования uiserv в меню рабочей области
+  en: Add uiserv admin journals to default workspace menu
+
+target: 'ui/menu$default-ws-admin-menu-items'
+system: true
+order: 200
+
+type: json
+config:
+  operations:
+    - op: add
+      path: '$.subMenu.left.items'
+      value:
+        - id: ecos-journals
+          label:
+            ru: Журналы
+            en: Journals
+          icon: ui/icon@i-leftmenu-tax-report
+          hidden: false
+          type: JOURNAL
+          config:
+            recordRef: uiserv/journal@ecos-journals
+        - id: ecos-forms
+          label:
+            ru: Формы
+            en: Forms
+          icon: ui/icon@i-leftmenu-types
+          hidden: false
+          type: JOURNAL
+          config:
+            recordRef: uiserv/journal@ecos-forms
+
