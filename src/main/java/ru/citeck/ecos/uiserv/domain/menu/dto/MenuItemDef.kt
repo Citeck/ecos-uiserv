@@ -18,6 +18,7 @@ data class MenuItemDef(
     val config: ObjectData,
     val action: MenuItemActionDef,
     val items: List<MenuItemDef>,
+    val collapsed: Boolean,
     val allowedFor: List<String>
 ) {
 
@@ -45,6 +46,7 @@ data class MenuItemDef(
         var config: ObjectData = ObjectData.create()
         var action: MenuItemActionDef = MenuItemActionDef.EMPTY
         var items: List<MenuItemDef> = emptyList()
+        var collapsed: Boolean = false
         var allowedFor: List<String> = emptyList()
 
         constructor(base: MenuItemDef) : this() {
@@ -56,6 +58,7 @@ data class MenuItemDef(
             this.config = ObjectData.deepCopyOrNew(base.config)
             this.action = base.action
             this.items = DataValue.create(base.items).asList(MenuItemDef::class.java)
+            this.collapsed = base.collapsed
             this.allowedFor = base.allowedFor
         }
 
@@ -99,6 +102,11 @@ data class MenuItemDef(
             return this
         }
 
+        fun withCollapsed(collapsed: Boolean?): Builder {
+            this.collapsed = collapsed ?: false
+            return this
+        }
+
         fun withAllowedFor(allowedFor: List<String>?): Builder {
             this.allowedFor = allowedFor ?: emptyList()
             return this
@@ -114,6 +122,7 @@ data class MenuItemDef(
                 config,
                 action,
                 items,
+                collapsed,
                 allowedFor
             )
         }
