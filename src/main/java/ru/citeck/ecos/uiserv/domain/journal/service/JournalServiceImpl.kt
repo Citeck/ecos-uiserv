@@ -1,270 +1,234 @@
-package ru.citeck.ecos.uiserv.domain.journal.service;
+package ru.citeck.ecos.uiserv.domain.journal.service
 
-import kotlin.Pair;
-import lombok.*;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
-import ru.citeck.ecos.context.lib.auth.AuthContext;
-import ru.citeck.ecos.records2.predicate.model.Predicate;
-import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
-import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
-import ru.citeck.ecos.uiserv.domain.journal.service.mapper.JournalMapper;
-import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository;
-import ru.citeck.ecos.uiserv.domain.journal.service.provider.JournalsProvider;
-import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter;
-import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory;
-
-import jakarta.annotation.PostConstruct;
-import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import jakarta.annotation.PostConstruct
+import lombok.RequiredArgsConstructor
+import lombok.extern.slf4j.Slf4j
+import org.apache.commons.lang3.StringUtils
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
+import org.springframework.stereotype.Service
+import ru.citeck.ecos.context.lib.auth.AuthContext.isRunAsSystem
+import ru.citeck.ecos.model.lib.workspace.IdInWs
+import ru.citeck.ecos.records2.predicate.model.Predicate
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
+import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity
+import ru.citeck.ecos.uiserv.domain.journal.repo.JournalRepository
+import ru.citeck.ecos.uiserv.domain.journal.service.mapper.JournalMapper
+import ru.citeck.ecos.uiserv.domain.journal.service.provider.JournalsProvider
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.function.BiConsumer
+import java.util.function.Consumer
+import java.util.regex.Pattern
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class JournalServiceImpl implements JournalService {
+class JournalServiceImpl(
+    private val journalRepository: JournalRepository,
+    private val journalMapper: JournalMapper,
+    private val jpaSearchConverterFactory: JpaSearchConverterFactory,
+) : JournalService {
 
-    private static final String DEFAULT_AUTO_JOURNAL_FOR_TYPE = "DEFAULT_JOURNAL";
+    companion object {
+        private const val DEFAULT_AUTO_JOURNAL_FOR_TYPE = "DEFAULT_JOURNAL"
 
-    public static Set<String> SYSTEM_JOURNALS = Collections.singleton(
-        DEFAULT_AUTO_JOURNAL_FOR_TYPE
-    );
+        var SYSTEM_JOURNALS: Set<String> = setOf(
+            DEFAULT_AUTO_JOURNAL_FOR_TYPE
+        )
 
-    private static final String VALID_ID_PATTERN_TXT = "^[\\w/.-]+\\w$";
-    private static final Pattern VALID_ID_PATTERN = Pattern.compile(VALID_ID_PATTERN_TXT);
+        private const val VALID_ID_PATTERN_TXT = "^[\\w/.-]+\\w$"
+        private val VALID_ID_PATTERN: Pattern = Pattern.compile(VALID_ID_PATTERN_TXT)
 
-    private static final Pattern VALID_COLUMN_NAME_PATTERN = Pattern.compile(
-        "^\\d?[a-zA-Z_][$\\da-zA-Z:_-]*$"
-    );
-    public static final Pattern VALID_COLUMN_ATT_PATTERN = Pattern.compile(
-        "^([a-zA-Z_][$.\\da-zA-Z:_-]*(\\(.+\\))?|\\(.+\\))$"
-    );
+        private val VALID_COLUMN_NAME_PATTERN: Pattern = Pattern.compile(
+            "^\\d?[a-zA-Z_][$\\da-zA-Z:_-]*$"
+        )
+        val VALID_COLUMN_ATT_PATTERN: Pattern = Pattern.compile(
+            "^([a-zA-Z_][$.\\da-zA-Z:_-]*(\\(.+\\))?|\\(.+\\))$"
+        )
+    }
 
-    private final JournalRepository journalRepository;
-    private final JournalMapper journalMapper;
+    private lateinit var searchConv: JpaSearchConverter<JournalEntity>
 
-    private final JpaSearchConverterFactory jpaSearchConverterFactory;
-    private JpaSearchConverter<JournalEntity> searchConv;
+    private val changeListeners: MutableList<BiConsumer<JournalWithMeta?, JournalWithMeta?>> = CopyOnWriteArrayList()
+    private val deleteListeners: MutableList<Consumer<JournalWithMeta>> = CopyOnWriteArrayList()
 
-    private final List<BiConsumer<JournalWithMeta, JournalWithMeta>> changeListeners = new CopyOnWriteArrayList<>();
-    private final List<Consumer<JournalWithMeta>> deleteListeners = new CopyOnWriteArrayList<>();
-
-    private final Map<String, JournalsProvider> providers = new ConcurrentHashMap<>();
+    private val providers: MutableMap<String, JournalsProvider> = ConcurrentHashMap()
 
     @PostConstruct
-    public void init() {
-        searchConv = jpaSearchConverterFactory.createConverter(JournalEntity.class).build();
+    fun init() {
+        searchConv = jpaSearchConverterFactory.createConverter(JournalEntity::class.java).build()
     }
 
-    public long getLastModifiedTimeMs() {
-        return journalRepository.getLastModifiedTime()
-            .map(Instant::toEpochMilli)
-            .orElse(0L);
+    override fun getLastModifiedTimeMs(): Long {
+        return journalRepository.lastModifiedTime
+            .map { it.toEpochMilli() }
+            .orElse(0L)
     }
 
-    @Override
-    public JournalWithMeta getJournalById(String id) {
-        if (id.contains("$")) {
-            String providerId = id.substring(0, id.indexOf('$'));
-            if (providers.containsKey(providerId)) {
-                JournalsProvider journalsProvider = providers.get(providerId);
-                EntityWithMeta<JournalDef> journal =
-                    journalsProvider.getJournalById(id.substring(id.indexOf('$') + 1));
+    override fun getJournalById(id: IdInWs): JournalWithMeta? {
+        val localId = id.id
+        if (localId.contains("$")) {
+            val providerId = localId.substring(0, localId.indexOf('$'))
+            val journalsProvider = providers[providerId]
+            if (journalsProvider != null) {
+                val journal = journalsProvider.getJournalById(
+                    localId.substring(localId.indexOf('$') + 1)
+                ) ?: return null
 
-                if (journal == null) {
-                    return null;
+                var journalDef = journal.entity
+                if (journalDef.id.isEmpty()) {
+                    journalDef = journalDef.copy().withId(localId).build()
                 }
-                JournalDef journalDef = journal.getEntity();
-                if (journalDef.getId().isEmpty()) {
-                    journalDef = journalDef.copy().withId(id).build();
-                }
-                JournalWithMeta journalWithMeta = new JournalWithMeta(journalDef);
-                journalWithMeta.setCreated(journal.getMeta().getCreated());
-                journalWithMeta.setCreator(journal.getMeta().getCreator());
-                journalWithMeta.setModified(journal.getMeta().getModified());
-                journalWithMeta.setModifier(journal.getMeta().getModifier());
-                return journalWithMeta;
+                val journalWithMeta = JournalWithMeta(journalDef)
+                journalWithMeta.created = journal.meta.created
+                journalWithMeta.creator = journal.meta.creator
+                journalWithMeta.modified = journal.meta.modified
+                journalWithMeta.modifier = journal.meta.modifier
+                return journalWithMeta
             }
         }
-        Optional<JournalEntity> entity = journalRepository.findByExtId(id);
-        return entity.map(journalMapper::entityToDto).orElse(null);
+        val entity = journalRepository.findByExtIdAndWorkspace(localId, id.workspace)
+        return entity.map { journalMapper.entityToDto(it) }.orElse(null)
     }
 
-    @Override
-    public List<JournalWithMeta> getAll(Predicate predicate, int max, int skip, List<SortBy> sort) {
+    override fun getAll(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<JournalWithMeta> {
         return searchConv.findAll(journalRepository, predicate, max, skip, sort)
-            .stream()
-            .map(journalMapper::entityToDto)
-            .collect(Collectors.toList());
+            .map { journalMapper.entityToDto(it) }
     }
 
-    @Override
-    public Set<JournalWithMeta> getAll(int maxItems, int skipCount) {
-
+    override fun getAll(maxItems: Int, skipCount: Int): Set<JournalWithMeta> {
         if (maxItems <= 0) {
-            return Collections.emptySet();
+            return emptySet()
         }
 
-        PageRequest page = PageRequest.of(
+        val page = PageRequest.of(
             skipCount / maxItems,
             maxItems,
             Sort.by(Sort.Direction.DESC, "id")
-        );
+        )
 
-        return journalRepository.findAll(page).stream()
-            .map(journalMapper::entityToDto)
-            .collect(Collectors.toSet());
+        return journalRepository.findAll(page)
+            .mapTo(LinkedHashSet()) { journalMapper.entityToDto(it) }
     }
 
-    @Override
-    public List<JournalWithMeta> getAll(Collection<String> extIds) {
-
-        Map<String, Integer> idsToRequestFromDb = new HashMap<>();
-        List<Pair<JournalWithMeta, Integer>> result = new ArrayList<>();
-        int idx = 0;
-        for (String id : extIds) {
-            if (id.contains("$")) {
-                String providerId = id.substring(0, id.indexOf('$'));
+    override fun getAll(extIds: Collection<IdInWs>): List<JournalWithMeta> {
+        val idsToRequestFromDb: MutableMap<IdInWs, Int> = HashMap()
+        val result: MutableList<Pair<JournalWithMeta, Int>> = ArrayList()
+        for ((idx, id) in extIds.withIndex()) {
+            val localId = id.id
+            if (localId.contains("$")) {
+                val providerId = localId.substring(0, localId.indexOf('$'))
                 if (providers.containsKey(providerId)) {
-                    JournalWithMeta journalById = getJournalById(id);
+                    val journalById = getJournalById(id)
                     if (journalById != null) {
-                        result.add(new Pair<>(journalById, idx));
+                        result.add(Pair(journalById, idx))
                     }
                 } else {
-                    idsToRequestFromDb.put(id, idx);
+                    idsToRequestFromDb[id] = idx
                 }
             } else {
-                idsToRequestFromDb.put(id, idx);
+                idsToRequestFromDb[id] = idx
             }
-            idx++;
         }
 
-        journalRepository.findAllByExtIdIn(idsToRequestFromDb.keySet()).stream()
-            .map(journalMapper::entityToDto)
-            .forEach(v ->
-                result.add(new Pair<>(v, idsToRequestFromDb.getOrDefault(v.getJournalDef().getId(), 0))));
-
-        result.sort(Comparator.comparing(Pair<JournalWithMeta, Integer>::getSecond));
-
-        return result.stream()
-            .map(Pair::getFirst)
-            .collect(Collectors.toList());
-    }
-
-    @Override
-    public long getCount() {
-        return (int) journalRepository.count();
-    }
-
-    @Override
-    public long getCount(Predicate predicate) {
-        return searchConv.getCount(journalRepository, predicate);
-    }
-
-    @Override
-    public void onJournalDeleted(Consumer<JournalWithMeta> consumer) {
-        deleteListeners.add(consumer);
-    }
-
-    @Override
-    public void onJournalWithMetaChanged(BiConsumer<JournalWithMeta, JournalWithMeta> consumer) {
-        changeListeners.add(consumer);
-    }
-
-    @Override
-    public void onJournalChanged(BiConsumer<JournalDef, JournalDef> consumer) {
-        changeListeners.add((before, after) -> {
-            JournalDef beforeDef = null;
-            if (before != null) {
-                beforeDef = before.getJournalDef();
+        idsToRequestFromDb.keys.groupBy { it.workspace }.forEach { (workspace, identifiers) ->
+            journalRepository.findAllByExtIdInAndWorkspace(
+                identifiers.mapTo(HashSet()) { it.id }, workspace
+            ).map { journalMapper.entityToDto(it) }.forEach {
+                val idInWs = IdInWs.create(workspace, it.journalDef.id)
+                result.add(Pair(it, idsToRequestFromDb.getOrDefault(idInWs, 0)))
             }
-            JournalDef afterDef = null;
-            if (after != null) {
-                afterDef = after.getJournalDef();
-            }
-            consumer.accept(beforeDef, afterDef);
-        });
-    }
-
-    @Override
-    public JournalWithMeta save(JournalDef dto) {
-
-        if (dto.getId().isEmpty()) {
-            throw new IllegalArgumentException("Journal without id: " + dto);
-        }
-        if (dto.getId().contains("$")) {
-            throw new IllegalArgumentException("You can't change generated journal: " + dto.getId());
         }
 
-        if (SYSTEM_JOURNALS.contains(dto.getId()) && !AuthContext.isRunAsSystem()) {
-            throw new RuntimeException("You can't change system journal: " + dto.getId());
+        result.sortBy { it.second }
+
+        return result.map { it.first }
+    }
+
+    override fun getCount(): Long {
+        return journalRepository.count()
+    }
+
+    override fun getCount(predicate: Predicate): Long {
+        return searchConv.getCount(journalRepository, predicate)
+    }
+
+    override fun onJournalDeleted(consumer: Consumer<JournalWithMeta>) {
+        deleteListeners.add(consumer)
+    }
+
+    override fun onJournalWithMetaChanged(consumer: BiConsumer<JournalWithMeta?, JournalWithMeta?>) {
+        changeListeners.add(consumer)
+    }
+
+    override fun onJournalChanged(consumer: BiConsumer<JournalDef?, JournalDef?>) {
+        changeListeners.add(BiConsumer { before: JournalWithMeta?, after: JournalWithMeta? ->
+            consumer.accept(before?.journalDef, after?.journalDef)
+        })
+    }
+
+    override fun save(dto: JournalDef): JournalWithMeta {
+
+        require(dto.id.isNotEmpty()) { "Journal without id: $dto" }
+        require(!dto.id.contains("$")) { "You can't change generated journal: " + dto.id }
+
+        if (SYSTEM_JOURNALS.contains(dto.id) && !isRunAsSystem()) {
+            throw RuntimeException("You can't change system journal: " + dto.id)
         }
 
         // preprocess config with builder
-        dto = dto.copy().build();
+        val dtoToSave = dto.copy().build()
 
-        dto.getColumns().forEach(column -> {
-            Matcher validNameMatcher = VALID_COLUMN_NAME_PATTERN.matcher(column.getId());
-            if (!validNameMatcher.matches()) {
-                throw new IllegalArgumentException(
-                    "Journal column name is invalid: '" + column.getId() + "'. Column: " + column);
+        dtoToSave.columns.forEach(Consumer { column: JournalColumnDef ->
+            val validNameMatcher = VALID_COLUMN_NAME_PATTERN.matcher(column.id)
+            require(validNameMatcher.matches()) {
+                "Journal column name is invalid: '" + column.id + "'. Column: " + column
             }
-            if (StringUtils.isNotBlank(column.getAttribute())) {
-                Matcher validAttMatcher = VALID_COLUMN_ATT_PATTERN.matcher(column.getAttribute());
-                if (!validAttMatcher.matches()) {
-                    throw new IllegalArgumentException(
-                        "Journal column attribute is invalid: '" + column.getAttribute() + "'. Column: " + column);
+            if (StringUtils.isNotBlank(column.attribute)) {
+                val validAttMatcher = VALID_COLUMN_ATT_PATTERN.matcher(column.attribute)
+                require(validAttMatcher.matches()) {
+                    "Journal column attribute is invalid: '" + column.attribute + "'. Column: " + column
                 }
             }
-        });
+        })
 
-        JournalWithMeta valueBefore = journalRepository.findByExtId(dto.getId())
-            .map(journalMapper::entityToDto)
-            .orElse(null);
+        val valueBefore = journalRepository.findByExtIdAndWorkspace(dtoToSave.id, dtoToSave.workspace)
+            .map { journalMapper.entityToDto(it) }
+            .orElse(null)
 
-        if (valueBefore == null) {
-            if (!VALID_ID_PATTERN.matcher(dto.getId()).matches()) {
-                throw new RuntimeException("Invalid id: " + dto.getId());
-            }
+        if (valueBefore == null && !VALID_ID_PATTERN.matcher(dtoToSave.id).matches()) {
+            throw RuntimeException("Invalid id: " + dtoToSave.id)
         }
 
-        JournalEntity journalEntity = journalMapper.dtoToEntity(dto);
-        JournalEntity storedJournalEntity = journalRepository.save(journalEntity);
+        val journalEntity = journalMapper.dtoToEntity(dtoToSave)
+        val storedJournalEntity = journalRepository.save(journalEntity)
 
-        JournalWithMeta journalDto = journalMapper.entityToDto(storedJournalEntity);
+        val journalDto = journalMapper.entityToDto(storedJournalEntity)
 
-        for (BiConsumer<JournalWithMeta, JournalWithMeta> listener : changeListeners) {
-            listener.accept(valueBefore, journalDto);
+        for (listener in changeListeners) {
+            listener.accept(valueBefore, journalDto)
         }
-        return journalDto;
+        return journalDto
     }
 
-    @Override
-    public void delete(String id) {
-        Optional<JournalEntity> before = journalRepository.findByExtId(id);
-        if (before.isPresent()) {
-            JournalWithMeta beforeDto = journalMapper.entityToDto(before.get());
-            journalRepository.delete(before.get());
-            for (Consumer<JournalWithMeta> listener : deleteListeners) {
-                listener.accept(beforeDto);
+    override fun delete(id: IdInWs) {
+        val before = journalRepository.findByExtIdAndWorkspace(id.id, id.workspace)
+        if (before.isPresent) {
+            val beforeDto = journalMapper.entityToDto(before.get())
+            journalRepository.delete(before.get())
+            for (listener in deleteListeners) {
+                listener.accept(beforeDto)
             }
         }
     }
 
-    @Override
-    public void registerProvider(JournalsProvider provider) {
-        this.providers.put(provider.getType(), provider);
+    override fun registerProvider(provider: JournalsProvider) {
+        providers[provider.getType()] = provider
     }
 }

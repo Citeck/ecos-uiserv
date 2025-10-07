@@ -9,6 +9,8 @@ interface EcosFormBuilder {
 
     fun withWidth(width: EcosFormWidth): EcosFormBuilder
 
+    fun withWorkspace(workspace: String): EcosFormBuilder
+
     fun withTitle(title: MLText): EcosFormBuilder
 
     fun withComponents(action: (EcosFormComponentsBuilder) -> Unit): EcosFormBuilder

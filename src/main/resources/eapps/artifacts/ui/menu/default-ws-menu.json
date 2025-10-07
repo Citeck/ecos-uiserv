@@ -66,6 +66,7 @@
           "hidden": false,
           "type": "SECTION",
           "config": {},
+          "collapsed": true,
           "items": [
             {
               "id": "default-ws-admin-menu-items",

@@ -22,6 +22,11 @@ class EcosFormBuilderImpl(
         return this
     }
 
+    override fun withWorkspace(workspace: String): EcosFormBuilder {
+        formModel.withWorkspace(workspace)
+        return this
+    }
+
     override fun withTitle(title: MLText): EcosFormBuilder {
         formModel.withTitle(title)
         return this

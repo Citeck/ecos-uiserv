@@ -230,79 +230,6 @@
                             ],
                             "reorder": false,
                             "dataGridLabel": false
-                          },
-                          {
-                            "label": {
-                              "ru": "Рабочее пространство",
-                              "en": "Workspace"
-                            },
-                            "key": "workspaceRef",
-                            "tooltip": {
-                              "ru": "Рабочее пространство, к которому относится данный журнал.\nЕсли указано значение, журнал считается «ограниченным» и может использоваться только внутри заданного воркспейса.\nЕсли значение не задано, журнал считается глобальным и доступен во всех воркспейсах.",
-                              "en": "Workspace to which this journal belongs. If defined, the journal is considered scoped and can only be used within the specified workspace. Journals without a workspace are treated as global and available across all workspaces."
-                            },
-                            "disabled": true,
-                            "modalTitle": "",
-                            "linkFormatter": "",
-                            "journalId": "workspaces-journal",
-                            "source": {
-                              "type": "journal",
-                              "custom": {
-                                "columns": []
-                              },
-                              "customValues": "",
-                              "viewMode": "default"
-                            },
-                            "queryData": "",
-                            "refreshOn": [],
-                            "customDefaultValue": "const currentWs = Citeck.Navigator.getWorkspaceId() || '';\nif (currentWs.indexOf('admin$') === 0) {\n  value = null;  \n} else {\n  value = \"emodel/workspace@\" + currentWs;\n}",
-                            "optionalWhenDisabled": false,
-                            "logic": [
-                              {
-                                "name": "enable-for-admin",
-                                "trigger": {
-                                  "type": "javascript",
-                                  "javascript": "result = instance.options.formMode === 'CREATE' && _.get(data, 'currentUserAtts.isAdmin', false);"
-                                },
-                                "actions": [
-                                  {
-                                    "name": "enable",
-                                    "type": "property",
-                                    "property": {
-                                      "label": "Disabled",
-                                      "value": "disabled",
-                                      "type": "boolean"
-                                    },
-                                    "state": "false"
-                                  }
-                                ]
-                              }
-                            ],
-                            "type": "selectJournal",
-                            "input": true
-                          },
-                          {
-                            "label": {
-                              "ru": "Настроить виджеты",
-                              "en": "Configure widgets"
-                            },
-                            "key": "configureWidgets",
-                            "action": "custom",
-                            "state": "",
-                            "showValidations": false,
-                            "custom": "utils.openSettingsWidgets();",
-                            "block": true,
-                            "refreshOn": [],
-                            "optionalWhenDisabled": false,
-                            "type": "button",
-                            "input": true,
-                            "event": "",
-                            "url": "",
-                            "headers": [
-                              {}
-                            ],
-                            "reorder": false,
-                            "dataGridLabel": false
                           }
                         ],
                         "type": "column",
@@ -1466,26 +1393,6 @@
         "key": "columns2",
         "type": "columns",
         "input": false
-      },
-      {
-        "label": "currentUserAtts",
-        "source": {
-          "type": "record",
-          "record": {
-            "id": "emodel/person@{{user}}",
-            "attributes": {
-              "isAdmin": "isAdmin?bool!"
-            }
-          },
-          "forceLoad": false
-        },
-        "update": {
-          "type": "once"
-        },
-        "key": "currentUserAtts",
-        "type": "asyncData",
-        "input": true,
-        "triggerEventOnChange": false
       }
     ],
     "formId": "journal-form"

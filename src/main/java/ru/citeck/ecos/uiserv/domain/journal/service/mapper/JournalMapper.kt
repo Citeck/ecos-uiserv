@@ -55,7 +55,7 @@ class JournalMapper(
 
     fun dtoToEntity(journal: JournalDef): JournalEntity {
 
-        var entity = repository.findByExtId(journal.id).orElse(null)
+        var entity = repository.findByExtIdAndWorkspace(journal.id, journal.workspace).orElse(null)
         if (entity == null) {
             entity = JournalEntity()
             entity.extId = journal.id

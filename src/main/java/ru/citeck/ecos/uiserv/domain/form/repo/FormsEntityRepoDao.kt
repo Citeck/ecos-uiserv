@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.domain.form.repo
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.records2.predicate.model.Predicate
+import ru.citeck.ecos.records2.predicate.model.Predicates
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
 import ru.citeck.ecos.uiserv.domain.form.service.FormsEntityDao
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaEntityFieldType
@@ -32,12 +33,15 @@ class FormsEntityRepoDao(
         return repo.count()
     }
 
-    override fun findByExtId(formId: String): EcosFormEntity? {
-        return repo.findByExtId(formId)
+    override fun findByExtId(formId: String, workspace: String): EcosFormEntity? {
+        return repo.findByExtIdAndWorkspace(formId, workspace)
     }
 
-    override fun findAllByExtIdIn(ids: Set<String>): Set<EcosFormEntity> {
-        return repo.findAllByExtIdIn(ids)
+    override fun findAllByExtIdIn(ids: Set<String>, workspace: String): Set<EcosFormEntity> {
+        return searchConv.findAll(repo, Predicates.and(
+            Predicates.inVals("extId", ids),
+            Predicates.eq("workspace", workspace)
+        ), 10000, 0, emptyList()).toSet()
     }
 
     override fun save(entity: EcosFormEntity): EcosFormEntity {

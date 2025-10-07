@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.citeck.ecos.model.lib.workspace.IdInWs;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.records2.predicate.model.Predicates;
@@ -32,6 +34,7 @@ public class TypeJournalService {
     private final RecordsService recordsService;
     private final JournalService journalService;
     private final JournalByFormGenerator byFormGenerator;
+    private final WorkspaceService workspaceService;
 
     private LoadingCache<EntityRef, Optional<JournalWithMeta>> journalByTypeCache;
     private LoadingCache<String, Optional<JournalWithMeta>> journalByFormIdCache;
@@ -69,7 +72,7 @@ public class TypeJournalService {
         try {
             typeMeta = recordsService.getAtts(typeRef, TypeMetaWithParents.class);
         } catch (Exception e) {
-            log.error("Type meta can't be received for type: " + typeRef, e);
+            log.error("Type meta can't be received for type: {}", typeRef, e);
         }
         if (typeMeta == null) {
             return Optional.empty();
@@ -81,7 +84,7 @@ public class TypeJournalService {
             typeMeta.getJournal(),
             typeMeta.getForm()
         );
-        if (!journal.isPresent()) {
+        if (journal.isEmpty()) {
             journal = getJournalForTypeImpl(typeMeta.parentsRefs, 0);
         }
         return journal;
@@ -99,7 +102,7 @@ public class TypeJournalService {
         try {
             meta = recordsService.getAtts(typeRef, TypeMeta.class);
         } catch (Exception e) {
-            log.error("Type meta can't be received for type: " + typeRef, e);
+            log.error("Type meta can't be received for type: {}", typeRef, e);
         }
         if (meta == null) {
             return Optional.empty();
@@ -111,7 +114,7 @@ public class TypeJournalService {
             meta.getJournal(),
             meta.getForm()
         );
-        if (!journal.isPresent()) {
+        if (journal.isEmpty()) {
             journal = getJournalForTypeImpl(types, idx + 1);
         }
         return journal;
@@ -123,7 +126,8 @@ public class TypeJournalService {
                                                  EntityRef formRef) {
 
         if (EntityRef.isNotEmpty(journalRef)) {
-            JournalWithMeta journal = journalService.getJournalById(journalRef.getLocalId());
+            IdInWs idInWs = workspaceService.convertToIdInWs(journalRef.getLocalId());
+            JournalWithMeta journal = journalService.getJournalById(idInWs);
             if (journal != null) {
                 return Optional.of(journal);
             }

@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import ru.citeck.ecos.commons.data.entity.EntityMeta
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records3.record.dao.RecordsDao
 import ru.citeck.ecos.records3.record.dao.impl.ext.ExtStorageRecordsDao
 import ru.citeck.ecos.records3.record.dao.impl.ext.ExtStorageRecordsDaoConfig
@@ -31,6 +32,7 @@ class JournalsRegistryConfiguration(
     private val journalsService: JournalService,
     private val typesRegistry: EcosTypesRegistry,
     private val ecosTypeService: EcosTypeService,
+    private val workspaceService: WorkspaceService,
     private val typeJournalsProvider: TypeJournalsProvider
 ) {
 
@@ -50,12 +52,10 @@ class JournalsRegistryConfiguration(
         appLockService.doInSync("journals-registry-initializer", Duration.ofMinutes(10)) {
             initDataFromDb(registry)
             journalsService.onJournalWithMetaChanged { before, after ->
-                var id = after?.journalDef?.id ?: ""
-                if (id.isBlank()) {
-                    id = before.journalDef.id
-                }
-                if (id.isNotBlank()) {
-                    setRegistryValue(registry, id, createRegistryValue(after))
+                val journalDef = after?.journalDef ?: before?.journalDef
+                if (journalDef != null) {
+                    val key = workspaceService.addWsPrefixToId(journalDef.id, journalDef.workspace)
+                    setRegistryValue(registry, key, createRegistryValue(after))
                 }
             }
             journalsService.onJournalDeleted {
@@ -82,6 +82,7 @@ class JournalsRegistryConfiguration(
         val config = ExtStorageRecordsDaoConfig.create(ReadOnlyMapExtStorage(registry))
             .withSourceId(JOURNALS_REGISTRY_SOURCE_ID)
             .withEcosType("journal")
+            .withWorkspaceScoped(true)
             .build()
 
         val dao = ExtStorageRecordsDao(config)
@@ -94,7 +95,8 @@ class JournalsRegistryConfiguration(
         var journals = journalsService.getAll(100, 0)
         while (journals.isNotEmpty()) {
             journals.forEach {
-                setRegistryValue(registry, it.journalDef.id, createRegistryValue(it))
+                val key = workspaceService.addWsPrefixToId(it.journalDef.id, it.journalDef.workspace)
+                setRegistryValue(registry, key, createRegistryValue(it))
             }
             skipCount += journals.size
             journals = journalsService.getAll(100, skipCount)
@@ -122,6 +124,7 @@ class JournalsRegistryConfiguration(
                 def.entity.name,
                 def.entity.sourceId,
                 def.entity.typeRef,
+                def.entity.workspace,
                 def.entity.system
             ),
             def.meta
@@ -145,6 +148,7 @@ class JournalsRegistryConfiguration(
                 journal.journalDef.name,
                 journal.journalDef.sourceId,
                 typeRef,
+                journal.journalDef.workspace,
                 journal.journalDef.system
             ),
             EntityMeta(

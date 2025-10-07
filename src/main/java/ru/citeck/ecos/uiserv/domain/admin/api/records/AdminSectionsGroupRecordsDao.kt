@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.domain.admin.api.records
 
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
@@ -14,7 +15,8 @@ import ru.citeck.ecos.uiserv.domain.journal.service.JournalServiceImpl
 @Component
 class AdminSectionsGroupRecordsDao(
     private val adminSectionsGroupService: AdminSectionsGroupService,
-    private val journalService: JournalServiceImpl
+    private val journalService: JournalServiceImpl,
+    private val workspaceService: WorkspaceService
 ) : AbstractRecordsDao(), RecordsQueryDao {
 
     companion object {
@@ -46,11 +48,12 @@ class AdminSectionsGroupRecordsDao(
             return section
         }
 
-        val journalId = section.config.get("journalId").asText()
+        val journalId = section.config["journalId"].asText()
         if (journalId.isBlank()) {
             return section
         }
-        val journal = journalService.getJournalById(journalId) ?: return section
+        val idInWs = workspaceService.convertToIdInWs(journalId)
+        val journal = journalService.getJournalById(idInWs) ?: return section
         return section.withName(journal.journalDef.name)
     }
 

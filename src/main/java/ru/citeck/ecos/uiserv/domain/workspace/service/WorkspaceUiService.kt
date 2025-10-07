@@ -4,6 +4,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import ru.citeck.ecos.commons.io.file.mem.EcosMemDir
 import ru.citeck.ecos.commons.json.Json
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
@@ -13,11 +14,14 @@ import java.util.*
 @Service
 class WorkspaceUiService(
     private val menuService: MenuService,
-    private val dashboardService: DashboardService
+    private val dashboardService: DashboardService,
+    private val workspaceService: WorkspaceService
 ) {
 
     companion object {
         private val log = KotlinLogging.logger {}
+
+        const val WS_REF_PREFIX = "emodel/workspace@"
 
         val REQUIRED_WS_ARTIFACTS_FROM_TEMPLATE = listOf("ui/**")
     }

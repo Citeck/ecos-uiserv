@@ -10,6 +10,7 @@ data class FormRegistryValue(
     val description: MLText,
     val formKey: String,
     val typeRef: EntityRef,
+    val workspace: String,
     val system: Boolean,
 ) {
     companion object {

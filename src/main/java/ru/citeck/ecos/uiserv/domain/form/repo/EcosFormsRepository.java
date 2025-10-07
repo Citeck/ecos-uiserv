@@ -17,10 +17,8 @@ public interface EcosFormsRepository extends JpaRepository<EcosFormEntity, Long>
 
     List<EcosFormEntity> findAllByTypeRefIn(List<String> types);
 
-    Set<EcosFormEntity> findAllByExtIdIn(Set<String> ids);
-
     @Nullable
-    EcosFormEntity findByExtId(String extId);
+    EcosFormEntity findByExtIdAndWorkspace(String extId, String workspace);
 
     @Nullable
     EcosFormEntity findFirstByFormKey(String formKey);

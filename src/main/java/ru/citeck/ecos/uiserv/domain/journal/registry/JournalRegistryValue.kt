@@ -9,6 +9,7 @@ data class JournalRegistryValue(
     val name: MLText,
     val sourceId: String,
     val typeRef: EntityRef,
+    val workspace: String,
     val system: Boolean
 ) {
     companion object {

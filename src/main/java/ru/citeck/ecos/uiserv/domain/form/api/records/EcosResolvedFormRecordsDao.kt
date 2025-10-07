@@ -6,6 +6,7 @@ import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.utils.ModelUtils
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
@@ -25,7 +26,8 @@ import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 class EcosResolvedFormRecordsDao(
     private val ecosFormRecordsDao: EcosFormRecordsDao,
     private val ecosTypeService: EcosTypeService,
-    private val formService: EcosFormService
+    private val formService: EcosFormService,
+    private val workspaceService: WorkspaceService
 ) : AbstractRecordsDao(), RecordAttsDao, RecordsQueryDao {
 
     companion object {
@@ -60,7 +62,7 @@ class EcosResolvedFormRecordsDao(
             typeRef = ecosTypeService.getTypeRefByForm(EntityRef.create("uiserv", "form", form.def.id))
         }
         val typeInfo = ecosTypeService.getTypeInfo(typeRef)
-        return ResolvedFormRecord(form, typeInfo, formService)
+        return ResolvedFormRecord(form, typeInfo, formService, workspaceService)
     }
 
     override fun getId(): String {
@@ -70,7 +72,8 @@ class EcosResolvedFormRecordsDao(
     class ResolvedFormRecord(
         @AttName("...") val form: EcosFormRecord,
         val typeInfo: TypeDef?,
-        val formService: EcosFormService
+        val formService: EcosFormService,
+        val workspaceService: WorkspaceService
     ) {
 
         fun getTypeRef(): EntityRef {
@@ -96,7 +99,8 @@ class EcosResolvedFormRecordsDao(
                 if (component["conditionalForm"].asBoolean(false)) {
                     return component
                 }
-                val formDef = formService.getFormById(formRef.getLocalId()).orElse(null)
+                val idInWs = workspaceService.convertToIdInWs(formRef.getLocalId())
+                val formDef = formService.getFormById(idInWs).orElse(null)
                 if (formDef?.definition != null) {
                     val components = formDef.definition["components"]
                     if (components.isArray()) {

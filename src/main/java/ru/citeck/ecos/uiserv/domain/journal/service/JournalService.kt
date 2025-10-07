@@ -1,42 +1,39 @@
-package ru.citeck.ecos.uiserv.domain.journal.service;
+package ru.citeck.ecos.uiserv.domain.journal.service
 
-import ru.citeck.ecos.records2.predicate.model.Predicate;
-import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef;
-import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta;
-import ru.citeck.ecos.uiserv.domain.journal.service.provider.JournalsProvider;
+import ru.citeck.ecos.model.lib.workspace.IdInWs
+import ru.citeck.ecos.records2.predicate.model.Predicate
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
+import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
+import ru.citeck.ecos.uiserv.domain.journal.service.provider.JournalsProvider
+import java.util.function.BiConsumer
+import java.util.function.Consumer
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+interface JournalService {
 
-public interface JournalService {
+    fun getLastModifiedTimeMs(): Long
 
-    long getLastModifiedTimeMs();
+    fun getJournalById(id: IdInWs): JournalWithMeta?
 
-    JournalWithMeta getJournalById(String id);
+    fun getAll(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<JournalWithMeta>
 
-    List<JournalWithMeta> getAll(Predicate predicate, int max, int skip, List<SortBy> sort);
+    fun getAll(maxItems: Int, skipCount: Int): Set<JournalWithMeta>
 
-    Set<JournalWithMeta> getAll(int maxItems, int skipCount);
+    fun getAll(extIds: Collection<IdInWs>): List<JournalWithMeta>
 
-    List<JournalWithMeta> getAll(Collection<String> extIds);
+    fun getCount(): Long
 
-    long getCount();
+    fun getCount(predicate: Predicate): Long
 
-    long getCount(Predicate predicate);
+    fun onJournalDeleted(consumer: Consumer<JournalWithMeta>)
 
-    void onJournalDeleted(Consumer<JournalWithMeta> consumer);
+    fun onJournalChanged(consumer: BiConsumer<JournalDef?, JournalDef?>)
 
-    void onJournalChanged(BiConsumer<JournalDef, JournalDef> consumer);
+    fun onJournalWithMetaChanged(consumer: BiConsumer<JournalWithMeta?, JournalWithMeta?>)
 
-    void onJournalWithMetaChanged(BiConsumer<JournalWithMeta, JournalWithMeta> consumer);
+    fun save(dto: JournalDef): JournalWithMeta
 
-    JournalWithMeta save(JournalDef dto);
+    fun delete(id: IdInWs)
 
-    void delete(String id);
-
-    void registerProvider(JournalsProvider provider);
+    fun registerProvider(provider: JournalsProvider)
 }

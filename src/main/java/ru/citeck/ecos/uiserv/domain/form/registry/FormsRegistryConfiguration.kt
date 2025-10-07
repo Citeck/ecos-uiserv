@@ -5,6 +5,7 @@ import com.hazelcast.replicatedmap.ReplicatedMap
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records3.record.dao.RecordsDao
 import ru.citeck.ecos.records3.record.dao.impl.ext.ExtStorageRecordsDao
 import ru.citeck.ecos.records3.record.dao.impl.ext.ExtStorageRecordsDaoConfig
@@ -24,6 +25,7 @@ class FormsRegistryConfiguration(
     private val formsService: EcosFormService,
     private val appLockService: EcosLockApi,
     private val typeFormsProvider: TypeFormsProvider,
+    private val workspaceService: WorkspaceService,
     val typesRegistry: EcosTypesRegistry
 ) {
 
@@ -43,12 +45,10 @@ class FormsRegistryConfiguration(
         appLockService.doInSync("forms-registry-initializer", Duration.ofMinutes(10)) {
             initDataFromDb(registry)
             formsService.addChangeWithMetaListener { before, after ->
-                var id = after?.entity?.id
-                if (id.isNullOrBlank()) {
-                    id = before?.entity?.id
-                }
-                if (!id.isNullOrBlank()) {
-                    setRegistryValue(registry, id, createFormModelRegistryValue(after))
+                val entity = after?.entity ?: before?.entity
+                if (entity != null && entity.id.isNotBlank()) {
+                    val key = workspaceService.addWsPrefixToId(entity.id, entity.workspace)
+                    setRegistryValue(registry, key, createFormModelRegistryValue(after))
                 }
             }
             formsService.addDeleteListener {
@@ -75,6 +75,7 @@ class FormsRegistryConfiguration(
         val config = ExtStorageRecordsDaoConfig.create(ReadOnlyMapExtStorage(registry))
             .withSourceId(FORMS_REGISTRY_SOURCE_ID)
             .withEcosType("form")
+            .withWorkspaceScoped(true)
             .build()
 
         return ExtStorageRecordsDao(config)
@@ -85,7 +86,8 @@ class FormsRegistryConfiguration(
         var forms = formsService.getAllFormsWithMeta(100, 0)
         while (forms.isNotEmpty()) {
             forms.forEach {
-                setRegistryValue(registry, it.entity.id, createFormModelRegistryValue(it))
+                val key = workspaceService.addWsPrefixToId(it.entity.id, it.entity.workspace)
+                setRegistryValue(registry, key, createFormModelRegistryValue(it))
             }
             skipCount += forms.size
             forms = formsService.getAllFormsWithMeta(100, skipCount)
@@ -114,6 +116,7 @@ class FormsRegistryConfiguration(
                 formDef.entity.description,
                 formDef.entity.formKey,
                 formDef.entity.typeRef,
+                formDef.entity.workspace,
                 formDef.entity.system
             ),
             formDef.meta
@@ -129,6 +132,7 @@ class FormsRegistryConfiguration(
                 form.entity.description,
                 form.entity.formKey,
                 form.entity.typeRef,
+                form.entity.workspace,
                 form.entity.system
             ),
             form.meta

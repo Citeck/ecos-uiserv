@@ -1,11 +1,11 @@
 package ru.citeck.ecos.uiserv.domain.journal.api.records
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.databind.node.ObjectNode
 import jakarta.annotation.PostConstruct
 import lombok.Data
 import lombok.RequiredArgsConstructor
-import org.springframework.security.access.annotation.Secured
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
@@ -13,10 +13,13 @@ import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.commons.json.YamlUtils
 import ru.citeck.ecos.commons.utils.StringUtils
+import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.context.lib.auth.AuthContext.isRunAsAdmin
-import ru.citeck.ecos.context.lib.auth.AuthRole
 import ru.citeck.ecos.events2.type.RecordEventsService
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
+import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records2.predicate.PredicateService
+import ru.citeck.ecos.records3.record.atts.schema.ScalarType
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.atts.value.AttValue
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
@@ -35,6 +38,7 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
 import ru.citeck.ecos.uiserv.domain.journal.registry.JournalsRegistryConfiguration
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalServiceImpl
+import ru.citeck.ecos.uiserv.domain.workspace.service.WorkspaceUiService
 import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.nio.charset.StandardCharsets
@@ -44,7 +48,8 @@ import java.nio.charset.StandardCharsets
 class JournalRecordsDao(
     private val journalService: JournalService,
     private val ecosTypeService: EcosTypeService,
-    private val recordEventsService: RecordEventsService
+    private val recordEventsService: RecordEventsService,
+    private val workspaceService: WorkspaceService
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordAttsDao,
@@ -58,8 +63,10 @@ class JournalRecordsDao(
     @PostConstruct
     fun init() {
         journalService.onJournalChanged { before, after ->
-            recordEventsService.emitRecChanged(before, after, getId()) {
-                JournalRecord(JournalWithMeta(it))
+            if (after != null) {
+                recordEventsService.emitRecChanged(before, after, getId()) {
+                    JournalRecord(JournalWithMeta(it), workspaceService)
+                }
             }
         }
     }
@@ -80,9 +87,10 @@ class JournalRecordsDao(
             val journalRef = ecosTypeService.getJournalRefByTypeRef(typeRef)
 
             if (EntityRef.isNotEmpty(journalRef)) {
-                val dto = journalService.getJournalById(journalRef.getLocalId())
+                val idInWs = workspaceService.convertToIdInWs(journalRef.getLocalId())
+                val dto = journalService.getJournalById(idInWs)
                 if (dto != null) {
-                    result.addRecord(JournalRecord(dto))
+                    result.addRecord(JournalRecord(dto, workspaceService))
                 }
             }
         } else {
@@ -94,7 +102,9 @@ class JournalRecordsDao(
                     .build()
                 val queryRes = recordsService.query(registryQuery)
 
-                val journals = journalService.getAll(queryRes.getRecords().map { it.getLocalId() }.toSet())
+                val journals = journalService.getAll(queryRes.getRecords().map {
+                    workspaceService.convertToIdInWs(it.getLocalId())
+                }.toSet())
                 result.setRecords(ArrayList(journals))
                 result.setTotalCount(queryRes.getTotalCount())
             } else {
@@ -103,14 +113,14 @@ class JournalRecordsDao(
                         journalService.getAll(recsQuery.page.maxItems, recsQuery.page.skipCount)
                     )
                 )
-                result.setTotalCount(journalService.count)
+                result.setTotalCount(journalService.getCount())
             }
         }
 
         val res = RecsQueryRes<JournalRecord>()
         res.setTotalCount(result.getTotalCount())
         res.setHasMore(result.getHasMore())
-        res.setRecords(result.getRecords().map { JournalRecord(it) })
+        res.setRecords(result.getRecords().map { JournalRecord(it, workspaceService) })
         return res
     }
 
@@ -118,24 +128,32 @@ class JournalRecordsDao(
         val dto = if (recordId.isEmpty()) {
             JournalWithMeta(false)
         } else {
-            journalService.getJournalById(recordId) ?: JournalWithMeta(false)
+            val idInWs = workspaceService.convertToIdInWs(recordId)
+            journalService.getJournalById(idInWs) ?: JournalWithMeta(false)
         }
-        return JournalRecord(dto)
+        return JournalRecord(dto, workspaceService)
     }
 
-    @Secured(AuthRole.ADMIN, AuthRole.SYSTEM)
     override fun delete(recordId: String): DelStatus {
-        journalService.delete(recordId)
+        val idInWs = workspaceService.convertToIdInWs(recordId)
+        checkWritePermissions(idInWs.workspace)
+        journalService.delete(idInWs)
         return DelStatus.OK
     }
 
-    @Secured(AuthRole.ADMIN, AuthRole.SYSTEM)
     override fun getRecToMutate(recordId: String): JournalMutateRec {
-        val dto = journalService.getJournalById(recordId)
-        return JournalMutateRec(dto?.journalDef ?: JournalDef.create().withId(recordId).build())
+        if (recordId.isEmpty()) {
+            return JournalMutateRec(JournalDef.create().build(), workspaceService)
+        }
+        val idInWs = workspaceService.convertToIdInWs(recordId)
+        val dto = journalService.getJournalById(idInWs) ?: error("Record with id '$idInWs' doesn't found")
+        return JournalMutateRec(dto.journalDef, workspaceService)
     }
 
     override fun saveMutatedRec(record: JournalMutateRec): String {
+
+        checkWritePermissions(record.workspace)
+
         record.actionsDef.forEach {
             val config = it.config
             config.forEach { k, v ->
@@ -151,7 +169,15 @@ class JournalRecordsDao(
             }
         }
 
-        return journalService.save(record.build()).journalDef.id
+        val afterSave = journalService.save(record.build()).journalDef
+        return workspaceService.addWsPrefixToId(afterSave.id, afterSave.workspace)
+    }
+
+    fun checkWritePermissions(workspace: String?) {
+        if (workspaceService.getArtifactsWritePermission(AuthContext.getCurrentUser(), workspace, "journal")) {
+            return
+        }
+        error("Permission denied. You can't create or change journals in workspace '$workspace'")
     }
 
     @Data
@@ -181,7 +207,18 @@ class JournalRecordsDao(
         }
     }
 
-    open class JournalRecord(base: JournalWithMeta) : JournalWithMeta(base) {
+    open class JournalRecord(base: JournalWithMeta, val workspaceService: WorkspaceService) : JournalWithMeta(base) {
+
+        @AttName(ScalarType.ID_SCHEMA)
+        open fun getRef(): EntityRef {
+            val journalId = journalDef?.id ?: ""
+            val localId = if (journalId.startsWith("type$")) {
+                journalId
+            } else {
+                workspaceService.addWsPrefixToId(journalId, journalDef?.workspace ?: "")
+            }
+            return EntityRef.create(AppName.UISERV, ID, localId)
+        }
 
         fun getModuleId(): String {
             return getLocalId()
@@ -201,16 +238,6 @@ class JournalRecordsDao(
         @AttName("?disp")
         fun getDisplayName(): MLText {
             return journalDef?.name ?: MLText.EMPTY
-        }
-
-        fun getWorkspaceRef(): EntityRef? {
-            return journalDef?.workspace?.let {
-                if (it.isBlank()) {
-                    EntityRef.EMPTY
-                } else {
-                    EntityRef.create(AppName.EMODEL, "workspace", it)
-                }
-            }
         }
 
         @JsonValue
@@ -256,7 +283,10 @@ class JournalRecordsDao(
         }
     }
 
-    class JournalMutateRec(base: JournalDef) : JournalDef.Builder(base) {
+    class JournalMutateRec(
+        base: JournalDef,
+        private val workspaceService: WorkspaceService
+    ) : JournalDef.Builder(base) {
 
         val originalId = base.id
 
@@ -264,8 +294,9 @@ class JournalRecordsDao(
             withId(id)
         }
 
-        fun withWorkspaceRef(workspaceRef: EntityRef) {
-            withWorkspace(workspaceRef.getLocalId())
+        @JsonProperty(RecordConstants.ATT_WORKSPACE)
+        fun withCtxWorkspace(workspace: String) {
+            withWorkspace(workspaceService.getUpdatedWsInMutation(this.workspace, workspace))
         }
     }
 }
