@@ -139,7 +139,8 @@ class JournalServiceImpl(
 
         idsToRequestFromDb.keys.groupBy { it.workspace }.forEach { (workspace, identifiers) ->
             journalRepository.findAllByExtIdInAndWorkspace(
-                identifiers.mapTo(HashSet()) { it.id }, workspace
+                identifiers.mapTo(HashSet()) { it.id },
+                workspace
             ).map { journalMapper.entityToDto(it) }.forEach {
                 val idInWs = IdInWs.create(workspace, it.journalDef.id)
                 result.add(Pair(it, idsToRequestFromDb.getOrDefault(idInWs, 0)))
@@ -168,9 +169,11 @@ class JournalServiceImpl(
     }
 
     override fun onJournalChanged(consumer: BiConsumer<JournalDef?, JournalDef?>) {
-        changeListeners.add(BiConsumer { before: JournalWithMeta?, after: JournalWithMeta? ->
-            consumer.accept(before?.journalDef, after?.journalDef)
-        })
+        changeListeners.add(
+            BiConsumer { before: JournalWithMeta?, after: JournalWithMeta? ->
+                consumer.accept(before?.journalDef, after?.journalDef)
+            }
+        )
     }
 
     override fun save(dto: JournalDef): JournalWithMeta {
@@ -185,18 +188,20 @@ class JournalServiceImpl(
         // preprocess config with builder
         val dtoToSave = dto.copy().build()
 
-        dtoToSave.columns.forEach(Consumer { column: JournalColumnDef ->
-            val validNameMatcher = VALID_COLUMN_NAME_PATTERN.matcher(column.id)
-            require(validNameMatcher.matches()) {
-                "Journal column name is invalid: '" + column.id + "'. Column: " + column
-            }
-            if (StringUtils.isNotBlank(column.attribute)) {
-                val validAttMatcher = VALID_COLUMN_ATT_PATTERN.matcher(column.attribute)
-                require(validAttMatcher.matches()) {
-                    "Journal column attribute is invalid: '" + column.attribute + "'. Column: " + column
+        dtoToSave.columns.forEach(
+            Consumer { column: JournalColumnDef ->
+                val validNameMatcher = VALID_COLUMN_NAME_PATTERN.matcher(column.id)
+                require(validNameMatcher.matches()) {
+                    "Journal column name is invalid: '" + column.id + "'. Column: " + column
+                }
+                if (StringUtils.isNotBlank(column.attribute)) {
+                    val validAttMatcher = VALID_COLUMN_ATT_PATTERN.matcher(column.attribute)
+                    require(validAttMatcher.matches()) {
+                        "Journal column attribute is invalid: '" + column.attribute + "'. Column: " + column
+                    }
                 }
             }
-        })
+        )
 
         val valueBefore = journalRepository.findByExtIdAndWorkspace(dtoToSave.id, dtoToSave.workspace)
             .map { journalMapper.entityToDto(it) }

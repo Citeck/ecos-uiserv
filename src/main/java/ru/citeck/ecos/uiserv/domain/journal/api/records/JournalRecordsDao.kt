@@ -38,7 +38,6 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
 import ru.citeck.ecos.uiserv.domain.journal.registry.JournalsRegistryConfiguration
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalServiceImpl
-import ru.citeck.ecos.uiserv.domain.workspace.service.WorkspaceUiService
 import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.nio.charset.StandardCharsets
@@ -102,9 +101,11 @@ class JournalRecordsDao(
                     .build()
                 val queryRes = recordsService.query(registryQuery)
 
-                val journals = journalService.getAll(queryRes.getRecords().map {
-                    workspaceService.convertToIdInWs(it.getLocalId())
-                }.toSet())
+                val journals = journalService.getAll(
+                    queryRes.getRecords().map {
+                        workspaceService.convertToIdInWs(it.getLocalId())
+                    }.toSet()
+                )
                 result.setRecords(ArrayList(journals))
                 result.setTotalCount(queryRes.getTotalCount())
             } else {

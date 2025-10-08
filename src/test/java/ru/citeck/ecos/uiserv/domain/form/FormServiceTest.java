@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
+import ru.citeck.ecos.model.lib.workspace.IdInWs;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
@@ -38,15 +39,15 @@ public class FormServiceTest {
 
         formService.save(model);
 
-        assertThat(formService.getFormById(id), is(Optional.of(model)));
+        assertThat(formService.getFormById(IdInWs.create(id)), is(Optional.of(model)));
 
-        formService.delete(id);
+        formService.delete(IdInWs.create(id));
 
-        assertThat(formService.getFormById(id), is(Optional.empty()));
+        assertThat(formService.getFormById(IdInWs.create(id)), is(Optional.empty()));
 
         formService.save(model);
 
-        assertThat(formService.getFormById(id), is(Optional.of(model)));
+        assertThat(formService.getFormById(IdInWs.create(id)), is(Optional.of(model)));
     }
 
     @Test
@@ -62,18 +63,18 @@ public class FormServiceTest {
 
         formService.save(modelA);
 
-        assertThat(formService.getFormById("TEST_FORM_A"), is(Optional.of(modelA)));
+        assertThat(formService.getFormById(IdInWs.create("TEST_FORM_A")), is(Optional.of(modelA)));
 
         modelA = modelA.copy().withFormKey("B").build();
         formService.save(modelA);
 
-        Optional<EcosFormDef> modelA_ = formService.getFormById("TEST_FORM_A");
+        Optional<EcosFormDef> modelA_ = formService.getFormById(IdInWs.create("TEST_FORM_A"));
         assertThat(modelA_.orElseThrow().getFormKey(), is("B"));
 
         modelA = modelA.copy().withFormKey("C").build();
         formService.save(modelA);
 
-        modelA_ = formService.getFormById("TEST_FORM_A");
+        modelA_ = formService.getFormById(IdInWs.create("TEST_FORM_A"));
         assertThat(modelA_.orElseThrow().getFormKey(), is("C"));
     }
 
@@ -118,7 +119,7 @@ public class FormServiceTest {
             formService.getFormByKey("K"),
             is(Optional.of(modelA)));
 
-        formService.delete(modelA.getId());
+        formService.delete(IdInWs.create(modelA.getId()));
         assertThat(
             formService.getFormByKey("K"),
             is(Optional.of(modelB)));

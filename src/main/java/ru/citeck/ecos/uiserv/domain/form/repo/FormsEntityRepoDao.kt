@@ -38,10 +38,16 @@ class FormsEntityRepoDao(
     }
 
     override fun findAllByExtIdIn(ids: Set<String>, workspace: String): Set<EcosFormEntity> {
-        return searchConv.findAll(repo, Predicates.and(
-            Predicates.inVals("extId", ids),
-            Predicates.eq("workspace", workspace)
-        ), 10000, 0, emptyList()).toSet()
+        return searchConv.findAll(
+            repo,
+            Predicates.and(
+                Predicates.inVals("extId", ids),
+                Predicates.eq("workspace", workspace)
+            ),
+            10000,
+            0,
+            emptyList()
+        ).toSet()
     }
 
     override fun save(entity: EcosFormEntity): EcosFormEntity {

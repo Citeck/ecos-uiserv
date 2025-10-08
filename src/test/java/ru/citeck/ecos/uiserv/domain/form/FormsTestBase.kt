@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.domain.form
 
 import org.junit.jupiter.api.BeforeEach
 import org.mockito.Mockito
+import ru.citeck.ecos.model.lib.ModelServiceFactory
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.RecordsServiceFactory
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
@@ -24,9 +25,18 @@ abstract class FormsTestBase {
     fun before() {
         val services = RecordsServiceFactory()
         recordsService = services.recordsService
-        ecosFormService = EcosFormServiceImpl(FormsEntityInMemDao(services.predicateService), services.recordsService)
+        val modelServices = ModelServiceFactory()
+        ecosFormService = EcosFormServiceImpl(
+            FormsEntityInMemDao(services.predicateService),
+            services.recordsService,
+            modelServices.workspaceService
+        )
 
-        val formsRecordsDao = EcosFormRecordsDao(ecosFormService, null)
+        val formsRecordsDao = EcosFormRecordsDao(
+            ecosFormService,
+            null,
+            modelServices.workspaceService
+        )
         recordsService.register(formsRecordsDao)
 
         val typeService = Mockito.mock(EcosTypeService::class.java)
@@ -37,7 +47,12 @@ abstract class FormsTestBase {
             typeByForm[it.getArgument(0)]
         }
 
-        val resolvedFormsRecordsDao = EcosResolvedFormRecordsDao(formsRecordsDao, typeService, ecosFormService)
+        val resolvedFormsRecordsDao = EcosResolvedFormRecordsDao(
+            formsRecordsDao,
+            typeService,
+            ecosFormService,
+            modelServices.workspaceService
+        )
         recordsService.register(resolvedFormsRecordsDao)
     }
 }

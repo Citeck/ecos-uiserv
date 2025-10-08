@@ -33,4 +33,12 @@ class CustomWorkspaceApi : WorkspaceApi {
     override fun isUserManagerOf(user: String, workspace: String): Boolean {
         return managersByWorkspace[workspace]?.contains(user) ?: false
     }
+
+    override fun getNestedWorkspaces(workspaces: Collection<String>): List<Set<String>> {
+        return workspaces.map { emptySet() }
+    }
+
+    override fun mapIdentifiers(identifiers: List<String>, mappingType: WorkspaceApi.IdMappingType): List<String> {
+        return identifiers
+    }
 }

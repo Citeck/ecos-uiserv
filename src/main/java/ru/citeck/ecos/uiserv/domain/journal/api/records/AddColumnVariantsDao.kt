@@ -114,5 +114,3 @@ class AddColumnVariantsDao(
         val type: String
     )
 }
-
-

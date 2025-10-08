@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
-import ru.citeck.ecos.uiserv.domain.workspace.service.WorkspaceUiService
 
 class EcosFormMutRecord(
     other: EcosFormDef,
