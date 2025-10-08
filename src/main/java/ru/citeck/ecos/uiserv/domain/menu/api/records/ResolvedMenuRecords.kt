@@ -47,7 +47,8 @@ class ResolvedMenuRecords(
     override fun getId() = ID
 
     override fun getRecordAtts(recordId: String): Any? {
-        return ResolvedMenu(menuRecords.getRecordAtts(recordId))
+        val atts = menuRecords.getRecordAtts(recordId)
+        return ResolvedMenu(atts, atts.model.workspace)
     }
 
     override fun queryRecords(recsQuery: RecordsQuery): Any? {
@@ -55,10 +56,12 @@ class ResolvedMenuRecords(
         val records = menuRecords.queryRecords(recsQuery)
         val result = RecsQueryRes<Any>()
 
+        val workspace = recsQuery.query["workspace"].asText()
+
         result.setRecords(
             records.getRecords().map {
                 if (it is MenuRecords.MenuRecord) {
-                    ResolvedMenu(it)
+                    ResolvedMenu(it, workspace)
                 } else {
                     it
                 }
@@ -72,11 +75,12 @@ class ResolvedMenuRecords(
 
     inner class ResolvedMenu(
         @AttName("...")
-        val menu: MenuRecords.MenuRecord
+        val menu: MenuRecords.MenuRecord,
+        val workspace: String
     ) {
 
         fun getSubMenu(): SubMenus {
-            return SubMenus(menu.model.workspace, menu.model.subMenu)
+            return SubMenus(workspace, menu.model.subMenu)
         }
     }
 
