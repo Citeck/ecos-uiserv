@@ -18,7 +18,7 @@ data class MenuItemDef(
     val config: ObjectData,
     val action: MenuItemActionDef,
     val items: List<MenuItemDef>,
-    val collapsed: Boolean,
+    val collapsed: Boolean?,
     val allowedFor: List<String>
 ) {
 
@@ -46,7 +46,7 @@ data class MenuItemDef(
         var config: ObjectData = ObjectData.create()
         var action: MenuItemActionDef = MenuItemActionDef.EMPTY
         var items: List<MenuItemDef> = emptyList()
-        var collapsed: Boolean = false
+        var collapsed: Boolean? = null
         var allowedFor: List<String> = emptyList()
 
         constructor(base: MenuItemDef) : this() {
@@ -103,7 +103,7 @@ data class MenuItemDef(
         }
 
         fun withCollapsed(collapsed: Boolean?): Builder {
-            this.collapsed = collapsed ?: false
+            this.collapsed = collapsed
             return this
         }
 
