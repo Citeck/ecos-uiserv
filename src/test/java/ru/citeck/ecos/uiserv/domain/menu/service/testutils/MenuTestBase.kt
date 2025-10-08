@@ -102,7 +102,8 @@ open class MenuTestBase {
             }?.id?.let { ModelUtils.getTypeRef(it) }
         }
 
-        resolvedMenuRecords = ResolvedMenuRecords(menuRecords, ecosTypeService)
+        val workspaceService = ModelServiceFactory().workspaceService
+        resolvedMenuRecords = ResolvedMenuRecords(menuRecords, ecosTypeService, workspaceService)
         records.register(resolvedMenuRecords)
 
         menuArtifactHandler = MenuArtifactHandler(menuService)

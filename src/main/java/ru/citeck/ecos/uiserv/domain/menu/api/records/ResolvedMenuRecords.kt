@@ -243,8 +243,8 @@ class ResolvedMenuRecords(
             if (allowedFor.any { currentUserWithAuthorities.contains(it.lowercase()) }) {
                 return true
             }
-            return allowedFor.contains(ROLE_WS_MANAGER) && isUserWsManager()
-                || allowedFor.contains(ROLE_WS_USER) && isUserWsMember()
+            return allowedFor.contains(ROLE_WS_MANAGER) && isUserWsManager() ||
+                allowedFor.contains(ROLE_WS_USER) && isUserWsMember()
         }
 
         private fun processMenuItems(
