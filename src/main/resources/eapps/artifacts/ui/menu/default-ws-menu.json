@@ -67,6 +67,9 @@
           "type": "SECTION",
           "config": {},
           "collapsed": true,
+          "allowedFor": [
+            "ROLE_WS_MANAGER"
+          ],
           "items": [
             {
               "id": "default-ws-admin-menu-items",

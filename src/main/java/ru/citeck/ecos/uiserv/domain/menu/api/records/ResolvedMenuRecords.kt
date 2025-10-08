@@ -5,7 +5,10 @@ import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.context.lib.auth.AuthContext
+import ru.citeck.ecos.context.lib.auth.AuthRole
 import ru.citeck.ecos.model.lib.type.dto.CreateVariantDef
+import ru.citeck.ecos.model.lib.utils.ModelUtils
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
@@ -24,7 +27,8 @@ import kotlin.collections.HashSet
 @Component
 class ResolvedMenuRecords(
     private val menuRecords: MenuRecords,
-    private val ecosTypeService: EcosTypeService
+    private val ecosTypeService: EcosTypeService,
+    private val workspaceService: WorkspaceService
 ) : AbstractRecordsDao(), RecordAttsDao, RecordsQueryDao {
 
     companion object {
@@ -35,6 +39,9 @@ class ResolvedMenuRecords(
         private const val ITEM_TYPE_LINK_CREATE_CASE = "LINK-CREATE-CASE"
         private const val ITEM_TYPE_INCLUDE_MENU = "INCLUDE_MENU"
         private const val ITEM_TYPE_CREATE_IN_SECTION = "CREATE_IN_SECTION"
+
+        private const val ROLE_WS_MANAGER = AuthRole.PREFIX + "WS_MANAGER"
+        private const val ROLE_WS_USER = AuthRole.PREFIX + "WS_USER"
     }
 
     override fun getId() = ID
@@ -69,17 +76,47 @@ class ResolvedMenuRecords(
     ) {
 
         fun getSubMenu(): SubMenus {
-            return SubMenus(menu.model.subMenu)
+            return SubMenus(menu.model.workspace, menu.model.subMenu)
         }
     }
 
-    inner class SubMenus(originalDef: Map<String, SubMenuDef>) {
+    inner class SubMenus(workspace: String, originalDef: Map<String, SubMenuDef>) {
 
         private val subMenus: Map<String, SubMenuDef>
 
+        private val currentWorkspace = workspace.ifBlank { ModelUtils.DEFAULT_WORKSPACE_ID }
+        private val currentUser: String
+        private val currentUserWithAuthorities: Set<String>
+
+        private var isUserWsManager: Boolean? = null
+        private var isUserWsMember: Boolean? = null
+
+        private fun isUserWsManager(): Boolean {
+            isUserWsManager?.let { return it }
+            return workspaceService.isUserManagerOf(currentUser, currentWorkspace).also {
+                isUserWsManager = it
+            }
+        }
+
+        private fun isUserWsMember(): Boolean {
+            isUserWsMember?.let { return it }
+            if (isUserWsManager == true) {
+                return true
+            }
+            return workspaceService.isUserMemberOf(currentUser, currentWorkspace).also {
+                isUserWsMember = it
+            }
+        }
+
         init {
-            val authorities = HashSet(ArrayList(AuthContext.getCurrentUserWithAuthorities()))
-            subMenus = processMenuItems(originalDef, authorities.map { it.lowercase() }.toSet())
+            val currentAuth = AuthContext.getCurrentFullAuth()
+            currentUser = currentAuth.getUser()
+            currentUserWithAuthorities = LinkedHashSet(currentAuth.getAuthorities().size + 1)
+            currentUserWithAuthorities.add(currentUser.lowercase())
+            currentAuth.getAuthorities().forEach {
+                currentUserWithAuthorities.add(it.lowercase())
+            }
+            subMenus = processMenuItems(originalDef)
         }
 
         fun getUser(): SubMenuDef {
@@ -195,20 +232,30 @@ class ResolvedMenuRecords(
             }
         }
 
+        private fun checkAllowedFor(allowedFor: List<String>): Boolean {
+            if (allowedFor.isEmpty()) {
+                return true
+            }
+            if (allowedFor.any { currentUserWithAuthorities.contains(it.lowercase()) }) {
+                return true
+            }
+            return allowedFor.contains(ROLE_WS_MANAGER) && isUserWsManager()
+                || allowedFor.contains(ROLE_WS_USER) && isUserWsMember()
+        }
+
         private fun processMenuItems(
-            subMenu: Map<String, SubMenuDef>,
-            authorities: Set<String>
+            subMenu: Map<String, SubMenuDef>
         ): Map<String, SubMenuDef> {
 
             val result = HashMap<String, SubMenuDef>()
             val contextsWithInternalIncludes = ArrayList<SubMenuProcessingContext>()
 
             for ((menuType, menu) in subMenu) {
-                if (menu.allowedFor.isNotEmpty() && !menu.allowedFor.any { authorities.contains(it.lowercase()) }) {
+                if (!checkAllowedFor(menu.allowedFor)) {
                     continue
                 }
                 val context = SubMenuProcessingContext(result, menuType)
-                result[menuType] = processMenuItems(context, menu, authorities)
+                result[menuType] = processMenuItems(context, menu)
                 if (context.internalIncludeItemsPaths.isNotEmpty()) {
                     contextsWithInternalIncludes.add(context)
                 }
@@ -217,7 +264,7 @@ class ResolvedMenuRecords(
             for (context in contextsWithInternalIncludes) {
                 val subMenuData = result[context.subMenuType] ?: continue
                 context.phase = SubMenuProcessingContext.ProcessingPhase.INTERNAL_INCLUDES
-                result[context.subMenuType] = processMenuItems(context, subMenuData, authorities)
+                result[context.subMenuType] = processMenuItems(context, subMenuData)
             }
 
             return result
@@ -225,26 +272,24 @@ class ResolvedMenuRecords(
 
         private fun processMenuItems(
             context: SubMenuProcessingContext,
-            menu: SubMenuDef,
-            authorities: Set<String>
+            menu: SubMenuDef
         ): SubMenuDef {
             val result = SubMenuDef()
             result.config = menu.config
-            result.items = processMenuItems(context, menu.items, authorities)
+            result.items = processMenuItems(context, menu.items)
             return result
         }
 
         private fun processMenuItems(
             context: SubMenuProcessingContext,
-            items: List<MenuItemDef>,
-            authorities: Set<String>
+            items: List<MenuItemDef>
         ): List<MenuItemDef> {
             val result = ArrayList<MenuItemDef>()
             for (item in items) {
                 context.doWithinSubPath(item.id) {
                     when (context.phase) {
                         SubMenuProcessingContext.ProcessingPhase.INITIAL -> {
-                            initialMenuItemProcess(context, item, authorities, result)
+                            initialMenuItemProcess(context, item, result)
                         }
                         SubMenuProcessingContext.ProcessingPhase.INTERNAL_INCLUDES -> {
                             internalIncludesMenuItemProcess(context, item, result)
@@ -291,14 +336,13 @@ class ResolvedMenuRecords(
         private fun initialMenuItemProcess(
             context: SubMenuProcessingContext,
             item: MenuItemDef,
-            authorities: Set<String>,
             result: MutableList<MenuItemDef>
         ) {
 
             if (item.hidden) {
                 return
             }
-            if (item.allowedFor.isNotEmpty() && !item.allowedFor.any { authorities.contains(it.lowercase()) }) {
+            if (!checkAllowedFor(item.allowedFor)) {
                 return
             }
 
@@ -348,7 +392,7 @@ class ResolvedMenuRecords(
                 return
             }
 
-            newItem.withItems(processMenuItems(context, newItem.items, authorities))
+            newItem.withItems(processMenuItems(context, newItem.items))
 
             result.add(newItem.build())
         }
