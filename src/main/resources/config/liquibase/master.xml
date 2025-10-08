@@ -68,5 +68,6 @@
     <include file="changelog/20250109000000_add_ext_id_constraints.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20250605000000_add_board_card_title_template.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20250609000000_add_ws_to_journal_settings.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20250826000000_add_ws_to_journals_n_forms.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

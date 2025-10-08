@@ -4,9 +4,12 @@ import com.fasterxml.jackson.annotation.JsonValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.json.YamlUtils.toNonDefaultString
 import ru.citeck.ecos.context.lib.auth.AuthContext.isRunAsAdmin
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
+import ru.citeck.ecos.records3.record.atts.schema.ScalarType
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.atts.value.AttValue
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
+import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.nio.charset.StandardCharsets
 
@@ -15,12 +18,19 @@ class EcosFormRecord(
     private val sourceId: String,
 
     @AttName("...")
-    val def: EcosFormDef
+    val def: EcosFormDef,
+    private val workspaceService: WorkspaceService
 ) {
 
-    @AttName("?id")
-    fun getId(): EntityRef {
-        return EntityRef.create(appName, sourceId, def.id)
+    @AttName(ScalarType.ID_SCHEMA)
+    fun getRef(): EntityRef {
+        val formId = def.id
+        val localId = if (formId.startsWith("type$")) {
+            formId
+        } else {
+            workspaceService.addWsPrefixToId(formId, def.workspace)
+        }
+        return EntityRef.create(appName, sourceId, localId)
     }
 
     fun getModuleId(): String {
@@ -36,9 +46,19 @@ class EcosFormRecord(
         }
     }
 
+    fun getWorkspaceRef(): EntityRef {
+        return def.workspace.let {
+            if (it.isBlank()) {
+                EntityRef.EMPTY
+            } else {
+                EntityRef.create(AppName.EMODEL, "workspace", it)
+            }
+        }
+    }
+
     @JsonValue
     fun toJson(): EcosFormDef {
-        return def
+        return def.copy().withWorkspace("").build()
     }
 
     fun getData(): ByteArray {

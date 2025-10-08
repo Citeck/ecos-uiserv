@@ -7,6 +7,7 @@ import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.context.lib.i18n.I18nContext
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.uiserv.domain.form.builder.*
@@ -19,7 +20,8 @@ import ru.citeck.ecos.webapp.api.entity.EntityRef
 class MobileTaskFormsProvider(
     val recordsService: RecordsService,
     val ecosFormService: EcosFormService,
-    val formBuilderFactory: EcosFormBuilderFactory
+    val formBuilderFactory: EcosFormBuilderFactory,
+    val workspaceService: WorkspaceService
 ) : EcosFormsProvider {
 
     @PostConstruct
@@ -31,6 +33,7 @@ class MobileTaskFormsProvider(
 
         val taskRef = EntityRef.valueOf(id)
         val taskAtts = recordsService.getAtts(taskRef, TaskAtts::class.java)
+        val docFormId = workspaceService.convertToIdInWs(taskAtts.documentFormId)
 
         val form = formBuilderFactory.createBuilder()
             .withComponents { formComponents ->
@@ -39,7 +42,7 @@ class MobileTaskFormsProvider(
                     .withComponents { bodyComponents ->
                         buildDocumentFields(
                             bodyComponents,
-                            ecosFormService.getFormById(taskAtts.documentFormId).orElse(null)
+                            ecosFormService.getFormById(docFormId).orElse(null)
                         )
                     }.build()
                 formComponents.addPanel()

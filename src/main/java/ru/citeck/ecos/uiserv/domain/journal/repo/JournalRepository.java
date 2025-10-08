@@ -12,11 +12,9 @@ import java.util.Set;
 @Repository
 public interface JournalRepository extends JpaRepository<JournalEntity, Long>, JpaSpecificationExecutor<JournalEntity> {
 
-    Optional<JournalEntity> findByExtId(String id);
+    Optional<JournalEntity> findByExtIdAndWorkspace(String extId, String workspace);
 
-    Set<JournalEntity> findAllByExtIdIn(Set<String> ids);
-
-    Set<JournalEntity> findAllByTypeRef(String typeRefStr);
+    Set<JournalEntity> findAllByExtIdInAndWorkspace(Set<String> ids, String workspace);
 
     @Query("SELECT max(j.lastModifiedDate) FROM JournalEntity j")
     Optional<Instant> getLastModifiedTime();

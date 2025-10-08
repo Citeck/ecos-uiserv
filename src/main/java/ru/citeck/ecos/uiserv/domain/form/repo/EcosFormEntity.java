@@ -20,6 +20,7 @@ public class EcosFormEntity extends AbstractAuditingEntity {
     private String extId;
     @Column(name = "type_ref")
     private String typeRef;
+    private String workspace = "";
 
     private Boolean system;
     private String title;

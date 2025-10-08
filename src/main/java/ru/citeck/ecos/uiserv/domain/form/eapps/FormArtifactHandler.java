@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.apps.app.domain.handler.EcosArtifactHandler;
+import ru.citeck.ecos.model.lib.workspace.IdInWs;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
 
@@ -30,7 +31,7 @@ public class FormArtifactHandler implements EcosArtifactHandler<EcosFormDef> {
 
     @Override
     public void deleteArtifact(@NotNull String s) {
-        formService.delete(s);
+        formService.delete(IdInWs.create(s));
     }
 
     @NotNull

@@ -24,6 +24,7 @@ class JournalEntity : AbstractAuditingEntity() {
     var groupBy: String? = null
     var sortBy: String? = null
     var typeRef: String? = null
+    var workspace: String = ""
     var predicate: String? = null
     var defaultFilters: String? = null
     var queryData: String? = null

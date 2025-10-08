@@ -4,10 +4,12 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
+import ru.citeck.ecos.commons.data.entity.EntityMeta
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 import ru.citeck.ecos.model.lib.attributes.dto.computed.ComputedAttType
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.uiserv.domain.form.builder.EcosFormBuilderFactory
@@ -23,7 +25,8 @@ class TypeFormsProvider(
     val recordsService: RecordsService,
     val ecosFormService: EcosFormService,
     val typesRegistry: EcosTypesRegistry,
-    val formBuilderFactory: EcosFormBuilderFactory
+    val formBuilderFactory: EcosFormBuilderFactory,
+    val workspaceService: WorkspaceService
 ) : EcosFormsProvider {
 
     companion object {
@@ -41,6 +44,19 @@ class TypeFormsProvider(
 
     fun getFormById(id: String, withDefinition: Boolean): EntityWithMeta<EcosFormDef>? {
         val typeDef = typesRegistry.getValueWithMeta(id) ?: return null
+
+        val fRefInTypeDef = typeDef.entity.formRef
+        if (!fRefInTypeDef.getLocalId().startsWith("type$")) {
+            val idInWs = workspaceService.convertToIdInWs(fRefInTypeDef.getLocalId())
+            val formDef = ecosFormService.getFormByIdWithMeta(idInWs).orElse(null)
+            if (formDef != null) {
+                return EntityWithMeta(
+                    formDef.entity.copy().withId("${getType()}$${typeDef.entity.id}").build(),
+                    formDef.meta
+                )
+            }
+        }
+
         return createFormDef(typeDef, withDefinition)
     }
 
@@ -49,6 +65,7 @@ class TypeFormsProvider(
         val formBuilder = formBuilderFactory.createBuilder()
         formBuilder.withId("${getType()}$${typeDef.entity.id}")
             .withWidth(EcosFormWidth.MEDIUM)
+            .withWorkspace(typeDef.entity.workspace)
             .withTitle(typeDef.entity.name)
 
         val form = formBuilder.withComponents { formComponents ->

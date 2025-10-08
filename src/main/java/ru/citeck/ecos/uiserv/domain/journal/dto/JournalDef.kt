@@ -47,6 +47,15 @@ data class JournalDef(
     val typeRef: EntityRef,
 
     /**
+     * Workspace identifier to which this journal belongs.
+     *
+     * If defined, the journal is considered scoped and can only be used
+     * within the specified workspace. Journals without a workspace are treated
+     * as global and available across all workspaces.
+     */
+    val workspace: String,
+
+    /**
      * Group records by specified attributes.
      */
     val groupBy: List<String>,
@@ -131,6 +140,7 @@ data class JournalDef(
         var queryData: ObjectData = ObjectData.create()
         var searchConfig: JournalSearchConfig = JournalSearchConfig.EMPTY
         var typeRef: EntityRef = EntityRef.EMPTY
+        var workspace: String = ""
         var groupBy: List<String> = emptyList()
         var defaultSortBy: List<JournalSortByDef> = emptyList()
         var hideImportDataActions: Boolean = false
@@ -153,6 +163,7 @@ data class JournalDef(
             queryData = ObjectData.deepCopyOrNew(base.queryData)
             searchConfig = base.searchConfig
             typeRef = base.typeRef
+            workspace = base.workspace
             groupBy = base.groupBy.let { DataValue.create(it).asStrList() }
             withDefaultSortBy(base.defaultSortBy)
             hideImportDataActions = base.hideImportDataActions
@@ -203,6 +214,11 @@ data class JournalDef(
 
         fun withTypeRef(typeRef: EntityRef?): Builder {
             this.typeRef = typeRef ?: EntityRef.EMPTY
+            return this
+        }
+
+        fun withWorkspace(workspace: String?): Builder {
+            this.workspace = workspace ?: ""
             return this
         }
 
@@ -288,6 +304,7 @@ data class JournalDef(
                 queryData = queryData,
                 searchConfig = searchConfig,
                 typeRef = typeRef,
+                workspace = workspace,
                 groupBy = groupBy,
                 defaultSortBy = defaultSortBy,
                 hideImportDataActions = hideImportDataActions,

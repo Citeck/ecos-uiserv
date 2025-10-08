@@ -28,6 +28,7 @@ class JournalMapper(
             .withMetaRecord(EntityRef.valueOf(entity.metaRecord))
             .withName(mapper.read(entity.name, MLText::class.java))
             .withTypeRef(EntityRef.valueOf(entity.typeRef))
+            .withWorkspace(entity.workspace)
             .withPredicate(mapper.read(entity.predicate, Predicate::class.java))
             .withDefaultFilters(mapper.readList(entity.defaultFilters, Predicate::class.java))
             .withQueryData(mapper.read(entity.queryData, ObjectData::class.java))
@@ -54,7 +55,7 @@ class JournalMapper(
 
     fun dtoToEntity(journal: JournalDef): JournalEntity {
 
-        var entity = repository.findByExtId(journal.id).orElse(null)
+        var entity = repository.findByExtIdAndWorkspace(journal.id, journal.workspace).orElse(null)
         if (entity == null) {
             entity = JournalEntity()
             entity.extId = journal.id
@@ -66,6 +67,7 @@ class JournalMapper(
         entity.editable = journal.editable
         entity.name = mapper.toString(journal.name)
         entity.typeRef = EntityRef.toString(journal.typeRef)
+        entity.workspace = journal.workspace
         entity.predicate = mapper.toString(journal.predicate)
         entity.defaultFilters = mapper.toString(journal.defaultFilters)
         entity.queryData = mapper.toString(journal.queryData)

@@ -14,6 +14,8 @@ import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.context.lib.i18n.I18nContext;
+import ru.citeck.ecos.model.lib.workspace.IdInWs;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.PredicateUtils;
 import ru.citeck.ecos.records2.predicate.element.elematts.RecordAttsElement;
@@ -49,6 +51,7 @@ public class TaskFormRecordsDao extends AbstractRecordsDao
     private final EcosFormService formService;
     private final RecordsServiceFactory recordsServices;
     private final PredicateService predicateService;
+    private final WorkspaceService workspaceService;
 
     private Map<String, String> taskInfoAttsToLoad;
 
@@ -91,7 +94,8 @@ public class TaskFormRecordsDao extends AbstractRecordsDao
             return EcosFormDef.create().build();
         }
 
-        EcosFormDef formById = formService.getFormById(formQuery.getFormRef().getLocalId()).orElse(null);
+        IdInWs idInWs = workspaceService.convertToIdInWs(formQuery.getFormRef().getLocalId());
+        EcosFormDef formById = formService.getFormById(idInWs).orElse(null);
         if (formById == null) {
             return EcosFormDef.create().build();
         }
@@ -188,7 +192,8 @@ public class TaskFormRecordsDao extends AbstractRecordsDao
         EcosFormDef form = null;
 
         if (task.getFormRef() != null && task.getFormRef().isNotEmpty()) {
-            form = formService.getFormById(task.getFormRef().getLocalId()).orElse(null);
+            IdInWs idInWs = workspaceService.convertToIdInWs(task.getFormRef().getLocalId());
+            form = formService.getFormById(idInWs).orElse(null);
         }
 
         if (form == null) {

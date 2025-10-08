@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.domain.ecostype.service
 import org.springframework.stereotype.Service
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.model.lib.type.dto.CreateVariantDef
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService
 import ru.citeck.ecos.uiserv.domain.ecostype.config.EcosTypesComponent
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
@@ -18,14 +19,16 @@ class EcosTypeService(
     private val formService: EcosFormService,
     private val boardService: BoardService,
     private val journalService: JournalService,
-    private val ecosTypesRegistry: EcosTypesRegistry
+    private val ecosTypesRegistry: EcosTypesRegistry,
+    private val workspaceService: WorkspaceService
 ) {
 
     fun getTypeRefByForm(formRef: EntityRef?): EntityRef {
         if (formRef == null || EntityRef.isEmpty(formRef)) {
             return EntityRef.EMPTY
         }
-        val typeRefForForm = formService.getFormById(formRef.getLocalId())
+        val idInWs = workspaceService.convertToIdInWs(formRef.getLocalId())
+        val typeRefForForm = formService.getFormById(idInWs)
             .map { it.typeRef }
             .orElse(EntityRef.EMPTY)
         if (EntityRef.isNotEmpty(typeRefForForm)) {
@@ -51,7 +54,8 @@ class EcosTypeService(
         if (journalRef == null || EntityRef.isEmpty(journalRef)) {
             return EntityRef.EMPTY
         }
-        val journal = journalService.getJournalById(journalRef.getLocalId())
+        val idInWs = workspaceService.convertToIdInWs(journalRef.getLocalId())
+        val journal = journalService.getJournalById(idInWs)
         if (journal != null && EntityRef.isNotEmpty(journal.journalDef.typeRef)) {
             return journal.journalDef.typeRef
         }

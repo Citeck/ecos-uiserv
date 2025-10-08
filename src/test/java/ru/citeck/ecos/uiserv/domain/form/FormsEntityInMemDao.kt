@@ -25,11 +25,11 @@ class FormsEntityInMemDao(
         return count()
     }
 
-    override fun findByExtId(formId: String): EcosFormEntity? {
+    override fun findByExtId(formId: String, workspace: String): EcosFormEntity? {
         return entities[formId]
     }
 
-    override fun findAllByExtIdIn(ids: Set<String>): Set<EcosFormEntity> {
+    override fun findAllByExtIdIn(ids: Set<String>, workspace: String): Set<EcosFormEntity> {
         val result = TreeSet<EcosFormEntity>()
         for (id in ids) {
             entities[id]?.let { result.add(it) }

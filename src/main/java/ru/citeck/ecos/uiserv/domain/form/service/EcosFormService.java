@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.form.service;
 
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
+import ru.citeck.ecos.model.lib.workspace.IdInWs;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
@@ -18,13 +19,13 @@ public interface EcosFormService {
 
     int getCount(Predicate predicate);
 
-    void updateFormType(String formId, EntityRef typeRef);
+    void updateFormType(IdInWs formId, EntityRef typeRef);
 
-    List<EcosFormDef> getAllForms(Predicate predicate, int max, int skip, List<SortBy> sort);
+    List<EcosFormDef> getAllForms(Predicate predicate, List<String> workspaces, int max, int skip, List<SortBy> sort);
 
     List<EcosFormDef> getAllForms(int max, int skip);
 
-    List<EntityWithMeta<EcosFormDef>> getFormsByIds(List<String> ids);
+    List<EntityWithMeta<EcosFormDef>> getFormsByIds(List<IdInWs> ids);
 
     List<EntityWithMeta<EcosFormDef>> getAllFormsWithMeta(int max, int skip);
 
@@ -34,7 +35,9 @@ public interface EcosFormService {
 
     List<EcosFormDef> getFormsByKeys(List<String> formKeys);
 
-    Optional<EcosFormDef> getFormById(String id);
+    Optional<EcosFormDef> getFormById(IdInWs id);
+
+    Optional<EntityWithMeta<EcosFormDef>> getFormByIdWithMeta(IdInWs id);
 
     List<EcosFormDef> getFormsForExactType(EntityRef typeRef);
 
@@ -44,7 +47,7 @@ public interface EcosFormService {
 
     EcosFormDef getDefault();
 
-    void delete(String id);
+    void delete(IdInWs id);
 
     void addDeleteListener(Consumer<EntityWithMeta<EcosFormDef>> listener);
 

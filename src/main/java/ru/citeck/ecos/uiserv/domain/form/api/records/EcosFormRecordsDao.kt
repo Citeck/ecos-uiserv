@@ -6,8 +6,11 @@ import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.annotation.Secured
 import org.springframework.stereotype.Component
+import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.context.lib.auth.AuthRole
 import ru.citeck.ecos.events2.type.RecordEventsService
+import ru.citeck.ecos.model.lib.workspace.IdInWs
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.PredicateUtils
 import ru.citeck.ecos.records2.predicate.model.AttributePredicate
@@ -25,6 +28,7 @@ import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
 import ru.citeck.ecos.uiserv.domain.form.registry.FormsRegistryConfiguration
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
+import ru.citeck.ecos.uiserv.domain.workspace.service.WorkspaceUiService
 import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.util.*
@@ -33,7 +37,8 @@ import java.util.stream.Collectors
 @Component
 class EcosFormRecordsDao(
     private val ecosFormService: EcosFormService,
-    private var recordEventsService: RecordEventsService?
+    private var recordEventsService: RecordEventsService?,
+    private val workspaceService: WorkspaceService
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordMutateDtoDao<EcosFormMutRecord>,
@@ -72,43 +77,56 @@ class EcosFormRecordsDao(
     fun init() {
         ecosFormService.addChangeListener { before: EcosFormDef?, after: EcosFormDef? ->
             if (after != null) {
-                recordEventsService?.emitRecChanged(before, after, getId()) { EcosFormRecord(AppName.UISERV, ID, it) }
+                recordEventsService?.emitRecChanged(before, after, getId()) {
+                    EcosFormRecord(AppName.UISERV, ID, it, workspaceService)
+                }
             }
         }
     }
 
-    @Secured(AuthRole.ADMIN, AuthRole.SYSTEM)
     override fun getRecToMutate(recordId: String): EcosFormMutRecord {
         if (recordId.isEmpty()) {
-            return EcosFormMutRecord()
+            return EcosFormMutRecord(workspaceService)
         }
-        val currentForm = ecosFormService.getFormById(recordId)
+        val idInWs = workspaceService.convertToIdInWs(recordId)
+        val currentForm = ecosFormService.getFormById(idInWs)
         require(!currentForm.isEmpty) { "Form with id $recordId not found!" }
-        return EcosFormMutRecord(currentForm.get())
+        return EcosFormMutRecord(currentForm.get(), workspaceService)
     }
 
     private fun toRecord(model: EcosFormDef): EcosFormRecord {
-        return EcosFormRecord(AppName.UISERV, ID, model)
+        return EcosFormRecord(AppName.UISERV, ID, model, workspaceService)
     }
 
     override fun saveMutatedRec(record: EcosFormMutRecord): String {
+        checkPermissions(record.workspace)
         return ecosFormService.save(record.build())
     }
 
-    @Secured(AuthRole.ADMIN, AuthRole.SYSTEM)
     override fun delete(recordId: String): DelStatus {
         if (SYSTEM_FORMS.contains(recordId)) {
             return DelStatus.PROTECTED
         }
-        ecosFormService.delete(recordId)
+        val idInWs = workspaceService.convertToIdInWs(recordId)
+        checkPermissions(idInWs.workspace)
+
+        ecosFormService.delete(idInWs)
         return DelStatus.OK
+    }
+
+    private fun checkPermissions(workspace: String) {
+        if (workspaceService.getArtifactsWritePermission(AuthContext.getCurrentUser(), workspace, "form")) {
+            return
+        }
+        error("Permission denied. You can't manage forms in workspace '$workspace'")
     }
 
     override fun getRecordAtts(recordId: String): EcosFormRecord? {
         return if (recordId.isEmpty()) {
             toRecord(EcosFormDef.create().build())
         } else {
-            ecosFormService.getFormById(recordId)
+            val idInWs = workspaceService.convertToIdInWs(recordId)
+            ecosFormService.getFormById(idInWs)
                 .map { toRecord(it) }
                 .orElse(null)
         }
@@ -167,7 +185,9 @@ class EcosFormRecordsDao(
                     .build()
                 val queryRes = recordsService.query(registryQuery)
                 val journals = ecosFormService.getFormsByIds(
-                    queryRes.getRecords().map { it.getLocalId() }
+                    queryRes.getRecords().map {
+                        workspaceService.convertToIdInWs(it.getLocalId())
+                    }
                 )
                 result.setRecords(journals.map { toRecord(it.entity) })
                 result.setTotalCount(queryRes.getTotalCount())
@@ -175,6 +195,7 @@ class EcosFormRecordsDao(
 
                 val forms = ecosFormService.getAllForms(
                     VoidPredicate.INSTANCE,
+                    emptyList(),
                     max,
                     skipCount,
                     recsQuery.sortBy

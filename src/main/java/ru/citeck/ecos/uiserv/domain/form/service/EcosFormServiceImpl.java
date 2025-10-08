@@ -14,13 +14,17 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.data.entity.EntityMeta;
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.model.lib.utils.ModelUtils;
+import ru.citeck.ecos.model.lib.workspace.IdInWs;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
+import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records2.predicate.model.Predicates;
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate;
 import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
-import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
-import ru.citeck.ecos.uiserv.domain.form.repo.EcosFormEntity;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
+import ru.citeck.ecos.uiserv.domain.form.repo.EcosFormEntity;
 import ru.citeck.ecos.uiserv.domain.form.service.provider.EcosFormsProvider;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
@@ -47,6 +51,7 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     private final FormsEntityDao formsEntityDao;
     private final RecordsService recordsService;
+    private final WorkspaceService workspaceService;
 
     private final Map<String, EcosFormsProvider> providers = new ConcurrentHashMap<>();
 
@@ -86,13 +91,13 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
-    public void updateFormType(String formId, EntityRef typeRef) {
+    public void updateFormType(IdInWs formId, EntityRef typeRef) {
 
         if (EntityRef.isEmpty(typeRef)) {
             return;
         }
 
-        EcosFormEntity form = formsEntityDao.findByExtId(formId);
+        EcosFormEntity form = formsEntityDao.findByExtId(formId.getId(), formId.getWorkspace());
         if (form != null && StringUtils.isBlank(form.getTypeRef())) {
             form.setTypeRef(typeRef.toString());
             formsEntityDao.save(form);
@@ -100,47 +105,71 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
-    public List<EcosFormDef> getAllForms(Predicate predicate, int max, int skip, List<SortBy> sort) {
-        return formsEntityDao.findAll(predicate, max, skip, sort).stream()
+    public List<EcosFormDef> getAllForms(
+        Predicate predicate,
+        List<String> workspaces,
+        int max,
+        int skip,
+        List<SortBy> sort
+    ) {
+        return formsEntityDao.findAll(
+            addWorkspaceCondition(predicate, workspaces), max, skip, sort
+            ).stream()
             .map(this::mapToDto)
             .map(EntityWithMeta::getEntity)
             .collect(Collectors.toList());
     }
 
+    private Predicate addWorkspaceCondition(Predicate predicate, List<String> workspaces) {
+        if (workspaces.isEmpty()) {
+            return predicate;
+        }
+        Set<String> fixedWorkspaces = workspaces.stream()
+            .map(it -> ModelUtils.DEFAULT_WORKSPACE_ID.equals(it) ? "" : it)
+            .collect(Collectors.toSet());
+        return Predicates.and(predicate, Predicates.inVals("workspace", fixedWorkspaces));
+    }
+
     private List<EntityWithMeta<EcosFormDef>> getAllFormsWithMeta(
-        Predicate predicate, int max, int skip, List<SortBy> sort) {
-        return formsEntityDao.findAll(predicate, max, skip, sort).stream()
+        Predicate predicate, List<String> workspaces, int max, int skip, List<SortBy> sort) {
+        return formsEntityDao.findAll(addWorkspaceCondition(predicate, workspaces), max, skip, sort).stream()
             .map(this::mapToDto)
             .collect(Collectors.toList());
     }
 
     @Override
-    public List<EntityWithMeta<EcosFormDef>> getFormsByIds(List<String> ids) {
+    public List<EntityWithMeta<EcosFormDef>> getFormsByIds(List<IdInWs> ids) {
 
-        Map<String, Integer> idsToRequestFromDb = new HashMap<>();
+        Map<String, Map<String, Integer>> idsToRequestFromDb = new HashMap<>();
         List<Pair<EntityWithMeta<EcosFormDef>, Integer>> result = new ArrayList<>();
+
         int idx = 0;
-        for (String id : ids) {
-            if (id.contains("$")) {
-                String providerId = id.substring(0, id.indexOf('$'));
+        for (IdInWs idInWs : ids) {
+            String localId = idInWs.getId();
+            if (localId.contains("$")) {
+                String providerId = localId.substring(0, localId.indexOf('$'));
                 if (providers.containsKey(providerId)) {
-                    Optional<EcosFormDef> formById = getFormById(id);
+                    Optional<EcosFormDef> formById = getFormById(idInWs);
                     if (formById.isPresent()) {
                         result.add(new Pair<>(new EntityWithMeta<>(formById.get(), EntityMeta.EMPTY), idx));
                     }
                 } else {
-                    idsToRequestFromDb.put(id, idx);
+                    idsToRequestFromDb.computeIfAbsent(idInWs.getWorkspace(), _ -> new HashMap<>())
+                        .put(idInWs.getId(), idx);
                 }
             } else {
-                idsToRequestFromDb.put(id, idx);
+                idsToRequestFromDb.computeIfAbsent(idInWs.getWorkspace(), _ -> new HashMap<>())
+                    .put(idInWs.getId(), idx);
             }
             idx++;
         }
 
-        formsEntityDao.findAllByExtIdIn(idsToRequestFromDb.keySet()).stream()
-            .map(this::mapToDto)
-            .forEach(v ->
-                result.add(new Pair<>(v, idsToRequestFromDb.getOrDefault(v.getEntity().getId(), 0))));
+        idsToRequestFromDb.forEach((workspace, idsWithIdx) -> {
+            formsEntityDao.findAllByExtIdIn(idsWithIdx.keySet(), workspace).stream()
+                .map(this::mapToDto)
+                .forEach(v ->
+                    result.add(new Pair<>(v, idsWithIdx.getOrDefault(v.getEntity().getId(), 0))));
+        });
 
         result.sort(Comparator.comparing(Pair<EntityWithMeta<EcosFormDef>, Integer>::getSecond));
 
@@ -151,12 +180,12 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     @Override
     public List<EcosFormDef> getAllForms(int max, int skip) {
-        return getAllForms(VoidPredicate.INSTANCE, max, skip, Collections.emptyList());
+        return getAllForms(VoidPredicate.INSTANCE, Collections.emptyList(), max, skip, Collections.emptyList());
     }
 
     @Override
     public List<EntityWithMeta<EcosFormDef>> getAllFormsWithMeta(int max, int skip) {
-        return getAllFormsWithMeta(VoidPredicate.INSTANCE, max, skip, Collections.emptyList());
+        return getAllFormsWithMeta(VoidPredicate.INSTANCE, Collections.emptyList(), max, skip, Collections.emptyList());
     }
 
     @Override
@@ -201,27 +230,38 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
-    public Optional<EcosFormDef> getFormById(String id) {
-        if (StringUtils.isBlank(id)) {
+    public Optional<EcosFormDef> getFormById(IdInWs id) {
+        return getFormByIdWithMeta(id).map(EntityWithMeta::getEntity);
+    }
+
+    @Override
+    public Optional<EntityWithMeta<EcosFormDef>> getFormByIdWithMeta(IdInWs id) {
+        String localId = id.getId();
+        if (StringUtils.isBlank(localId)) {
             return Optional.empty();
         }
-        if (id.contains("$")) {
-            String resolverId = id.substring(0, id.indexOf('$'));
+        if (localId.contains("$")) {
+            String resolverId = localId.substring(0, localId.indexOf('$'));
             EcosFormsProvider resolver = providers.get(resolverId);
             if (resolver != null) {
                 return Optional.ofNullable(
-                    resolver.getFormById(id.substring(resolverId.length() + 1))
+                    resolver.getFormById(localId.substring(resolverId.length() + 1))
                 ).map(formDefWithMeta -> {
                     if (StringUtils.isBlank(formDefWithMeta.getEntity().getId())) {
-                        return formDefWithMeta.getEntity().copy().withId(id).build();
+                        return new EntityWithMeta<>(
+                            formDefWithMeta.getEntity()
+                            .copy()
+                            .withId(id.getId())
+                            .build(),
+                            formDefWithMeta.getMeta()
+                        );
                     }
-                    return formDefWithMeta.getEntity();
+                    return formDefWithMeta;
                 });
             }
         }
-        return Optional.ofNullable(formsEntityDao.findByExtId(id))
-            .map(this::mapToDto)
-            .map(EntityWithMeta::getEntity);
+        return Optional.ofNullable(formsEntityDao.findByExtId(id.getId(), id.getWorkspace()))
+            .map(this::mapToDto);
     }
 
     @Override
@@ -231,7 +271,7 @@ public class EcosFormServiceImpl implements EcosFormService {
             throw new RuntimeException("You can't change generated form: '" + model.getId() + "'");
         }
 
-        EcosFormEntity entityBefore = formsEntityDao.findByExtId(model.getId());
+        EcosFormEntity entityBefore = formsEntityDao.findByExtId(model.getId(), model.getWorkspace());
         EntityWithMeta<EcosFormDef> formDtoBefore = null;
         if (entityBefore != null) {
             formDtoBefore = mapToDto(entityBefore);
@@ -252,8 +292,8 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
-    public void delete(String id) {
-        EcosFormEntity entity = formsEntityDao.findByExtId(id);
+    public void delete(IdInWs id) {
+        EcosFormEntity entity = formsEntityDao.findByExtId(id.getId(), id.getWorkspace());
         if (entity != null) {
             EntityWithMeta<EcosFormDef> dtoBefore = mapToDto(entity);
             formsEntityDao.delete(entity);
@@ -287,7 +327,8 @@ public class EcosFormServiceImpl implements EcosFormService {
         try {
             ParentsAndFormByType parents = recordsService.getAtts(typeRef, ParentsAndFormByType.class);
             if (!EntityRef.isEmpty(parents.form)) {
-                Optional.ofNullable(formsEntityDao.findByExtId(parents.form.getLocalId()))
+                IdInWs idInWs = workspaceService.convertToIdInWs(parents.form.getLocalId());
+                Optional.ofNullable(formsEntityDao.findByExtId(idInWs.getId(), idInWs.getWorkspace()))
                     .ifPresent(addIfNotAdded);
             }
 
@@ -317,6 +358,7 @@ public class EcosFormServiceImpl implements EcosFormService {
             .withWidth(entity.getWidth())
             .withFormKey(entity.getFormKey())
             .withTypeRef(EntityRef.valueOf(entity.getTypeRef()))
+            .withWorkspace(entity.getWorkspace())
             .withCustomModule(entity.getCustomModule())
             .withI18n(Json.getMapper().read(entity.getI18n(), ObjectData.class))
             .withAttributes(Json.getMapper().read(entity.getAttributes(), ObjectData.class))
@@ -338,7 +380,7 @@ public class EcosFormServiceImpl implements EcosFormService {
 
         EcosFormEntity entity = null;
         if (!StringUtils.isBlank(model.getId())) {
-            entity = formsEntityDao.findByExtId(model.getId());
+            entity = formsEntityDao.findByExtId(model.getId(), model.getWorkspace());
         }
         if (entity == null) {
             entity = new EcosFormEntity();
@@ -354,6 +396,7 @@ public class EcosFormServiceImpl implements EcosFormService {
         entity.setDescription(Json.getMapper().toString(model.getDescription()));
         entity.setFormKey(model.getFormKey());
         entity.setTypeRef(EntityRef.toString(model.getTypeRef()));
+        entity.setWorkspace(model.getWorkspace());
         entity.setCustomModule(model.getCustomModule());
         entity.setI18n(Json.getMapper().toString(model.getI18n()));
         entity.setDefinition(Json.getMapper().toString(model.getDefinition()));

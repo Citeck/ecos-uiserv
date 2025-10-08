@@ -12,6 +12,7 @@ import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 import ru.citeck.ecos.model.lib.attributes.dto.computed.ComputedAttDef
 import ru.citeck.ecos.model.lib.attributes.dto.computed.ComputedAttStoringType
 import ru.citeck.ecos.model.lib.attributes.dto.computed.ComputedAttType
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records2.predicate.PredicateUtils
 import ru.citeck.ecos.records2.predicate.model.Predicate
@@ -44,16 +45,19 @@ class ResolvedJournalRecordsDao(
     private val columnEditorResolver: ColumnEditorResolver,
     private val columnFormatterResolver: ColumnFormatterResolver,
     private val columnAttSchemaResolver: ColumnAttSchemaResolver,
-    private val ecosWebAppsApi: EcosRemoteWebAppsApi
+    private val ecosWebAppsApi: EcosRemoteWebAppsApi,
+    private val workspaceService: WorkspaceService
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordAttsDao {
 
     companion object {
+        const val ID = "rjournal"
+
         private val log = KotlinLogging.logger {}
     }
 
-    override fun getId() = "rjournal"
+    override fun getId() = ID
 
     override fun queryRecords(recsQuery: RecordsQuery): Any? {
 
@@ -73,7 +77,7 @@ class ResolvedJournalRecordsDao(
     private fun resolveJournal(journal: JournalRecordsDao.JournalRecord): ResolvedJournalDef {
 
         if (journal.journalDef == null || StringUtils.isBlank(journal.journalDef.id)) {
-            return ResolvedJournalDef(journal) { emptyList() }
+            return ResolvedJournalDef(journal, workspaceService) { emptyList() }
         }
         val journalBuilder = journal.journalDef.copy()
 
@@ -142,10 +146,10 @@ class ResolvedJournalRecordsDao(
         typeInfo: TypeDef?
     ): ResolvedJournalDef {
 
-        val newJournal = JournalRecordsDao.JournalRecord(journalRecord)
+        val newJournal = JournalRecordsDao.JournalRecord(journalRecord, workspaceService)
         newJournal.journalDef = journalBuilder.build()
 
-        val result = ResolvedJournalDef(newJournal) { resolveColumns(journalBuilder, typeInfo) }
+        val result = ResolvedJournalDef(newJournal, workspaceService) { resolveColumns(journalBuilder, typeInfo) }
 
         if (typeInfo != null) {
             result.createVariants = typeInfo.createVariants ?: emptyList()

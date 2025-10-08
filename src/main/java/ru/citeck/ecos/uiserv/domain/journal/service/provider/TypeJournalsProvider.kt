@@ -3,9 +3,11 @@ package ru.citeck.ecos.uiserv.domain.journal.service.provider
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
+import ru.citeck.ecos.commons.data.entity.EntityMeta
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.context.lib.i18n.I18nContext
 import ru.citeck.ecos.model.lib.utils.ModelUtils
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records3.record.atts.schema.ScalarType
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef
@@ -16,7 +18,8 @@ import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
 @Component
 class TypeJournalsProvider(
     val typesRegistry: EcosTypesRegistry,
-    val journalService: JournalService
+    val journalService: JournalService,
+    val workspaceService: WorkspaceService
 ) : JournalsProvider {
 
     @PostConstruct
@@ -26,6 +29,22 @@ class TypeJournalsProvider(
 
     override fun getJournalById(id: String): EntityWithMeta<JournalDef>? {
         val typeDef = typesRegistry.getValueWithMeta(id) ?: return null
+        val jRefInTypeDef = typeDef.entity.journalRef
+        if (!jRefInTypeDef.getLocalId().startsWith("type$")) {
+            val idInWs = workspaceService.convertToIdInWs(jRefInTypeDef.getLocalId())
+            val journalDef = journalService.getJournalById(idInWs)
+            if (journalDef != null) {
+                return EntityWithMeta(
+                    journalDef.journalDef.copy().withId(getType() + "$" + id).build(),
+                    EntityMeta(
+                        journalDef.created,
+                        journalDef.creator,
+                        journalDef.modified,
+                        journalDef.modifier
+                    )
+                )
+            }
+        }
         return EntityWithMeta(
             createJournalDef(typeDef.entity),
             typeDef.meta
@@ -63,6 +82,7 @@ class TypeJournalsProvider(
         return JournalDef.create()
             .withName(typeDef.name)
             .withTypeRef(ModelUtils.getTypeRef(typeDef.id))
+            .withWorkspace(typeDef.workspace)
             .withColumns(columns)
             .build()
     }

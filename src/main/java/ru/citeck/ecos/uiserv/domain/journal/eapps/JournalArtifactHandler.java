@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.apps.app.domain.handler.EcosArtifactHandler;
+import ru.citeck.ecos.model.lib.workspace.IdInWs;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService;
 
@@ -22,7 +23,7 @@ public class JournalArtifactHandler implements EcosArtifactHandler<JournalDef> {
 
     @Override
     public void deleteArtifact(@NotNull String s) {
-        journalService.delete(s);
+        journalService.delete(IdInWs.create(s));
     }
 
     @Override
