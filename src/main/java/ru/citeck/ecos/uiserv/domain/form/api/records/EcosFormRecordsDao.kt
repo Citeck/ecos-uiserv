@@ -96,7 +96,8 @@ class EcosFormRecordsDao(
 
     override fun saveMutatedRec(record: EcosFormMutRecord): String {
         checkPermissions(record.workspace)
-        return ecosFormService.save(record.build())
+        val recAfterSave = ecosFormService.save(record.build())
+        return workspaceService.addWsPrefixToId(recAfterSave.id, recAfterSave.workspace)
     }
 
     override fun delete(recordId: String): DelStatus {
@@ -122,6 +123,11 @@ class EcosFormRecordsDao(
             toRecord(EcosFormDef.create().build())
         } else {
             val idInWs = workspaceService.convertToIdInWs(recordId)
+            if (!workspaceService.isWorkspaceWithGlobalArtifacts(idInWs.workspace) &&
+                !workspaceService.isUserMemberOf(AuthContext.getCurrentUser(), idInWs.workspace)
+            ) {
+                return null
+            }
             ecosFormService.getFormById(idInWs)
                 .map { toRecord(it) }
                 .orElse(null)

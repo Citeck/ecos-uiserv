@@ -1,0 +1,14 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="citeck" id="20251013000000">
+
+        <dropUniqueConstraint tableName="journal" constraintName="journal_ext_id_key" uniqueColumns="ext_id"/>
+        <addUniqueConstraint tableName="journal" columnNames="workspace,ext_id"/>
+
+        <dropUniqueConstraint tableName="ecos_forms" constraintName="ecos_forms_ext_id_key" uniqueColumns="ext_id"/>
+        <addUniqueConstraint tableName="ecos_forms" columnNames="workspace,ext_id"/>
+
+    </changeSet>
+
+</databaseChangeLog>

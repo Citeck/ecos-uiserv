@@ -8,6 +8,7 @@ import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeType
 import ru.citeck.ecos.model.lib.attributes.dto.computed.ComputedAttType
+import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records3.RecordsService
@@ -41,8 +42,8 @@ class TypeFormsProvider(
         return getFormById(id, true)
     }
 
-    fun getFormById(id: String, withDefinition: Boolean): EntityWithMeta<EcosFormDef>? {
-        val typeDef = typesRegistry.getValueWithMeta(id) ?: return null
+    fun getFormById(typeRefId: String, withDefinition: Boolean): EntityWithMeta<EcosFormDef>? {
+        val typeDef = typesRegistry.getValueWithMeta(typeRefId) ?: return null
 
         val fRefInTypeDef = typeDef.entity.formRef
         if (!fRefInTypeDef.getLocalId().startsWith("type$")) {
@@ -50,20 +51,25 @@ class TypeFormsProvider(
             val formDef = ecosFormService.getFormByIdWithMeta(idInWs).orElse(null)
             if (formDef != null) {
                 return EntityWithMeta(
-                    formDef.entity.copy().withId("${getType()}$${typeDef.entity.id}").build(),
+                    formDef.entity.copy().withId("${getType()}$${typeRefId}").build(),
                     formDef.meta
                 )
             }
         }
 
-        return createFormDef(typeDef, withDefinition)
+        return createFormDef(typeRefId, typeDef, withDefinition)
     }
 
-    private fun createFormDef(typeDef: EntityWithMeta<TypeDef>, withDefinition: Boolean): EntityWithMeta<EcosFormDef> {
+    private fun createFormDef(
+        typeRefId: String,
+        typeDef: EntityWithMeta<TypeDef>,
+        withDefinition: Boolean
+    ): EntityWithMeta<EcosFormDef> {
 
         val formBuilder = formBuilderFactory.createBuilder()
-        formBuilder.withId("${getType()}$${typeDef.entity.id}")
+        formBuilder.withId("${getType()}$${typeRefId}")
             .withWidth(EcosFormWidth.MEDIUM)
+            .withTypeRef(ModelUtils.getTypeRef(typeRefId))
             .withWorkspace(typeDef.entity.workspace)
             .withTitle(typeDef.entity.name)
 

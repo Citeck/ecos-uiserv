@@ -2,12 +2,15 @@ package ru.citeck.ecos.uiserv.domain.form.builder
 
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 interface EcosFormBuilder {
 
     fun withId(id: String): EcosFormBuilder
 
     fun withWidth(width: EcosFormWidth): EcosFormBuilder
+
+    fun withTypeRef(typeRef: EntityRef): EcosFormBuilder
 
     fun withWorkspace(workspace: String): EcosFormBuilder
 

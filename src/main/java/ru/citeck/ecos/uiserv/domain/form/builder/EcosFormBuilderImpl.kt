@@ -4,6 +4,7 @@ import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 class EcosFormBuilderImpl(
     val context: FormBuilderContext,
@@ -14,6 +15,11 @@ class EcosFormBuilderImpl(
 
     override fun withId(id: String): EcosFormBuilder {
         formModel.withId(id)
+        return this
+    }
+
+    override fun withTypeRef(typeRef: EntityRef): EcosFormBuilder {
+        formModel.typeRef = typeRef
         return this
     }
 

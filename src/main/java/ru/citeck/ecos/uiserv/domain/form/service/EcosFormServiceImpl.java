@@ -265,13 +265,15 @@ public class EcosFormServiceImpl implements EcosFormService {
     }
 
     @Override
-    public String save(EcosFormDef model) {
+    public EcosFormDef save(EcosFormDef model) {
 
         if (model.getId().contains("$")) {
             throw new RuntimeException("You can't change generated form: '" + model.getId() + "'");
         }
 
-        EcosFormEntity entityBefore = formsEntityDao.findByExtId(model.getId(), model.getWorkspace());
+        EcosFormEntity newFormEntity = mapToEntity(model);
+
+        EcosFormEntity entityBefore = formsEntityDao.findByExtId(model.getId(), newFormEntity.getWorkspace());
         EntityWithMeta<EcosFormDef> formDtoBefore = null;
         if (entityBefore != null) {
             formDtoBefore = mapToDto(entityBefore);
@@ -281,14 +283,14 @@ public class EcosFormServiceImpl implements EcosFormService {
             }
         }
 
-        EcosFormEntity entity = formsEntityDao.save(mapToEntity(model));
+        EcosFormEntity entity = formsEntityDao.save(newFormEntity);
         EntityWithMeta<EcosFormDef> result = mapToDto(entity);
 
         for (BiConsumer<EntityWithMeta<EcosFormDef>, EntityWithMeta<EcosFormDef>> listener : listeners) {
             listener.accept(formDtoBefore, result);
         }
 
-        return result.getEntity().getId();
+        return result.getEntity();
     }
 
     @Override
@@ -351,6 +353,11 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     private EntityWithMeta<EcosFormDef> mapToDto(EcosFormEntity entity) {
 
+        String workspace = entity.getWorkspace();
+        if (StringUtils.isBlank(workspace)) {
+            workspace = ModelUtils.DEFAULT_WORKSPACE_ID;
+        }
+
         EcosFormDef model = EcosFormDef.create()
             .withId(entity.getExtId())
             .withTitle(Json.getMapper().read(entity.getTitle(), MLText.class))
@@ -358,7 +365,7 @@ public class EcosFormServiceImpl implements EcosFormService {
             .withWidth(entity.getWidth())
             .withFormKey(entity.getFormKey())
             .withTypeRef(EntityRef.valueOf(entity.getTypeRef()))
-            .withWorkspace(entity.getWorkspace())
+            .withWorkspace(workspace)
             .withCustomModule(entity.getCustomModule())
             .withI18n(Json.getMapper().read(entity.getI18n(), ObjectData.class))
             .withAttributes(Json.getMapper().read(entity.getAttributes(), ObjectData.class))
@@ -378,9 +385,14 @@ public class EcosFormServiceImpl implements EcosFormService {
 
     private EcosFormEntity mapToEntity(EcosFormDef model) {
 
+        String workspace = model.getWorkspace();
+        if (ModelUtils.DEFAULT_WORKSPACE_ID.equals(workspace)) {
+            workspace = "";
+        }
+
         EcosFormEntity entity = null;
         if (!StringUtils.isBlank(model.getId())) {
-            entity = formsEntityDao.findByExtId(model.getId(), model.getWorkspace());
+            entity = formsEntityDao.findByExtId(model.getId(), workspace);
         }
         if (entity == null) {
             entity = new EcosFormEntity();
@@ -396,7 +408,7 @@ public class EcosFormServiceImpl implements EcosFormService {
         entity.setDescription(Json.getMapper().toString(model.getDescription()));
         entity.setFormKey(model.getFormKey());
         entity.setTypeRef(EntityRef.toString(model.getTypeRef()));
-        entity.setWorkspace(model.getWorkspace());
+        entity.setWorkspace(workspace);
         entity.setCustomModule(model.getCustomModule());
         entity.setI18n(Json.getMapper().toString(model.getI18n()));
         entity.setDefinition(Json.getMapper().toString(model.getDefinition()));

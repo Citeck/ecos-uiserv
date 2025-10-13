@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json.mapper
+import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.uiserv.domain.journal.dto.*
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity
@@ -21,6 +22,10 @@ class JournalMapper(
 
         val dto = JournalWithMeta(true)
 
+        val workspace = entity.workspace.ifBlank {
+            ModelUtils.DEFAULT_WORKSPACE_ID
+        }
+
         dto.journalDef = JournalDef.create()
             .withId(entity.extId)
             .withEditable(entity.editable)
@@ -28,7 +33,7 @@ class JournalMapper(
             .withMetaRecord(EntityRef.valueOf(entity.metaRecord))
             .withName(mapper.read(entity.name, MLText::class.java))
             .withTypeRef(EntityRef.valueOf(entity.typeRef))
-            .withWorkspace(entity.workspace)
+            .withWorkspace(workspace)
             .withPredicate(mapper.read(entity.predicate, Predicate::class.java))
             .withDefaultFilters(mapper.readList(entity.defaultFilters, Predicate::class.java))
             .withQueryData(mapper.read(entity.queryData, ObjectData::class.java))
@@ -61,13 +66,19 @@ class JournalMapper(
             entity.extId = journal.id
         }
 
+        val workspace = if (journal.workspace == ModelUtils.DEFAULT_WORKSPACE_ID) {
+            ""
+        } else {
+            journal.workspace
+        }
+
         entity.sourceId = journal.sourceId
         entity.metaRecord = journal.metaRecord.toString()
         entity.columns = mapper.toString(journal.columns.map { mapper.toNonDefaultJson(it) })!!
         entity.editable = journal.editable
         entity.name = mapper.toString(journal.name)
         entity.typeRef = EntityRef.toString(journal.typeRef)
-        entity.workspace = journal.workspace
+        entity.workspace = workspace
         entity.predicate = mapper.toString(journal.predicate)
         entity.defaultFilters = mapper.toString(journal.defaultFilters)
         entity.queryData = mapper.toString(journal.queryData)

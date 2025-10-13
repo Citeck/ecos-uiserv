@@ -43,7 +43,7 @@ public interface EcosFormService {
 
     List<EcosFormDef> getAllFormsForType(EntityRef typeRef);
 
-    String save(EcosFormDef model);
+    EcosFormDef save(EcosFormDef model);
 
     EcosFormDef getDefault();
 

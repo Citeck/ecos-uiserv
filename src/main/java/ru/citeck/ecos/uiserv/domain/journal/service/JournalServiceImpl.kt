@@ -32,7 +32,7 @@ import java.util.regex.Pattern
 class JournalServiceImpl(
     private val journalRepository: JournalRepository,
     private val journalMapper: JournalMapper,
-    private val jpaSearchConverterFactory: JpaSearchConverterFactory,
+    private val jpaSearchConverterFactory: JpaSearchConverterFactory
 ) : JournalService {
 
     companion object {
@@ -202,8 +202,9 @@ class JournalServiceImpl(
                 }
             }
         )
+        val newJournalEntity = journalMapper.dtoToEntity(dtoToSave)
 
-        val valueBefore = journalRepository.findByExtIdAndWorkspace(dtoToSave.id, dtoToSave.workspace)
+        val valueBefore = journalRepository.findByExtIdAndWorkspace(dtoToSave.id, newJournalEntity.workspace)
             .map { journalMapper.entityToDto(it) }
             .orElse(null)
 
@@ -211,8 +212,7 @@ class JournalServiceImpl(
             throw RuntimeException("Invalid id: " + dtoToSave.id)
         }
 
-        val journalEntity = journalMapper.dtoToEntity(dtoToSave)
-        val storedJournalEntity = journalRepository.save(journalEntity)
+        val storedJournalEntity = journalRepository.save(newJournalEntity)
 
         val journalDto = journalMapper.entityToDto(storedJournalEntity)
 

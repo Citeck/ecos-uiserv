@@ -3,8 +3,8 @@ package ru.citeck.ecos.uiserv.domain.journal.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.journal.service.mapper.JournalMapper;
@@ -18,13 +18,13 @@ public class JournalServiceImplTest {
 
     private JournalServiceImpl journalService;
 
-    @MockBean
+    @MockitoBean
     private RecordsService recordsService;
 
-    @SpyBean
+    @MockitoSpyBean
     private JournalMapper journalMapper;
 
-    @MockBean
+    @MockitoBean
     private JournalRepository journalRepository;
 
     @BeforeEach

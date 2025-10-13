@@ -46,12 +46,12 @@ class TypeJournalsProvider(
             }
         }
         return EntityWithMeta(
-            createJournalDef(typeDef.entity),
+            createJournalDef(id, typeDef.entity),
             typeDef.meta
         )
     }
 
-    private fun createJournalDef(typeDef: TypeDef): JournalDef {
+    private fun createJournalDef(typeRefId: String, typeDef: TypeDef): JournalDef {
 
         val columns = mutableListOf<JournalColumnDef>()
 
@@ -80,8 +80,9 @@ class TypeJournalsProvider(
         )
 
         return JournalDef.create()
+            .withId(getType() + "$" + typeRefId)
             .withName(typeDef.name)
-            .withTypeRef(ModelUtils.getTypeRef(typeDef.id))
+            .withTypeRef(ModelUtils.getTypeRef(typeRefId))
             .withWorkspace(typeDef.workspace)
             .withColumns(columns)
             .build()
