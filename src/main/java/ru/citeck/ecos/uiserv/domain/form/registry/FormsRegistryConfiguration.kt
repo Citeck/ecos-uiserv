@@ -5,6 +5,7 @@ import com.hazelcast.replicatedmap.ReplicatedMap
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta
+import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records3.record.dao.RecordsDao
 import ru.citeck.ecos.records3.record.dao.impl.ext.ExtStorageRecordsDao
@@ -106,6 +107,13 @@ class FormsRegistryConfiguration(
         }
     }
 
+    private fun normalizeWsForRegistry(workspace: String): String {
+        if (workspace == ModelUtils.DEFAULT_WORKSPACE_ID) {
+            return ""
+        }
+        return workspace
+    }
+
     private fun createRegistryValue(typeDef: EntityWithMeta<TypeDef>): EntityWithMeta<FormRegistryValue>? {
         val formId = typeDef.entity.formRef.getLocalId().substringAfter('$')
         val formDef = typeFormsProvider.getFormById(formId, false) ?: return null
@@ -116,7 +124,7 @@ class FormsRegistryConfiguration(
                 formDef.entity.description,
                 formDef.entity.formKey,
                 formDef.entity.typeRef,
-                formDef.entity.workspace,
+                normalizeWsForRegistry(formDef.entity.workspace),
                 formDef.entity.system
             ),
             formDef.meta
@@ -132,7 +140,7 @@ class FormsRegistryConfiguration(
                 form.entity.description,
                 form.entity.formKey,
                 form.entity.typeRef,
-                form.entity.workspace,
+                normalizeWsForRegistry(form.entity.workspace),
                 form.entity.system
             ),
             form.meta
