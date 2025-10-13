@@ -51,7 +51,7 @@ class TypeFormsProvider(
             val formDef = ecosFormService.getFormByIdWithMeta(idInWs).orElse(null)
             if (formDef != null) {
                 return EntityWithMeta(
-                    formDef.entity.copy().withId("${getType()}$${typeRefId}").build(),
+                    formDef.entity.copy().withId("${getType()}$$typeRefId").build(),
                     formDef.meta
                 )
             }
@@ -67,7 +67,7 @@ class TypeFormsProvider(
     ): EntityWithMeta<EcosFormDef> {
 
         val formBuilder = formBuilderFactory.createBuilder()
-        formBuilder.withId("${getType()}$${typeRefId}")
+        formBuilder.withId("${getType()}$$typeRefId")
             .withWidth(EcosFormWidth.MEDIUM)
             .withTypeRef(ModelUtils.getTypeRef(typeRefId))
             .withWorkspace(typeDef.entity.workspace)

@@ -86,9 +86,12 @@ class TypeInWsCreatedListener(
             leftMenuJson.add(
                 "\$..[?(@.id == \"sections\")].items",
                 DataValue.createObj()
-                    .set("id", AUTO_JOURNAL_MENU_ITEM_ID_PREFIX +
-                        event.typeId + "-" +
-                        System.currentTimeMillis().toString(Character.MAX_RADIX))
+                    .set(
+                        "id",
+                        AUTO_JOURNAL_MENU_ITEM_ID_PREFIX +
+                            event.typeId + "-" +
+                            System.currentTimeMillis().toString(Character.MAX_RADIX)
+                    )
                     .set("label", label)
                     .set("type", "JOURNAL")
                     .set("icon", "ui/icon@i-leftmenu-types")
@@ -106,7 +109,7 @@ class TypeInWsCreatedListener(
             if (autoItem == null) {
                 log.info {
                     "Auto item doesn't found for journalRef $journalRef " +
-                    "in menu ${menu.id} in workspace ${menu.workspace}"
+                        "in menu ${menu.id} in workspace ${menu.workspace}"
                 }
                 return
             } else {

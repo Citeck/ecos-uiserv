@@ -35,6 +35,7 @@ public class FormServiceTest {
             .withId(id)
             .withTitle(new MLText("test"))
             .withDefinition(ObjectData.create())
+            .withWorkspace("default")
             .build();
 
         formService.save(model);
@@ -58,6 +59,7 @@ public class FormServiceTest {
             .withDescription(new MLText("Test form"))
             .withTitle(new MLText("Test Form"))
             .withDefinition(ObjectData.create())
+            .withWorkspace("default")
             .withFormKey("A")
             .build();
 
@@ -86,21 +88,25 @@ public class FormServiceTest {
             .withDescription(new MLText("Test form"))
             .withTitle(new MLText("Test Form"))
             .withDefinition(ObjectData.create())
+            .withWorkspace("default")
             .withFormKey("K")
             .build();
 
         EcosFormDef modelB = new EcosFormDef.Builder(modelA)
             .withId("TEST_FORM_B")
+            .withWorkspace("default")
             .withFormKey("K")
             .build();
 
         EcosFormDef modelC = new EcosFormDef.Builder(modelA)
             .withId("TEST_FORM_C")
+            .withWorkspace("default")
             .withFormKey("K")
             .build();
 
         EcosFormDef modelD = new EcosFormDef.Builder(modelA)
             .withId("TEST_FORM_D")
+            .withWorkspace("default")
             .withFormKey("L")
             .build();
 
