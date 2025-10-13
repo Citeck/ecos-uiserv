@@ -60,16 +60,16 @@ class JournalMapper(
 
     fun dtoToEntity(journal: JournalDef): JournalEntity {
 
-        var entity = repository.findByExtIdAndWorkspace(journal.id, journal.workspace).orElse(null)
-        if (entity == null) {
-            entity = JournalEntity()
-            entity.extId = journal.id
-        }
-
         val workspace = if (journal.workspace == ModelUtils.DEFAULT_WORKSPACE_ID) {
             ""
         } else {
             journal.workspace
+        }
+
+        var entity = repository.findByExtIdAndWorkspace(journal.id, workspace).orElse(null)
+        if (entity == null) {
+            entity = JournalEntity()
+            entity.extId = journal.id
         }
 
         entity.sourceId = journal.sourceId
