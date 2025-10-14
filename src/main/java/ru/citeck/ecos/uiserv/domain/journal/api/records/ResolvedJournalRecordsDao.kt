@@ -33,6 +33,7 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalSortByDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedColumnDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.resolve.ResolvedJournalDef
 import ru.citeck.ecos.webapp.api.apps.EcosRemoteWebAppsApi
+import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import java.util.*
@@ -164,7 +165,8 @@ class ResolvedJournalRecordsDao(
             return
         }
 
-        val journalRef = EntityRef.create("uiserv", JournalRecordsDao.ID, journal.id)
+        val localId = workspaceService.addWsPrefixToId(journal.id, journal.workspace)
+        val journalRef = EntityRef.create(AppName.UISERV, JournalRecordsDao.ID, localId)
         val typeRef = ecosTypeService.getTypeRefByJournal(journalRef)
 
         journal.withTypeRef(typeRef)
