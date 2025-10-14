@@ -35,7 +35,7 @@ class TypeJournalsProvider(
             val journalDef = journalService.getJournalById(idInWs)
             if (journalDef != null) {
                 return EntityWithMeta(
-                    journalDef.journalDef.copy().withId(getType() + "$" + id).build(),
+                    journalDef.journalDef,
                     EntityMeta(
                         journalDef.created,
                         journalDef.creator,

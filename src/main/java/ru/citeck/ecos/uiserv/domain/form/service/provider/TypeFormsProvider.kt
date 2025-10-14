@@ -50,10 +50,7 @@ class TypeFormsProvider(
             val idInWs = workspaceService.convertToIdInWs(fRefInTypeDef.getLocalId())
             val formDef = ecosFormService.getFormByIdWithMeta(idInWs).orElse(null)
             if (formDef != null) {
-                return EntityWithMeta(
-                    formDef.entity.copy().withId("${getType()}$$typeRefId").build(),
-                    formDef.meta
-                )
+                return formDef
             }
         }
 
