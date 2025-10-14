@@ -227,11 +227,11 @@ class JournalRecordsDao(
             return EntityRef.create(AppName.UISERV, ID, localId)
         }
 
-        fun getModuleId(): String {
+        open fun getModuleId(): String {
             return getLocalId()
         }
 
-        fun getLocalId(): String {
+        open fun getLocalId(): String {
             return journalDef?.id ?: ""
         }
 

@@ -22,12 +22,21 @@ class ResolvedJournalDef(
         return super.getRef().withSourceId(ResolvedJournalRecordsDao.ID)
     }
 
+    override fun getLocalId(): String {
+        return super.getRef().getLocalId()
+    }
+
+    override fun getModuleId(): String {
+        return getLocalId()
+    }
+
     override fun getColumns(): List<Any> {
         return columnsEval.invoke()
     }
 
     override fun toNonDefaultJson(): Any {
         val data = ObjectData.create(journalDef)
+        data["id"] = getLocalId()
         data["createVariants"] = createVariants
         data["columns"] = getColumns()
         return data

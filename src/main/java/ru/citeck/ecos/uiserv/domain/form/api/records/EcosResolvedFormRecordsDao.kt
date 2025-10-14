@@ -7,6 +7,7 @@ import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.model.lib.attributes.dto.AttributeDef
 import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
+import ru.citeck.ecos.records3.record.atts.schema.ScalarType
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
@@ -75,6 +76,18 @@ class EcosResolvedFormRecordsDao(
         val formService: EcosFormService,
         val workspaceService: WorkspaceService
     ) {
+
+        fun getId(): String {
+            if (form.def.id.startsWith("type$")) {
+                return form.def.id
+            }
+            return workspaceService.addWsPrefixToId(form.def.id, form.def.workspace)
+        }
+
+        @AttName(ScalarType.ID_SCHEMA)
+        fun getRef(): EntityRef {
+            return EntityRef.create(AppName.UISERV, ID, getId())
+        }
 
         fun getTypeRef(): EntityRef {
             return form.def.typeRef.ifEmpty { ModelUtils.getTypeRef(typeInfo?.id ?: "base") }
