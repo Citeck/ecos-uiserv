@@ -123,7 +123,7 @@ class EcosFormRecordsDao(
             toRecord(EcosFormDef.create().build())
         } else {
             val idInWs = workspaceService.convertToIdInWs(recordId)
-            if (!workspaceService.isWorkspaceWithGlobalArtifacts(idInWs.workspace) &&
+            if (!workspaceService.isWorkspaceWithGlobalEntities(idInWs.workspace) &&
                 !workspaceService.isUserMemberOf(AuthContext.getCurrentUser(), idInWs.workspace)
             ) {
                 return null

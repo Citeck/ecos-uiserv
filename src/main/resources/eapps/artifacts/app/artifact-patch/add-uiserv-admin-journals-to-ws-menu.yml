@@ -19,6 +19,7 @@ config:
             ru: Журналы
             en: Journals
           icon: ui/icon@i-leftmenu-tax-report
+
           hidden: false
           type: JOURNAL
           config:
@@ -32,4 +33,21 @@ config:
           type: JOURNAL
           config:
             recordRef: uiserv/journal@ecos-forms
-
+        - id: ecos-menus
+          label:
+            ru: Меню
+            en: Menu
+          icon: ui/icon@i-leftmenu-groups
+          hidden: false
+          type: JOURNAL
+          config:
+            recordRef: uiserv/journal@ecos-menus
+        - id: ecos-dashboards
+          label:
+            ru: Дашборды
+            en: Dashboards
+          icon: ui/icon@i-leftmenu-templates
+          hidden: false
+          type: JOURNAL
+          config:
+            recordRef: uiserv/journal@ecos-dashboards

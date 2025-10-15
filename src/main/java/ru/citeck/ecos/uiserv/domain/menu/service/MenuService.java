@@ -14,6 +14,7 @@ import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.context.lib.auth.AuthGroup;
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records2.predicate.model.Predicates;
 import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.menu.dao.MenuDao;
@@ -123,8 +124,12 @@ public class MenuService {
         return menuDao.getCount(predicate);
     }
 
-    public List<MenuDto> findAll(Predicate predicate, int max, int skip, List<SortBy> sort) {
-        return menuDao.findAll(predicate, max, skip, sort).stream()
+    public List<MenuDto> findAll(Predicate predicate, List<String> workspaces, int max, int skip, List<SortBy> sort) {
+        var predicateForQuery = Predicates.and(
+            predicate,
+            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentUser(), workspaces)
+        );
+        return menuDao.findAll(predicateForQuery, max, skip, sort).stream()
             .map(this::mapToDto)
             .collect(Collectors.toList());
     }

@@ -68,17 +68,21 @@ class DashboardService(
     }
 
     fun findAllForWorkspace(workspace: String): List<DashboardDto> {
-        return findAll(Predicates.eq("workspace", workspace), 1000, 0, emptyList())
+        return findAll(Predicates.eq("workspace", workspace), emptyList(),1000, 0, emptyList())
     }
 
-    fun findAll(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<DashboardDto> {
-        return searchConv.findAll(repo, predicate, max, skip, sort).stream()
+    fun findAll(predicate: Predicate, workspaces: List<String>, max: Int, skip: Int, sort: List<SortBy>): List<DashboardDto> {
+        val predicateForQuery = Predicates.and(
+            predicate,
+            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentUser(), workspaces)
+        )
+        return searchConv.findAll(repo, predicateForQuery, max, skip, sort).stream()
             .map { entity: DashboardEntity -> this.mapToDto(entity) }
             .collect(Collectors.toList())
     }
 
     fun getAllDashboards(): List<DashboardDto> {
-        return findAll(Predicates.alwaysTrue(), 1000, 0, emptyList())
+        return findAll(Predicates.alwaysTrue(), emptyList(), 1000, 0, emptyList())
     }
 
     fun getDashboardById(id: String?): Optional<DashboardDto> {

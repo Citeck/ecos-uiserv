@@ -131,7 +131,7 @@ class JournalRecordsDao(
             JournalWithMeta(false)
         } else {
             val idInWs = workspaceService.convertToIdInWs(recordId)
-            if (!workspaceService.isWorkspaceWithGlobalArtifacts(idInWs.workspace) &&
+            if (!workspaceService.isWorkspaceWithGlobalEntities(idInWs.workspace) &&
                 !workspaceService.isUserMemberOf(AuthContext.getCurrentUser(), idInWs.workspace)
             ) {
                 JournalWithMeta(false)

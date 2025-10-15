@@ -13,9 +13,6 @@ journalRef: uiserv/journal@ecos-dashboards
 
 createVariants:
 
-  - id: create-new-dashboard
-    name: { ru: Создать дашборд, en: Create dashboard }
-
   - id: upload-dashboard
     name: { ru: Загрузить дашборд, en: Upload dashboard }
     formRef: uiserv/form@ecos-module-upload

@@ -125,6 +125,7 @@ public class DashboardRecords extends AbstractRecordsDao
 
             List<DashboardRecord> records = dashboardService.findAll(
                 predicate,
+                recordsQuery.getWorkspaces(),
                 recordsQuery.getPage().getMaxItems(),
                 recordsQuery.getPage().getSkipCount(),
                 recordsQuery.getSortBy()

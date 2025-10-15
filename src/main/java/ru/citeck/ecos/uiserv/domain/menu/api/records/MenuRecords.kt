@@ -79,6 +79,7 @@ class MenuRecords(
             val predicate = recsQuery.getQuery(Predicate::class.java)
             val records = menuService.findAll(
                 predicate,
+                recsQuery.workspaces,
                 recsQuery.page.maxItems,
                 recsQuery.page.skipCount,
                 recsQuery.sortBy
