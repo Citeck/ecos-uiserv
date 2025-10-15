@@ -16,6 +16,7 @@ import ru.citeck.ecos.commons.utils.StringUtils
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.context.lib.auth.AuthContext.isRunAsAdmin
 import ru.citeck.ecos.events2.type.RecordEventsService
+import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records2.predicate.PredicateService
@@ -272,7 +273,12 @@ class JournalRecordsDao(
                     if (journalId.contains("$")) {
                         false
                     } else {
-                        isRunAsAdmin() && !JournalServiceImpl.SYSTEM_JOURNALS.contains(journalId)
+                        if (JournalServiceImpl.SYSTEM_JOURNALS.contains(journalId)) {
+                            false
+                        } else {
+                            val workspace = journalDef?.workspace ?: ModelUtils.DEFAULT_WORKSPACE_ID
+                            isRunAsAdmin() || workspaceService.isUserManagerOf(AuthContext.getCurrentUser(), workspace)
+                        }
                     }
                 } else {
                     name.equals("read", ignoreCase = true)

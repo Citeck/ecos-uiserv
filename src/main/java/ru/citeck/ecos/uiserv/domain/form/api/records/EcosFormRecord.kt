@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.domain.form.api.records
 import com.fasterxml.jackson.annotation.JsonValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.json.YamlUtils.toNonDefaultString
+import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.context.lib.auth.AuthContext.isRunAsAdmin
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records3.record.atts.schema.ScalarType
@@ -82,6 +83,12 @@ class EcosFormRecord(
                     false
                 } else {
                     isRunAsAdmin() && !EcosFormRecordsDao.SYSTEM_FORMS.contains(formId)
+                    if (EcosFormRecordsDao.SYSTEM_FORMS.contains(formId)) {
+                        false
+                    } else {
+                        val workspace = this@EcosFormRecord.def.workspace
+                        isRunAsAdmin() || workspaceService.isUserManagerOf(AuthContext.getCurrentUser(), workspace)
+                    }
                 }
             } else {
                 name.equals("read", ignoreCase = true)
