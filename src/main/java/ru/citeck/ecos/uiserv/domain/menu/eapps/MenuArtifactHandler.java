@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import ru.citeck.ecos.apps.app.domain.handler.EcosArtifactHandler;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.utils.NameUtils;
+import ru.citeck.ecos.model.lib.utils.ModelUtils;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDeployArtifact;
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService;
 
@@ -33,13 +34,14 @@ public class MenuArtifactHandler implements EcosArtifactHandler<MenuDeployArtifa
     public void listenChanges(@NotNull Consumer<MenuDeployArtifact> consumer) {
 
         menuService.addOnChangeListener((before, after) -> {
+            if (after.getWorkspace().isBlank() || ModelUtils.DEFAULT_WORKSPACE_ID.equals(after.getWorkspace())) {
+                MenuDeployArtifact artifact = new MenuDeployArtifact();
+                artifact.setFilename(NameUtils.escape(after.getId()) + ".json");
+                artifact.setData(Json.getMapper().toBytes(after));
+                artifact.setId(after.getId());
 
-            MenuDeployArtifact artifact = new MenuDeployArtifact();
-            artifact.setFilename(NameUtils.escape(after.getId()) + ".json");
-            artifact.setData(Json.getMapper().toBytes(after));
-            artifact.setId(after.getId());
-
-            consumer.accept(artifact);
+                consumer.accept(artifact);
+            }
         });
     }
 

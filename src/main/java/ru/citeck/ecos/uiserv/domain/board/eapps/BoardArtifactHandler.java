@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.apps.app.domain.handler.EcosArtifactHandler;
+import ru.citeck.ecos.model.lib.utils.ModelUtils;
+import ru.citeck.ecos.model.lib.workspace.IdInWs;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 
@@ -16,7 +18,7 @@ public class BoardArtifactHandler implements EcosArtifactHandler<BoardDef> {
 
     @Override
     public void deleteArtifact(@NotNull String id) {
-        service.delete(id);
+        service.delete(IdInWs.create(id));
     }
 
     @Override
@@ -26,7 +28,11 @@ public class BoardArtifactHandler implements EcosArtifactHandler<BoardDef> {
 
     @Override
     public void listenChanges(@NotNull Consumer<BoardDef> consumer) {
-        service.onBoardChanged((before, after) -> consumer.accept(after));
+        service.onBoardChanged((before, after) -> {
+            if (after.getWorkspace().isBlank() || ModelUtils.DEFAULT_WORKSPACE_ID.equals(after.getWorkspace())) {
+                consumer.accept(after);
+            }
+        });
     }
 
     @NotNull

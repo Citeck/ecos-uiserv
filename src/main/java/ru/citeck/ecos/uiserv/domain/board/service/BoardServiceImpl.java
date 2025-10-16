@@ -1,13 +1,18 @@
 package ru.citeck.ecos.uiserv.domain.board.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.Assert;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import ru.citeck.ecos.context.lib.auth.AuthContext;
+import ru.citeck.ecos.model.lib.workspace.IdInWs;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records2.predicate.model.Predicates;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
@@ -18,7 +23,6 @@ import ru.citeck.ecos.webapp.api.entity.EntityRef;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory;
 
-import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -34,6 +38,7 @@ public class BoardServiceImpl implements BoardService {
     private static final Pattern VALID_ID_PATTERN = Pattern.compile("^[\\w-]+$");
 
     private final BoardRepository repository;
+    private final WorkspaceService workspaceService;
     private final List<BiConsumer<BoardDef, BoardDef>> changeListeners = new CopyOnWriteArrayList<>();
 
     private final JpaSearchConverterFactory jpaSearchConverterFactory;
@@ -45,11 +50,11 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public BoardWithMeta getBoardById(String id) {
-        if (StringUtils.isBlank(id)) {
+    public BoardWithMeta getBoardById(IdInWs id) {
+        if (id == null || id.isEmpty()) {
             return null;
         }
-        return repository.findByExtId(id)
+        return repository.findByExtIdAndWorkspace(id.getId(), id.getWorkspace())
             .map(BoardMapper::entityToDto)
             .orElse(null);
     }
@@ -65,11 +70,13 @@ public class BoardServiceImpl implements BoardService {
             }
         }
 
-        BoardDef beforeBoardDef = Optional.ofNullable(getBoardById(boardDef.getId()))
-            .map(BoardWithMeta::getBoardDef)
-            .orElse(null);
+        var newEntity = BoardMapper.dtoToEntity(repository, boardDef);
 
-        BoardEntity entity = repository.save(BoardMapper.dtoToEntity(repository, boardDef));
+        BoardDef beforeBoardDef = Optional.ofNullable(getBoardById(
+            IdInWs.create(boardDef.getId(), newEntity.getExtId())
+        )).map(BoardWithMeta::getBoardDef).orElse(null);
+
+        BoardEntity entity = repository.save(newEntity);
         BoardWithMeta result = BoardMapper.entityToDto(entity);
 
         for (BiConsumer<BoardDef, BoardDef> listener : changeListeners) {
@@ -87,14 +94,24 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     @Transactional
-    public void delete(String id) {
+    public void delete(IdInWs id) {
         Assert.notNull(id, "Deleted board ID must not be null");
-        repository.findByExtId(id).ifPresent(repository::delete);
+        repository.findByExtIdAndWorkspace(id.getId(), id.getWorkspace()).ifPresent(repository::delete);
     }
 
     @Override
-    public List<BoardWithMeta> getAll(Predicate predicate, int maxItems, int skipCount, List<SortBy> sort) {
-        return searchConv.findAll(repository, predicate, maxItems, skipCount, sort)
+    public List<BoardWithMeta> getAll(
+        Predicate predicate,
+        List<String> workspaces,
+        int maxItems,
+        int skipCount,
+        List<SortBy> sort
+    ) {
+        var predicateForQuery = Predicates.and(
+            predicate,
+            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentUser(), workspaces)
+        );
+        return searchConv.findAll(repository, predicateForQuery, maxItems, skipCount, sort)
             .stream()
             .map(BoardMapper::entityToDto)
             .collect(Collectors.toList());

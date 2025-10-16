@@ -1,13 +1,18 @@
 package ru.citeck.ecos.uiserv.domain.board.api.records;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.json.YamlUtils;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
+import ru.citeck.ecos.records3.record.atts.schema.ScalarType;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
+import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.nio.charset.StandardCharsets;
 
@@ -19,16 +24,28 @@ import java.nio.charset.StandardCharsets;
 public class BoardRecord {
     @AttName("...")
     private BoardWithMeta boardDefWithMeta;
+    private WorkspaceService workspaceService;
 
-    public BoardRecord() {
+    public BoardRecord(WorkspaceService workspaceService) {
+        this.workspaceService = workspaceService;
     }
 
-    public BoardRecord(BoardWithMeta boardDefWithMeta) {
+    public BoardRecord(BoardWithMeta boardDefWithMeta, WorkspaceService workspaceService) {
         this.boardDefWithMeta = boardDefWithMeta;
+        this.workspaceService = workspaceService;
     }
 
-    public BoardRecord(String id) {
+    public BoardRecord(String id, WorkspaceService workspaceService) {
         boardDefWithMeta = new BoardWithMeta(id);
+        this.workspaceService = workspaceService;
+    }
+
+    @JsonIgnore
+    @AttName(ScalarType.ID_SCHEMA)
+    public EntityRef getRef() {
+        BoardDef boardDef = boardDefWithMeta.getBoardDef();
+        var localId = workspaceService.addWsPrefixToId(boardDef.getId(), boardDef.getWorkspace());
+        return EntityRef.create(Application.NAME, BoardRecordsDao.ID, localId);
     }
 
     public BoardDef getBoardDef() {

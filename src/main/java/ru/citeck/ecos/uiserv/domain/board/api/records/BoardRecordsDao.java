@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.events2.type.RecordEventsService;
+import ru.citeck.ecos.model.lib.workspace.IdInWs;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.atts.value.impl.EmptyAttValue;
@@ -21,6 +23,7 @@ import ru.citeck.ecos.records3.record.dao.query.dto.query.QueryPage;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.uiserv.app.common.api.records.Utils;
+import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 
@@ -39,14 +42,17 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
     RecordDeleteDao {
 
     private final BoardService boardService;
+    private final WorkspaceService workspaceService;
+
     private RecordEventsService recordEventsService;
 
     public static final String ID = "board";
     public static final String LANG_BY_TYPE = "by-type";
 
     @Autowired
-    public BoardRecordsDao(BoardService service) {
+    public BoardRecordsDao(BoardService service, WorkspaceService workspaceService) {
         this.boardService = service;
+        this.workspaceService = workspaceService;
     }
 
     @PostConstruct
@@ -57,7 +63,7 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
                     before,
                     after,
                     getId(),
-                    def -> new BoardRecord(new BoardWithMeta(def))
+                    def -> new BoardRecord(new BoardWithMeta(def), workspaceService)
                 );
             }
         });
@@ -81,14 +87,15 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
     @Override
     public Object getRecordAtts(@NotNull String localBoardId) {
         if (localBoardId.isEmpty()) {
-            return new BoardRecord();
+            return new BoardRecord(workspaceService);
         } else {
-            BoardWithMeta board = boardService.getBoardById(localBoardId);
+            IdInWs idInWs = workspaceService.convertToIdInWs(localBoardId);
+            BoardWithMeta board = boardService.getBoardById(idInWs);
             if (board == null) {
                 log.debug("Board with ID {} was not found", localBoardId);
                 return EmptyAttValue.INSTANCE;
             }
-            return new BoardRecord(board);
+            return new BoardRecord(board, workspaceService);
         }
     }
 
@@ -107,7 +114,7 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
             List<BoardWithMeta> boards = boardService.getBoardsForExactType(typeQuery.getTypeRef(), sort);
             result.setRecords(boards
                 .stream()
-                .map(BoardRecord::new)
+                .map(it -> new BoardRecord(it, workspaceService))
                 .collect(Collectors.toList()));
             result.setTotalCount(boards.size());
         } else {
@@ -116,9 +123,15 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
             int skipCount = page.getSkipCount();
             if (PredicateService.LANGUAGE_PREDICATE.equals(recordsQuery.getLanguage())) {
                 Predicate predicate = recordsQuery.getQuery(Predicate.class);
-                result.setRecords(boardService.getAll(predicate, maxItems, skipCount, recordsQuery.getSortBy())
-                    .stream()
-                    .map(BoardRecord::new)
+                result.setRecords(
+                    boardService.getAll(
+                        predicate,
+                        recordsQuery.getWorkspaces(),
+                        maxItems,
+                        skipCount,
+                        recordsQuery.getSortBy()
+                    ).stream()
+                    .map(it -> new BoardRecord(it, workspaceService))
                     .collect(Collectors.toList()));
                 result.setTotalCount(boardService.getCount(predicate));
             } else {
@@ -132,24 +145,25 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
 
     @Override
     public BoardMutRecord getRecToMutate(@NotNull String localId) {
-        BoardWithMeta boardWithMeta = boardService.getBoardById(localId);
+        IdInWs idInWs = workspaceService.convertToIdInWs(localId);
+        BoardWithMeta boardWithMeta = boardService.getBoardById(idInWs);
         return boardWithMeta != null ?
-            new BoardMutRecord(boardWithMeta.getBoardDef()) :
-            new BoardMutRecord(localId);
+            new BoardMutRecord(boardWithMeta.getBoardDef(), workspaceService) :
+            new BoardMutRecord(localId, workspaceService);
     }
 
     @NotNull
     @Override
     public String saveMutatedRec(BoardMutRecord boardRecord) {
-        return boardService.save(boardRecord)
-            .getBoardDef()
-            .getId();
+        BoardDef boardDef = boardService.save(boardRecord)
+            .getBoardDef();
+        return workspaceService.addWsPrefixToId(boardDef.getId(), boardDef.getWorkspace());
     }
 
     @NotNull
     @Override
     public DelStatus delete(@NotNull String localId) {
-        boardService.delete(localId);
+        boardService.delete(workspaceService.convertToIdInWs(localId));
         return DelStatus.OK;
     }
 

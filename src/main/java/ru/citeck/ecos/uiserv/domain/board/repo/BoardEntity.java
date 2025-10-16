@@ -22,6 +22,7 @@ public class BoardEntity extends AbstractAuditingEntity {
 
     @NotNull
     private String extId;
+    private String workspace;
     private String typeRef;
     private String journalRef;
     private String cardFormRef;

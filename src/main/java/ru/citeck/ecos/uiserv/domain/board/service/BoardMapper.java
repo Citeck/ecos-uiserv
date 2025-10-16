@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.model.lib.utils.ModelUtils;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
@@ -19,6 +20,7 @@ public class BoardMapper {
 
         BoardDef boardDto = new BoardDef();
         boardDto.setId(entity.getExtId());
+        boardDto.setWorkspace(StringUtils.defaultIfBlank(entity.getWorkspace(), ModelUtils.DEFAULT_WORKSPACE_ID));
         boardDto.setReadOnly(entity.getReadOnly());
         boardDto.setDisableTitle(entity.getDisableTitle());
         boardDto.setName(Json.getMapper().read(entity.getName(), MLText.class));
@@ -61,9 +63,14 @@ public class BoardMapper {
 
     public static BoardEntity dtoToEntity(BoardRepository repository, @NotNull BoardDef board) {
 
+        String workspace = board.getWorkspace();
+        if (ModelUtils.DEFAULT_WORKSPACE_ID.equals(workspace)) {
+            workspace = "";
+        }
+
         BoardEntity entity = null;
         if (repository != null && !StringUtils.isBlank(board.getId())) {
-            entity = repository.findByExtId(board.getId()).orElse(null);
+            entity = repository.findByExtIdAndWorkspace(board.getId(), workspace).orElse(null);
         }
         if (entity == null) {
             entity = new BoardEntity();
@@ -73,6 +80,8 @@ public class BoardMapper {
                 entity.setExtId(board.getId());
             }
         }
+
+        entity.setWorkspace(workspace);
         entity.setName(Json.getMapper().toString(board.getName()));
         entity.setReadOnly(board.getReadOnly());
         entity.setDisableTitle(board.getDisableTitle());

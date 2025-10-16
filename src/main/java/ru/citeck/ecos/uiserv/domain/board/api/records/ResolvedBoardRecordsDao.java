@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
@@ -17,6 +18,7 @@ public class ResolvedBoardRecordsDao extends AbstractRecordsDao implements Recor
 
     private final BoardRecordsDao recordsDao;
     private final EcosTypeService ecosTypeService;
+    private final WorkspaceService workspaceService;
 
     @NotNull
     @Override
@@ -30,7 +32,7 @@ public class ResolvedBoardRecordsDao extends AbstractRecordsDao implements Recor
         RecsQueryRes<BoardRecord> queryRes = recordsDao.queryRecords(recordsQuery);
         if (queryRes != null) {
             queryRes.withRecords(record ->
-                new ResolvedBoardRecord(record.getBoardDef(), ecosTypeService));
+                new ResolvedBoardRecord(record.getBoardDef(), ecosTypeService, workspaceService));
         }
         return queryRes;
     }
@@ -40,7 +42,7 @@ public class ResolvedBoardRecordsDao extends AbstractRecordsDao implements Recor
     public ResolvedBoardRecord getRecordAtts(@NotNull String localBoardId) {
         Object board = recordsDao.getRecordAtts(localBoardId);
         if (board instanceof BoardRecord boardRec) {
-            return new ResolvedBoardRecord(boardRec.getBoardDef(), ecosTypeService);
+            return new ResolvedBoardRecord(boardRec.getBoardDef(), ecosTypeService, workspaceService);
         }
         return null;
     }

@@ -26,13 +26,6 @@ public class BoardWithMeta {
     @AttName("_creator")
     private String creator;
 
-    public String getLocalId() {
-        if (boardDef != null) {
-            return boardDef.getId();
-        }
-        return "";
-    }
-
     public BoardWithMeta() {
     }
 
@@ -50,10 +43,6 @@ public class BoardWithMeta {
         this.modifier = other.modifier;
         this.created = other.created;
         this.creator = other.creator;
-    }
-
-    public EntityRef getRef() {
-        return EntityRef.create(Application.NAME, BoardRecordsDao.ID, getLocalId());
     }
 
     public BoardDef getBoardDef() {

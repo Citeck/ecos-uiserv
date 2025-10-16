@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.apps.app.domain.handler.EcosArtifactHandler;
 import ru.citeck.ecos.context.lib.auth.AuthContext;
+import ru.citeck.ecos.model.lib.utils.ModelUtils;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
 
@@ -20,7 +21,7 @@ public class DashboardArtifactHandler implements EcosArtifactHandler<DashboardDt
 
     @Override
     public void deployArtifact(@NotNull DashboardDto module) {
-        log.info("Dashboard artifact received: " + module.getId() + " " + module.getTypeRef());
+        log.info("Dashboard artifact received: {} {}", module.getId(), module.getTypeRef());
         AuthContext.runAsSystemJ(() -> {
             dashboardService.saveDashboard(module);
         });
@@ -33,7 +34,13 @@ public class DashboardArtifactHandler implements EcosArtifactHandler<DashboardDt
 
     @Override
     public void listenChanges(@NotNull Consumer<DashboardDto> consumer) {
-        dashboardService.addChangeListener((before, after) -> consumer.accept(after));
+        dashboardService.addChangeListener((before, after) -> {
+            if (after != null &&
+                (after.getWorkspace().isBlank() || ModelUtils.DEFAULT_WORKSPACE_ID.equals(after.getWorkspace()))) {
+
+                consumer.accept(after);
+            }
+        });
     }
 
     @NotNull

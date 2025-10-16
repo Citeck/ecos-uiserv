@@ -4,6 +4,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.model.lib.status.dto.StatusDef;
+import ru.citeck.ecos.model.lib.workspace.IdInWs;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
@@ -20,12 +22,14 @@ public class ResolvedBoardRecord {
     @AttName("...")
     private final BoardDef boardDef;
     private final EcosTypeService typeService;
+    private final WorkspaceService workspaceService;
 
     public static final String ID = "rboard";
 
-    public ResolvedBoardRecord(BoardDef boardDef, EcosTypeService typeService) {
+    public ResolvedBoardRecord(BoardDef boardDef, EcosTypeService typeService, WorkspaceService workspaceService) {
         this.boardDef = boardDef;
         this.typeService = typeService;
+        this.workspaceService = workspaceService;
     }
 
     public MLText getName() {
@@ -36,6 +40,13 @@ public class ResolvedBoardRecord {
             return boardDef.getName();
         }
         return MLText.EMPTY;
+    }
+
+    public String getId() {
+        if (boardDef.getId().startsWith("type$")) {
+            return boardDef.getId();
+        }
+        return workspaceService.addWsPrefixToId(boardDef.getId(), boardDef.getWorkspace());
     }
 
     public BoardDef getBoardDef() {
@@ -50,7 +61,7 @@ public class ResolvedBoardRecord {
             return Collections.unmodifiableList(boardDef.getColumns());
         }
         TypeDef typeInfo = typeService.getTypeInfo(boardDef.getTypeRef());
-        if (typeInfo != null && typeInfo.getModel() != null) {
+        if (typeInfo != null) {
             List<BoardColumnDef> columns = new ArrayList<>();
             for (StatusDef statusDef : typeInfo.getModel().getStatuses()) {
                 columns.add(
@@ -73,7 +84,7 @@ public class ResolvedBoardRecord {
         if (EntityRef.isNotEmpty(boardDef.getTypeRef())) {
             return boardDef.getTypeRef();
         }
-        return typeService.getTypeRefByBoard(boardDef.getId());
+        return typeService.getTypeRefByBoard(IdInWs.create(boardDef.getId(), boardDef.getWorkspace()));
     }
 
     public EntityRef getJournalRef() {

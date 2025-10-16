@@ -1,10 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.board.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import ru.citeck.ecos.commons.data.MLText;
-import ru.citeck.ecos.uiserv.Application;
-import ru.citeck.ecos.uiserv.domain.board.api.records.BoardRecordsDao;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.List;
@@ -15,6 +12,7 @@ public class BoardDef {
     public static final CardFieldsLabelLayout DEFAULT_CARD_FIELDS_LABEL_LAYOUT = CardFieldsLabelLayout.TOP;
 
     private String id;
+    private String workspace;
 
     private EntityRef typeRef;
     private EntityRef journalRef;
@@ -40,6 +38,7 @@ public class BoardDef {
 
     public BoardDef(BoardDef other) {
         this.id = other.getId();
+        this.workspace = other.getWorkspace();
         this.typeRef = other.getTypeRef();
         this.journalRef = other.getJournalRef();
         this.cardFormRef = other.getCardFormRef();
@@ -50,15 +49,6 @@ public class BoardDef {
         this.name = other.getName();
         this.actions = other.getActions();
         this.columns = other.getColumns();
-    }
-
-    @JsonIgnore
-    public EntityRef getRef() {
-        return EntityRef.create(Application.NAME, BoardRecordsDao.ID, id);
-    }
-
-    public static EntityRef createRef(String localId) {
-        return EntityRef.create(Application.NAME, BoardRecordsDao.ID, localId);
     }
 
     public EntityRef getTypeRef() {

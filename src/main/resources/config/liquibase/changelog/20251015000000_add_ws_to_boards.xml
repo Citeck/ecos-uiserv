@@ -1,0 +1,23 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="citeck" id="20251015000000">
+
+        <addColumn tableName="board">
+            <column name="workspace" type="VARCHAR"/>
+        </addColumn>
+
+        <sql>UPDATE board SET workspace='' where workspace is null</sql>
+
+        <dropUniqueConstraint tableName="board" constraintName="board_ext_id_key" uniqueColumns="ext_id"/>
+        <addUniqueConstraint tableName="board" columnNames="workspace,ext_id"/>
+
+        <addDefaultValue tableName="board" columnName="workspace" defaultValue="" />
+        <addDefaultValue tableName="ecos_forms" columnName="workspace" defaultValue="" />
+        <addDefaultValue tableName="journal" columnName="workspace" defaultValue="" />
+
+        <addNotNullConstraint tableName="board" columnName="workspace" />
+
+    </changeSet>
+
+</databaseChangeLog>

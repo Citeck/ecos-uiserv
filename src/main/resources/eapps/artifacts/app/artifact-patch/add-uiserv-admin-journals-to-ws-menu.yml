@@ -51,3 +51,12 @@ config:
           type: JOURNAL
           config:
             recordRef: uiserv/journal@ecos-dashboards
+        - id: ecos-boards
+          label:
+            ru: Канбан-доски
+            en: Kanban boards
+          icon: ui/icon@i-leftmenu-workflows
+          hidden: false
+          type: JOURNAL
+          config:
+            recordRef: uiserv/journal@ecos-boards

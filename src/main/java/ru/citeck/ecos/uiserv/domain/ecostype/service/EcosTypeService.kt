@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.domain.ecostype.service
 import org.springframework.stereotype.Service
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.model.lib.type.dto.CreateVariantDef
+import ru.citeck.ecos.model.lib.workspace.IdInWs
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService
 import ru.citeck.ecos.uiserv.domain.ecostype.config.EcosTypesComponent
@@ -38,15 +39,15 @@ class EcosTypeService(
         return EntityRef.valueOf(typesComponent.getTypeRefByForm(ref))
     }
 
-    fun getTypeRefByBoard(boardId: String?): EntityRef {
-        if (boardId.isNullOrBlank()) {
+    fun getTypeRefByBoard(boardId: IdInWs?): EntityRef {
+        if (boardId == null || boardId.isEmpty()) {
             return EntityRef.EMPTY
         }
         val boardData = boardService.getBoardById(boardId)
         if (boardData != null && EntityRef.isNotEmpty(boardData.boardDef.typeRef)) {
             return boardData.boardDef.typeRef
         }
-        val ref = EntityRef.create(AppName.UISERV, "board", boardId)
+        val ref = EntityRef.create(AppName.UISERV, "board", workspaceService.convertToStrId(boardId))
         return EntityRef.valueOf(typesComponent.getTypeRefByBoard(ref))
     }
 
