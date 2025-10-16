@@ -84,7 +84,7 @@ public class ResolvedBoardRecord {
         if (EntityRef.isNotEmpty(boardDef.getTypeRef())) {
             return boardDef.getTypeRef();
         }
-        return typeService.getTypeRefByBoard(IdInWs.create(boardDef.getId(), boardDef.getWorkspace()));
+        return typeService.getTypeRefByBoard(IdInWs.create(boardDef.getWorkspace(), boardDef.getId()));
     }
 
     public EntityRef getJournalRef() {

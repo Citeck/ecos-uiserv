@@ -63,7 +63,7 @@ public class BoardMapper {
 
     public static BoardEntity dtoToEntity(BoardRepository repository, @NotNull BoardDef board) {
 
-        String workspace = board.getWorkspace();
+        String workspace = StringUtils.defaultString(board.getWorkspace());
         if (ModelUtils.DEFAULT_WORKSPACE_ID.equals(workspace)) {
             workspace = "";
         }

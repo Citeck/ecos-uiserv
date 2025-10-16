@@ -68,7 +68,7 @@ class DashboardService(
     }
 
     fun findAllForWorkspace(workspace: String): List<DashboardDto> {
-        return findAll(Predicates.eq("workspace", workspace), emptyList(),1000, 0, emptyList())
+        return findAll(Predicates.eq("workspace", workspace), emptyList(), 1000, 0, emptyList())
     }
 
     fun findAll(predicate: Predicate, workspaces: List<String>, max: Int, skip: Int, sort: List<SortBy>): List<DashboardDto> {

@@ -23,6 +23,7 @@ public class BoardTestData {
 
     static {
         testBoard.setName(new MLText("Test board").withValue(Locale.GERMAN, "German name"));
+        testBoard.setWorkspace("default");
         testBoard.setTypeRef(EntityRef.valueOf("emodel/type@user-board"));
         testBoard.setActions(Arrays.asList(EntityRef.valueOf("uiserv/action@test0")));
         testBoard.setColumns(Arrays.asList(

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.citeck.ecos.commons.data.MLText;
+import ru.citeck.ecos.model.lib.workspace.IdInWs;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
@@ -55,8 +56,8 @@ public class BoardServiceContextTest {
 
     @Test
     public void deleteTest() {
-        service.delete(BoardTestData.BOARD_ID);
-        assertNull(service.getBoardById(BoardTestData.BOARD_ID));
+        service.delete(IdInWs.create(BoardTestData.BOARD_ID));
+        assertNull(service.getBoardById(IdInWs.create(BoardTestData.BOARD_ID)));
     }
 
     @Test
@@ -64,7 +65,7 @@ public class BoardServiceContextTest {
         BoardDef boardDef = BoardTestData.getTestBoard();
         service.save(boardDef);
         Matcher<BoardDef> boardDefMatcher = is(boardDef);
-        assertThat(service.getBoardById(BoardTestData.BOARD_ID).getBoardDef(), boardDefMatcher);
+        assertThat(service.getBoardById(IdInWs.create(BoardTestData.BOARD_ID)).getBoardDef(), boardDefMatcher);
 
         boardDef.setColumns(Arrays.asList(
             BoardColumnDef.create()
@@ -77,11 +78,11 @@ public class BoardServiceContextTest {
                 .build()
         ));
         service.save(boardDef);
-        assertThat(service.getBoardById(BoardTestData.BOARD_ID).getBoardDef(), boardDefMatcher);
+        assertThat(service.getBoardById(IdInWs.create(BoardTestData.BOARD_ID)).getBoardDef(), boardDefMatcher);
 
         boardDef.setReadOnly(true);
         service.save(boardDef);
-        assertThat(service.getBoardById(BoardTestData.BOARD_ID).getBoardDef(), boardDefMatcher);
+        assertThat(service.getBoardById(IdInWs.create(BoardTestData.BOARD_ID)).getBoardDef(), boardDefMatcher);
     }
 
     @Test
@@ -90,11 +91,11 @@ public class BoardServiceContextTest {
         boardDef.setCardFormRef(EntityRef.valueOf("uiserv/form@some-form-id"));
         service.save(boardDef);
         Matcher<BoardDef> boardDefMatcher = is(boardDef);
-        assertThat(service.getBoardById(BoardTestData.BOARD_ID).getBoardDef(), boardDefMatcher);
+        assertThat(service.getBoardById(IdInWs.create(BoardTestData.BOARD_ID)).getBoardDef(), boardDefMatcher);
 
         boardDef.setCardFormRef(null);
         service.save(boardDef);
-        assertThat(service.getBoardById(BoardTestData.BOARD_ID).getBoardDef(), boardDefMatcher);
+        assertThat(service.getBoardById(IdInWs.create(BoardTestData.BOARD_ID)).getBoardDef(), boardDefMatcher);
     }
 
     @Test

@@ -1,7 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.board;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
+import ru.citeck.ecos.model.lib.workspace.IdInWs;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.RecordsServiceFactory;
@@ -13,11 +13,11 @@ import ru.citeck.ecos.uiserv.domain.board.service.BoardMapper;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class BoardServiceMock implements BoardService {
@@ -31,8 +31,8 @@ public class BoardServiceMock implements BoardService {
     }
 
     @Override
-    public void delete(String id) {
-        data.remove(id);
+    public void delete(IdInWs id) {
+        data.remove(id.getId());
     }
 
     @Override
@@ -55,22 +55,22 @@ public class BoardServiceMock implements BoardService {
     }
 
     @Override
-    public List<BoardWithMeta> getAll(Predicate predicate, int maxItems, int skipCount, List<SortBy> sort) {
+    public List<BoardWithMeta> getAll(Predicate predicate, List<String> workspaces, int maxItems, int skipCount, List<SortBy> sort) {
         return predicateService.filter(data.values(), predicate)
             .stream().map(BoardMapper::entityToDto).collect(Collectors.toList());
     }
 
     @Override
-    public BoardWithMeta getBoardById(String id) {
-        if (StringUtils.isBlank(id) || data.get(id) == null) {
+    public BoardWithMeta getBoardById(IdInWs id) {
+        if (id.isEmpty() || data.get(id.getId()) == null) {
             return null;
         }
-        return BoardMapper.entityToDto(data.get(id));
+        return BoardMapper.entityToDto(data.get(id.getId()));
     }
 
     @Override
     public long getCount(Predicate predicate) {
-        return this.getAll(predicate, 0, 0, null).size();
+        return this.getAll(predicate, Collections.emptyList(), 0, 0, null).size();
     }
 
     @Override
