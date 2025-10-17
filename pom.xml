@@ -9,7 +9,7 @@
     <parent>
         <groupId>ru.citeck.ecos.webapp</groupId>
         <artifactId>ecos-webapp-spring-hibernate-parent</artifactId>
-        <version>3.18.16</version>
+        <version>3.18.19</version>
     </parent>
 
     <properties>

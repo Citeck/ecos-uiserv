@@ -11,6 +11,7 @@ import ru.citeck.ecos.events2.EventsService
 import ru.citeck.ecos.events2.listener.ListenerConfig
 import ru.citeck.ecos.events2.type.RecordChangedEvent
 import ru.citeck.ecos.events2.type.RecordCreatedEvent
+import ru.citeck.ecos.events2.type.RecordDeletedEvent
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.predicate.model.Predicates
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
@@ -41,7 +42,16 @@ class TypeInWsCreatedListener(
                 .withEventType(RecordCreatedEvent.TYPE)
                 .withTransactional(true)
                 .withFilter(baseFilter)
-                .withAction { handleEvent(it, true) }
+                .withAction { handleEvent(it, EventType.CREATE) }
+                .withDataClass(EventData::class.java)
+                .build()
+        )
+        eventsService.addListener(
+            ListenerConfig.create<EventData>()
+                .withEventType(RecordDeletedEvent.TYPE)
+                .withTransactional(true)
+                .withFilter(baseFilter)
+                .withAction { handleEvent(it, EventType.DELETE) }
                 .withDataClass(EventData::class.java)
                 .build()
         )
@@ -55,15 +65,15 @@ class TypeInWsCreatedListener(
                         Predicates.eq("diff._has.name?bool", true)
                     )
                 )
-                .withAction { handleEvent(it, false) }
+                .withAction { handleEvent(it, EventType.UPDATE) }
                 .withDataClass(EventData::class.java)
                 .build()
         )
     }
 
-    private fun handleEvent(event: EventData, created: Boolean) {
+    private fun handleEvent(event: EventData, eventType: EventType) {
 
-        log.info { "Detected type ${ if (created) "creation" else "updating" } in workspace: $event" }
+        log.info { "Detected event $eventType for type in workspace: $event" }
 
         val menu = menuService.getMenuForCurrentUser(1, event.workspace)
         if (menu == null) {
@@ -82,38 +92,66 @@ class TypeInWsCreatedListener(
             event.name
         }
         val journalRef = "uiserv/journal@type$" + event.typeId
-        if (created) {
-            leftMenuJson.add(
-                "\$..[?(@.id == \"sections\")].items",
-                DataValue.createObj()
-                    .set(
-                        "id",
-                        AUTO_JOURNAL_MENU_ITEM_ID_PREFIX +
-                            event.typeId + "-" +
-                            System.currentTimeMillis().toString(Character.MAX_RADIX)
-                    )
-                    .set("label", label)
-                    .set("type", "JOURNAL")
-                    .set("icon", "ui/icon@i-leftmenu-types")
-                    .set("config", DataValue.createObj().set("recordRef", journalRef))
-            )
-        } else {
-            val sectionsWithItems = leftMenuJson["\$..[?(@.id == \"sections\")].items"]
-            val autoItem = sectionsWithItems.firstNotNullOfOrNull { currentItems ->
-                currentItems.find {
-                    it["type"].asText() == "JOURNAL" &&
-                        it["/config/recordRef"].asText() == journalRef &&
-                        it["id"].asText().startsWith(AUTO_JOURNAL_MENU_ITEM_ID_PREFIX)
+        when (eventType) {
+            EventType.CREATE -> {
+                leftMenuJson.add(
+                    "\$..[?(@.id == \"sections\")].items",
+                    DataValue.createObj()
+                        .set(
+                            "id",
+                            AUTO_JOURNAL_MENU_ITEM_ID_PREFIX +
+                                event.typeId + "-" +
+                                System.currentTimeMillis().toString(Character.MAX_RADIX)
+                        )
+                        .set("label", label)
+                        .set("type", "JOURNAL")
+                        .set("icon", "ui/icon@i-leftmenu-types")
+                        .set("config", DataValue.createObj().set("recordRef", journalRef))
+                )
+            }
+            EventType.UPDATE -> {
+                val sectionsWithItems = leftMenuJson["\$..[?(@.id == \"sections\")].items"]
+                val autoItem = sectionsWithItems.firstNotNullOfOrNull { currentItems ->
+                    currentItems.find {
+                        it["type"].asText() == "JOURNAL" &&
+                            it["/config/recordRef"].asText() == journalRef &&
+                            it["id"].asText().startsWith(AUTO_JOURNAL_MENU_ITEM_ID_PREFIX)
+                    }
+                }
+                if (autoItem == null) {
+                    log.info {
+                        "Auto item doesn't found for journalRef $journalRef " +
+                            "in menu ${menu.id} in workspace ${menu.workspace}"
+                    }
+                    return
+                } else {
+                    autoItem["label"] = label
                 }
             }
-            if (autoItem == null) {
-                log.info {
-                    "Auto item doesn't found for journalRef $journalRef " +
-                        "in menu ${menu.id} in workspace ${menu.workspace}"
+            // todo: delete event is not exists for types and this logic doesn't executed
+            EventType.DELETE -> {
+                val sectionsWithItems = leftMenuJson["\$..[?(@.id == \"sections\")].items"]
+                var updated = false
+                sectionsWithItems.forEach { currentItems ->
+                    val autoItemIndex = currentItems.indexOfFirst {
+                        it["type"].asText() == "JOURNAL" &&
+                            it["/config/recordRef"].asText() == journalRef &&
+                            it["id"].asText().startsWith(AUTO_JOURNAL_MENU_ITEM_ID_PREFIX)
+                    }
+                    if (autoItemIndex >= 0) {
+                        log.info { "Remove auto item from menu: '${currentItems[autoItemIndex]["id"].asText()}'" }
+                        currentItems.remove(autoItemIndex)
+                        updated = true
+                        return@forEach
+                    }
                 }
-                return
-            } else {
-                autoItem["label"] = label
+                if (!updated) {
+                    log.debug {
+                        "Auto item doesn't found for journalRef $journalRef " +
+                            "in menu ${menu.id} in workspace ${menu.workspace}. Nothing to delete."
+                    }
+                    return
+                }
             }
         }
         val newSubMenu = LinkedHashMap(menu.subMenu)
@@ -121,6 +159,9 @@ class TypeInWsCreatedListener(
 
         val newMenu = menu.copy().withSubMenu(newSubMenu)
         if (newMenu.workspace.isBlank() || newMenu.workspace != event.workspace) {
+            if (eventType == EventType.DELETE) {
+                return
+            }
             newMenu.withId(UUID.randomUUID().toString())
             newMenu.withWorkspace(event.workspace)
             if (newMenu.authorities.isEmpty()) {
@@ -139,4 +180,8 @@ class TypeInWsCreatedListener(
         @AttName("record.name?json")
         val name: MLText
     )
+
+    private enum class EventType {
+        CREATE, DELETE, UPDATE
+    }
 }
