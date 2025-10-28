@@ -104,7 +104,6 @@
         "key": "sumAtt",
         "hidden": true,
         "validate": {
-          "required": true,
           "select": false
         },
         "dataSrc": "custom",
@@ -136,6 +135,16 @@
                   "type": "boolean"
                 },
                 "state": "false"
+              },
+              {
+                "name": "require-sum-attr-input-action",
+                "type": "property",
+                "property": {
+                  "label": "Required",
+                  "value": "validate.required",
+                  "type": "boolean"
+                },
+                "state": "true"
               }
             ]
           }
