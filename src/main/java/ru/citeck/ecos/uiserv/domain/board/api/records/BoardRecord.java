@@ -4,11 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.json.YamlUtils;
+import ru.citeck.ecos.context.lib.auth.AuthContext;
+import ru.citeck.ecos.model.lib.utils.ModelUtils;
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.records3.record.atts.schema.ScalarType;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
+import ru.citeck.ecos.records3.record.atts.value.AttValue;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
@@ -63,5 +67,25 @@ public class BoardRecord {
 
     public String getEcosType() {
         return "board";
+    }
+
+    public Permissions getPermissions() {
+        return new Permissions();
+    }
+
+    public class Permissions implements AttValue {
+
+        @Override
+        public boolean has(@NotNull String name) {
+            if (name.equalsIgnoreCase("write")) {
+                BoardDef boardDef = boardDefWithMeta != null ? boardDefWithMeta.getBoardDef() : null;
+                String workspace = boardDef != null && boardDef.getWorkspace() != null
+                    ? boardDef.getWorkspace()
+                    : ModelUtils.DEFAULT_WORKSPACE_ID;
+                return AuthContext.isRunAsAdmin() || workspaceService.isUserManagerOf(AuthContext.getCurrentUser(), workspace);
+            } else {
+                return name.equalsIgnoreCase("read");
+            }
+        }
     }
 }
