@@ -160,6 +160,7 @@ public class ThemeRecords extends AbstractRecordsDao implements RecordsQueryDao,
 
             byte[] bytes = Base64.getDecoder().decode(base64);
             EcosMemDir ecosMemDir = ZipUtils.extractZip(bytes);
+            removeHiddenAndSystemFiles(ecosMemDir);
 
             EcosFile theme = ecosMemDir.getChildren().get(0);
             this.setModuleId(theme.getName());
@@ -208,6 +209,21 @@ public class ThemeRecords extends AbstractRecordsDao implements RecordsQueryDao,
                 }
             }
             return ZipUtils.writeZipAsBytes(root);
+        }
+
+        private void removeHiddenAndSystemFiles(EcosMemDir dir) {
+            if (dir == null) {
+                return;
+            }
+
+            for (EcosFile file : dir.getChildren()) {
+                String name = file.getName();
+                if (name.startsWith(".") || name.startsWith("_")) {
+                    file.delete();
+                } else if (file.isDirectory()) {
+                    removeHiddenAndSystemFiles((EcosMemDir) file);
+                }
+            }
         }
     }
 }
