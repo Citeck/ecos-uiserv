@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.board.api.records;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -7,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.events2.type.RecordEventsService;
 import ru.citeck.ecos.model.lib.workspace.IdInWs;
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
@@ -26,8 +28,6 @@ import ru.citeck.ecos.uiserv.app.common.api.records.Utils;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
-
-import jakarta.annotation.PostConstruct;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.Collections;
@@ -155,6 +155,7 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
     @NotNull
     @Override
     public String saveMutatedRec(BoardMutRecord boardRecord) {
+        checkWritePermissions(boardRecord.getWorkspace());
         BoardDef boardDef = boardService.save(boardRecord)
             .getBoardDef();
         return workspaceService.addWsPrefixToId(boardDef.getId(), boardDef.getWorkspace());
@@ -163,13 +164,22 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
     @NotNull
     @Override
     public DelStatus delete(@NotNull String localId) {
-        boardService.delete(workspaceService.convertToIdInWs(localId));
+        IdInWs idInWs = workspaceService.convertToIdInWs(localId);
+        checkWritePermissions(idInWs.getWorkspace());
+        boardService.delete(idInWs);
         return DelStatus.OK;
     }
 
     @Autowired(required = false)
     public void setRecordEventsService(RecordEventsService recordEventsService) {
         this.recordEventsService = recordEventsService;
+    }
+
+    private void checkWritePermissions(String workspace) {
+        if (workspaceService.getArtifactsWritePermission(AuthContext.getCurrentUser(), workspace, "board")) {
+            return;
+        }
+        throw new IllegalStateException("Permission denied. You can't create or change boards in workspace '" + workspace + "'");
     }
 
     @Data
