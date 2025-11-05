@@ -10,6 +10,7 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.io.file.EcosFile;
 import ru.citeck.ecos.commons.io.file.mem.EcosMemDir;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.commons.utils.FileUtils;
 import ru.citeck.ecos.commons.utils.ZipUtils;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
@@ -160,7 +161,7 @@ public class ThemeRecords extends AbstractRecordsDao implements RecordsQueryDao,
 
             byte[] bytes = Base64.getDecoder().decode(base64);
             EcosMemDir ecosMemDir = ZipUtils.extractZip(bytes);
-            removeHiddenAndSystemFiles(ecosMemDir);
+            FileUtils.deleteHiddenAndSystemFiles(ecosMemDir);
 
             EcosFile theme = ecosMemDir.getChildren().get(0);
             this.setModuleId(theme.getName());
@@ -209,21 +210,6 @@ public class ThemeRecords extends AbstractRecordsDao implements RecordsQueryDao,
                 }
             }
             return ZipUtils.writeZipAsBytes(root);
-        }
-
-        private void removeHiddenAndSystemFiles(EcosMemDir dir) {
-            if (dir == null) {
-                return;
-            }
-
-            for (EcosFile file : dir.getChildren()) {
-                String name = file.getName();
-                if (name.startsWith(".") || name.startsWith("_")) {
-                    file.delete();
-                } else if (file.isDirectory()) {
-                    removeHiddenAndSystemFiles((EcosMemDir) file);
-                }
-            }
         }
     }
 }
