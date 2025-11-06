@@ -309,7 +309,11 @@ class JournalRecordsDao(
 
         @JsonProperty(RecordConstants.ATT_WORKSPACE)
         fun withCtxWorkspace(workspace: String) {
-            withWorkspace(workspaceService.getUpdatedWsInMutation(this.workspace, workspace))
+            if (originalId.isNotBlank() && originalId != id) {
+                withWorkspace(workspace)
+            } else {
+                withWorkspace(workspaceService.getUpdatedWsInMutation(this.workspace, workspace))
+            }
         }
     }
 }

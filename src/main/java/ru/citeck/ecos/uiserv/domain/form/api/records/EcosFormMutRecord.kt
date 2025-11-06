@@ -12,9 +12,15 @@ class EcosFormMutRecord(
 
     constructor(workspaceService: WorkspaceService) : this(EcosFormDef.EMPTY, workspaceService)
 
+    val originalId = other.id
+
     @JsonProperty(RecordConstants.ATT_WORKSPACE)
     fun withCtxWorkspace(workspace: String) {
-        withWorkspace(workspaceService.getUpdatedWsInMutation(this.workspace, workspace))
+        if (originalId.isNotBlank() && originalId != id) {
+            withWorkspace(workspace)
+        } else {
+            withWorkspace(workspaceService.getUpdatedWsInMutation(this.workspace, workspace))
+        }
     }
 
     fun withModuleId(value: String?) {

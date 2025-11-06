@@ -6,13 +6,13 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.records2.RecordConstants;
-import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 
 import java.util.List;
 
 public class BoardMutRecord extends BoardDef {
 
+    private String originalId;
     private final WorkspaceService workspaceService;
 
     public BoardMutRecord(String id, WorkspaceService workspaceService) {
@@ -22,14 +22,19 @@ public class BoardMutRecord extends BoardDef {
 
     public BoardMutRecord(BoardDef boardDef, WorkspaceService workspaceService) {
         super(boardDef);
+        this.originalId = boardDef.getId();
         this.workspaceService = workspaceService;
     }
 
     @JsonProperty(RecordConstants.ATT_WORKSPACE)
     public void setCtxWorkspace(String workspace) {
-        this.setWorkspace(
-            workspaceService.getUpdatedWsInMutation(StringUtils.defaultString(getWorkspace()), workspace)
-        );
+        if (StringUtils.isNotBlank(originalId) && !originalId.equals(getId())) {
+            this.setWorkspace(workspace);
+        } else {
+            this.setWorkspace(
+                workspaceService.getUpdatedWsInMutation(StringUtils.defaultString(getWorkspace()), workspace)
+            );
+        }
     }
 
     @JsonProperty("_content")
