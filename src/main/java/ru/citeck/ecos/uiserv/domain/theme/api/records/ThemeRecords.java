@@ -23,9 +23,13 @@ import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao;
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
+import ru.citeck.ecos.uiserv.app.common.perms.UiServSystemArtifactPerms;
 import ru.citeck.ecos.uiserv.domain.theme.dto.ThemeDto;
 import ru.citeck.ecos.uiserv.domain.theme.eapps.ThemeArtifactHandler;
 import ru.citeck.ecos.uiserv.domain.theme.service.ThemeService;
+import ru.citeck.ecos.webapp.api.constants.AppName;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
+import ru.citeck.ecos.webapp.lib.perms.RecordPerms;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -38,7 +42,10 @@ public class ThemeRecords extends AbstractRecordsDao implements RecordsQueryDao,
     RecordMutateDtoDao<ThemeRecords.ThemeRecord>,
     RecordsDeleteDao {
 
+    public static final String ID = "theme";
+
     private final ThemeService themeService;
+    private final UiServSystemArtifactPerms perms;
 
     @Nullable
     @Override
@@ -111,10 +118,10 @@ public class ThemeRecords extends AbstractRecordsDao implements RecordsQueryDao,
     @NotNull
     @Override
     public String getId() {
-        return "theme";
+        return ID;
     }
 
-    public static class ThemeRecord extends ThemeDto {
+    public class ThemeRecord extends ThemeDto {
 
         private final ThemeService themeService;
 
@@ -186,6 +193,10 @@ public class ThemeRecords extends AbstractRecordsDao implements RecordsQueryDao,
                 }
             }
             this.setResources(resources);
+        }
+
+        public RecordPerms getPermissions() {
+            return perms.getPerms(EntityRef.create(AppName.UISERV, "theme", getId()));
         }
 
         public byte[] getData() {

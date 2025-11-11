@@ -14,8 +14,12 @@ import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao;
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
+import ru.citeck.ecos.uiserv.app.common.perms.UiServSystemArtifactPerms;
 import ru.citeck.ecos.uiserv.domain.icon.service.IconService;
 import ru.citeck.ecos.uiserv.domain.icon.dto.IconDto;
+import ru.citeck.ecos.webapp.api.constants.AppName;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
+import ru.citeck.ecos.webapp.lib.perms.RecordPerms;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -29,10 +33,13 @@ public class IconRecords extends AbstractRecordsDao
     RecordsDeleteDao {
 
     public static final String ID = "icon";
-    private final IconService iconService;
 
-    public IconRecords(IconService iconService) {
+    private final IconService iconService;
+    private final UiServSystemArtifactPerms perms;
+
+    public IconRecords(IconService iconService, UiServSystemArtifactPerms perms) {
         this.iconService = iconService;
+        this.perms = perms;
     }
 
     @NotNull
@@ -112,7 +119,7 @@ public class IconRecords extends AbstractRecordsDao
     }
 
     @RequiredArgsConstructor
-    public static class IconRecord {
+    public class IconRecord {
         @AttName("...")
         private final IconDto dto;
 
@@ -129,6 +136,10 @@ public class IconRecords extends AbstractRecordsDao
 
         public String getDisplayName() {
             return dto.getId();
+        }
+
+        public RecordPerms getPermissions() {
+            return perms.getPerms(EntityRef.create(AppName.UISERV, IconRecords.ID, dto.getId()));
         }
     }
 }

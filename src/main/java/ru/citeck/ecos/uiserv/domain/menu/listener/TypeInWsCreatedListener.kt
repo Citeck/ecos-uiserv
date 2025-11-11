@@ -182,6 +182,8 @@ class TypeInWsCreatedListener(
     )
 
     private enum class EventType {
-        CREATE, DELETE, UPDATE
+        CREATE,
+        DELETE,
+        UPDATE
     }
 }

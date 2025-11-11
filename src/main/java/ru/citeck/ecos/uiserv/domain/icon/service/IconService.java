@@ -6,9 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.uiserv.app.common.perms.UiServSystemArtifactPerms;
+import ru.citeck.ecos.uiserv.domain.icon.api.records.IconRecords;
 import ru.citeck.ecos.uiserv.domain.icon.repo.IconEntity;
 import ru.citeck.ecos.uiserv.domain.icon.repo.IconRepository;
 import ru.citeck.ecos.uiserv.domain.icon.dto.IconDto;
+import ru.citeck.ecos.webapp.api.constants.AppName;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.time.Instant;
 import java.util.List;
@@ -20,6 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class IconService {
     private final IconRepository iconRepository;
+    private final UiServSystemArtifactPerms perms;
 
     public List<IconDto> findAll() {
         return iconRepository.findAll().stream()
@@ -36,6 +41,8 @@ public class IconService {
     }
 
     public void deleteById(String id) {
+        perms.checkWrite(EntityRef.create(AppName.UISERV, IconRecords.ID, id));
+
         if (StringUtils.isBlank(id)) {
             throw new IllegalArgumentException("Id parameter is mandatory for icon deletion");
         }
@@ -43,6 +50,8 @@ public class IconService {
     }
 
     public IconDto save(IconDto iconDto) {
+        perms.checkWrite(EntityRef.create(AppName.UISERV, IconRecords.ID, iconDto.getId()));
+
         if (StringUtils.isBlank(iconDto.getId())) {
             iconDto.setId(UUID.randomUUID().toString());
         }

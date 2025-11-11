@@ -13,9 +13,13 @@ import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.utils.MandatoryParam;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
+import ru.citeck.ecos.uiserv.app.common.perms.UiServSystemArtifactPerms;
+import ru.citeck.ecos.uiserv.domain.i18n.api.records.I18nRecords;
 import ru.citeck.ecos.uiserv.domain.i18n.repo.I18nEntity;
 import ru.citeck.ecos.uiserv.domain.i18n.dto.I18nDto;
 import ru.citeck.ecos.uiserv.domain.i18n.repo.I18nRepository;
+import ru.citeck.ecos.webapp.api.constants.AppName;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory;
 
@@ -33,6 +37,7 @@ import java.util.stream.Collectors;
 public class I18nService implements MessageResolver {
 
     private final I18nRepository repo;
+    private final UiServSystemArtifactPerms perms;
 
     private final Map<String, Map<String, String>> messagesByLocale = new ConcurrentHashMap<>();
     private Map<String, String> defaultMessages = Collections.emptyMap();
@@ -95,6 +100,7 @@ public class I18nService implements MessageResolver {
     }
 
     public I18nDto upload(I18nDto dto) {
+        perms.checkWrite(EntityRef.create(AppName.UISERV, I18nRecords.ID, dto.getId()));
 
         MandatoryParam.checkString("id", dto.getId());
         MandatoryParam.check("locales", dto.getLocales());
@@ -173,6 +179,8 @@ public class I18nService implements MessageResolver {
     }
 
     public void delete(String id) {
+        perms.checkWrite(EntityRef.create(AppName.UISERV, I18nRecords.ID, id));
+
         repo.findByTenantAndExtId("", id).ifPresent(entity -> {
             repo.delete(entity);
             initialized.set(false);

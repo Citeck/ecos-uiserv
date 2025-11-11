@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import kotlin.Unit;
 import lombok.Data;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.commons.data.ObjectData;
-import ru.citeck.ecos.records2.request.result.RecordsResult;
 import ru.citeck.ecos.commons.utils.StringUtils;
 import ru.citeck.ecos.records3.record.atts.value.impl.EmptyAttValue;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
@@ -34,12 +32,14 @@ import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao;
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
-import ru.citeck.ecos.records3.record.request.RequestContext;
+import ru.citeck.ecos.uiserv.app.common.perms.UiServSystemArtifactPerms;
 import ru.citeck.ecos.uiserv.domain.action.service.ActionService;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto;
+import ru.citeck.ecos.webapp.api.constants.AppName;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import jakarta.annotation.PostConstruct;
+import ru.citeck.ecos.webapp.lib.perms.RecordPerms;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -61,11 +61,13 @@ public class ActionRecords extends AbstractRecordsDao
     private final ActionService actionService;
     private RecordEventsService recordEventsService;
     private final TypesRepo typesRepo;
+    private final UiServSystemArtifactPerms perms;
 
     @Autowired
-    public ActionRecords(ActionService actionService, TypesRepo typesRepo) {
+    public ActionRecords(ActionService actionService, TypesRepo typesRepo, UiServSystemArtifactPerms perms) {
         this.actionService = actionService;
         this.typesRepo = typesRepo;
+        this.perms = perms;
     }
 
     @PostConstruct
@@ -491,5 +493,10 @@ public class ActionRecords extends AbstractRecordsDao
         public byte[] getData() {
             return YamlUtils.toNonDefaultString(toJson()).getBytes(StandardCharsets.UTF_8);
         }
+
+        public RecordPerms getPermissions() {
+           return perms.getPerms(EntityRef.create(AppName.UISERV, ActionRecords.ID, getId()));
+        }
+
     }
 }
