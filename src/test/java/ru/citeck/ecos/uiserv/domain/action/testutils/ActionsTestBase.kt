@@ -1,10 +1,12 @@
 package ru.citeck.ecos.uiserv.domain.action.testutils
 
 import org.junit.jupiter.api.BeforeEach
+import org.mockito.Mockito
 import ru.citeck.ecos.model.lib.type.repo.DefaultTypesRepo
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.RecordsServiceFactory
 import ru.citeck.ecos.test.commons.EcosWebAppApiMock
+import ru.citeck.ecos.uiserv.app.common.perms.UiServSystemArtifactPerms
 import ru.citeck.ecos.uiserv.domain.action.api.records.ActionRecords
 import ru.citeck.ecos.uiserv.domain.action.dao.ActionDao
 import ru.citeck.ecos.uiserv.domain.action.service.ActionEntityMapper
@@ -19,6 +21,7 @@ open class ActionsTestBase {
     protected lateinit var records: RecordsService
     protected lateinit var mapper: ActionEntityMapper
     protected lateinit var actionDao: ActionDao
+    protected lateinit var perms: UiServSystemArtifactPerms
 
     @BeforeEach
     fun before() {
@@ -33,6 +36,7 @@ open class ActionsTestBase {
 
         actionDao = ActionInMemDao(recordsServices.predicateService)
         mapper = ActionEntityMapper(actionDao)
+        perms = Mockito.mock(UiServSystemArtifactPerms::class.java)
 
         val actionsDaoProvider = DaoActionsProvider(actionDao, mapper)
 
@@ -43,14 +47,16 @@ open class ActionsTestBase {
         actionService = ActionService(
             evaluatorService,
             mapper,
-            actionDao
+            actionDao,
+            perms
         )
         actionService.setActionProviders(listOf(actionsDaoProvider))
 
         recordsServices.recordsService.register(
             ActionRecords(
                 actionService,
-                DefaultTypesRepo()
+                DefaultTypesRepo(),
+                perms
             )
         )
     }

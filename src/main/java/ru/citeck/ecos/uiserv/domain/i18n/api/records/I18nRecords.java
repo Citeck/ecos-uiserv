@@ -23,10 +23,15 @@ import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao;
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
+import ru.citeck.ecos.uiserv.app.common.perms.UiServSystemArtifactPerms;
 import ru.citeck.ecos.uiserv.domain.i18n.dto.I18nDto;
 import ru.citeck.ecos.uiserv.domain.i18n.service.I18nService;
 
 import jakarta.annotation.PostConstruct;
+import ru.citeck.ecos.webapp.api.constants.AppName;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
+import ru.citeck.ecos.webapp.lib.perms.RecordPerms;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +43,11 @@ public class I18nRecords extends AbstractRecordsDao implements RecordsQueryDao,
     RecordMutateDtoDao<I18nRecords.I18nRecord>,
     RecordsDeleteDao {
 
+    public static final String ID = "i18n";
+
     private final I18nService i18nService;
     private final RecordEventsService recordEventsService;
+    private final UiServSystemArtifactPerms perms;
 
     @PostConstruct
     public void init() {
@@ -117,7 +125,6 @@ public class I18nRecords extends AbstractRecordsDao implements RecordsQueryDao,
     }
 
 
-
     @Data
     public static class QueryWithTypeRef {
         private String typeRef;
@@ -131,10 +138,10 @@ public class I18nRecords extends AbstractRecordsDao implements RecordsQueryDao,
     @NotNull
     @Override
     public String getId() {
-        return "i18n";
+        return ID;
     }
 
-    public static class I18nRecord extends I18nDto {
+    public class I18nRecord extends I18nDto {
 
         I18nRecord(I18nDto dto) {
             super(dto);
@@ -174,6 +181,10 @@ public class I18nRecords extends AbstractRecordsDao implements RecordsQueryDao,
 
         public byte[] getData() {
             return YamlUtils.toNonDefaultString(toJson()).getBytes(StandardCharsets.UTF_8);
+        }
+
+        public RecordPerms getPermissions() {
+            return perms.getPerms(EntityRef.create(AppName.UISERV, ID, getId()));
         }
     }
 }

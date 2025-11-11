@@ -1,14 +1,17 @@
 package ru.citeck.ecos.uiserv.domain.theme.api.records
 
 import org.springframework.stereotype.Component
-import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.dao.mutate.ValueMutateDao
+import ru.citeck.ecos.uiserv.app.common.perms.UiServSystemArtifactPerms
 import ru.citeck.ecos.uiserv.domain.theme.service.ThemeService
+import ru.citeck.ecos.webapp.api.constants.AppName
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 @Component
 class ApplyThemeRecordsDao(
     private val themeService: ThemeService,
+    private val perms: UiServSystemArtifactPerms
 ) : AbstractRecordsDao(), ValueMutateDao<ApplyThemeRecordsDao.ApplyThemeDto> {
 
     companion object {
@@ -22,9 +25,7 @@ class ApplyThemeRecordsDao(
     }
 
     override fun mutate(value: ApplyThemeDto): Any? {
-        if (AuthContext.isNotRunAsSystemOrAdmin()) {
-            error("Permission denied")
-        }
+        perms.checkWrite(EntityRef.create(AppName.UISERV, ThemeRecords.ID, value.themeId))
 
         if (themeService.activeTheme == value.themeId) {
             error("Theme ${value.themeId} already activated")

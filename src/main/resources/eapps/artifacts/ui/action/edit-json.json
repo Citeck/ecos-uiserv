@@ -9,5 +9,13 @@
   "config": {
     "editorFormId": "uiserv/form@json-editor-form",
     "contentAttribute": "_self"
+  },
+  "evaluator": {
+    "id": null,
+    "type": "has-permission",
+    "inverse": false,
+    "config": {
+      "permission": "Write"
+    }
   }
 }

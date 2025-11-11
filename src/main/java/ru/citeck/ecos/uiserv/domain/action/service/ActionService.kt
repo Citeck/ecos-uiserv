@@ -7,6 +7,8 @@ import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
+import ru.citeck.ecos.uiserv.app.common.perms.UiServSystemArtifactPerms
+import ru.citeck.ecos.uiserv.domain.action.api.records.ActionRecords
 import ru.citeck.ecos.uiserv.domain.action.dao.ActionDao
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto
 import ru.citeck.ecos.uiserv.domain.action.dto.RecordsActionsDto
@@ -16,8 +18,8 @@ import ru.citeck.ecos.uiserv.domain.evaluator.RecordEvaluatorService
 import ru.citeck.ecos.uiserv.domain.evaluator.evaluators.AlwaysFalseEvaluator
 import ru.citeck.ecos.uiserv.domain.evaluator.evaluators.AlwaysTrueEvaluator
 import ru.citeck.ecos.uiserv.domain.evaluator.evaluators.PredicateEvaluator
+import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.function.Consumer
@@ -26,7 +28,8 @@ import java.util.function.Consumer
 class ActionService(
     private val evaluatorsService: RecordEvaluatorService,
     private val actionEntityMapper: ActionEntityMapper,
-    private val actionDao: ActionDao
+    private val actionDao: ActionDao,
+    private val perms: UiServSystemArtifactPerms
 ) {
     companion object {
         val log = KotlinLogging.logger {}
@@ -80,6 +83,7 @@ class ActionService(
     }
 
     fun updateAction(action: ActionDto) {
+        perms.checkWrite(EntityRef.create(AppName.UISERV, ActionRecords.ID, action.id))
 
         val before = actionDao.getAction(action.id)?.let { actionEntityMapper.toDto(it) }
 
@@ -98,6 +102,9 @@ class ActionService(
 
     fun deleteAction(id: String?) {
         id ?: return
+
+        perms.checkWrite(EntityRef.create(AppName.UISERV, ActionRecords.ID, id))
+
         val action = actionDao.getAction(id)
         if (action != null) {
             actionDao.delete(action)

@@ -22,13 +22,16 @@ import ru.citeck.ecos.commons.utils.ZipUtils;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
+import ru.citeck.ecos.uiserv.app.common.perms.UiServSystemArtifactPerms;
 import ru.citeck.ecos.uiserv.domain.icon.api.records.IconRecords;
 import ru.citeck.ecos.uiserv.domain.icon.dto.IconDto;
 import ru.citeck.ecos.uiserv.domain.icon.service.IconService;
+import ru.citeck.ecos.uiserv.domain.theme.api.records.ThemeRecords;
 import ru.citeck.ecos.uiserv.domain.theme.dto.ResourceData;
 import ru.citeck.ecos.uiserv.domain.theme.dto.ThemeDto;
 import ru.citeck.ecos.uiserv.domain.theme.repo.ThemeEntity;
 import ru.citeck.ecos.uiserv.domain.theme.repo.ThemeRepository;
+import ru.citeck.ecos.webapp.api.constants.AppName;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter;
 import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory;
@@ -63,6 +66,7 @@ public class ThemeService {
     private final IconService iconService;
 
     private final JpaSearchConverterFactory jpaSearchConverterFactory;
+    private final UiServSystemArtifactPerms perms;
     private JpaSearchConverter<ThemeEntity> searchConv;
 
     private LoadingCache<ResourceKey, ResourceData> resourcesCache;
@@ -149,6 +153,8 @@ public class ThemeService {
     }
 
     public ThemeDto deploy(ThemeDto themeDto) {
+        perms.checkWrite(EntityRef.create(AppName.UISERV, ThemeRecords.ID, themeDto.getId()));
+
         ThemeEntity entity = toEntity(themeDto);
         if (entity != null) {
             try {
@@ -161,6 +167,8 @@ public class ThemeService {
     }
 
     public void delete(String id) {
+        perms.checkWrite(EntityRef.create(AppName.UISERV, ThemeRecords.ID, id));
+
         if (!DEFAULT_THEME_ID.equals(id)) {
             themeRepo.findFirstByExtId(id).ifPresent(themeRepo::delete);
             resourcesCache.invalidateAll();
