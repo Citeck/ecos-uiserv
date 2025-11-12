@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv;
 
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import ru.citeck.ecos.uiserv.app.application.props.ApplicationProperties;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
@@ -11,6 +12,7 @@ import ru.citeck.ecos.webapp.lib.spring.EcosSpringApplication;
 @SpringBootApplication
 @EnableConfigurationProperties({LiquibaseProperties.class, ApplicationProperties.class})
 @EnableDiscoveryClient
+@EnableMethodSecurity(securedEnabled = true)
 @EnableJpaRepositories({
     "ru.citeck.ecos.uiserv.app.*.repo",
     "ru.citeck.ecos.uiserv.domain.*.repo"
