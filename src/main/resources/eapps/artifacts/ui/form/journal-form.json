@@ -208,6 +208,19 @@
                           },
                           {
                             "label": {
+                              "ru": "Обновлять данные журнала при смене фокуса",
+                              "en": "Update log data when changing focus"
+                            },
+                            "key": "isReloadDataOnFocus",
+                            "refreshOn": [],
+                            "optionalWhenDisabled": false,
+                            "type": "checkbox",
+                            "input": true,
+                            "reorder": false,
+                            "dataGridLabel": false
+                          },
+                          {
+                            "label": {
                               "ru": "Добавить колонки",
                               "en": "Add columns"
                             },
