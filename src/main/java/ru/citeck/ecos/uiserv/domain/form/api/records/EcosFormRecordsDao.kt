@@ -96,6 +96,13 @@ class EcosFormRecordsDao(
 
     override fun saveMutatedRec(record: EcosFormMutRecord): String {
         checkPermissions(record.workspace)
+
+        var typeLocalId = record.typeRef.getLocalId()
+        if (typeLocalId.isNotBlank()) {
+            typeLocalId = workspaceService.replaceMaskFromIdToWsPrefix(typeLocalId, record.workspace)
+            record.withTypeRef(record.typeRef.withLocalId(typeLocalId))
+        }
+
         val recAfterSave = ecosFormService.save(record.build())
         return workspaceService.addWsPrefixToId(recAfterSave.id, recAfterSave.workspace)
     }

@@ -74,7 +74,7 @@ class DashboardService(
     fun findAll(predicate: Predicate, workspaces: List<String>, max: Int, skip: Int, sort: List<SortBy>): List<DashboardDto> {
         val predicateForQuery = Predicates.and(
             predicate,
-            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentUser(), workspaces)
+            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentFullAuth(), workspaces)
         )
         return searchConv.findAll(repo, predicateForQuery, max, skip, sort).stream()
             .map { entity: DashboardEntity -> this.mapToDto(entity) }

@@ -159,8 +159,13 @@ class JournalRecordsDao(
     }
 
     override fun saveMutatedRec(record: JournalMutateRec): String {
-
         checkWritePermissions(record.workspace)
+
+        var typeLocalId = record.typeRef.getLocalId()
+        if (typeLocalId.isNotBlank()) {
+            typeLocalId = workspaceService.replaceMaskFromIdToWsPrefix(typeLocalId, record.workspace)
+            record.withTypeRef(record.typeRef.withLocalId(typeLocalId))
+        }
 
         record.actionsDef.forEach {
             val config = it.config
@@ -250,7 +255,14 @@ class JournalRecordsDao(
 
         @JsonValue
         open fun toNonDefaultJson(): Any {
-            return mapper.toNonDefaultJson(journalDef)
+            val journalDefCopy = journalDef.copy {
+                var typeLocalId = journalDef.typeRef.getLocalId()
+                if (typeLocalId.isNotBlank()) {
+                    typeLocalId = workspaceService.replaceWsPrefixFromIdToMask(typeLocalId)
+                    withTypeRef(journalDef.typeRef.withLocalId(typeLocalId))
+                }
+            }
+            return mapper.toNonDefaultJson(journalDefCopy)
         }
 
         open fun getColumns(): List<Any> {

@@ -127,7 +127,7 @@ public class MenuService {
     public List<MenuDto> findAll(Predicate predicate, List<String> workspaces, int max, int skip, List<SortBy> sort) {
         var predicateForQuery = Predicates.and(
             predicate,
-            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentUser(), workspaces)
+            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentFullAuth(), workspaces)
         );
         return menuDao.findAll(predicateForQuery, max, skip, sort).stream()
             .map(this::mapToDto)

@@ -59,7 +59,15 @@ class EcosFormRecord(
 
     @JsonValue
     fun toJson(): EcosFormDef {
-        return def.copy().withWorkspace("").build()
+        return def.copy {
+            withWorkspace("")
+
+            var typeLocalId = def.typeRef.getLocalId()
+            if (typeLocalId.isNotBlank()) {
+                typeLocalId = workspaceService.replaceWsPrefixFromIdToMask(typeLocalId)
+                withTypeRef(def.typeRef.withLocalId(typeLocalId))
+            }
+        }
     }
 
     fun getData(): ByteArray {

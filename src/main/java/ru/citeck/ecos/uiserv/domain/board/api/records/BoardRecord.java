@@ -58,7 +58,26 @@ public class BoardRecord {
 
     @JsonValue
     public JsonNode toNonDefaultJson() {
-        return Json.getMapper().toNonDefaultJson(boardDefWithMeta.getBoardDef());
+        BoardDef boardDefCopy = new BoardDef(boardDefWithMeta.getBoardDef());
+        EntityRef typeRef = boardDefCopy.getTypeRef();
+        if (typeRef != null) {
+            String localId = workspaceService.replaceWsPrefixFromIdToMask(typeRef.getLocalId());
+            boardDefCopy.setTypeRef(typeRef.withLocalId(localId));
+        }
+
+        EntityRef journalRef = boardDefCopy.getJournalRef();
+        if (journalRef != null) {
+            String localId = workspaceService.replaceWsPrefixFromIdToMask(journalRef.getLocalId());
+            boardDefCopy.setJournalRef(journalRef.withLocalId(localId));
+        }
+
+        EntityRef cardFormRef = boardDefCopy.getCardFormRef();
+        if (cardFormRef != null) {
+            String localId = workspaceService.replaceWsPrefixFromIdToMask(cardFormRef.getLocalId());
+            boardDefCopy.setCardFormRef(cardFormRef.withLocalId(localId));
+        }
+
+        return Json.getMapper().toNonDefaultJson(boardDefCopy);
     }
 
     public byte[] getData() {
