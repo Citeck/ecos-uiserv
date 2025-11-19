@@ -3,7 +3,9 @@
 
     <changeSet author="citeck" id="20251119000000">
 
-        <addDefaultValue tableName="journal" columnName="reload_data_on_focus" />
+        <addColumn tableName="journal">
+            <column name="reload_data_on_focus" type="BOOLEAN"/>
+        </addColumn>
 
     </changeSet>
 
