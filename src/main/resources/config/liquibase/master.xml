@@ -61,5 +61,6 @@
     <include file="changelog/20230920000000_update_board_table.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20240202000000_update_actions.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20240427000000_update_journal_settings.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20251119000000_add_reload_on_focus_to_journal.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

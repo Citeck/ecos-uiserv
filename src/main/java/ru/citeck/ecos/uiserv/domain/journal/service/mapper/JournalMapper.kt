@@ -24,6 +24,7 @@ class JournalMapper(
         dto.journalDef = JournalDef.create()
             .withId(entity.extId)
             .withEditable(entity.editable)
+            .withReloadDataOnFocus(entity.reloadDataOnFocus)
             .withSourceId(entity.sourceId)
             .withMetaRecord(EntityRef.valueOf(entity.metaRecord))
             .withName(mapper.read(entity.name, MLText::class.java))
@@ -63,6 +64,7 @@ class JournalMapper(
         entity.metaRecord = journal.metaRecord.toString()
         entity.columns = mapper.toString(journal.columns.map { mapper.toNonDefaultJson(it) })!!
         entity.editable = journal.editable
+        entity.reloadDataOnFocus = journal.reloadDataOnFocus
         entity.name = mapper.toString(journal.name)
         entity.typeRef = EntityRef.toString(journal.typeRef)
         entity.predicate = mapper.toString(journal.predicate)
