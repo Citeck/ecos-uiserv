@@ -213,7 +213,7 @@
                               "ru": "Обновлять данные журнала при смене фокуса",
                               "en": "Update log data when changing focus"
                             },
-                            "key": "isReloadDataOnFocus",
+                            "key": "reloadDataOnFocus",
                             "refreshOn": [],
                             "optionalWhenDisabled": false,
                             "type": "checkbox",
