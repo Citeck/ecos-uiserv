@@ -2,7 +2,7 @@ package ru.citeck.ecos.uiserv.domain.form.api.records
 
 import com.fasterxml.jackson.annotation.JsonValue
 import ru.citeck.ecos.commons.data.MLText
-import ru.citeck.ecos.commons.json.YamlUtils.toNonDefaultString
+import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.context.lib.auth.AuthContext.isRunAsAdmin
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
@@ -59,19 +59,20 @@ class EcosFormRecord(
 
     @JsonValue
     fun toJson(): EcosFormDef {
-        return def.copy {
+        return def.copy().withWorkspace("").build()
+    }
+
+    fun getData(): ByteArray {
+        val data = def.copy {
             withWorkspace("")
 
             var typeLocalId = def.typeRef.getLocalId()
             if (typeLocalId.isNotBlank()) {
-                typeLocalId = workspaceService.replaceWsPrefixFromIdToMask(typeLocalId)
+                typeLocalId = workspaceService.replaceWsPrefixToCurrentWsPlaceholder(typeLocalId)
                 withTypeRef(def.typeRef.withLocalId(typeLocalId))
             }
         }
-    }
-
-    fun getData(): ByteArray {
-        return toNonDefaultString(toJson()).toByteArray(StandardCharsets.UTF_8)
+        return Json.mapper.toPrettyStringNotNull(data).toByteArray(StandardCharsets.UTF_8)
     }
 
     fun getEcosType(): String {

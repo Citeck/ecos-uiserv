@@ -158,27 +158,17 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
         checkWritePermissions(boardRecord.getWorkspace());
 
         String workspace = boardRecord.getWorkspace();
-        EntityRef typeRef = boardRecord.getTypeRef();
-        if (typeRef != null) {
-            String localId = workspaceService.replaceMaskFromIdToWsPrefix(typeRef.getLocalId(), workspace);
-            boardRecord.setTypeRef(typeRef.withLocalId(localId));
-        }
-
-        EntityRef journalRef = boardRecord.getJournalRef();
-        if (journalRef != null) {
-            String localId = workspaceService.replaceMaskFromIdToWsPrefix(journalRef.getLocalId(), workspace);
-            boardRecord.setJournalRef(journalRef.withLocalId(localId));
-        }
-
-        EntityRef cardFormRef = boardRecord.getCardFormRef();
-        if (cardFormRef != null) {
-            String localId = workspaceService.replaceMaskFromIdToWsPrefix(cardFormRef.getLocalId(), workspace);
-            boardRecord.setCardFormRef(cardFormRef.withLocalId(localId));
-        }
+        boardRecord.setTypeRef(prepareExtRef(boardRecord.getTypeRef(), workspace));
+        boardRecord.setJournalRef(prepareExtRef(boardRecord.getJournalRef(), workspace));
+        boardRecord.setCardFormRef(prepareExtRef(boardRecord.getCardFormRef(), workspace));
 
         BoardDef boardDef = boardService.save(boardRecord)
             .getBoardDef();
         return workspaceService.addWsPrefixToId(boardDef.getId(), boardDef.getWorkspace());
+    }
+
+    private EntityRef prepareExtRef(EntityRef ref, String workspace) {
+        return ref.withLocalId(workspaceService.replaceCurrentWsPlaceholderToWsPrefix(ref.getLocalId(), workspace));
     }
 
     @NotNull

@@ -163,7 +163,7 @@ class JournalRecordsDao(
 
         var typeLocalId = record.typeRef.getLocalId()
         if (typeLocalId.isNotBlank()) {
-            typeLocalId = workspaceService.replaceMaskFromIdToWsPrefix(typeLocalId, record.workspace)
+            typeLocalId = workspaceService.replaceCurrentWsPlaceholderToWsPrefix(typeLocalId, record.workspace)
             record.withTypeRef(record.typeRef.withLocalId(typeLocalId))
         }
 
@@ -255,14 +255,7 @@ class JournalRecordsDao(
 
         @JsonValue
         open fun toNonDefaultJson(): Any {
-            val journalDefCopy = journalDef.copy {
-                var typeLocalId = journalDef.typeRef.getLocalId()
-                if (typeLocalId.isNotBlank()) {
-                    typeLocalId = workspaceService.replaceWsPrefixFromIdToMask(typeLocalId)
-                    withTypeRef(journalDef.typeRef.withLocalId(typeLocalId))
-                }
-            }
-            return mapper.toNonDefaultJson(journalDefCopy)
+            return mapper.toNonDefaultJson(journalDef)
         }
 
         open fun getColumns(): List<Any> {
@@ -270,7 +263,14 @@ class JournalRecordsDao(
         }
 
         open fun getData(): ByteArray {
-            return YamlUtils.toNonDefaultString(toNonDefaultJson()).toByteArray(StandardCharsets.UTF_8)
+            val journalDefCopy = journalDef.copy {
+                var typeLocalId = journalDef.typeRef.getLocalId()
+                if (typeLocalId.isNotBlank()) {
+                    typeLocalId = workspaceService.replaceWsPrefixToCurrentWsPlaceholder(typeLocalId)
+                    withTypeRef(journalDef.typeRef.withLocalId(typeLocalId))
+                }
+            }
+            return YamlUtils.toNonDefaultString(journalDefCopy).toByteArray(StandardCharsets.UTF_8)
         }
 
         open fun getPermissions(): Permissions? {

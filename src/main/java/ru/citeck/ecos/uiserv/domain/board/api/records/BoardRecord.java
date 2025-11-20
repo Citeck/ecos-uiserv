@@ -21,9 +21,10 @@ import ru.citeck.ecos.webapp.api.entity.EntityRef;
 import java.nio.charset.StandardCharsets;
 
 /**
-* Class supports uploading board from yml-file,
-* editing board with JSON Editor
-* */
+ * Class supports uploading board from yml-file,
+ * editing board with JSON Editor
+ *
+ */
 @Data
 public class BoardRecord {
     @AttName("...")
@@ -58,30 +59,20 @@ public class BoardRecord {
 
     @JsonValue
     public JsonNode toNonDefaultJson() {
-        BoardDef boardDefCopy = new BoardDef(boardDefWithMeta.getBoardDef());
-        EntityRef typeRef = boardDefCopy.getTypeRef();
-        if (typeRef != null) {
-            String localId = workspaceService.replaceWsPrefixFromIdToMask(typeRef.getLocalId());
-            boardDefCopy.setTypeRef(typeRef.withLocalId(localId));
-        }
-
-        EntityRef journalRef = boardDefCopy.getJournalRef();
-        if (journalRef != null) {
-            String localId = workspaceService.replaceWsPrefixFromIdToMask(journalRef.getLocalId());
-            boardDefCopy.setJournalRef(journalRef.withLocalId(localId));
-        }
-
-        EntityRef cardFormRef = boardDefCopy.getCardFormRef();
-        if (cardFormRef != null) {
-            String localId = workspaceService.replaceWsPrefixFromIdToMask(cardFormRef.getLocalId());
-            boardDefCopy.setCardFormRef(cardFormRef.withLocalId(localId));
-        }
-
-        return Json.getMapper().toNonDefaultJson(boardDefCopy);
+        return Json.getMapper().toNonDefaultJson(boardDefWithMeta.getBoardDef());
     }
 
     public byte[] getData() {
-        return YamlUtils.toNonDefaultString(toNonDefaultJson()).getBytes(StandardCharsets.UTF_8);
+        BoardDef boardDefCopy = new BoardDef(boardDefWithMeta.getBoardDef());
+        boardDefCopy.setTypeRef(prepareExtRef(boardDefCopy.getTypeRef()));
+        boardDefCopy.setJournalRef(prepareExtRef(boardDefCopy.getJournalRef()));
+        boardDefCopy.setCardFormRef(prepareExtRef(boardDefCopy.getCardFormRef()));
+
+        return YamlUtils.toNonDefaultString(boardDefCopy).getBytes(StandardCharsets.UTF_8);
+    }
+
+    private EntityRef prepareExtRef(EntityRef ref) {
+        return ref.withLocalId(workspaceService.replaceWsPrefixToCurrentWsPlaceholder(ref.getLocalId()));
     }
 
     public String getEcosType() {

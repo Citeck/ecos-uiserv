@@ -10,7 +10,7 @@ defaultFilters:
 
 actions:
   - uiserv/action@debug-form
-  - uiserv/action@ecos-module-download
+  - uiserv/action@download-base64-data-json
   - uiserv/action@delete
   - uiserv/action@edit-form
   - uiserv/action@edit-json

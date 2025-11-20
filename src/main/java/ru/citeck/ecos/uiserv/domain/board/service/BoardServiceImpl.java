@@ -109,7 +109,7 @@ public class BoardServiceImpl implements BoardService {
     ) {
         var predicateForQuery = Predicates.and(
             predicate,
-            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentFullAuth(), workspaces)
+            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentRunAsAuth(), workspaces)
         );
         return searchConv.findAll(repository, predicateForQuery, maxItems, skipCount, sort)
             .stream()

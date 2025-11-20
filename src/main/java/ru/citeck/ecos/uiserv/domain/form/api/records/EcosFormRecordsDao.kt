@@ -99,7 +99,7 @@ class EcosFormRecordsDao(
 
         var typeLocalId = record.typeRef.getLocalId()
         if (typeLocalId.isNotBlank()) {
-            typeLocalId = workspaceService.replaceMaskFromIdToWsPrefix(typeLocalId, record.workspace)
+            typeLocalId = workspaceService.replaceCurrentWsPlaceholderToWsPrefix(typeLocalId, record.workspace)
             record.withTypeRef(record.typeRef.withLocalId(typeLocalId))
         }
 
