@@ -72,6 +72,9 @@ public class BoardRecord {
     }
 
     private EntityRef prepareExtRef(EntityRef ref) {
+        if (ref == null) {
+            return null;
+        }
         return ref.withLocalId(workspaceService.replaceWsPrefixToCurrentWsPlaceholder(ref.getLocalId()));
     }
 

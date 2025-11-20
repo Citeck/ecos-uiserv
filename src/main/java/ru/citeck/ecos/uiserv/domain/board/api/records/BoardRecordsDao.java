@@ -168,6 +168,9 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
     }
 
     private EntityRef prepareExtRef(EntityRef ref, String workspace) {
+        if (ref == null) {
+            return null;
+        }
         return ref.withLocalId(workspaceService.replaceCurrentWsPlaceholderToWsPrefix(ref.getLocalId(), workspace));
     }
 
