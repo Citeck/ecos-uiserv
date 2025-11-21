@@ -94,6 +94,11 @@ data class JournalDef(
     val editable: Boolean,
 
     /**
+     * Reload journal data on focus
+     */
+    val reloadDataOnFocus: Boolean,
+
+    /**
      * Journal columns to display in table.
      */
     val columns: List<JournalColumnDef>,
@@ -148,6 +153,7 @@ data class JournalDef(
         var actions: List<EntityRef> = emptyList()
         var actionsDef: List<JournalActionDef> = emptyList()
         var editable: Boolean = true
+        var reloadDataOnFocus: Boolean = false
         var columns: List<JournalColumnDef> = emptyList()
         var computed: List<JournalComputedDef> = emptyList()
         var system: Boolean = false
@@ -171,6 +177,7 @@ data class JournalDef(
             actions = base.actions.let { DataValue.create(it).asList(EntityRef::class.java) }
             actionsDef = base.actionsDef.let { DataValue.create(it).asList(JournalActionDef::class.java) }
             editable = base.editable
+            reloadDataOnFocus = base.reloadDataOnFocus
             withColumns(base.columns)
             computed = base.computed.let { DataValue.create(it).asList(JournalComputedDef::class.java) }
             system = base.system
@@ -272,6 +279,11 @@ data class JournalDef(
             return this
         }
 
+        fun withReloadDataOnFocus(reloadDataOnFocus: Boolean?): Builder {
+            this.reloadDataOnFocus = reloadDataOnFocus ?: false
+            return this
+        }
+
         fun withColumns(columns: List<JournalColumnDef>): Builder {
             this.columns = columns.filter { it.id.isNotBlank() }
             return this
@@ -312,6 +324,7 @@ data class JournalDef(
                 actions = actions,
                 actionsDef = actionsDef,
                 editable = editable,
+                reloadDataOnFocus = reloadDataOnFocus,
                 columns = columns,
                 computed = computed,
                 system = system,
