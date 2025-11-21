@@ -255,7 +255,7 @@ class JournalRecordsDao(
 
         @JsonValue
         open fun toNonDefaultJson(): Any {
-            return mapper.toNonDefaultJson(journalDef)
+            return mapper.toNonDefaultJson(journalDef.copy().withWorkspace("").build())
         }
 
         open fun getColumns(): List<Any> {
@@ -264,6 +264,8 @@ class JournalRecordsDao(
 
         open fun getData(): ByteArray {
             val journalDefCopy = journalDef.copy {
+                withWorkspace("")
+
                 var typeLocalId = journalDef.typeRef.getLocalId()
                 if (typeLocalId.isNotBlank()) {
                     typeLocalId = workspaceService.replaceWsPrefixToCurrentWsPlaceholder(typeLocalId)
