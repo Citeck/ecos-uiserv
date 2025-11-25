@@ -130,9 +130,9 @@ public class TaskFormRecordsDao extends AbstractRecordsDao
         tasksQuery.setDocument(recordRef.toString());
 
         RecordsQuery tasksRecsQuery = RecordsQuery.create()
-                .withSourceId(AppName.EPROC + "/" + WF_TASK_SOURCE_ID)
-                .withQuery(tasksQuery)
-                .build();
+            .withSourceId(AppName.EPROC + "/" + WF_TASK_SOURCE_ID)
+            .withQuery(tasksQuery)
+            .build();
 
         Set<String> attsToLoad = new HashSet<>(taskInfoAttsToLoad.values());
         attsToLoad.addAll(PredicateUtils.getAllPredicateAttributes(evalOutcomesForTasks));
@@ -162,7 +162,7 @@ public class TaskFormRecordsDao extends AbstractRecordsDao
 
             List<Outcome> outcomes;
             if (predicateService.isMatch(RecordAttsElement.create(taskAtts), evalOutcomesForTasks)) {
-                outcomes = getOutcomesForForm(form);
+                outcomes = getOutcomesForForm(form, task.possibleOutcomes);
             } else {
                 outcomes = Collections.emptyList();
             }
@@ -210,7 +210,7 @@ public class TaskFormRecordsDao extends AbstractRecordsDao
             return definition;
         }
 
-        if (isOutcomeBtn(definition)) {
+        if (isOutcomeBtn(definition) || isTaskOutcomeComponent(definition)) {
             return DataValue.NULL;
         }
 
@@ -238,7 +238,10 @@ public class TaskFormRecordsDao extends AbstractRecordsDao
         return resultComponent;
     }
 
-    private List<Outcome> getOutcomesForForm(@NotNull EcosFormDef form) {
+    private List<Outcome> getOutcomesForForm(
+        @NotNull EcosFormDef form,
+        List<PossibleOutcome> possibleOutcomes
+    ) {
 
         ObjectData i18n = form.getI18n();
         if (i18n.isNotEmpty()) {
@@ -254,18 +257,38 @@ public class TaskFormRecordsDao extends AbstractRecordsDao
             }
         }
 
-        return getOutcomes(form.getDefinition().getData(), i18n);
+        return getOutcomes(form.getDefinition().getData(), i18n, possibleOutcomes);
     }
 
-    private List<Outcome> getOutcomes(DataValue definition, ObjectData i18n) {
+    private List<Outcome> getOutcomes(
+        DataValue definition,
+        ObjectData i18n,
+        List<PossibleOutcome> possibleOutcomes
+    ) {
         ArrayList<Outcome> result = new ArrayList<>();
-        getOutcomes(definition, result, i18n);
+        getOutcomes(definition, result, i18n, possibleOutcomes);
         return result;
     }
 
-    private void getOutcomes(DataValue definition, List<Outcome> result, ObjectData i18n) {
+    private void getOutcomes(
+        DataValue definition,
+        List<Outcome> result,
+        ObjectData i18n,
+        List<PossibleOutcome> possibleOutcomes
+    ) {
 
         if (!definition.isObject()) {
+            return;
+        }
+
+        if (isTaskOutcomeComponent(definition)) {
+            for (PossibleOutcome possibleOutcome : possibleOutcomes) {
+                if (StringUtils.isBlank(possibleOutcome.id)) {
+                    continue;
+                }
+                String label = StringUtils.defaultIfBlank(possibleOutcome.name, possibleOutcome.id);
+                result.add(new Outcome(label, possibleOutcome.id));
+            }
             return;
         }
 
@@ -295,9 +318,14 @@ public class TaskFormRecordsDao extends AbstractRecordsDao
         DataValue components = FormDefUtils.getInnerComponents(definition);
         if (components.isArray()) {
             for (DataValue value : components) {
-                getOutcomes(value, result, i18n);
+                getOutcomes(value, result, i18n, possibleOutcomes);
             }
         }
+    }
+
+    private boolean isTaskOutcomeComponent(DataValue value) {
+        String type = value.get("type").asText();
+        return type.equals("taskOutcome");
     }
 
     private boolean isOutcomeBtn(DataValue value) {
@@ -358,6 +386,16 @@ public class TaskFormRecordsDao extends AbstractRecordsDao
 
         @AttName("_formRef")
         private EntityRef formRef;
+        @AttName("possibleOutcomes![]")
+        private List<PossibleOutcome> possibleOutcomes;
+    }
+
+    @Data
+    public static class PossibleOutcome {
+        @AttName("id!")
+        private String id;
+        @AttName("name!")
+        private String name;
     }
 
     @Data
