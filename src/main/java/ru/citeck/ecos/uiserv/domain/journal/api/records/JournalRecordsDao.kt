@@ -214,7 +214,7 @@ class JournalRecordsDao(
     )
 
     class ActionDefRecord(
-        @AttName("...")
+        @param:AttName("...")
         val actionDef: JournalActionDef
     ) {
         fun getConfigMap(): Map<String, String> {
@@ -269,7 +269,8 @@ class JournalRecordsDao(
         }
 
         @JsonValue
-        open fun toNonDefaultJson(): Any {
+        open fun toNonDefaultJson(): Any? {
+            val journalDef = journalDef ?: return null
             return mapper.toNonDefaultJson(journalDef.copy().withWorkspace("").build())
         }
 
@@ -277,7 +278,8 @@ class JournalRecordsDao(
             return journalDef?.columns?.map { ColumnAttValue(it) } ?: emptyList()
         }
 
-        open fun getData(): ByteArray {
+        open fun getData(): ByteArray? {
+            val journalDef = journalDef ?: return null
             val journalDefCopy = journalDef.copy {
                 withWorkspace("")
 
@@ -317,7 +319,7 @@ class JournalRecordsDao(
     }
 
     class ColumnAttValue(
-        @AttName("...")
+        @param:AttName("...")
         val column: JournalColumnDef
     ) {
         fun getJsonValue(): ObjectData {
