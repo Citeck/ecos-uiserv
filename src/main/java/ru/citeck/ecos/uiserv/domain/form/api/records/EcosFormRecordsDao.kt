@@ -12,6 +12,7 @@ import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.PredicateUtils
 import ru.citeck.ecos.records2.predicate.model.AttributePredicate
 import ru.citeck.ecos.records2.predicate.model.Predicate
+import ru.citeck.ecos.records2.predicate.model.Predicates
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
@@ -169,7 +170,7 @@ class EcosFormRecordsDao(
         if (query == null) {
             val (max, skipCount) = recsQuery.page
             if (PredicateService.LANGUAGE_PREDICATE == recsQuery.language) {
-                val predicate = PredicateUtils.mapAttributePredicates(
+                var predicate = PredicateUtils.mapAttributePredicates(
                     recsQuery.getQuery(Predicate::class.java)
                 ) { pred: AttributePredicate ->
                     if (ATTS_MAPPING.containsKey(pred.getAttribute())) {
@@ -179,6 +180,16 @@ class EcosFormRecordsDao(
                     } else {
                         pred
                     }
+                }
+                val isSysShouldBeFiltered = workspaceService.isSystemArtifactsShouldBeFiltered(
+                    AuthContext.getCurrentRunAsAuth(),
+                    recsQuery.workspaces
+                )
+                if (isSysShouldBeFiltered) {
+                    predicate = Predicates.and(
+                        predicate,
+                        Predicates.notEq("system", true)
+                    )
                 }
                 val mappedSortBy = recsQuery.sortBy.map { sortBy: SortBy ->
                     if (ATTS_MAPPING.containsKey(sortBy.attribute)) {
@@ -228,7 +239,7 @@ class EcosFormRecordsDao(
             return result
         } else if (!query.formKey.isNullOrBlank()) {
 
-            val keys = (query.formKey ?: "")
+            val keys = query.formKey
                 .split(",")
                 .filter { it.isNotBlank() }
             form = ecosFormService.getFormByKey(keys)

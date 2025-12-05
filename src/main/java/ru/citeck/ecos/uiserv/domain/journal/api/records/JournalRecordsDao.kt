@@ -20,6 +20,7 @@ import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records2.predicate.PredicateService
+import ru.citeck.ecos.records2.predicate.model.Predicates
 import ru.citeck.ecos.records3.record.atts.schema.ScalarType
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.atts.value.AttValue
@@ -97,10 +98,24 @@ class JournalRecordsDao(
 
             if (recsQuery.language == PredicateService.LANGUAGE_PREDICATE) {
 
-                val registryQuery = recsQuery.copy()
+                var predicate = recsQuery.getPredicate()
+
+                val isSysShouldBeFiltered = workspaceService.isSystemArtifactsShouldBeFiltered(
+                    AuthContext.getCurrentRunAsAuth(),
+                    recsQuery.workspaces
+                )
+                if (isSysShouldBeFiltered) {
+                    predicate = Predicates.and(
+                        predicate,
+                        Predicates.notEq("system", true)
+                    )
+                }
+
+                val queryRes = recordsService.query(recsQuery.copy()
                     .withSourceId(JournalsRegistryConfiguration.JOURNALS_REGISTRY_SOURCE_ID)
+                    .withQuery(predicate)
                     .build()
-                val queryRes = recordsService.query(registryQuery)
+                )
 
                 val journals = journalService.getAll(
                     queryRes.getRecords().map {

@@ -3,5 +3,6 @@ type: 'maven-webapp'
 properties:
   jdk: JDK24
   skipTests: false
+  buildArgs: '-Plegacy-testcontainers'
   image:
     multiplatform: true
