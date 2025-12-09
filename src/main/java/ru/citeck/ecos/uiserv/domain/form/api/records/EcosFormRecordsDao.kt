@@ -12,7 +12,6 @@ import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.PredicateUtils
 import ru.citeck.ecos.records2.predicate.model.AttributePredicate
 import ru.citeck.ecos.records2.predicate.model.Predicate
-import ru.citeck.ecos.records2.predicate.model.Predicates
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao
@@ -26,16 +25,19 @@ import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
 import ru.citeck.ecos.uiserv.domain.form.registry.FormsRegistryConfiguration
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
+import ru.citeck.ecos.uiserv.domain.workspace.service.WorkspaceUiService
 import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.util.*
 import java.util.stream.Collectors
+import kotlin.collections.set
 
 @Component
 class EcosFormRecordsDao(
     private val ecosFormService: EcosFormService,
     private var recordEventsService: RecordEventsService?,
-    private val workspaceService: WorkspaceService
+    private val workspaceService: WorkspaceService,
+    private val workspaceUiService: WorkspaceUiService
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordMutateDtoDao<EcosFormMutRecord>,
@@ -56,18 +58,15 @@ class EcosFormRecordsDao(
         private const val ECOS_FORM_ID = "ECOS_FORM"
         private const val DEFAULT_AUTO_FORM_FOR_TYPE = "DEFAULT_FORM"
 
-        private val ATTS_MAPPING: MutableMap<String, String>
+        private val ATTS_MAPPING: MutableMap<String, String> = HashMap<String, String>().also {
+            it["moduleId"] = "id"
+        }
 
         val SYSTEM_FORMS: Set<String> = setOf(
             DEFAULT_AUTO_FORM_FOR_TYPE,
             DEFAULT_FORM_ID,
             ECOS_FORM_ID
         )
-
-        init {
-            ATTS_MAPPING = HashMap()
-            ATTS_MAPPING["moduleId"] = "id"
-        }
     }
 
     @PostConstruct
@@ -144,6 +143,7 @@ class EcosFormRecordsDao(
 
     override fun queryRecords(recsQuery: RecordsQuery): RecsQueryRes<Any>? {
 
+        var recsQuery = recsQuery
         val result = RecsQueryRes<Any>()
         var query: Query? = null
 
@@ -168,9 +168,11 @@ class EcosFormRecordsDao(
             return result
         }
         if (query == null) {
+
+            recsQuery = workspaceUiService.prepareQueryWithSystemFilterIfRequired(recsQuery)
             val (max, skipCount) = recsQuery.page
             if (PredicateService.LANGUAGE_PREDICATE == recsQuery.language) {
-                var predicate = PredicateUtils.mapAttributePredicates(
+                val predicate = PredicateUtils.mapAttributePredicates(
                     recsQuery.getQuery(Predicate::class.java)
                 ) { pred: AttributePredicate ->
                     if (ATTS_MAPPING.containsKey(pred.getAttribute())) {
@@ -180,16 +182,6 @@ class EcosFormRecordsDao(
                     } else {
                         pred
                     }
-                }
-                val isSysShouldBeFiltered = workspaceService.isSystemArtifactsShouldBeFiltered(
-                    AuthContext.getCurrentRunAsAuth(),
-                    recsQuery.workspaces
-                )
-                if (isSysShouldBeFiltered) {
-                    predicate = Predicates.and(
-                        predicate,
-                        Predicates.notEq("system", true)
-                    )
                 }
                 val mappedSortBy = recsQuery.sortBy.map { sortBy: SortBy ->
                     if (ATTS_MAPPING.containsKey(sortBy.attribute)) {

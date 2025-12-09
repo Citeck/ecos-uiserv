@@ -40,6 +40,7 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
 import ru.citeck.ecos.uiserv.domain.journal.registry.JournalsRegistryConfiguration
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalServiceImpl
+import ru.citeck.ecos.uiserv.domain.workspace.service.WorkspaceUiService
 import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.nio.charset.StandardCharsets
@@ -50,7 +51,8 @@ class JournalRecordsDao(
     private val journalService: JournalService,
     private val ecosTypeService: EcosTypeService,
     private val recordEventsService: RecordEventsService,
-    private val workspaceService: WorkspaceService
+    private val workspaceService: WorkspaceService,
+    private val workspaceUiService: WorkspaceUiService,
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordAttsDao,
@@ -80,6 +82,7 @@ class JournalRecordsDao(
             return RecsQueryRes()
         }
 
+        var recsQuery = recsQuery
         val result = RecsQueryRes<JournalWithMeta>()
 
         if (recsQuery.language == "by-type") {
@@ -96,24 +99,12 @@ class JournalRecordsDao(
             }
         } else {
 
+            recsQuery = workspaceUiService.prepareQueryWithSystemFilterIfRequired(recsQuery)
+
             if (recsQuery.language == PredicateService.LANGUAGE_PREDICATE) {
-
-                var predicate = recsQuery.getPredicate()
-
-                val isSysShouldBeFiltered = workspaceService.isSystemArtifactsShouldBeFiltered(
-                    AuthContext.getCurrentRunAsAuth(),
-                    recsQuery.workspaces
-                )
-                if (isSysShouldBeFiltered) {
-                    predicate = Predicates.and(
-                        predicate,
-                        Predicates.notEq("system", true)
-                    )
-                }
 
                 val queryRes = recordsService.query(recsQuery.copy()
                     .withSourceId(JournalsRegistryConfiguration.JOURNALS_REGISTRY_SOURCE_ID)
-                    .withQuery(predicate)
                     .build()
                 )
 
