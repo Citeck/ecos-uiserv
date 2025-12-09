@@ -222,16 +222,16 @@ class TypeInWsCreatedListener(
 
         fun addMenuItem() {
             val item = DataValue.createObj()
-                    .set(
-                        "id",
-                        AUTO_JOURNAL_MENU_ITEM_ID_PREFIX +
-                            typeId + "-" +
-                            System.currentTimeMillis().toString(Character.MAX_RADIX)
-                    )
-                    .set("label", label)
-                    .set("type", "JOURNAL")
-                    .set("icon", "ui/icon@i-leftmenu-types")
-                    .set("config", DataValue.createObj().set("recordRef", autoJournalRef))
+                .set(
+                    "id",
+                    AUTO_JOURNAL_MENU_ITEM_ID_PREFIX +
+                        typeId + "-" +
+                        System.currentTimeMillis().toString(Character.MAX_RADIX)
+                )
+                .set("label", label)
+                .set("type", "JOURNAL")
+                .set("icon", "ui/icon@i-leftmenu-types")
+                .set("config", DataValue.createObj().set("recordRef", autoJournalRef))
 
             leftMenuJson.add(SECTION_ITEMS_JSON_PATH, item)
             autoItemWasChanged = true

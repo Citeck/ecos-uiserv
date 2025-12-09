@@ -10,6 +10,7 @@ import ru.citeck.ecos.uiserv.domain.form.api.records.EcosFormRecordsDao
 import ru.citeck.ecos.uiserv.domain.form.api.records.EcosResolvedFormRecordsDao
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormServiceImpl
+import ru.citeck.ecos.uiserv.domain.workspace.service.WorkspaceUiService
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 
@@ -31,11 +32,16 @@ abstract class FormsTestBase {
             services.recordsService,
             modelServices.workspaceService
         )
-
+        val workspaceUiService = WorkspaceUiService(
+            Mockito.mock(),
+            Mockito.mock(),
+            modelServices.workspaceService
+        )
         val formsRecordsDao = EcosFormRecordsDao(
             ecosFormService,
             null,
-            modelServices.workspaceService
+            modelServices.workspaceService,
+            workspaceUiService
         )
         recordsService.register(formsRecordsDao)
 
