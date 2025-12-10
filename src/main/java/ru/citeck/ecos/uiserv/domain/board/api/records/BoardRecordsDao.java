@@ -133,7 +133,7 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
                     ).stream()
                     .map(it -> new BoardRecord(it, workspaceService))
                     .collect(Collectors.toList()));
-                result.setTotalCount(boardService.getCount(predicate));
+                result.setTotalCount(boardService.getCount(predicate, recordsQuery.getWorkspaces()));
             } else {
                 log.warn("Unsupported query language '{}'", recordsQuery.getLanguage());
                 result.setRecords(Collections.emptyList());

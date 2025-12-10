@@ -24,7 +24,7 @@ public interface BoardService {
 
     long getCount();
 
-    long getCount(Predicate predicate);
+    long getCount(Predicate predicate, List<String> workspaces);
 
     List<BoardWithMeta> getAll(
         Predicate predicate,

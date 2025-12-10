@@ -63,8 +63,12 @@ class DashboardService(
         searchConv = jpaSearchConverterFactory.createConverter(DashboardEntity::class.java).build()
     }
 
-    fun getCount(predicate: Predicate): Long {
-        return searchConv.getCount(repo, predicate)
+    fun getCount(predicate: Predicate, workspaces: List<String>): Long {
+        val predicateForQuery = Predicates.and(
+            predicate,
+            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentRunAsAuth(), workspaces)
+        )
+        return searchConv.getCount(repo, predicateForQuery)
     }
 
     fun findAllForWorkspace(workspace: String): List<DashboardDto> {

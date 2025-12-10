@@ -120,8 +120,12 @@ public class MenuService {
         return menuDao.getAllAuthoritiesWithMenu();
     }
 
-    public long getCount(Predicate predicate) {
-        return menuDao.getCount(predicate);
+    public long getCount(Predicate predicate, List<String> workspaces) {
+        var predicateForQuery = Predicates.and(
+            predicate,
+            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentRunAsAuth(), workspaces)
+        );
+        return menuDao.getCount(predicateForQuery);
     }
 
     public List<MenuDto> findAll(Predicate predicate, List<String> workspaces, int max, int skip, List<SortBy> sort) {
