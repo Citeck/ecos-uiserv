@@ -135,7 +135,9 @@ class TypeInWsCreatedListener(
 
             when (eventType) {
                 TypeEventType.CREATE -> {
-                    menuCtx.addMenuItem()
+                    if (event.journalRefAfter.isNotEmpty()) {
+                        menuCtx.addMenuItem()
+                    }
                 }
                 TypeEventType.UPDATE -> {
                     if (event.journalRefBefore.isNotEmpty() && event.journalRefAfter.isEmpty()) {
