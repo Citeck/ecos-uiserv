@@ -392,7 +392,10 @@
           {
             "components": [
               {
-                "label": "Reset Storage",
+                "label": {
+                  "ru": "Очистить хранилище",
+                  "en": "Reset Storage"
+                },
                 "action": "custom",
                 "state": "",
                 "showValidations": false,

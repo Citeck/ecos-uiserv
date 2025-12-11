@@ -69,8 +69,8 @@ public class BoardServiceMock implements BoardService {
     }
 
     @Override
-    public long getCount(Predicate predicate) {
-        return this.getAll(predicate, Collections.emptyList(), 0, 0, null).size();
+    public long getCount(Predicate predicate, List<String> workspaces) {
+        return this.getAll(predicate, workspaces, 0, 0, null).size();
     }
 
     @Override

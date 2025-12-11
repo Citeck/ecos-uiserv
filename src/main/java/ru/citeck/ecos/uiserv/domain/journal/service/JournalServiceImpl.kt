@@ -36,7 +36,7 @@ class JournalServiceImpl(
 ) : JournalService {
 
     companion object {
-        private const val DEFAULT_AUTO_JOURNAL_FOR_TYPE = "DEFAULT_JOURNAL"
+        const val DEFAULT_AUTO_JOURNAL_FOR_TYPE = "DEFAULT_JOURNAL"
 
         var SYSTEM_JOURNALS: Set<String> = setOf(
             DEFAULT_AUTO_JOURNAL_FOR_TYPE

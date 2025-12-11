@@ -4,7 +4,12 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import ru.citeck.ecos.commons.io.file.mem.EcosMemDir
 import ru.citeck.ecos.commons.json.Json
+import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
+import ru.citeck.ecos.records2.predicate.PredicateService
+import ru.citeck.ecos.records2.predicate.model.Predicate
+import ru.citeck.ecos.records2.predicate.model.Predicates
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
@@ -38,6 +43,28 @@ class WorkspaceUiService(
     fun deployWsArtifactsFromTemplate(workspace: String, artifacts: EcosMemDir) {
         deployWsMenus(workspace, artifacts)
         deployWsDashboards(workspace, artifacts)
+    }
+
+    fun prepareQueryWithSystemFilterIfRequired(recsQuery: RecordsQuery): RecordsQuery {
+        if (recsQuery.language != "predicate-with-data") {
+            return recsQuery
+        }
+        val isSysArtifactsShouldBeFiltered = recsQuery.query["/data/queryFromJournal"].asBoolean() &&
+            workspaceService.isSystemArtifactsShouldBeFiltered(
+                AuthContext.getCurrentRunAsAuth(),
+                recsQuery.workspaces
+            )
+        var predicate = recsQuery.query["predicate"].getAsNotNull(Predicate::class.java)
+        if (isSysArtifactsShouldBeFiltered) {
+            predicate = Predicates.and(
+                predicate,
+                Predicates.notEq("system", true)
+            )
+        }
+        return recsQuery.copy()
+            .withQuery(predicate)
+            .withLanguage(PredicateService.LANGUAGE_PREDICATE)
+            .build()
     }
 
     private fun deployWsDashboards(workspace: String, outDir: EcosMemDir) {

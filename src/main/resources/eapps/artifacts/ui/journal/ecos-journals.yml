@@ -8,6 +8,9 @@ system: true
 defaultFilters:
   - { t: eq, att: system, val: false }
 
+queryData:
+  queryFromJournal: true
+
 actions:
   - uiserv/action@download-base64-data-yml
   - uiserv/action@delete

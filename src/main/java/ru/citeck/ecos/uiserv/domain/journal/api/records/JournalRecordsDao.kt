@@ -39,6 +39,7 @@ import ru.citeck.ecos.uiserv.domain.journal.dto.JournalWithMeta
 import ru.citeck.ecos.uiserv.domain.journal.registry.JournalsRegistryConfiguration
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalServiceImpl
+import ru.citeck.ecos.uiserv.domain.workspace.service.WorkspaceUiService
 import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.nio.charset.StandardCharsets
@@ -49,7 +50,8 @@ class JournalRecordsDao(
     private val journalService: JournalService,
     private val ecosTypeService: EcosTypeService,
     private val recordEventsService: RecordEventsService,
-    private val workspaceService: WorkspaceService
+    private val workspaceService: WorkspaceService,
+    private val workspaceUiService: WorkspaceUiService,
 ) : AbstractRecordsDao(),
     RecordsQueryDao,
     RecordAttsDao,
@@ -79,6 +81,7 @@ class JournalRecordsDao(
             return RecsQueryRes()
         }
 
+        var recsQuery = recsQuery
         val result = RecsQueryRes<JournalWithMeta>()
 
         if (recsQuery.language == "by-type") {
@@ -95,12 +98,15 @@ class JournalRecordsDao(
             }
         } else {
 
+            recsQuery = workspaceUiService.prepareQueryWithSystemFilterIfRequired(recsQuery)
+
             if (recsQuery.language == PredicateService.LANGUAGE_PREDICATE) {
 
-                val registryQuery = recsQuery.copy()
-                    .withSourceId(JournalsRegistryConfiguration.JOURNALS_REGISTRY_SOURCE_ID)
-                    .build()
-                val queryRes = recordsService.query(registryQuery)
+                val queryRes = recordsService.query(
+                    recsQuery.copy()
+                        .withSourceId(JournalsRegistryConfiguration.JOURNALS_REGISTRY_SOURCE_ID)
+                        .build()
+                )
 
                 val journals = journalService.getAll(
                     queryRes.getRecords().map {
@@ -199,7 +205,7 @@ class JournalRecordsDao(
     )
 
     class ActionDefRecord(
-        @AttName("...")
+        @param:AttName("...")
         val actionDef: JournalActionDef
     ) {
         fun getConfigMap(): Map<String, String> {
@@ -254,7 +260,8 @@ class JournalRecordsDao(
         }
 
         @JsonValue
-        open fun toNonDefaultJson(): Any {
+        open fun toNonDefaultJson(): Any? {
+            val journalDef = journalDef ?: return null
             return mapper.toNonDefaultJson(journalDef.copy().withWorkspace("").build())
         }
 
@@ -262,7 +269,8 @@ class JournalRecordsDao(
             return journalDef?.columns?.map { ColumnAttValue(it) } ?: emptyList()
         }
 
-        open fun getData(): ByteArray {
+        open fun getData(): ByteArray? {
+            val journalDef = journalDef ?: return null
             val journalDefCopy = journalDef.copy {
                 withWorkspace("")
 
@@ -302,7 +310,7 @@ class JournalRecordsDao(
     }
 
     class ColumnAttValue(
-        @AttName("...")
+        @param:AttName("...")
         val column: JournalColumnDef
     ) {
         fun getJsonValue(): ObjectData {

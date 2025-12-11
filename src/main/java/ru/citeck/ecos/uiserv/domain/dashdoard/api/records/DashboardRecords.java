@@ -135,7 +135,7 @@ public class DashboardRecords extends AbstractRecordsDao
 
             RecsQueryRes<DashboardRecord> result = new RecsQueryRes<>();
             result.setRecords(records);
-            result.setTotalCount(dashboardService.getCount(predicate));
+            result.setTotalCount(dashboardService.getCount(predicate, recordsQuery.getWorkspaces()));
 
             return result;
         }

@@ -123,8 +123,12 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public long getCount(Predicate predicate) {
-        return searchConv.getCount(repository, predicate);
+    public long getCount(Predicate predicate, List<String> workspaces) {
+        var predicateForQuery = Predicates.and(
+            predicate,
+            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentRunAsAuth(), workspaces)
+        );
+        return searchConv.getCount(repository, predicateForQuery);
     }
 
     @Override

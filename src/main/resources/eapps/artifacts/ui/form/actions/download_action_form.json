@@ -817,7 +817,10 @@
             "label": "Column",
             "components": [
               {
-                "label": "Submit",
+                "label": {
+                  "ru": "Сохранить",
+                  "en": "Save"
+                },
                 "state": "",
                 "theme": "primary",
                 "shortcut": "",

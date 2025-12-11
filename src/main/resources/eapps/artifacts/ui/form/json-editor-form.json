@@ -107,6 +107,10 @@
             "index": 1,
             "components": [
               {
+                "label": {
+                  "ru": "Сохранить",
+                  "en": "Save"
+                },
                 "state": "",
                 "theme": "primary",
                 "block": true,

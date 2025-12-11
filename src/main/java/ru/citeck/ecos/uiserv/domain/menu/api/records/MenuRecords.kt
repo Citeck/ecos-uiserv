@@ -86,7 +86,7 @@ class MenuRecords(
             ).map { MenuRecord(it) }
             val result = RecsQueryRes<Any>()
             result.setRecords(records)
-            result.setTotalCount(menuService.getCount(predicate))
+            result.setTotalCount(menuService.getCount(predicate, recsQuery.workspaces))
             return result
         }
         if ("criteria" != recsQuery.language) {
