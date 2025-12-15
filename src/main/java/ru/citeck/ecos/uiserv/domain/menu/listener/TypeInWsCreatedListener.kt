@@ -45,6 +45,10 @@ class TypeInWsCreatedListener(
 
         private const val JOURNAL_REF_SRC_ID = "uiserv/journal"
         private const val SECTION_ITEMS_JSON_PATH = "$..[?(@.id == \"sections\")].items"
+
+        private const val MENU_ITEM_TYPE_JOURNAL = "JOURNAL"
+        private const val MENU_ITEM_TYPE_DOCLIB = "DOCLIB"
+        private const val MENU_ITEM_TYPE_PREVIEW_LIST = "PREVIEW_LIST"
     }
 
     @PostConstruct
@@ -80,7 +84,9 @@ class TypeInWsCreatedListener(
                         baseFilter,
                         Predicates.or(
                             Predicates.eq("diff._has.name?bool", true),
-                            Predicates.eq("diff._has.journalRef?bool", true)
+                            Predicates.eq("diff._has.journalRef?bool", true),
+                            Predicates.eq("diff._has.parentRef?bool", true),
+                            Predicates.eq("diff._has.aspects?bool", true)
                         )
                     )
                 )
@@ -111,7 +117,9 @@ class TypeInWsCreatedListener(
             idInWs.workspace,
             journalLocalId,
             typeRef.getLocalId(),
-            typeDef.name
+            typeDef.name,
+            typeDef.parentRef.getLocalId(),
+            typeDef.aspects.mapTo(HashSet()) { it.ref.getLocalId() },
         ) { menuCtx ->
             menuCtx.updateMenuItem { it.set("label", after.name) }
         }
@@ -134,7 +142,9 @@ class TypeInWsCreatedListener(
             event.workspace,
             event.journalRefAfter.getLocalId(),
             event.typeId,
-            event.typeName
+            event.typeName,
+            event.typeParentId,
+            event.typeAspects
         ) { menuCtx ->
 
             when (eventType) {
@@ -164,6 +174,8 @@ class TypeInWsCreatedListener(
         journalId: String,
         typeId: String,
         typeName: MLText,
+        typeParentId: String,
+        typeAspects: Set<String>,
         action: (MenuUpdateContext) -> Unit
     ) {
 
@@ -179,7 +191,16 @@ class TypeInWsCreatedListener(
         val leftMenuSrc = menu.subMenu["left"] ?: SubMenuDef()
         val leftMenuJson = DataValue.of(Json.mapper.toJson(leftMenuSrc))
 
-        val context = MenuUpdateContext(menu.id, workspace, leftMenuJson, journalId, typeId, typeName)
+        val context = MenuUpdateContext(
+            menu.id,
+            workspace,
+            leftMenuJson,
+            journalId,
+            typeId,
+            typeName,
+            typeParentId,
+            typeAspects
+        )
         action(context)
 
         val newSubMenu = LinkedHashMap(menu.subMenu)
@@ -209,7 +230,11 @@ class TypeInWsCreatedListener(
         @param:AttName("record.workspace?str")
         val workspace: String,
         @param:AttName("record.name?json")
-        val typeName: MLText
+        val typeName: MLText,
+        @param:AttName("record.parentRef?localId!")
+        val typeParentId: String,
+        @param:AttName("record.aspects[].ref?localId!")
+        val typeAspects: Set<String>
     )
 
     private inner class MenuUpdateContext(
@@ -218,7 +243,9 @@ class TypeInWsCreatedListener(
         private val leftMenuJson: DataValue,
         private val journalId: String,
         private val typeId: String,
-        private val typeName: MLText
+        private val typeName: MLText,
+        private val typeParentId: String,
+        private val typeAspects: Set<String>
     ) {
         // true if items were added or updated (not on delete)
         var autoItemWasChanged: Boolean = false
@@ -227,6 +254,7 @@ class TypeInWsCreatedListener(
         private val menuItemIdPrefix = "$AUTO_JOURNAL_MENU_ITEM_ID_PREFIX$typeId-"
 
         val label by lazy { evalMenuItemLabel() }
+        val menuItemType by lazy { evalMenuItemType() }
 
         fun addMenuItem() {
             val item = DataValue.createObj()
@@ -235,7 +263,7 @@ class TypeInWsCreatedListener(
                     menuItemIdPrefix + System.currentTimeMillis().toString(Character.MAX_RADIX)
                 )
                 .set("label", label)
-                .set("type", "JOURNAL")
+                .set("type", menuItemType)
                 .set("icon", "ui/icon@i-leftmenu-types")
                 .set("config", DataValue.createObj().set("recordRef", menuJournalRef))
 
@@ -282,7 +310,30 @@ class TypeInWsCreatedListener(
 
         fun updateJournalAndLabel() {
             updateMenuItem {
-                it.set("label", label).set("config", it["config"].copy().set("recordRef", menuJournalRef))
+                it.set("label", label)
+                    .set("type", menuItemType)
+                    .set("config", it["config"].copy().set("recordRef", menuJournalRef))
+            }
+        }
+
+        private fun evalMenuItemType(): String {
+            val aspects = HashSet(typeAspects)
+            fillAspects(typeParentId, aspects)
+            if (aspects.contains("doclib")) {
+                return MENU_ITEM_TYPE_DOCLIB
+            }
+            if (aspects.contains("listview")) {
+                return MENU_ITEM_TYPE_PREVIEW_LIST
+            }
+            return MENU_ITEM_TYPE_JOURNAL
+        }
+
+        private fun fillAspects(typeId: String, aspects: MutableSet<String>) {
+            if (typeId.isBlank()) {
+                return
+            }
+            ecosTypesRegistry.getValue(typeId)?.aspects?.forEach {
+                aspects.add(it.ref.getLocalId())
             }
         }
 
@@ -312,8 +363,7 @@ class TypeInWsCreatedListener(
         }
 
         private fun isElementAutoItemForCurrentJournal(element: DataValue): Boolean {
-            return element["type"].asText() == "JOURNAL" &&
-                element["id"].asText().startsWith(menuItemIdPrefix)
+            return element["id"].asText().startsWith(menuItemIdPrefix)
         }
     }
 
