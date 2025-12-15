@@ -102,12 +102,16 @@ class TypeInWsCreatedListener(
             return
         }
         val journalLocalId = workspaceService.addWsPrefixToId(after.id, after.workspace)
+        val typeDef = ecosTypesRegistry.getValue(typeRef.getLocalId()) ?: return
+        if (typeDef.journalRef.getLocalId() != journalLocalId) {
+            return
+        }
         log.info { "Detected journal name changed event for journal '$journalLocalId' with type $typeRef" }
         doWithMenuForCurrentUser(
             idInWs.workspace,
             journalLocalId,
             typeRef.getLocalId(),
-            ecosTypesRegistry.getTypeInfo(typeRef)?.name ?: MLText()
+            typeDef.name
         ) { menuCtx ->
             menuCtx.updateMenuItem { it.set("label", after.name) }
         }
@@ -145,7 +149,7 @@ class TypeInWsCreatedListener(
                     } else if (event.journalRefBefore.isEmpty() && event.journalRefAfter.isNotEmpty()) {
                         menuCtx.addMenuItem()
                     } else {
-                        menuCtx.updateLabel()
+                        menuCtx.updateJournalAndLabel()
                     }
                 }
                 TypeEventType.DELETE -> {
@@ -218,7 +222,9 @@ class TypeInWsCreatedListener(
     ) {
         // true if items were added or updated (not on delete)
         var autoItemWasChanged: Boolean = false
-        val autoJournalRef = "$JOURNAL_REF_SRC_ID@type$$typeId"
+        val menuJournalRef = "$JOURNAL_REF_SRC_ID@${journalId.ifBlank { "type$$typeId" }}"
+
+        private val menuItemIdPrefix = "$AUTO_JOURNAL_MENU_ITEM_ID_PREFIX$typeId-"
 
         val label by lazy { evalMenuItemLabel() }
 
@@ -226,14 +232,12 @@ class TypeInWsCreatedListener(
             val item = DataValue.createObj()
                 .set(
                     "id",
-                    AUTO_JOURNAL_MENU_ITEM_ID_PREFIX +
-                        typeId + "-" +
-                        System.currentTimeMillis().toString(Character.MAX_RADIX)
+                    menuItemIdPrefix + System.currentTimeMillis().toString(Character.MAX_RADIX)
                 )
                 .set("label", label)
                 .set("type", "JOURNAL")
                 .set("icon", "ui/icon@i-leftmenu-types")
-                .set("config", DataValue.createObj().set("recordRef", autoJournalRef))
+                .set("config", DataValue.createObj().set("recordRef", menuJournalRef))
 
             leftMenuJson.add(SECTION_ITEMS_JSON_PATH, item)
             autoItemWasChanged = true
@@ -276,8 +280,10 @@ class TypeInWsCreatedListener(
             }
         }
 
-        fun updateLabel() {
-            updateMenuItem { it.set("label", label) }
+        fun updateJournalAndLabel() {
+            updateMenuItem {
+                it.set("label", label).set("config", it["config"].copy().set("recordRef", menuJournalRef))
+            }
         }
 
         private fun evalMenuItemLabel(): MLText {
@@ -300,15 +306,14 @@ class TypeInWsCreatedListener(
 
         private fun logAutoItemNotFound() {
             log.debug {
-                "Auto item doesn't found for journalRef $autoJournalRef " +
+                "Auto item doesn't found for typeId $typeId " +
                     "in menu $menuId in workspace $workspace"
             }
         }
 
         private fun isElementAutoItemForCurrentJournal(element: DataValue): Boolean {
             return element["type"].asText() == "JOURNAL" &&
-                element["/config/recordRef"].asText() == autoJournalRef &&
-                element["id"].asText().startsWith(AUTO_JOURNAL_MENU_ITEM_ID_PREFIX)
+                element["id"].asText().startsWith(menuItemIdPrefix)
         }
     }
 
