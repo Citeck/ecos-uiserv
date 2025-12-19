@@ -23,6 +23,16 @@ columns:
 
   - id: id
     name: { ru: Идентификатор, en: Id }
+    formatter:
+      type: script
+      config:
+        fn: |
+          let twoDotsIdx = cell.indexOf(':');
+          if (twoDotsIdx > 0) {
+            return (cell.indexOf('type$') === 0 ? 'type$' : '') + cell.substring(twoDotsIdx + 1);
+          } else {
+            return cell
+          }
     type: TEXT
 
   - id: typeRef

@@ -41,7 +41,7 @@ class EcosFormRecord(
     fun getDisplayName(): MLText {
         val title: MLText = def.title
         return if (MLText.isEmpty(title)) {
-            MLText("Form")
+            MLText(def.id.ifBlank { "Form" })
         } else {
             title
         }

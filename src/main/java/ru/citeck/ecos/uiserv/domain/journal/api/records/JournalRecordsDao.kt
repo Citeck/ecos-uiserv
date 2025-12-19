@@ -256,7 +256,16 @@ class JournalRecordsDao(
 
         @AttName("?disp")
         fun getDisplayName(): MLText {
-            return journalDef?.name ?: MLText.EMPTY
+            val name = journalDef?.name
+            if (name == null || MLText.isEmpty(name)) {
+                val id = journalDef?.id ?: ""
+                if (id.isNotBlank()) {
+                    return MLText(id)
+                }
+            } else {
+                return name
+            }
+            return MLText.EMPTY
         }
 
         @JsonValue
