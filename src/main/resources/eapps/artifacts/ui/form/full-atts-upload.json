@@ -1,0 +1,115 @@
+{
+  "id": "full-atts-upload",
+  "title": {
+    "ru": "Загрузить в систему все атрибуты",
+    "en": "Upload full attributes to system"
+  },
+  "description": {},
+  "system": true,
+  "i18n": {},
+  "definition": {
+    "display": "form",
+    "components": [
+      {
+        "scrollableContent": true,
+        "key": "panel2",
+        "type": "panel",
+        "input": false,
+        "components": [
+          {
+            "label": {
+              "ru": "Содержимое",
+              "en": "Content"
+            },
+            "storage": "base64",
+            "fileMaxSize": "100MB",
+            "key": "__fullAtts",
+            "type": "file",
+            "input": true
+          }
+        ]
+      },
+      {
+        "columns": [
+          {
+            "components": [
+              {
+                "label": {
+                  "ru": "Отменить",
+                  "en": "Cancel"
+                },
+                "action": "event",
+                "state": "",
+                "showValidations": false,
+                "event": "cancel",
+                "block": true,
+                "type": "button",
+                "input": true,
+                "key": "submit2",
+                "conditional": {
+                  "show": null,
+                  "when": null
+                }
+              }
+            ],
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "label": "Column",
+            "md": 3,
+            "index": 0,
+            "clearOnHide": true,
+            "conditional": {
+              "show": null,
+              "when": null
+            }
+          },
+          {
+            "components": [],
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "label": "Column",
+            "index": 1,
+            "clearOnHide": true,
+            "conditional": {
+              "show": null,
+              "when": null
+            }
+          },
+          {
+            "md": 3,
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "label": "Column",
+            "components": [
+              {
+                "label": {
+                  "ru": "Создать",
+                  "en": "Submit"
+                },
+                "state": "",
+                "theme": "primary",
+                "block": true,
+                "disableOnInvalid": true,
+                "type": "button",
+                "input": true,
+                "key": "submit"
+              }
+            ],
+            "index": 2,
+            "clearOnHide": true,
+            "conditional": {
+              "show": null,
+              "when": null
+            }
+          }
+        ],
+        "key": "columns2",
+        "type": "columns",
+        "input": false
+      }
+    ]
+  }
+}

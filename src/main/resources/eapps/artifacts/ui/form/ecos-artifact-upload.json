@@ -39,7 +39,10 @@
         "input": false,
         "components": [
           {
-            "label": "Content",
+            "label": {
+              "ru": "Содержимое",
+              "en": "Content"
+            },
             "mask": false,
             "tableView": true,
             "alwaysEnabled": false,
