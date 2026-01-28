@@ -11,7 +11,13 @@ system: true
 sourceId: uiserv/action
 journalRef: uiserv/journal@ui-actions
 
+formRef: uiserv/form@action-form
+
 createVariants:
+
+  - id: create-action
+    name: { ru: Создать действие, en: Create action }
+    formRef: uiserv/form@action-form
 
   - id: upload-action
     name: { ru: Загрузить действие, en: Upload action }

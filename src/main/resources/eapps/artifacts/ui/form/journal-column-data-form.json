@@ -2,292 +2,613 @@
   "id": "journal-column-data-form",
   "formKey": "",
   "title": {
-    "en": "journal-column-data-form"
+    "en": "Column Additional Configuration",
+    "ru": "Дополнительная конфигурация колонки"
   },
   "description": {},
   "customModule": "",
   "typeRef": "",
-  "width": "",
+  "width": "lg",
   "system": true,
-  "i18n": {},
+  "i18n": {
+    "ru": {
+      "Column Settings": "Настройки колонки",
+      "Display Settings": "Настройки отображения",
+      "Column Formatter": "Форматтер колонки",
+      "Formatter type": "Тип форматтера",
+      "Configuration": "Конфигурация",
+      "Script Configuration": "Конфигурация скрипта",
+      "Formatter Function": "Функция форматирования",
+      "Additional Variables": "Дополнительные переменные",
+      "Colored Formatter Configuration": "Конфигурация цветового форматтера",
+      "Color Mapping": "Цветовая карта",
+      "Default Color": "Цвет по умолчанию",
+      "Show Pointer": "Показывать индикатор",
+      "Color Function": "Функция определения цвета",
+      "Column Editor": "Редактор колонки",
+      "Editor type": "Тип редактора",
+      "Header Filter Configuration": "Конфигурация фильтра в заголовке",
+      "Search Config": "Конфигурация поиска",
+      "Calculated values": "Вычисляемые значения"
+    },
+    "en": {
+      "Column Settings": "Column Settings",
+      "Display Settings": "Display Settings",
+      "Column Formatter": "Column Formatter",
+      "Formatter type": "Formatter type",
+      "Configuration": "Configuration",
+      "Script Configuration": "Script Configuration",
+      "Formatter Function": "Formatter Function",
+      "Additional Variables": "Additional Variables",
+      "Colored Formatter Configuration": "Colored Formatter Configuration",
+      "Color Mapping": "Color Mapping",
+      "Default Color": "Default Color",
+      "Show Pointer": "Show Pointer",
+      "Color Function": "Color Function",
+      "Column Editor": "Column Editor",
+      "Editor type": "Editor type",
+      "Header Filter Configuration": "Header Filter Configuration",
+      "Search Config": "Search Config",
+      "Calculated values": "Calculated values"
+    }
+  },
   "definition": {
     "components": [
       {
         "label": {
-          "ru": "Columns"
+          "ru": "Настройки колонки",
+          "en": "Column Settings"
         },
-        "columns": [
+        "key": "columnSettingsPanel",
+        "title": {
+          "en": "Column Settings",
+          "ru": "Настройки колонки"
+        },
+        "collapsible": false,
+        "type": "panel",
+        "input": false,
+        "components": [
           {
+            "label": {
+              "ru": "Атрибут для загрузки (по умолчанию системное имя)",
+              "en": "Attribute to load (system name by default)"
+            },
+            "tooltip": {
+              "ru": "Выражение для загрузки данных колонки. По умолчанию используется системное имя колонки.",
+              "en": "Expression to load column data. By default, the column system name is used."
+            },
+            "defaultValue": "",
+            "key": "attribute",
+            "type": "textfield",
+            "input": true
+          },
+          {
+            "label": {
+              "ru": "Задать ширину колонки в пикселях",
+              "en": "Set the column width in pixels"
+            },
+            "key": "width",
+            "validate": {
+              "integer": false
+            },
+            "isBigNumber": false,
+            "delimiterValue": " ",
+            "optionalWhenDisabled": false,
+            "defaultValue": "",
+            "type": "number",
+            "input": true
+          },
+          {
+            "label": {
+              "ru": "Columns"
+            },
+            "columns": [
+              {
+                "components": [
+                  {
+                    "label": {
+                      "ru": "Можно ли искать по атрибуту",
+                      "en": "Is search allowed by attribute"
+                    },
+                    "hasThreeStates": true,
+                    "key": "searchable",
+                    "type": "checkbox",
+                    "input": true
+                  },
+                  {
+                    "label": {
+                      "ru": "Можно ли искать в шапке колонки",
+                      "en": "Is allowed to search in the column header"
+                    },
+                    "hasThreeStates": true,
+                    "key": "searchableByText",
+                    "type": "checkbox",
+                    "input": true
+                  },
+                  {
+                    "label": {
+                      "ru": "Можно ли сортировать",
+                      "en": "Is sorting allowed"
+                    },
+                    "key": "sortable",
+                    "hasThreeStates": true,
+                    "refreshOn": [],
+                    "optionalWhenDisabled": false,
+                    "type": "checkbox",
+                    "input": true
+                  }
+                ],
+                "type": "column",
+                "input": false,
+                "key": "column",
+                "index": 0
+              },
+              {
+                "index": 1,
+                "type": "column",
+                "input": false,
+                "key": "column",
+                "components": [
+                  {
+                    "label": {
+                      "ru": "Можно ли группировать",
+                      "en": "Is grouping allowed"
+                    },
+                    "key": "groupable",
+                    "hasThreeStates": true,
+                    "refreshOn": [],
+                    "optionalWhenDisabled": false,
+                    "type": "checkbox",
+                    "input": true
+                  },
+                  {
+                    "label": {
+                      "ru": "Можно ли редактировать в таблице",
+                      "en": "Is allowed to edit in the table"
+                    },
+                    "key": "editable",
+                    "hasThreeStates": true,
+                    "refreshOn": [],
+                    "optionalWhenDisabled": false,
+                    "type": "checkbox",
+                    "input": true
+                  },
+                  {
+                    "label": {
+                      "ru": "Отобразить общую сумму колонки",
+                      "en": "Display the total amount of the column"
+                    },
+                    "key": "hasTotalSumField",
+                    "hasThreeStates": true,
+                    "refreshOn": [],
+                    "optionalWhenDisabled": false,
+                    "customConditional": "show = data.parentType === \"NUMBER\";",
+                    "type": "checkbox",
+                    "input": true,
+                    "show": false
+                  }
+                ]
+              },
+              {
+                "index": 2,
+                "type": "column",
+                "input": false,
+                "key": "column",
+                "components": [
+                  {
+                    "label": {
+                      "ru": "Отображать по умолчанию",
+                      "en": "Display by default"
+                    },
+                    "key": "visible",
+                    "hasThreeStates": true,
+                    "refreshOn": [],
+                    "optionalWhenDisabled": false,
+                    "type": "checkbox",
+                    "input": true
+                  },
+                  {
+                    "label": {
+                      "ru": "Скрытая колонка",
+                      "en": "Hidden column"
+                    },
+                    "key": "hidden",
+                    "description": {
+                      "ru": "Можно искать по колонке, но её нельзя вывести в таблицу",
+                      "en": "You can search by column, but it cannot be displayed in a table"
+                    },
+                    "hasThreeStates": true,
+                    "refreshOn": [],
+                    "optionalWhenDisabled": false,
+                    "type": "checkbox",
+                    "input": true
+                  },
+                  {
+                    "label": {
+                      "ru": "Множественное значение",
+                      "en": "Multiple value"
+                    },
+                    "key": "multiple",
+                    "hasThreeStates": true,
+                    "refreshOn": [],
+                    "optionalWhenDisabled": false,
+                    "type": "checkbox",
+                    "input": true
+                  }
+                ]
+              }
+            ],
+            "key": "flagsColumns",
+            "type": "columns",
+            "input": false
+          }
+        ]
+      },
+      {
+        "label": {
+          "ru": "Форматтер колонки",
+          "en": "Column Formatter"
+        },
+        "key": "formatterPanel",
+        "title": {
+          "en": "Column Formatter",
+          "ru": "Форматтер колонки"
+        },
+        "collapsible": false,
+        "type": "panel",
+        "input": false,
+        "components": [
+          {
+            "label": {
+              "ru": "Форматтер для колонки",
+              "en": "Column formatter"
+            },
+            "hideLabel": true,
+            "key": "formatter",
+            "refreshOn": [],
+            "optionalWhenDisabled": false,
+            "clearOnHide": false,
+            "type": "container",
+            "input": true,
+            "components": [
+              {
+                "key": "_originalConfig",
+                "calculateValue": "var existing = _.get(data, 'formatter._originalConfig'); if (existing === undefined || existing === null) { value = _.cloneDeep(_.get(data, 'formatter.config')) || {}; } else { value = existing; }",
+                "type": "hidden",
+                "input": true
+              },
+              {
+                "label": {
+                  "ru": "Тип форматтера",
+                  "en": "Formatter type"
+                },
+                "key": "type",
+                "dataSrc": "custom",
+                "data": {
+                  "headers": [
+                    {
+                      "key": "",
+                      "value": ""
+                    }
+                  ],
+                  "custom": "const registry = Citeck.FormattersRegistry;\nif (registry) {\n  const formatters = registry.getAllFormatters();\n  values = formatters.map((formatter) => ({\n    label: `journals.formatter.${formatter.getType()}.name`, \n    value: formatter.getType(),\n  }));\n}"
+                },
+                "optionalWhenDisabled": false,
+                "clearOnHide": false,
+                "type": "ecosSelect",
+                "input": true
+              },
+              {
+                "label": {
+                  "ru": "Конфигурация",
+                  "en": "Configuration"
+                },
+                "key": "_configOther",
+                "keyLabel": "",
+                "refreshOn": [],
+                "optionalWhenDisabled": false,
+                "clearOnHide": false,
+                "customConditional": "show = _.get(data, 'formatter.type') && _.get(data, 'formatter.type') !== 'script' && _.get(data, 'formatter.type') !== 'colored';",
+                "calculateValue": "value = _.get(data, 'formatter._originalConfig') || {};",
+                "allowCalculateOverride": true,
+                "type": "datamap",
+                "input": true
+              },
+              {
+                "label": {
+                  "ru": "Конфигурация скрипта",
+                  "en": "Script Configuration"
+                },
+                "key": "scriptConfigPanel",
+                "title": {
+                  "en": "Script Configuration",
+                  "ru": "Конфигурация скрипта"
+                },
+                "collapsible": false,
+                "customConditional": "show = _.get(data, 'formatter.type') === 'script';",
+                "type": "panel",
+                "input": false,
+                "components": [
+                  {
+                    "label": {
+                      "ru": "Функция форматирования",
+                      "en": "Formatter Function"
+                    },
+                    "key": "_scriptFn",
+                    "description": {
+                      "ru": "JavaScript функция для форматирования значения ячейки. Доступные переменные: cell (значение), row (данные строки), column (конфигурация колонки), vars (дополнительные переменные).",
+                      "en": "JavaScript function to format cell value. Available variables: cell (value), row (row data), column (column config), vars (additional variables)."
+                    },
+                    "tooltip": {
+                      "ru": "Функция получает: cell (значение ячейки), row (объект записи), column (конфигурация колонки), vars (дополнительные переменные). Должна вернуть отформатированное значение.",
+                      "en": "Function receives: cell (cell value), row (record object), column (column config), vars (additional variables). Should return formatted value."
+                    },
+                    "editor": "ace",
+                    "as": "javascript",
+                    "rows": 15,
+                    "refreshOn": ["_originalConfig"],
+                    "optionalWhenDisabled": false,
+                    "clearOnHide": false,
+                    "calculateValue": "value = _.get(data, 'formatter._originalConfig.fn') || '';",
+                    "allowCalculateOverride": true,
+                    "aiEnabled": true,
+                    "scriptContextType": "journal_formatter",
+                    "type": "textarea",
+                    "input": true
+                  },
+                  {
+                    "label": {
+                      "ru": "Дополнительные переменные",
+                      "en": "Additional Variables"
+                    },
+                    "key": "_scriptVars",
+                    "keyLabel": {
+                      "ru": "Имя переменной",
+                      "en": "Variable name"
+                    },
+                    "tooltip": {
+                      "ru": "Дополнительные переменные, доступные в скрипте через объект vars. Значения могут содержать record-выражения вида ${...}",
+                      "en": "Additional variables available in script via vars object. Values can contain record expressions like ${...}"
+                    },
+                    "description": {
+                      "ru": "Пример: options = ${_parent.items[]{value:?str,label:?disp}}. В скрипте доступно как vars.options",
+                      "en": "Example: options = ${_parent.items[]{value:?str,label:?disp}}. Available in script as vars.options"
+                    },
+                    "type": "datamap",
+                    "input": true,
+                    "clearOnHide": false,
+                    "refreshOn": ["_originalConfig"],
+                    "calculateValue": "value = _.get(data, 'formatter._originalConfig.vars') || {};",
+                    "allowCalculateOverride": true,
+                    "valueComponent": {
+                      "label": {
+                        "ru": "Выражение",
+                        "en": "Expression"
+                      },
+                      "key": "value",
+                      "type": "textfield",
+                      "input": true
+                    }
+                  }
+                ]
+              },
+              {
+                "label": {
+                  "ru": "Конфигурация цветового форматтера",
+                  "en": "Colored Formatter Configuration"
+                },
+                "key": "coloredConfigPanel",
+                "title": {
+                  "en": "Colored Formatter Configuration",
+                  "ru": "Конфигурация цветового форматтера"
+                },
+                "collapsible": false,
+                "customConditional": "show = _.get(data, 'formatter.type') === 'colored';",
+                "type": "panel",
+                "input": false,
+                "components": [
+                  {
+                    "label": {
+                      "ru": "Columns"
+                    },
+                    "columns": [
+                      {
+                        "components": [
+                          {
+                            "label": {
+                              "ru": "Цвет по умолчанию",
+                              "en": "Default Color"
+                            },
+                            "key": "_coloredDefaultColor",
+                            "tooltip": {
+                              "ru": "Цвет по умолчанию (CSS название или HEX код), например: red, #FF0000",
+                              "en": "Default color (CSS name or HEX code), e.g.: red, #FF0000"
+                            },
+                            "clearOnHide": false,
+                            "calculateValue": "value = _.get(data, 'formatter._originalConfig.defaultColor') || '';",
+                            "allowCalculateOverride": true,
+                            "type": "textfield",
+                            "input": true
+                          },
+                          {
+                            "label": {
+                              "ru": "Показывать индикатор",
+                              "en": "Show Pointer"
+                            },
+                            "key": "_coloredShowPointer",
+                            "tooltip": {
+                              "ru": "Если включено, показывает цветную точку вместо фона ячейки",
+                              "en": "If enabled, shows colored dot indicator instead of cell background"
+                            },
+                            "clearOnHide": false,
+                            "refreshOn": ["_originalConfig"],
+                            "logic": [
+                              {
+                                "name": "setInitialValue",
+                                "trigger": {
+                                  "type": "javascript",
+                                  "javascript": "result = _.get(data, 'formatter._originalConfig.showPointer') === true && !instance._showPointerSet;"
+                                },
+                                "actions": [
+                                  {
+                                    "name": "setValue",
+                                    "type": "value",
+                                    "value": "value = true; instance._showPointerSet = true;"
+                                  }
+                                ]
+                              }
+                            ],
+                            "type": "checkbox",
+                            "input": true
+                          }
+                        ],
+                        "type": "column",
+                        "input": false,
+                        "key": "column",
+                        "index": 0
+                      },
+                      {
+                        "index": 1,
+                        "type": "column",
+                        "input": false,
+                        "key": "column",
+                        "components": [
+                          {
+                            "label": {
+                              "ru": "Цветовая карта",
+                              "en": "Color Mapping"
+                            },
+                            "key": "_coloredColorMap",
+                            "keyLabel": {
+                              "ru": "Значение",
+                              "en": "Value"
+                            },
+                            "tooltip": {
+                              "ru": "Сопоставление значений с цветами. Ключ - значение ячейки, значение - цвет (CSS название или HEX код)",
+                              "en": "Map values to colors. Key - cell value, value - color (CSS name or HEX code)"
+                            },
+                            "type": "datamap",
+                            "input": true,
+                            "clearOnHide": false,
+                            "calculateValue": "value = _.get(data, 'formatter._originalConfig.color') || {};",
+                            "allowCalculateOverride": true,
+                            "valueComponent": {
+                              "label": {
+                                "ru": "Цвет",
+                                "en": "Color"
+                              },
+                              "key": "value",
+                              "type": "textfield",
+                              "input": true
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                    "key": "coloredBasicColumns",
+                    "type": "columns",
+                    "input": false
+                  },
+                  {
+                    "label": {
+                      "ru": "Функция определения цвета (опционально)",
+                      "en": "Color Function (optional)"
+                    },
+                    "key": "_coloredFn",
+                    "description": {
+                      "ru": "Опциональная JavaScript функция для динамического определения цвета. Если указана, имеет приоритет над цветовой картой.",
+                      "en": "Optional JavaScript function to dynamically determine color. If specified, takes priority over color mapping."
+                    },
+                    "tooltip": {
+                      "ru": "Функция получает: cell (значение ячейки), row (данные строки). Должна вернуть цвет (CSS название или HEX).",
+                      "en": "Function receives: cell (cell value), row (row data). Should return color (CSS name or HEX)."
+                    },
+                    "editor": "ace",
+                    "as": "javascript",
+                    "rows": 10,
+                    "refreshOn": [],
+                    "optionalWhenDisabled": false,
+                    "clearOnHide": false,
+                    "calculateValue": "value = _.get(data, 'formatter._originalConfig.fn') || '';",
+                    "allowCalculateOverride": true,
+                    "aiEnabled": true,
+                    "scriptContextType": "journal_formatter",
+                    "type": "textarea",
+                    "input": true
+                  }
+                ]
+              },
+              {
+                "key": "config",
+                "refreshOn": ["type", "_configOther", "_scriptFn", "_scriptVars", "_coloredDefaultColor", "_coloredShowPointer", "_coloredColorMap", "_coloredFn"],
+                "calculateValue": "var type = _.get(data, 'formatter.type');\nif (type === 'script') {\n    value = {};\n    var fn = _.get(data, 'formatter._scriptFn');\n    if (!fn) fn = _.get(data, 'formatter._originalConfig.fn');\n    if (fn) value.fn = fn;\n    var vars = _.get(data, 'formatter._scriptVars');\n    if (!vars || Object.keys(vars).length === 0) vars = _.get(data, 'formatter._originalConfig.vars');\n    if (vars && Object.keys(vars).length > 0) value.vars = vars;\n} else if (type === 'colored') {\n    value = {};\n    var defColor = _.get(data, 'formatter._coloredDefaultColor');\n    if (!defColor) defColor = _.get(data, 'formatter._originalConfig.defaultColor');\n    if (defColor) value.defaultColor = defColor;\n    var showPtr = _.get(data, 'formatter._coloredShowPointer');\n    if (showPtr === undefined || showPtr === null) showPtr = _.get(data, 'formatter._originalConfig.showPointer');\n    if (showPtr === true) value.showPointer = true;\n    var colorMap = _.get(data, 'formatter._coloredColorMap');\n    if (!colorMap || Object.keys(colorMap).length === 0) colorMap = _.get(data, 'formatter._originalConfig.color');\n    if (colorMap && Object.keys(colorMap).length > 0) value.color = colorMap;\n    var fn = _.get(data, 'formatter._coloredFn');\n    if (!fn) fn = _.get(data, 'formatter._originalConfig.fn');\n    if (fn) value.fn = fn;\n} else {\n    value = _.get(data, 'formatter._configOther') || _.get(data, 'formatter._originalConfig') || {};\n}",
+                "type": "hidden",
+                "input": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": {
+          "ru": "Редактор колонки",
+          "en": "Column Editor"
+        },
+        "key": "editorPanel",
+        "title": {
+          "en": "Column Editor",
+          "ru": "Редактор колонки"
+        },
+        "collapsible": true,
+        "collapsed": true,
+        "type": "panel",
+        "input": false,
+        "components": [
+          {
+            "label": {
+              "ru": "Редактор для колонки",
+              "en": "Column editor"
+            },
+            "hideLabel": true,
+            "key": "editor",
+            "refreshOn": [],
+            "optionalWhenDisabled": false,
+            "type": "container",
+            "input": true,
             "components": [
               {
                 "label": {
-                  "ru": "Атрибут для загрузки (по умолчанию системное имя)",
-                  "en": "Attribute to load (system name by default)"
+                  "ru": "Тип редактора",
+                  "en": "Editor type"
                 },
+                "key": "type",
+                "inputMasks": [
+                  {
+                    "label": "",
+                    "mask": ""
+                  }
+                ],
                 "defaultValue": "",
-                "key": "attribute",
+                "refreshOn": [],
+                "optionalWhenDisabled": false,
                 "type": "textfield",
                 "input": true
               },
               {
                 "label": {
-                  "ru": "Можно ли искать по атрибуту",
-                  "en": "Is search allowed by attribute"
+                  "ru": "Конфигурация",
+                  "en": "Configuration"
                 },
-                "hasThreeStates": true,
-                "key": "searchable",
-                "type": "checkbox",
-                "input": true
-              },
-              {
-                "label": {
-                  "ru": "Можно ли искать в шапке колонки",
-                  "en": "Is allowed to search in the column header"
-                },
-                "hasThreeStates": true,
-                "key": "searchableByText",
-                "type": "checkbox",
-                "input": true
-              },
-              {
-                "label": {
-                  "ru": "Можно ли сортировать",
-                  "en": "Is sorting allowed"
-                },
-                "key": "sortable",
-                "hasThreeStates": true,
+                "key": "config",
+                "keyLabel": "",
                 "refreshOn": [],
                 "optionalWhenDisabled": false,
-                "type": "checkbox",
-                "input": true
-              },
-              {
-                "label": {
-                  "ru": "Отобразить общую сумму колонки",
-                  "en": "Display the total amount of the column"
-                },
-                "key": "hasTotalSumField",
-                "hasThreeStates": true,
-                "refreshOn": [],
-                "optionalWhenDisabled": false,
-                "customConditional": "show = data.parentType === \"NUMBER\";",
-                "type": "checkbox",
-                "input": true,
-                "show": false
-              },
-              {
-                "label": {
-                  "ru": "Задать ширину колонки в пикселях",
-                  "en": "Set the column width in pixels"
-                },
-                "key": "width",
-                "validate": {
-                  "integer": false
-                },
-                "isBigNumber": false,
-                "delimiterValue": " ",
-                "optionalWhenDisabled": false,
-                "defaultValue": "",
-                "type": "number",
-                "input": true
-              }
-            ],
-            "type": "column",
-            "input": false,
-            "key": "column",
-            "index": 0
-          },
-          {
-            "index": 1,
-            "type": "column",
-            "input": false,
-            "key": "column",
-            "components": [
-              {
-                "label": {
-                  "ru": "Можно ли группировать",
-                  "en": "Is grouping allowed"
-                },
-                "key": "groupable",
-                "hasThreeStates": true,
-                "refreshOn": [],
-                "optionalWhenDisabled": false,
-                "type": "checkbox",
-                "input": true
-              },
-              {
-                "label": {
-                  "ru": "Можно ли редактировать в таблице",
-                  "en": "Is allowed to edit in the table"
-                },
-                "key": "editable",
-                "hasThreeStates": true,
-                "refreshOn": [],
-                "optionalWhenDisabled": false,
-                "type": "checkbox",
-                "input": true
-              },
-              {
-                "label": {
-                  "ru": "Отображать по умолчанию",
-                  "en": "Display by default"
-                },
-                "key": "visible",
-                "hasThreeStates": true,
-                "refreshOn": [],
-                "optionalWhenDisabled": false,
-                "type": "checkbox",
-                "input": true
-              },
-              {
-                "label": {
-                  "ru": "Скрытая колонка",
-                  "en": "Hidden column"
-                },
-                "key": "hidden",
-                "description": {
-                  "ru": "Можно искать по колонке, но её нельзя вывести в таблицу",
-                  "en": "You can search by column, but it cannot be displayed in a table"
-                },
-                "hasThreeStates": true,
-                "refreshOn": [],
-                "optionalWhenDisabled": false,
-                "type": "checkbox",
-                "input": true
-              },
-              {
-                "label": {
-                  "ru": "Множественное значение",
-                  "en": "Multiple value"
-                },
-                "key": "multiple",
-                "hasThreeStates": true,
-                "refreshOn": [],
-                "optionalWhenDisabled": false,
-                "type": "checkbox",
+                "type": "datamap",
                 "input": true
               }
             ]
           }
-        ],
-        "key": "columns2",
-        "type": "columns",
-        "input": false
-      },
-      {
-        "label": {
-          "ru": "Columns"
-        },
-        "columns": [
-          {
-            "components": [
-              {
-                "label": {
-                  "ru": "Форматтер для колонки",
-                  "en": "Column formatter"
-                },
-                "key": "formatter",
-                "refreshOn": [],
-                "optionalWhenDisabled": false,
-                "type": "container",
-                "input": true,
-                "components": [
-                  {
-                    "label": {
-                      "ru": "Тип форматтера",
-                      "en": "Formatter type"
-                    },
-                    "key": "type",
-                    "dataSrc": "custom",
-                    "data": {
-                      "headers": [
-                        {
-                          "key": "",
-                          "value": ""
-                        }
-                      ],
-                      "custom": "const registry = Citeck.FormattersRegistry;\nif (registry) {\n  const formatters = registry.getAllFormatters();\n  values = formatters.map((formatter) => ({\n    label: `journals.formatter.${formatter.getType()}.name`, \n    value: formatter.getType(),\n  }));\n}"
-                    },
-                    "defaultValue": "",
-                    "optionalWhenDisabled": false,
-                    "type": "ecosSelect",
-                    "input": true
-                  },
-                  {
-                    "label": {
-                      "ru": "Конфигурация",
-                      "en": "Configuration"
-                    },
-                    "key": "config",
-                    "keyLabel": "",
-                    "refreshOn": [],
-                    "optionalWhenDisabled": false,
-                    "type": "datamap",
-                    "input": true
-                  }
-                ]
-              }
-            ],
-            "type": "column",
-            "input": false,
-            "key": "column",
-            "index": 0
-          },
-          {
-            "index": 1,
-            "type": "column",
-            "input": false,
-            "key": "column",
-            "components": [
-              {
-                "label": {
-                  "ru": "Редактор для колонки",
-                  "en": "Column editor"
-                },
-                "key": "editor",
-                "refreshOn": [],
-                "optionalWhenDisabled": false,
-                "type": "container",
-                "input": true,
-                "components": [
-                  {
-                    "label": {
-                      "ru": "Тип редактора",
-                      "en": "Editor type"
-                    },
-                    "key": "type",
-                    "inputMasks": [
-                      {
-                        "label": "",
-                        "mask": ""
-                      }
-                    ],
-                    "defaultValue": "",
-                    "refreshOn": [],
-                    "optionalWhenDisabled": false,
-                    "type": "textfield",
-                    "input": true
-                  },
-                  {
-                    "label": {
-                      "ru": "Конфигурация",
-                      "en": "Configuration"
-                    },
-                    "key": "config",
-                    "keyLabel": "",
-                    "refreshOn": [],
-                    "optionalWhenDisabled": false,
-                    "type": "datamap",
-                    "input": true
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "key": "columns3",
-        "type": "columns",
-        "input": false
+        ]
       },
       {
         "label": {
@@ -336,7 +657,10 @@
           "ru": "Panel"
         },
         "key": "searchConfigPanel",
-        "title": "Search Config",
+        "title": {
+          "en": "Search Config",
+          "ru": "Конфигурация поиска"
+        },
         "collapsible": true,
         "collapsed": true,
         "refreshOn": [],
@@ -484,79 +808,97 @@
           "ru": "Вычисляемые значения",
           "en": "Calculated values"
         },
-        "key": "computed",
-        "multiple": true,
-        "validate": {
-          "minLength": "",
-          "maxLength": ""
+        "key": "computedPanel",
+        "title": {
+          "en": "Calculated values",
+          "ru": "Вычисляемые значения"
         },
-        "disableAddingRemovingRows": false,
-        "addAnother": "",
-        "addAnotherPosition": "bottom",
-        "removePlacement": "col",
-        "defaultOpen": false,
-        "layoutFixed": false,
-        "enableRowGroups": false,
-        "rowGroups": [
-          {
-            "label": "",
-            "numberOfRows": ""
-          }
-        ],
-        "reorder": false,
-        "defaultValue": [
-          {
-            "textField": "",
-            "id": "",
-            "type3": "",
-            "value": "Value",
-            "config3": {},
-            "type": "",
-            "config": {}
-          }
-        ],
-        "refreshOn": [],
-        "optionalWhenDisabled": false,
-        "type": "datagrid",
-        "input": true,
+        "collapsible": true,
+        "collapsed": true,
+        "type": "panel",
+        "input": false,
         "components": [
           {
             "label": {
-              "ru": "Panel"
+              "ru": "Вычисляемые значения",
+              "en": "Calculated values"
             },
-            "key": "panel",
-            "type": "panel",
-            "input": false,
+            "hideLabel": true,
+            "key": "computed",
+            "multiple": true,
+            "validate": {
+              "minLength": "",
+              "maxLength": ""
+            },
+            "disableAddingRemovingRows": false,
+            "addAnother": "",
+            "addAnotherPosition": "bottom",
+            "removePlacement": "col",
+            "defaultOpen": false,
+            "layoutFixed": false,
+            "enableRowGroups": false,
+            "rowGroups": [
+              {
+                "label": "",
+                "numberOfRows": ""
+              }
+            ],
+            "reorder": false,
+            "defaultValue": [
+              {
+                "textField": "",
+                "id": "",
+                "type3": "",
+                "value": "Value",
+                "config3": {},
+                "type": "",
+                "config": {}
+              }
+            ],
+            "refreshOn": [],
+            "optionalWhenDisabled": false,
+            "type": "datagrid",
+            "input": true,
             "components": [
               {
                 "label": {
-                  "ru": "id"
+                  "ru": "Panel"
                 },
-                "defaultValue": "",
-                "key": "id",
-                "type": "textfield",
-                "input": true
-              },
-              {
-                "label": {
-                  "ru": "type"
-                },
-                "defaultValue": "",
-                "key": "type",
-                "type": "textfield",
-                "input": true
-              },
-              {
-                "label": {
-                  "ru": "Config"
-                },
-                "keyLabel": "",
-                "key": "config",
-                "type": "datamap",
-                "input": true
+                "key": "panel",
+                "type": "panel",
+                "input": false,
+                "components": [
+                  {
+                    "label": {
+                      "ru": "id"
+                    },
+                    "defaultValue": "",
+                    "key": "id",
+                    "type": "textfield",
+                    "input": true
+                  },
+                  {
+                    "label": {
+                      "ru": "type"
+                    },
+                    "defaultValue": "",
+                    "key": "type",
+                    "type": "textfield",
+                    "input": true
+                  },
+                  {
+                    "label": {
+                      "ru": "Config"
+                    },
+                    "keyLabel": "",
+                    "key": "config",
+                    "type": "datamap",
+                    "input": true
+                  }
+                ],
+                "row": "0-0"
               }
-            ],
-            "row": "0-0"
+            ]
           }
         ]
       }

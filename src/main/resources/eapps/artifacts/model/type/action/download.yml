@@ -5,7 +5,6 @@ name:
   ru: Скачать
 
 parentRef: emodel/type@ui-action
-formRef: uiserv/form@download_action_form
 
 system: true
 

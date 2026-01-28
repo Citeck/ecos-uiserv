@@ -1,0 +1,1111 @@
+{
+  "id": "action-form",
+  "formKey": "action-form",
+  "title": {
+    "en": "Action Form",
+    "ru": "Форма действия"
+  },
+  "description": {},
+  "customModule": "",
+  "typeRef": "emodel/type@ui-action",
+  "workspace": "",
+  "width": "extra-lg",
+  "system": true,
+  "i18n": {
+    "ru": {
+      "Main": "Основные",
+      "Config": "Конфигурация",
+      "Features": "Функции",
+      "Confirmation": "Подтверждение",
+      "Advanced": "Расширенные",
+      "Action ID": "Идентификатор действия",
+      "Action Name": "Название действия",
+      "Plural Name": "Название (множ. число)",
+      "Action Type": "Тип действия",
+      "Icon": "Иконка",
+      "Type Reference": "Ссылка на тип",
+      "Pre Action Module": "Модуль предобработки",
+      "Script Function": "JavaScript функция",
+      "URL": "URL",
+      "HTTP Method": "HTTP метод",
+      "Arguments": "Аргументы",
+      "Request Body": "Тело запроса",
+      "Open in Background": "Открыть в фоне",
+      "Reopen": "Переоткрыть",
+      "New Browser Tab": "Новая вкладка браузера",
+      "Reopen Browser Tab": "Переоткрыть вкладку браузера",
+      "Attributes": "Атрибуты",
+      "Create Variant ID": "ID варианта создания",
+      "Create Variant": "Вариант создания",
+      "Redirect to Page": "Перенаправить на страницу",
+      "Wait for Response": "Ждать ответа",
+      "Without Confirmation": "Без подтверждения",
+      "Template Type": "Тип шаблона",
+      "Output Format": "Формат вывода",
+      "Include Timezone": "Включить часовой пояс",
+      "Template Reference": "Ссылка на шаблон",
+      "Result Name": "Имя результата",
+      "Request Parameters": "Параметры запроса",
+      "Scale": "Масштаб",
+      "Record Reference": "Ссылка на запись",
+      "Record ID": "ID записи",
+      "Record Attributes": "Атрибуты записи",
+      "Implementation Source ID": "ID источника реализации",
+      "No Result Modal": "Без модального окна результата",
+      "Association": "Ассоциация",
+      "Action": "Действие",
+      "Workflow From Record": "Workflow из записи",
+      "Hide Confirm Empty Form": "Скрыть подтверждение для пустой формы",
+      "Form ID": "ID формы",
+      "Event Data": "Данные события",
+      "Input": "Вход",
+      "Transformations": "Трансформации",
+      "Output": "Выход",
+      "Download": "Скачать",
+      "For Record": "Для записи",
+      "For Records": "Для записей",
+      "For Query": "Для запроса",
+      "Batch Size": "Размер пакета",
+      "Parallel Batches Count": "Количество параллельных пакетов",
+      "Timeout Error Message": "Сообщение об ошибке таймаута",
+      "Execute As For Records": "Выполнить как для записей",
+      "Confirmation Title": "Заголовок подтверждения",
+      "Confirmation Message": "Сообщение подтверждения",
+      "Confirmation Form": "Форма подтверждения",
+      "Attributes Mapping": "Сопоставление атрибутов",
+      "Form Attributes": "Атрибуты формы",
+      "Result Title": "Заголовок результата",
+      "Result Message": "Сообщение результата",
+      "Predicate": "Предикат",
+      "Evaluator": "Вычислитель",
+      "Save": "Сохранить",
+      "Cancel": "Отмена",
+      "view": "Просмотр",
+      "edit": "Редактирование",
+      "open-in-background": "Открыть в фоне",
+      "download": "Скачать",
+      "delete": "Удалить",
+      "download-card-template": "Скачать шаблон карточки",
+      "download-by-template": "Скачать по шаблону",
+      "view-card-template": "Просмотр шаблона карточки",
+      "upload-new-version": "Загрузить новую версию",
+      "create": "Создать",
+      "save-as-case-template": "Сохранить как шаблон кейса",
+      "open-url": "Открыть URL",
+      "assoc-action": "Действие с ассоциацией",
+      "content-preview-modal": "Модальное окно предпросмотра",
+      "fetch": "Fetch запрос",
+      "view-business-process": "Просмотр бизнес-процесса",
+      "cancel-business-process": "Отмена бизнес-процесса",
+      "mutate": "Изменить",
+      "edit-menu": "Редактировать меню",
+      "view-menu": "Просмотр меню",
+      "task-outcome": "Результат задачи",
+      "tasks-actions": "Действия задач",
+      "edit-password": "Изменить пароль",
+      "open-submit-form": "Открыть форму отправки",
+      "user-event": "Пользовательское событие",
+      "transform": "Трансформация",
+      "script": "Скрипт",
+      "View config": "Настройки просмотра",
+      "Edit/Create config": "Настройки редактирования/создания",
+      "Delete config": "Настройки удаления",
+      "Download config": "Настройки скачивания",
+      "Template config": "Настройки шаблона",
+      "Download by template config": "Настройки скачивания по шаблону",
+      "Content preview config": "Настройки предпросмотра контента",
+      "URL/Fetch config": "Настройки URL/Fetch",
+      "Mutate config": "Настройки изменения",
+      "Association action config": "Настройки действия ассоциации",
+      "Business process config": "Настройки бизнес-процесса",
+      "Tasks config": "Настройки задач",
+      "Submit form config": "Настройки формы отправки",
+      "User event config": "Настройки пользовательского события",
+      "Transform config": "Настройки трансформации",
+      "Script config": "Настройки скрипта",
+      "Save as template config": "Настройки сохранения как шаблон",
+      "Applicability": "Применимость",
+      "Query execution config": "Настройки выполнения запроса",
+      "Confirmation settings": "Настройки подтверждения",
+      "Result settings": "Настройки результата",
+      "Actions": "Действия",
+      "Confirm": "Подтвердить",
+      "Disabled": "Отключено",
+      "Result": "Результат"
+    },
+    "en": {
+      "Main": "Main",
+      "Config": "Config",
+      "Features": "Features",
+      "Confirmation": "Confirmation",
+      "Advanced": "Advanced",
+      "Action ID": "Action ID",
+      "Action Name": "Action Name",
+      "Plural Name": "Plural Name",
+      "Action Type": "Action Type",
+      "Icon": "Icon",
+      "Type Reference": "Type Reference",
+      "Pre Action Module": "Pre Action Module",
+      "Script Function": "JavaScript Function",
+      "URL": "URL",
+      "HTTP Method": "HTTP Method",
+      "Arguments": "Arguments",
+      "Request Body": "Request Body",
+      "Open in Background": "Open in Background",
+      "Reopen": "Reopen",
+      "New Browser Tab": "New Browser Tab",
+      "Reopen Browser Tab": "Reopen Browser Tab",
+      "Attributes": "Attributes",
+      "Create Variant ID": "Create Variant ID",
+      "Create Variant": "Create Variant",
+      "Redirect to Page": "Redirect to Page",
+      "Wait for Response": "Wait for Response",
+      "Without Confirmation": "Without Confirmation",
+      "Template Type": "Template Type",
+      "Output Format": "Output Format",
+      "Include Timezone": "Include Timezone",
+      "Template Reference": "Template Reference",
+      "Result Name": "Result Name",
+      "Request Parameters": "Request Parameters",
+      "Scale": "Scale",
+      "Record Reference": "Record Reference",
+      "Record ID": "Record ID",
+      "Record Attributes": "Record Attributes",
+      "Implementation Source ID": "Implementation Source ID",
+      "No Result Modal": "No Result Modal",
+      "Association": "Association",
+      "Action": "Action",
+      "Workflow From Record": "Workflow From Record",
+      "Hide Confirm Empty Form": "Hide Confirm Empty Form",
+      "Form ID": "Form ID",
+      "Event Data": "Event Data",
+      "Input": "Input",
+      "Transformations": "Transformations",
+      "Output": "Output",
+      "Download": "Download",
+      "For Record": "For Record",
+      "For Records": "For Records",
+      "For Query": "For Query",
+      "Batch Size": "Batch Size",
+      "Parallel Batches Count": "Parallel Batches Count",
+      "Timeout Error Message": "Timeout Error Message",
+      "Execute As For Records": "Execute As For Records",
+      "Confirmation Title": "Confirmation Title",
+      "Confirmation Message": "Confirmation Message",
+      "Confirmation Form": "Confirmation Form",
+      "Attributes Mapping": "Attributes Mapping",
+      "Form Attributes": "Form Attributes",
+      "Result Title": "Result Title",
+      "Result Message": "Result Message",
+      "Predicate": "Predicate",
+      "Evaluator": "Evaluator",
+      "Save": "Save",
+      "Cancel": "Cancel",
+      "view": "View",
+      "edit": "Edit",
+      "open-in-background": "Open in Background",
+      "download": "Download",
+      "delete": "Delete",
+      "download-card-template": "Download Card Template",
+      "download-by-template": "Download by Template",
+      "view-card-template": "View Card Template",
+      "upload-new-version": "Upload New Version",
+      "create": "Create",
+      "save-as-case-template": "Save as Case Template",
+      "open-url": "Open URL",
+      "assoc-action": "Association Action",
+      "content-preview-modal": "Content Preview Modal",
+      "fetch": "Fetch",
+      "view-business-process": "View Business Process",
+      "cancel-business-process": "Cancel Business Process",
+      "mutate": "Mutate",
+      "edit-menu": "Edit Menu",
+      "view-menu": "View Menu",
+      "task-outcome": "Task Outcome",
+      "tasks-actions": "Tasks Actions",
+      "edit-password": "Edit Password",
+      "open-submit-form": "Open Submit Form",
+      "user-event": "User Event",
+      "transform": "Transform",
+      "script": "Script",
+      "View config": "View config",
+      "Edit/Create config": "Edit/Create config",
+      "Delete config": "Delete config",
+      "Download config": "Download config",
+      "Template config": "Template config",
+      "Download by template config": "Download by template config",
+      "Content preview config": "Content preview config",
+      "URL/Fetch config": "URL/Fetch config",
+      "Mutate config": "Mutate config",
+      "Association action config": "Association action config",
+      "Business process config": "Business process config",
+      "Tasks config": "Tasks config",
+      "Submit form config": "Submit form config",
+      "User event config": "User event config",
+      "Transform config": "Transform config",
+      "Script config": "Script config",
+      "Save as template config": "Save as template config",
+      "Applicability": "Applicability",
+      "Query execution config": "Query execution config",
+      "Confirmation settings": "Confirmation settings",
+      "Result settings": "Result settings",
+      "Actions": "Actions",
+      "Confirm": "Confirm",
+      "Disabled": "Disabled",
+      "Result": "Result"
+    }
+  },
+  "definition": {
+    "components": [
+      {
+        "key": "tabs",
+        "components": [
+          {
+            "label": "Main",
+            "key": "mainTab",
+            "components": [
+              {
+                "key": "mainPanel",
+                "type": "panel",
+                "input": false,
+                "components": [
+                  {
+                    "columns": [
+                      {
+                        "components": [
+                          {
+                            "label": "Action ID",
+                            "key": "id",
+                            "validate": {
+                              "required": true,
+                              "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+                            },
+                            "defaultValue": "",
+                            "logic": [
+                              {
+                                "name": "disabled",
+                                "trigger": {
+                                  "type": "javascript",
+                                  "javascript": "result = _.get(instance, 'root.options.formMode') !== 'CREATE';"
+                                },
+                                "actions": [
+                                  {
+                                    "name": "setDisabled",
+                                    "type": "property",
+                                    "property": {
+                                      "label": "Disabled",
+                                      "value": "disabled",
+                                      "type": "boolean"
+                                    },
+                                    "state": "true"
+                                  }
+                                ]
+                              }
+                            ],
+                            "type": "textfield",
+                            "input": true
+                          },
+                          {
+                            "label": "Action Name",
+                            "key": "name",
+                            "validate": {
+                              "required": true
+                            },
+                            "type": "mlText",
+                            "input": true
+                          },
+                          {
+                            "label": "Plural Name",
+                            "key": "pluralName",
+                            "type": "mlText",
+                            "input": true
+                          },
+                          {
+                            "label": "Action Type",
+                            "key": "type",
+                            "validate": {
+                              "required": true
+                            },
+                            "data": {
+                              "values": [
+                                {
+                                  "label": "view",
+                                  "value": "view"
+                                },
+                                {
+                                  "label": "edit",
+                                  "value": "edit"
+                                },
+                                {
+                                  "label": "open-in-background",
+                                  "value": "open-in-background"
+                                },
+                                {
+                                  "label": "download",
+                                  "value": "download"
+                                },
+                                {
+                                  "label": "delete",
+                                  "value": "delete"
+                                },
+                                {
+                                  "label": "download-card-template",
+                                  "value": "download-card-template"
+                                },
+                                {
+                                  "label": "download-by-template",
+                                  "value": "download-by-template"
+                                },
+                                {
+                                  "label": "view-card-template",
+                                  "value": "view-card-template"
+                                },
+                                {
+                                  "label": "upload-new-version",
+                                  "value": "upload-new-version"
+                                },
+                                {
+                                  "label": "create",
+                                  "value": "create"
+                                },
+                                {
+                                  "label": "save-as-case-template",
+                                  "value": "save-as-case-template"
+                                },
+                                {
+                                  "label": "open-url",
+                                  "value": "open-url"
+                                },
+                                {
+                                  "label": "assoc-action",
+                                  "value": "assoc-action"
+                                },
+                                {
+                                  "label": "content-preview-modal",
+                                  "value": "content-preview-modal"
+                                },
+                                {
+                                  "label": "fetch",
+                                  "value": "fetch"
+                                },
+                                {
+                                  "label": "view-business-process",
+                                  "value": "view-business-process"
+                                },
+                                {
+                                  "label": "cancel-business-process",
+                                  "value": "cancel-business-process"
+                                },
+                                {
+                                  "label": "mutate",
+                                  "value": "mutate"
+                                },
+                                {
+                                  "label": "edit-menu",
+                                  "value": "edit-menu"
+                                },
+                                {
+                                  "label": "view-menu",
+                                  "value": "view-menu"
+                                },
+                                {
+                                  "label": "task-outcome",
+                                  "value": "task-outcome"
+                                },
+                                {
+                                  "label": "tasks-actions",
+                                  "value": "tasks-actions"
+                                },
+                                {
+                                  "label": "edit-password",
+                                  "value": "edit-password"
+                                },
+                                {
+                                  "label": "open-submit-form",
+                                  "value": "open-submit-form"
+                                },
+                                {
+                                  "label": "user-event",
+                                  "value": "user-event"
+                                },
+                                {
+                                  "label": "transform",
+                                  "value": "transform"
+                                },
+                                {
+                                  "label": "script",
+                                  "value": "script"
+                                }
+                              ]
+                            },
+                            "valueProperty": "value",
+                            "defaultValue": "",
+                            "type": "select",
+                            "input": true
+                          }
+                        ],
+                        "type": "column",
+                        "input": false,
+                        "key": "column",
+                        "index": 0
+                      },
+                      {
+                        "index": 1,
+                        "type": "column",
+                        "input": false,
+                        "key": "column",
+                        "components": [
+                          {
+                            "label": "Icon",
+                            "key": "icon",
+                            "tooltip": {
+                              "ru": "Код иконки из шрифта Citeck (например: icon-delete, icon-edit)",
+                              "en": "Icon code from Citeck icon font (e.g.: icon-delete, icon-edit)"
+                            },
+                            "type": "textfield",
+                            "input": true
+                          },
+                          {
+                            "label": "Type Reference",
+                            "key": "typeRef",
+                            "journalId": "ecos-types",
+                            "type": "selectJournal",
+                            "input": true
+                          },
+                          {
+                            "label": "Pre Action Module",
+                            "key": "preActionModule",
+                            "tooltip": {
+                              "ru": "Ссылка на модуль с JS кодом для предобработки",
+                              "en": "Reference to a module with JS code for pre-processing"
+                            },
+                            "type": "textfield",
+                            "input": true
+                          }
+                        ]
+                      }
+                    ],
+                    "key": "mainColumns",
+                    "type": "columns",
+                    "input": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Config",
+            "key": "configTab",
+            "components": [
+              {
+                "label": "Script config",
+                "key": "scriptConfigPanel",
+                "customConditional": "show = data.type === 'script';",
+                "type": "panel",
+                "input": false,
+                "components": [
+                  {
+                    "label": {
+                      "ru": "JavaScript функция",
+                      "en": "JavaScript Function"
+                    },
+                    "key": "scriptFnEditor",
+                    "tooltip": {
+                      "ru": "JavaScript функция для выполнения действия. Доступны переменные: record, context.",
+                      "en": "JavaScript function to execute the action. Available variables: record, context."
+                    },
+                    "editor": "ace",
+                    "as": "javascript",
+                    "rows": 25,
+                    "persistent": false,
+                    "refreshOn": [
+                      "scriptFnLoaded"
+                    ],
+                    "calculateValue": "value = _.get(data, 'scriptFnLoaded._config', '') || '';",
+                    "allowCalculateOverride": true,
+                    "type": "textarea",
+                    "input": true
+                  },
+                  {
+                    "label": "scriptFnLoader",
+                    "source": {
+                      "type": "custom",
+                      "custom": {
+                        "syncData": "value = { recId: instance.options.recordId };",
+                        "asyncData": "return Citeck.Records.get(data.recId).load({'_config': 'config.fn?str'});"
+                      },
+                      "forceLoad": false
+                    },
+                    "update": {
+                      "type": "once"
+                    },
+                    "executionCondition": "value = !_.has(data, 'scriptFnLoaded._config') && data.type === 'script';",
+                    "key": "scriptFnLoaded",
+                    "type": "asyncData",
+                    "input": true
+                  }
+                ]
+              },
+              {
+                "label": {
+                  "ru": "Конфигурация (JSON)",
+                  "en": "Config (JSON)"
+                },
+                "key": "configJsonEditor",
+                "tooltip": {
+                  "ru": "Конфигурация действия в формате JSON. Поля зависят от выбранного типа действия.",
+                  "en": "Action configuration in JSON format. Fields depend on the selected action type."
+                },
+                "editor": "ace",
+                "wysiwyg": "",
+                "persistent": false,
+                "refreshOn": [
+                  "configLoaded"
+                ],
+                "calculateValue": "value = _.get(data, 'configLoaded._config', null);",
+                "allowCalculateOverride": true,
+                "optionalWhenDisabled": false,
+                "customConditional": "show = data.type !== 'script';",
+                "rows": 25,
+                "as": "json",
+                "type": "textarea",
+                "input": true,
+                "defaultValue": "",
+                "uploadStorage": "",
+                "uploadUrl": "",
+                "uploadOptions": "",
+                "uploadDir": "",
+                "reorder": false
+              },
+              {
+                "label": "configLoader",
+                "source": {
+                  "type": "custom",
+                  "custom": {
+                    "syncData": "value = { recId: instance.options.recordId };",
+                    "asyncData": "return Citeck.Records.get(data.recId).load({'_config': 'config?json'});"
+                  },
+                  "forceLoad": false
+                },
+                "update": {
+                  "type": "once"
+                },
+                "executionCondition": "value = !_.has(data, 'configLoaded._config') && data.type !== 'script';",
+                "key": "configLoaded",
+                "type": "asyncData",
+                "input": true
+              },
+              {
+                "key": "config",
+                "refreshOn": [
+                  "scriptFnEditor",
+                  "configJsonEditor",
+                  "type"
+                ],
+                "calculateValue": "if (data.type === 'script') { var fn = data.scriptFnEditor; value = (fn === '' || fn === undefined || fn === null) ? null : { fn: fn }; } else { value = data.configJsonEditor || null; }",
+                "type": "hidden",
+                "input": true
+              }
+            ]
+          },
+          {
+            "label": "Features",
+            "key": "featuresTab",
+            "components": [
+              {
+                "key": "featuresPanel",
+                "type": "panel",
+                "input": false,
+                "components": [
+                  {
+                    "label": "Applicability",
+                    "key": "features",
+                    "type": "container",
+                    "input": true,
+                    "components": [
+                      {
+                        "key": "featuresColumns",
+                        "inlineColumns": true,
+                        "columns": [
+                          {
+                            "components": [
+                              {
+                                "label": "For Record",
+                                "key": "execForRecord",
+                                "tooltip": {
+                                  "ru": "Действие доступно для одной записи",
+                                  "en": "Action is available for a single record"
+                                },
+                                "hasThreeStates": true,
+                                "type": "checkbox",
+                                "input": true
+                              }
+                            ],
+                            "md": 4,
+                            "type": "column",
+                            "input": false,
+                            "key": "column",
+                            "index": 0
+                          },
+                          {
+                            "md": 4,
+                            "type": "column",
+                            "input": false,
+                            "key": "column",
+                            "index": 1,
+                            "components": [
+                              {
+                                "label": "For Records",
+                                "key": "execForRecords",
+                                "tooltip": {
+                                  "ru": "Действие доступно для выбранных записей",
+                                  "en": "Action is available for selected records"
+                                },
+                                "hasThreeStates": true,
+                                "type": "checkbox",
+                                "input": true
+                              }
+                            ]
+                          },
+                          {
+                            "md": 4,
+                            "type": "column",
+                            "input": false,
+                            "key": "column",
+                            "index": 2,
+                            "components": [
+                              {
+                                "label": "For Query",
+                                "key": "execForQuery",
+                                "tooltip": {
+                                  "ru": "Действие доступно для всего запроса (без выбора записей)",
+                                  "en": "Action is available for the entire query (without selecting records)"
+                                },
+                                "hasThreeStates": true,
+                                "type": "checkbox",
+                                "input": true
+                              }
+                            ]
+                          }
+                        ],
+                        "type": "columns",
+                        "input": false
+                      }
+                    ]
+                  },
+                  {
+                    "columns": [
+                      {
+                        "components": [
+                          {
+                            "label": "Batch Size",
+                            "key": "execForRecordsBatchSize",
+                            "tooltip": {
+                              "ru": "Размер пакета для обработки нескольких записей",
+                              "en": "Batch size for processing multiple records"
+                            },
+                            "defaultValue": 0,
+                            "type": "number",
+                            "input": true
+                          },
+                          {
+                            "label": "Parallel Batches Count",
+                            "key": "execForRecordsParallelBatchesCount",
+                            "tooltip": {
+                              "ru": "Количество параллельных пакетов для обработки",
+                              "en": "Number of parallel batches for processing"
+                            },
+                            "defaultValue": 1,
+                            "type": "number",
+                            "input": true
+                          }
+                        ],
+                        "type": "column",
+                        "input": false,
+                        "key": "column",
+                        "index": 0
+                      },
+                      {
+                        "index": 1,
+                        "type": "column",
+                        "input": false,
+                        "key": "column",
+                        "components": [
+                          {
+                            "label": "Timeout Error Message",
+                            "key": "timeoutErrorMessage",
+                            "tooltip": {
+                              "ru": "Сообщение об ошибке при таймауте действия",
+                              "en": "Error message displayed on action timeout"
+                            },
+                            "type": "mlText",
+                            "input": true
+                          }
+                        ]
+                      }
+                    ],
+                    "key": "batchColumns",
+                    "type": "columns",
+                    "input": false
+                  },
+                  {
+                    "label": "Query execution config",
+                    "key": "execForQueryConfig",
+                    "customConditional": "show = _.get(data, 'features.execForQuery') === true;",
+                    "type": "container",
+                    "input": true,
+                    "components": [
+                      {
+                        "label": "Execute As For Records",
+                        "key": "execAsForRecords",
+                        "tooltip": {
+                          "ru": "Выполнить действие как для выбранных записей",
+                          "en": "Execute action as for selected records"
+                        },
+                        "hasThreeStates": true,
+                        "type": "checkbox",
+                        "input": true
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Confirmation",
+            "key": "confirmationTab",
+            "components": [
+              {
+                "label": "Confirmation settings",
+                "key": "confirmPanel",
+                "type": "panel",
+                "input": false,
+                "components": [
+                  {
+                    "label": "Confirm",
+                    "key": "confirm",
+                    "type": "container",
+                    "input": true,
+                    "components": [
+                      {
+                        "columns": [
+                          {
+                            "components": [
+                              {
+                                "label": "Confirmation Title",
+                                "key": "title",
+                                "tooltip": {
+                                  "ru": "Заголовок диалога подтверждения",
+                                  "en": "Confirmation dialog title"
+                                },
+                                "type": "mlText",
+                                "input": true
+                              },
+                              {
+                                "label": "Confirmation Message",
+                                "key": "message",
+                                "tooltip": {
+                                  "ru": "Сообщение в диалоге подтверждения",
+                                  "en": "Confirmation message"
+                                },
+                                "type": "mlText",
+                                "input": true
+                              }
+                            ],
+                            "type": "column",
+                            "input": false,
+                            "key": "column",
+                            "index": 0
+                          },
+                          {
+                            "index": 1,
+                            "type": "column",
+                            "input": false,
+                            "key": "column",
+                            "components": [
+                              {
+                                "label": "Confirmation Form",
+                                "key": "formRef",
+                                "tooltip": {
+                                  "ru": "Ссылка на форму для показа в диалоге подтверждения",
+                                  "en": "Reference to form to display in confirmation dialog"
+                                },
+                                "journalId": "ecos-forms",
+                                "type": "selectJournal",
+                                "input": true
+                              }
+                            ]
+                          }
+                        ],
+                        "key": "confirmColumns",
+                        "type": "columns",
+                        "input": false
+                      },
+                      {
+                        "label": "Form Attributes",
+                        "key": "formAttributes",
+                        "tooltip": {
+                          "ru": "Дополнительные атрибуты для передачи в форму подтверждения (ключ - имя атрибута, значение - выражение)",
+                          "en": "Additional attributes to pass to the confirmation form (key - attribute name, value - expression)"
+                        },
+                        "keyLabel": {
+                          "ru": "Атрибут",
+                          "en": "Attribute"
+                        },
+                        "type": "datamap",
+                        "input": true,
+                        "valueComponent": {
+                          "label": {
+                            "ru": "Значение",
+                            "en": "Value"
+                          },
+                          "key": "value",
+                          "type": "textfield",
+                          "input": true
+                        }
+                      },
+                      {
+                        "label": "Attributes Mapping",
+                        "key": "attributesMapping",
+                        "tooltip": {
+                          "ru": "Сопоставление данных из формы подтверждения с конфигурацией действия (ключ - путь в record, значение - имя поля формы)",
+                          "en": "Mapping of data from confirmation form to action configuration (key - record path, value - form field name)"
+                        },
+                        "keyLabel": {
+                          "ru": "Путь в record",
+                          "en": "Record path"
+                        },
+                        "type": "datamap",
+                        "input": true,
+                        "valueComponent": {
+                          "label": {
+                            "ru": "Поле формы",
+                            "en": "Form field"
+                          },
+                          "key": "value",
+                          "type": "textfield",
+                          "input": true
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "label": "Result settings",
+                "key": "resultPanel",
+                "type": "panel",
+                "input": false,
+                "components": [
+                  {
+                    "label": "Result",
+                    "key": "result",
+                    "type": "container",
+                    "input": true,
+                    "components": [
+                      {
+                        "columns": [
+                          {
+                            "components": [
+                              {
+                                "label": "Result Title",
+                                "key": "title",
+                                "tooltip": {
+                                  "ru": "Заголовок уведомления о результате",
+                                  "en": "Result notification title"
+                                },
+                                "type": "mlText",
+                                "input": true
+                              }
+                            ],
+                            "type": "column",
+                            "input": false,
+                            "key": "column",
+                            "index": 0
+                          },
+                          {
+                            "index": 1,
+                            "type": "column",
+                            "input": false,
+                            "key": "column",
+                            "components": [
+                              {
+                                "label": "Result Message",
+                                "key": "message",
+                                "tooltip": {
+                                  "ru": "Сообщение уведомления о результате",
+                                  "en": "Result notification message"
+                                },
+                                "type": "mlText",
+                                "input": true
+                              }
+                            ]
+                          }
+                        ],
+                        "key": "resultColumns",
+                        "type": "columns",
+                        "input": false
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Advanced",
+            "key": "advancedTab",
+            "components": [
+              {
+                "key": "advancedPanel",
+                "type": "panel",
+                "input": false,
+                "components": [
+                  {
+                    "columns": [
+                      {
+                        "components": [
+                          {
+                            "label": {
+                              "ru": "Predicate (JSON)"
+                            },
+                            "key": "predicate",
+                            "tooltip": {
+                              "ru": "Предикат для условного отображения действия. Формат JSON",
+                              "en": "Predicate for conditional action visibility. JSON format"
+                            },
+                            "editor": "ace",
+                            "wysiwyg": "",
+                            "defaultValue": "",
+                            "refreshOn": [],
+                            "optionalWhenDisabled": false,
+                            "properties": {
+                              "dataType": "json"
+                            },
+                            "rows": 25,
+                            "as": "json",
+                            "type": "textarea",
+                            "inputFormat": "raw",
+                            "input": true,
+                            "uploadStorage": "",
+                            "uploadUrl": "",
+                            "uploadOptions": "",
+                            "uploadDir": "",
+                            "reorder": false
+                          }
+                        ],
+                        "type": "column",
+                        "input": false,
+                        "key": "column",
+                        "index": 0
+                      },
+                      {
+                        "index": 1,
+                        "type": "column",
+                        "input": false,
+                        "key": "column",
+                        "components": [
+                          {
+                            "label": {
+                              "ru": "Evaluator (JSON)"
+                            },
+                            "key": "evaluator",
+                            "tooltip": {
+                              "ru": "Вычислитель для определения доступности действия. Формат JSON",
+                              "en": "Evaluator for determining action availability. JSON format"
+                            },
+                            "editor": "ace",
+                            "wysiwyg": "",
+                            "defaultValue": "",
+                            "refreshOn": [],
+                            "optionalWhenDisabled": false,
+                            "properties": {
+                              "dataType": "json"
+                            },
+                            "rows": 25,
+                            "as": "json",
+                            "type": "textarea",
+                            "inputFormat": "raw",
+                            "input": true,
+                            "uploadStorage": "",
+                            "uploadUrl": "",
+                            "uploadOptions": "",
+                            "uploadDir": "",
+                            "reorder": false
+                          }
+                        ]
+                      }
+                    ],
+                    "key": "advancedColumns",
+                    "type": "columns",
+                    "input": false
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "type": "tabs",
+        "input": false
+      },
+      {
+        "label": "Actions",
+        "columns": [
+          {
+            "components": [],
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 0
+          },
+          {
+            "md": 3,
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 1,
+            "components": [
+              {
+                "label": "Cancel",
+                "action": "event",
+                "state": "",
+                "showValidations": false,
+                "event": "cancel",
+                "block": true,
+                "key": "cancelBtn",
+                "type": "button",
+                "input": true
+              }
+            ]
+          },
+          {
+            "md": 3,
+            "type": "column",
+            "input": false,
+            "key": "column",
+            "index": 2,
+            "components": [
+              {
+                "label": "Save",
+                "state": "",
+                "theme": "primary",
+                "block": true,
+                "disableOnInvalid": true,
+                "key": "submit",
+                "type": "button",
+                "input": true
+              }
+            ]
+          }
+        ],
+        "key": "actionButtons",
+        "type": "columns",
+        "input": false
+      }
+    ],
+    "formId": "action-form"
+  },
+  "attributes": {},
+  "notExists": false
+}

@@ -1,0 +1,9 @@
+id: delete-download-action-form
+name:
+  ru: Удалить форму действия загрузки
+  en: Delete download action form
+type: "delete"
+date: "2026-01-28T00:00:00Z"
+config:
+  records:
+    - uiserv/form@download_action_form

@@ -9,6 +9,7 @@ properties: {upd: true}
 system: true
 
 actions:
+  - uiserv/action@edit
   - uiserv/action@download-base64-data-yml
   - uiserv/action@delete
   - uiserv/action@edit-json
