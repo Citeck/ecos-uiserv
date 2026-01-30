@@ -7,7 +7,9 @@ import org.springframework.stereotype.Repository
 import java.time.Instant
 
 @Repository
-interface MenuRepository : JpaRepository<MenuEntity, Long>, JpaSpecificationExecutor<MenuEntity> {
+interface MenuRepository :
+    JpaRepository<MenuEntity, Long>,
+    JpaSpecificationExecutor<MenuEntity> {
 
     fun findByExtId(extId: String): MenuEntity?
 

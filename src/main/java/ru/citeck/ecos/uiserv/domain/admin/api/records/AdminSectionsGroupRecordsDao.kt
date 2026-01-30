@@ -17,7 +17,8 @@ class AdminSectionsGroupRecordsDao(
     private val adminSectionsGroupService: AdminSectionsGroupService,
     private val journalService: JournalServiceImpl,
     private val workspaceService: WorkspaceService
-) : AbstractRecordsDao(), RecordsQueryDao {
+) : AbstractRecordsDao(),
+    RecordsQueryDao {
 
     companion object {
         private const val JOURNAL_SECTION_TYPE = "JOURNAL"

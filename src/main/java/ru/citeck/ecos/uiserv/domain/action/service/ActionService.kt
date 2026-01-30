@@ -145,7 +145,8 @@ class ActionService(
         val evaluators = actionArtifacts.map { actionDto ->
             var recordEvaluatorDto = actionDto.evaluator
 
-            if (recordEvaluatorDto == null && actionDto.predicate != null &&
+            if (recordEvaluatorDto == null &&
+                actionDto.predicate != null &&
                 actionDto.predicate != VoidPredicate.INSTANCE
             ) {
 
