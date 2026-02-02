@@ -17,7 +17,9 @@ import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
 @Component
 class AddColumnVariantsDao(
     private val typesRegistry: EcosTypesRegistry
-) : RecordsQueryDao, RecordAttsDao, AbstractRecordsDao() {
+) : AbstractRecordsDao(),
+    RecordsQueryDao,
+    RecordAttsDao {
 
     companion object {
         const val SRC_ID = "journal-column-variants"

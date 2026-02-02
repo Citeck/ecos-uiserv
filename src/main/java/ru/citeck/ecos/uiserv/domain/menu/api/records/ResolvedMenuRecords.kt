@@ -29,7 +29,9 @@ class ResolvedMenuRecords(
     private val menuRecords: MenuRecords,
     private val ecosTypeService: EcosTypeService,
     private val workspaceService: WorkspaceService
-) : AbstractRecordsDao(), RecordAttsDao, RecordsQueryDao {
+) : AbstractRecordsDao(),
+    RecordAttsDao,
+    RecordsQueryDao {
 
     companion object {
         const val ID = "rmenu"
@@ -243,8 +245,10 @@ class ResolvedMenuRecords(
             if (allowedFor.any { currentUserWithAuthorities.contains(it.lowercase()) }) {
                 return true
             }
-            return allowedFor.contains(ROLE_WS_MANAGER) && isUserWsManager() ||
-                allowedFor.contains(ROLE_WS_USER) && isUserWsMember()
+            return allowedFor.contains(ROLE_WS_MANAGER) &&
+                isUserWsManager() ||
+                allowedFor.contains(ROLE_WS_USER) &&
+                isUserWsMember()
         }
 
         private fun processMenuItems(

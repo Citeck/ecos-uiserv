@@ -15,7 +15,8 @@ import ru.citeck.ecos.webapp.api.entity.toEntityRef
 class UserEventActionRecords(
     private val eventsService: EventsService,
     private val actionService: ActionService
-) : AbstractRecordsDao(), RecordMutateDao {
+) : AbstractRecordsDao(),
+    RecordMutateDao {
 
     companion object {
         const val ID = "user-event"

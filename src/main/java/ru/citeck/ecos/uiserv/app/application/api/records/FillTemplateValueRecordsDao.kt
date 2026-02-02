@@ -10,7 +10,9 @@ import ru.citeck.ecos.records3.record.request.RequestContext
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 @Component
-class FillTemplateValueRecordsDao : AbstractRecordsDao(), RecordsQueryDao {
+class FillTemplateValueRecordsDao :
+    AbstractRecordsDao(),
+    RecordsQueryDao {
 
     companion object {
         const val ID = "fill-template-value"

@@ -29,7 +29,9 @@ class EcosResolvedFormRecordsDao(
     private val ecosTypeService: EcosTypeService,
     private val formService: EcosFormService,
     private val workspaceService: WorkspaceService
-) : AbstractRecordsDao(), RecordAttsDao, RecordsQueryDao {
+) : AbstractRecordsDao(),
+    RecordAttsDao,
+    RecordsQueryDao {
 
     companion object {
         const val ID = "rform"

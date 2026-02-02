@@ -24,7 +24,8 @@ import java.util.concurrent.*
 class JournalsServiceRecordsDao(
     private val ecosContext: EcosContext,
     private val ecosWebAppContext: EcosWebAppApi
-) : AbstractRecordsDao(), RecordsQueryDao {
+) : AbstractRecordsDao(),
+    RecordsQueryDao {
 
     companion object {
         const val LANG_JOURNALS_TOTAL_COUNT = "journals-total-count"

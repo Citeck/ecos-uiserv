@@ -8,7 +8,9 @@ import java.io.Serializable
 @Data
 @Entity
 @Table(name = "admin_sections_group")
-class AdminSectionsGroupEntity : AbstractAuditingEntity(), Serializable {
+class AdminSectionsGroupEntity :
+    AbstractAuditingEntity(),
+    Serializable {
 
     companion object {
         private const val serialVersionUID = 1L

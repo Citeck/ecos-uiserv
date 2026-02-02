@@ -12,7 +12,8 @@ import ru.citeck.ecos.webapp.api.entity.EntityRef
 class ApplyThemeRecordsDao(
     private val themeService: ThemeService,
     private val perms: UiServSystemArtifactPerms
-) : AbstractRecordsDao(), ValueMutateDao<ApplyThemeRecordsDao.ApplyThemeDto> {
+) : AbstractRecordsDao(),
+    ValueMutateDao<ApplyThemeRecordsDao.ApplyThemeDto> {
 
     companion object {
         const val ID = "apply-theme"
