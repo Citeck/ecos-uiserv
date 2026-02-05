@@ -60,7 +60,8 @@ class JournalsRegistryConfiguration(
                 }
             }
             journalsService.onJournalDeleted {
-                registry.remove(it.journalDef.id)
+                val key = workspaceService.addWsPrefixToId(it.journalDef.id, it.journalDef.workspace)
+                registry.remove(key)
             }
             typesRegistry.initializationPromise().get()
             typesRegistry.listenEventsWithMeta { _, before, after ->

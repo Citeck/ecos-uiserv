@@ -53,7 +53,8 @@ class FormsRegistryConfiguration(
                 }
             }
             formsService.addDeleteListener {
-                registry.remove(it.entity.id)
+                val key = workspaceService.addWsPrefixToId(it.entity.id, it.entity.workspace)
+                registry.remove(key)
             }
             typesRegistry.initializationPromise().get()
             typesRegistry.listenEventsWithMeta { _, before, after ->
