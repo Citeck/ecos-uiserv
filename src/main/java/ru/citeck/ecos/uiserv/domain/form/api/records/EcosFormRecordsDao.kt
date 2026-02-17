@@ -95,6 +95,20 @@ class EcosFormRecordsDao(
     }
 
     override fun saveMutatedRec(record: EcosFormMutRecord): String {
+        // Re-apply _workspace after all Jackson processing.
+        // When _self content-data is used, the form JSON's "workspace" field
+        // may overwrite the value set by withCtxWorkspace during deserialization.
+        val ctxWs = record.ctxWorkspace
+        if (ctxWs != null) {
+            if (record.originalId.isNotBlank() && record.originalId != record.id) {
+                record.withWorkspace(ctxWs)
+            } else {
+                record.withWorkspace(
+                    workspaceService.getUpdatedWsInMutation(record.originalWorkspace, ctxWs)
+                )
+            }
+        }
+
         checkPermissions(record.workspace)
 
         var typeLocalId = record.typeRef.getLocalId()

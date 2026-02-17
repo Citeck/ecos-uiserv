@@ -1,5 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.form
 
+import ru.citeck.ecos.model.lib.workspace.IdInWs
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.PredicateUtils
 import ru.citeck.ecos.records2.predicate.model.Predicate
@@ -12,10 +14,15 @@ import java.util.*
 import kotlin.collections.HashMap
 
 class FormsEntityInMemDao(
-    private val predicateService: PredicateService
+    private val predicateService: PredicateService,
+    private val workspaceService: WorkspaceService
 ) : FormsEntityDao {
 
     private val entities: MutableMap<String, EcosFormEntity> = HashMap()
+
+    private fun compositeKey(extId: String, workspace: String): String {
+        return workspaceService.convertToStrId(IdInWs.create(workspace, extId))
+    }
 
     override fun count(): Long {
         return entities.size.toLong()
@@ -26,19 +33,19 @@ class FormsEntityInMemDao(
     }
 
     override fun findByExtId(formId: String, workspace: String): EcosFormEntity? {
-        return entities[formId]
+        return entities[compositeKey(formId, workspace)]
     }
 
     override fun findAllByExtIdIn(ids: Set<String>, workspace: String): Set<EcosFormEntity> {
         val result = TreeSet<EcosFormEntity>()
         for (id in ids) {
-            entities[id]?.let { result.add(it) }
+            entities[compositeKey(id, workspace)]?.let { result.add(it) }
         }
         return result
     }
 
     override fun save(entity: EcosFormEntity): EcosFormEntity {
-        entities[entity.extId] = entity
+        entities[compositeKey(entity.extId, entity.workspace ?: "")] = entity
         return entity
     }
 
@@ -66,7 +73,7 @@ class FormsEntityInMemDao(
     }
 
     override fun delete(entity: EcosFormEntity) {
-        entities.remove(entity.extId)
+        entities.remove(compositeKey(entity.extId, entity.workspace ?: ""))
     }
 
     override fun findAllByTypeRef(typeRef: String): List<EcosFormEntity> {

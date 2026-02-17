@@ -13,9 +13,19 @@ class EcosFormMutRecord(
     constructor(workspaceService: WorkspaceService) : this(EcosFormDef.EMPTY, workspaceService)
 
     val originalId = other.id
+    val originalWorkspace = other.workspace
+
+    /**
+     * The raw _workspace value from the mutation request.
+     * Stored separately because _self content-data expansion may overwrite
+     * the `workspace` field after this method is called.
+     */
+    var ctxWorkspace: String? = null
+        private set
 
     @JsonProperty(RecordConstants.ATT_WORKSPACE)
     fun withCtxWorkspace(workspace: String) {
+        ctxWorkspace = workspace
         if (originalId.isNotBlank() && originalId != id) {
             withWorkspace(workspace)
         } else {

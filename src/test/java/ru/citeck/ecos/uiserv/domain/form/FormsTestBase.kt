@@ -3,6 +3,8 @@ package ru.citeck.ecos.uiserv.domain.form
 import org.junit.jupiter.api.BeforeEach
 import org.mockito.Mockito
 import ru.citeck.ecos.model.lib.ModelServiceFactory
+import ru.citeck.ecos.model.lib.workspace.api.WorkspaceApi
+import ru.citeck.ecos.model.lib.workspace.api.WsMembershipType
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.RecordsServiceFactory
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
@@ -27,8 +29,26 @@ abstract class FormsTestBase {
         val services = RecordsServiceFactory()
         recordsService = services.recordsService
         val modelServices = ModelServiceFactory()
+        modelServices.setWorkspaceApi(object : WorkspaceApi {
+            override fun getNestedWorkspaces(workspaces: Collection<String>): List<Set<String>> {
+                return workspaces.map { emptySet() }
+            }
+            override fun getUserWorkspaces(user: String, membershipType: WsMembershipType): Set<String> {
+                return emptySet()
+            }
+            override fun isUserManagerOf(user: String, workspace: String): Boolean {
+                return true
+            }
+            override fun mapIdentifiers(
+                identifiers: List<String>,
+                mappingType: WorkspaceApi.IdMappingType
+            ): List<String> {
+                // In tests, workspace ID == system ID (identity mapping)
+                return identifiers
+            }
+        })
         ecosFormService = EcosFormServiceImpl(
-            FormsEntityInMemDao(services.predicateService),
+            FormsEntityInMemDao(services.predicateService, modelServices.workspaceService),
             services.recordsService,
             modelServices.workspaceService
         )
