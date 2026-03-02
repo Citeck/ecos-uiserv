@@ -7,6 +7,8 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.commons.data.entity.EntityMeta
+import ru.citeck.ecos.commons.data.entity.EntityWithMeta
 import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.model.lib.utils.ModelUtils
@@ -91,6 +93,28 @@ class DashboardService(
 
     fun getDashboardById(id: String?): Optional<DashboardDto> {
         return repo.findByExtId(id).map { entity: DashboardEntity -> this.mapToDto(entity) }
+    }
+
+    fun getDashboardWithMeta(id: String?): Optional<EntityWithMeta<DashboardDto>> {
+        return repo.findByExtId(id).map { entity -> mapToDtoWithMeta(entity) }
+    }
+
+    fun findAllWithMeta(predicate: Predicate, workspaces: List<String>, max: Int, skip: Int, sort: List<SortBy>): List<EntityWithMeta<DashboardDto>> {
+        val predicateForQuery = Predicates.and(
+            predicate,
+            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentRunAsAuth(), workspaces)
+        )
+        return searchConv.findAll(repo, predicateForQuery, max, skip, sort).map { entity -> mapToDtoWithMeta(entity) }
+    }
+
+    private fun mapToDtoWithMeta(entity: DashboardEntity): EntityWithMeta<DashboardDto> {
+        val meta = EntityMeta.create()
+            .withCreated(entity.createdDate)
+            .withCreator(entity.createdBy)
+            .withModified(entity.lastModifiedDate)
+            .withModifier(entity.lastModifiedBy)
+            .build()
+        return EntityWithMeta(mapToDto(entity), meta)
     }
 
     fun getForAuthority(

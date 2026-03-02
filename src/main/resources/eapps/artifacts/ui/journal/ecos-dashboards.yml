@@ -31,3 +31,27 @@ columns:
 
   - id: authority
     name: { ru: Пользователь или группа, en: User or group }
+
+  - id: _created
+    name:
+      ru: Дата создания
+      en: Created
+    type: DATETIME
+
+  - id: _modified
+    name:
+      ru: Дата изменения
+      en: Modified
+    type: DATETIME
+
+  - id: _creator
+    name:
+      ru: Создатель
+      en: Creator
+    hidden: true
+
+  - id: _modifier
+    name:
+      ru: Изменил
+      en: Modified by
+    hidden: true

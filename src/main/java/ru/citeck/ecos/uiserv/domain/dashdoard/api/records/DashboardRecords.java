@@ -13,6 +13,7 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.json.YamlUtils;
 import ru.citeck.ecos.events2.type.RecordEventsService;
+import ru.citeck.ecos.records2.RecordConstants;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.atts.dto.LocalRecordAtts;
@@ -26,13 +27,16 @@ import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDao;
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
+import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
 
 import jakarta.annotation.PostConstruct;
+import ru.citeck.ecos.webapp.api.authority.EcosAuthoritiesApi;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,6 +55,7 @@ public class DashboardRecords extends AbstractRecordsDao
 
     private final DashboardService dashboardService;
     private final RecordEventsService recordEventsService;
+    private final EcosAuthoritiesApi authoritiesApi;
 
     @PostConstruct
     public void init() {
@@ -110,8 +115,8 @@ public class DashboardRecords extends AbstractRecordsDao
         if (dashboardId.isEmpty()) {
             return new DashboardRecord();
         }
-        return dashboardService.getDashboardById(dashboardId)
-            .map(DashboardRecord::new)
+        return dashboardService.getDashboardWithMeta(dashboardId)
+            .map(wm -> new DashboardRecord(wm, authoritiesApi))
             .orElse(null);
     }
 
@@ -123,14 +128,14 @@ public class DashboardRecords extends AbstractRecordsDao
 
             Predicate predicate = recordsQuery.getQuery(Predicate.class);
 
-            List<DashboardRecord> records = dashboardService.findAll(
+            List<DashboardRecord> records = dashboardService.findAllWithMeta(
                 predicate,
                 recordsQuery.getWorkspaces(),
                 recordsQuery.getPage().getMaxItems(),
                 recordsQuery.getPage().getSkipCount(),
                 recordsQuery.getSortBy()
             ).stream()
-                .map(DashboardRecord::new)
+                .map(wm -> new DashboardRecord(wm, authoritiesApi))
                 .collect(Collectors.toList());
 
             RecsQueryRes<DashboardRecord> result = new RecsQueryRes<>();
@@ -182,11 +187,45 @@ public class DashboardRecords extends AbstractRecordsDao
 
     public static class DashboardRecord extends DashboardDto.Builder {
 
+        @Nullable
+        private final Instant createdDate;
+        @Nullable
+        private final Instant lastModifiedDate;
+        @Nullable
+        private final String createdBy;
+        @Nullable
+        private final String lastModifiedBy;
+        @Nullable
+        private final EcosAuthoritiesApi authoritiesApi;
+
         DashboardRecord() {
+            this.createdDate = null;
+            this.lastModifiedDate = null;
+            this.createdBy = null;
+            this.lastModifiedBy = null;
+            this.authoritiesApi = null;
         }
 
         DashboardRecord(DashboardDto dto) {
             super(dto);
+            this.createdDate = null;
+            this.lastModifiedDate = null;
+            this.createdBy = null;
+            this.lastModifiedBy = null;
+            this.authoritiesApi = null;
+        }
+
+        DashboardRecord(EntityWithMeta<DashboardDto> withMeta) {
+            this(withMeta, null);
+        }
+
+        DashboardRecord(EntityWithMeta<DashboardDto> withMeta, @Nullable EcosAuthoritiesApi authoritiesApi) {
+            super(withMeta.getEntity());
+            this.createdDate = withMeta.getMeta().getCreated();
+            this.lastModifiedDate = withMeta.getMeta().getModified();
+            this.createdBy = withMeta.getMeta().getCreator();
+            this.lastModifiedBy = withMeta.getMeta().getModifier();
+            this.authoritiesApi = authoritiesApi;
         }
 
         public String getModuleId() {
@@ -206,6 +245,36 @@ public class DashboardRecords extends AbstractRecordsDao
 
         public String getEcosType() {
             return "dashboard";
+        }
+
+        @AttName(RecordConstants.ATT_CREATED)
+        @Nullable
+        public Instant getCreated() {
+            return createdDate;
+        }
+
+        @AttName(RecordConstants.ATT_MODIFIED)
+        @Nullable
+        public Instant getModified() {
+            return lastModifiedDate;
+        }
+
+        @AttName(RecordConstants.ATT_CREATOR)
+        @Nullable
+        public EntityRef getCreator() {
+            if (authoritiesApi == null || createdBy == null || createdBy.isEmpty()) {
+                return null;
+            }
+            return authoritiesApi.getPersonRef(createdBy);
+        }
+
+        @AttName(RecordConstants.ATT_MODIFIER)
+        @Nullable
+        public EntityRef getModifier() {
+            if (authoritiesApi == null || lastModifiedBy == null || lastModifiedBy.isEmpty()) {
+                return null;
+            }
+            return authoritiesApi.getPersonRef(lastModifiedBy);
         }
 
         @JsonProperty("_content")
