@@ -108,6 +108,34 @@ public class DashboardRecordControllerTest {
         assertEquals("Dashboard with id '" + nonExistsId + "' is not found!", exception.getMessage());
     }
 
+    @Test
+    public void createdAndModifiedAttributesAreReturned() {
+        final String id = UUID.randomUUID().toString();
+        recordsService.mutate(RECORD_ID_AT, Map.of("id", id));
+
+        val atts = recordsService.getAtts(RECORD_ID_AT + id, Map.of(
+            "created", "_created",
+            "modified", "_modified"
+        ));
+
+        assertThat(atts.get("created").asText()).isNotBlank();
+        assertThat(atts.get("modified").asText()).isNotBlank();
+    }
+
+    @Test
+    public void creatorAndModifierAttributesAreReturned() {
+        final String id = UUID.randomUUID().toString();
+        recordsService.mutate(RECORD_ID_AT, Map.of("id", id));
+
+        val atts = recordsService.getAtts(RECORD_ID_AT + id, Map.of(
+            "creator", "_creator?id",
+            "modifier", "_modifier?id"
+        ));
+
+        assertThat(atts.get("creator").asText()).isNotBlank();
+        assertThat(atts.get("modifier").asText()).isNotBlank();
+    }
+
     private DashboardDto getTestDtoForQueryWithId(String id) throws IOException {
         DashboardDto.Builder dto = DashboardDto.create();
         dto.setTypeRef(EntityRef.create("emodel", "type", "main-dashboard"));
