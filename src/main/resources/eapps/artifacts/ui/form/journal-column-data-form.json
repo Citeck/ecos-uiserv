@@ -343,8 +343,7 @@
                       "ru": "Функция получает: cell (значение ячейки), row (объект записи), column (конфигурация колонки), vars (дополнительные переменные). Должна вернуть отформатированное значение.",
                       "en": "Function receives: cell (cell value), row (record object), column (column config), vars (additional variables). Should return formatted value."
                     },
-                    "editor": "monaco",
-                    "codeAs": "javascript",
+                    "editor": "ace",
                     "as": "javascript",
                     "rows": 15,
                     "refreshOn": ["_originalConfig"],
@@ -524,8 +523,7 @@
                       "ru": "Функция получает: cell (значение ячейки), row (данные строки). Должна вернуть цвет (CSS название или HEX).",
                       "en": "Function receives: cell (cell value), row (row data). Should return color (CSS name or HEX)."
                     },
-                    "editor": "monaco",
-                    "codeAs": "javascript",
+                    "editor": "ace",
                     "as": "javascript",
                     "rows": 10,
                     "refreshOn": [],
