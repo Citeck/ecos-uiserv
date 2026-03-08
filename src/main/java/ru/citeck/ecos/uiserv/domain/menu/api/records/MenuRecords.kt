@@ -6,9 +6,11 @@ import jakarta.annotation.PostConstruct
 import lombok.Data
 import lombok.RequiredArgsConstructor
 import org.apache.commons.lang3.StringUtils
+import org.jetbrains.annotations.Nullable
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.commons.data.entity.EntityMeta
 import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.commons.json.YamlUtils.toNonDefaultString
 import ru.citeck.ecos.events2.type.RecordEventsService
@@ -30,7 +32,10 @@ import ru.citeck.ecos.uiserv.domain.menu.api.records.MenuRecords.MenuMutRecord
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService
+import ru.citeck.ecos.webapp.api.authority.EcosAuthoritiesApi
+import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.nio.charset.StandardCharsets
+import java.time.Instant
 import java.util.*
 import java.util.stream.Collectors
 
@@ -38,7 +43,8 @@ import java.util.stream.Collectors
 @RequiredArgsConstructor
 class MenuRecords(
     private val menuService: MenuService,
-    private val messageResolver: MessageResolver
+    private val messageResolver: MessageResolver,
+    private val authoritiesApi: EcosAuthoritiesApi
 ) : AbstractRecordsDao(),
     RecordAttsDao,
     RecordsQueryDao,
@@ -62,8 +68,9 @@ class MenuRecords(
     override fun getId() = ID
 
     override fun getRecordAtts(recordId: String): MenuRecord {
-        val menuDto = menuService.getMenu(recordId).orElseGet { MenuDto.EMPTY }
-        return MenuRecord(menuDto)
+        val withMeta = menuService.getMenuWithMeta(recordId).orElse(null)
+            ?: return MenuRecord(MenuDto.EMPTY, null)
+        return MenuRecord(withMeta.entity, withMeta.meta)
     }
 
     override fun getRecToMutate(recordId: String): MenuMutRecord {
@@ -77,13 +84,13 @@ class MenuRecords(
         }
         if (recsQuery.language == PredicateService.LANGUAGE_PREDICATE) {
             val predicate = recsQuery.getQuery(Predicate::class.java)
-            val records = menuService.findAll(
+            val records = menuService.findAllWithMeta(
                 predicate,
                 recsQuery.workspaces,
                 recsQuery.page.maxItems,
                 recsQuery.page.skipCount,
                 recsQuery.sortBy
-            ).map { MenuRecord(it) }
+            ).map { MenuRecord(it.entity, it.meta) }
             val result = RecsQueryRes<Any>()
             result.setRecords(records)
             result.setTotalCount(menuService.getCount(predicate, recsQuery.workspaces))
@@ -98,7 +105,7 @@ class MenuRecords(
                     menuQuery.version,
                     menuQuery.workspace ?: ""
                 )
-                return RecsQueryRes.of(MenuRecord(menuDto))
+                return RecsQueryRes.of(MenuRecord(menuDto, null))
             }
         }
 
@@ -106,7 +113,7 @@ class MenuRecords(
         result.setRecords(
             menuService.allMenus
                 .stream()
-                .map { model: MenuDto -> MenuRecord(model) }
+                .map { model: MenuDto -> MenuRecord(model, null) }
                 .collect(Collectors.toList())
         )
         return result
@@ -139,7 +146,8 @@ class MenuRecords(
     }
 
     inner class MenuRecord(
-        @AttName("...") val model: MenuDto
+        @AttName("...") val model: MenuDto,
+        @Nullable private val meta: EntityMeta?
     ) {
 
         @AttName(RecordConstants.ATT_NOT_EXISTS)
@@ -175,6 +183,36 @@ class MenuRecords(
             val authorities = model.authorities
             return authorities.stream().filter { "GROUP_EVERYONE" != it }
                 .collect(Collectors.joining(", "))
+        }
+
+        @AttName(RecordConstants.ATT_CREATED)
+        @Nullable
+        fun getCreated(): Instant? {
+            val created = meta?.created
+            return if (created == null || created == Instant.EPOCH) null else created
+        }
+
+        @AttName(RecordConstants.ATT_MODIFIED)
+        @Nullable
+        fun getModified(): Instant? {
+            val modified = meta?.modified
+            return if (modified == null || modified == Instant.EPOCH) null else modified
+        }
+
+        @AttName(RecordConstants.ATT_CREATOR)
+        @Nullable
+        fun getCreator(): EntityRef? {
+            val creator = meta?.creator
+            if (creator.isNullOrBlank()) return null
+            return authoritiesApi.getPersonRef(creator)
+        }
+
+        @AttName(RecordConstants.ATT_MODIFIER)
+        @Nullable
+        fun getModifier(): EntityRef? {
+            val modifier = meta?.modifier
+            if (modifier.isNullOrBlank()) return null
+            return authoritiesApi.getPersonRef(modifier)
         }
 
         @JsonValue

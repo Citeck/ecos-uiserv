@@ -30,6 +30,7 @@ import ru.citeck.ecos.uiserv.domain.menu.service.MenuService
 import ru.citeck.ecos.uiserv.domain.menu.service.format.MenuReaderService
 import ru.citeck.ecos.uiserv.domain.menu.service.format.json.JsonMenuReader
 import ru.citeck.ecos.webapp.api.EcosWebAppApi
+import ru.citeck.ecos.webapp.api.authority.EcosAuthoritiesApi
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import java.io.File
@@ -86,7 +87,8 @@ open class MenuTestBase {
                 override fun getMessage(key: String): String {
                     return key
                 }
-            }
+            },
+            Mockito.mock(EcosAuthoritiesApi::class.java)
         )
         records.register(menuRecords)
 

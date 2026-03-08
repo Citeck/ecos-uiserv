@@ -13,6 +13,8 @@ import ru.citeck.ecos.config.lib.records.CfgRecordsDao;
 import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.context.lib.auth.AuthGroup;
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
+import ru.citeck.ecos.commons.data.entity.EntityMeta;
+import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records2.predicate.model.Predicates;
 import ru.citeck.ecos.records3.RecordsService;
@@ -150,6 +152,33 @@ public class MenuService {
             return Optional.empty();
         }
         return Optional.ofNullable(menuDao.findByExtId(menuId)).map(this::mapToDto);
+    }
+
+    public Optional<EntityWithMeta<MenuDto>> getMenuWithMeta(String menuId) {
+        if (StringUtils.isBlank(menuId)) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(menuDao.findByExtId(menuId)).map(this::mapToDtoWithMeta);
+    }
+
+    public List<EntityWithMeta<MenuDto>> findAllWithMeta(Predicate predicate, List<String> workspaces, int max, int skip, List<SortBy> sort) {
+        var predicateForQuery = Predicates.and(
+            predicate,
+            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentRunAsAuth(), workspaces)
+        );
+        return menuDao.findAll(predicateForQuery, max, skip, sort).stream()
+            .map(this::mapToDtoWithMeta)
+            .collect(Collectors.toList());
+    }
+
+    private EntityWithMeta<MenuDto> mapToDtoWithMeta(MenuEntity entity) {
+        EntityMeta meta = EntityMeta.create()
+            .withCreated(entity.getCreatedDate())
+            .withCreator(entity.getCreatedBy())
+            .withModified(entity.getLastModifiedDate())
+            .withModifier(entity.getLastModifiedBy())
+            .build();
+        return new EntityWithMeta<>(mapToDto(entity), meta);
     }
 
     private MenuEntity mapToEntity(MenuDto menuDto) {
