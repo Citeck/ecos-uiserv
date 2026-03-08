@@ -43,3 +43,15 @@ columns:
       ru: Дата изменения
       en: Modified Date
     type: DATETIME
+
+  - id: _creator
+    name:
+      ru: Создатель
+      en: Creator
+    hidden: true
+
+  - id: _modifier
+    name:
+      ru: Изменил
+      en: Modified by
+    hidden: true
