@@ -10,6 +10,7 @@ system: true
 
 sourceId: uiserv/dashboard
 journalRef: uiserv/journal@ecos-dashboards
+postCreateActionRef: uiserv/action@none
 
 createVariants:
 
