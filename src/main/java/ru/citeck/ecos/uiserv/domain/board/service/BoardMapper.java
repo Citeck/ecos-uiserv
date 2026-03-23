@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.model.lib.utils.ModelUtils;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
@@ -61,10 +62,13 @@ public class BoardMapper {
         return boardWithMeta;
     }
 
-    public static BoardEntity dtoToEntity(BoardRepository repository, @NotNull BoardDef board) {
-
+    public static BoardEntity dtoToEntity(
+        BoardRepository repository,
+        @NotNull BoardDef board,
+        @NotNull WorkspaceService workspaceService
+    ) {
         String workspace = StringUtils.defaultString(board.getWorkspace());
-        if (ModelUtils.DEFAULT_WORKSPACE_ID.equals(workspace)) {
+        if (workspaceService.isWorkspaceWithGlobalEntities(workspace)) {
             workspace = "";
         }
 
