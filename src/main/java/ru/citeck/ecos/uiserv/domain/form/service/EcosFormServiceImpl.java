@@ -125,7 +125,7 @@ public class EcosFormServiceImpl implements EcosFormService {
             return predicate;
         }
         Set<String> fixedWorkspaces = workspaces.stream()
-            .map(it -> ModelUtils.DEFAULT_WORKSPACE_ID.equals(it) ? "" : it)
+            .map(it -> workspaceService.isWorkspaceWithGlobalEntities(it) ? "" : it)
             .collect(Collectors.toSet());
         return Predicates.and(predicate, Predicates.inVals("workspace", fixedWorkspaces));
     }
@@ -386,7 +386,7 @@ public class EcosFormServiceImpl implements EcosFormService {
     private EcosFormEntity mapToEntity(EcosFormDef model) {
 
         String workspace = model.getWorkspace();
-        if (ModelUtils.DEFAULT_WORKSPACE_ID.equals(workspace)) {
+        if (workspaceService.isWorkspaceWithGlobalEntities(workspace)) {
             workspace = "";
         }
 

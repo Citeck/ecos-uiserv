@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.apps.app.domain.handler.EcosArtifactHandler;
-import ru.citeck.ecos.model.lib.utils.ModelUtils;
 import ru.citeck.ecos.model.lib.workspace.IdInWs;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
 
@@ -18,6 +18,7 @@ import java.util.function.Consumer;
 public class FormArtifactHandler implements EcosArtifactHandler<EcosFormDef> {
 
     private final EcosFormService formService;
+    private final WorkspaceService workspaceService;
 
     @Override
     public void deployArtifact(@NotNull EcosFormDef formModel) {
@@ -28,7 +29,7 @@ public class FormArtifactHandler implements EcosArtifactHandler<EcosFormDef> {
     @Override
     public void listenChanges(@NotNull Consumer<EcosFormDef> consumer) {
         formService.addChangeListener((before, after) -> {
-            if (after.getWorkspace().isBlank() || ModelUtils.DEFAULT_WORKSPACE_ID.equals(after.getWorkspace())) {
+            if (workspaceService.isWorkspaceWithGlobalEntities(after.getWorkspace())) {
                 consumer.accept(after);
             }
         });

@@ -6,6 +6,7 @@ import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.model.lib.utils.ModelUtils
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.uiserv.domain.journal.dto.*
 import ru.citeck.ecos.uiserv.domain.journal.repo.JournalEntity
@@ -15,7 +16,8 @@ import ru.citeck.ecos.webapp.api.entity.EntityRef
 @Component
 @Slf4j
 class JournalMapper(
-    private val repository: JournalRepository
+    private val repository: JournalRepository,
+    private val workspaceService: WorkspaceService
 ) {
 
     fun entityToDto(entity: JournalEntity): JournalWithMeta {
@@ -61,7 +63,7 @@ class JournalMapper(
 
     fun dtoToEntity(journal: JournalDef): JournalEntity {
 
-        val workspace = if (journal.workspace == ModelUtils.DEFAULT_WORKSPACE_ID) {
+        val workspace = if (workspaceService.isWorkspaceWithGlobalEntities(journal.workspace)) {
             ""
         } else {
             journal.workspace

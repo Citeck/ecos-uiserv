@@ -13,11 +13,11 @@ import java.util.Locale;
 public class BoardTestData {
 
     public static final String UISERV_APP_ID = Application.NAME;
-    public static String BOARD_ID = "test-board";
-    public static String PROP_ID = "id";
-    public static String PROP_NAME = "name";
-    public static String PROP_READ_ONLY = "readOnly";
-    public static String PROP_COLUMNS = "columns";
+    public static final String BOARD_ID = "test-board";
+    public static final String PROP_ID = "id";
+    public static final String PROP_NAME = "name";
+    public static final String PROP_READ_ONLY = "readOnly";
+    public static final String PROP_COLUMNS = "columns";
     public static final BoardDef testBoard = new BoardDef(BOARD_ID);
     public static final EntityRef testTypeRef = EntityRef.create("emodel", "type", "testType");
 

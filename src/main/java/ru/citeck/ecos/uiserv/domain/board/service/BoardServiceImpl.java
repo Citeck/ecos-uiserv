@@ -70,7 +70,7 @@ public class BoardServiceImpl implements BoardService {
             }
         }
 
-        var newEntity = BoardMapper.dtoToEntity(repository, boardDef);
+        var newEntity = BoardMapper.dtoToEntity(repository, boardDef, workspaceService);
 
         BoardDef beforeBoardDef = Optional.ofNullable(getBoardById(
             IdInWs.create(StringUtils.defaultString(newEntity.getWorkspace()), StringUtils.defaultString(boardDef.getId()))

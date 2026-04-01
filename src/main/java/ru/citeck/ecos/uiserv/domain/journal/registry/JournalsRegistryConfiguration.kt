@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import ru.citeck.ecos.commons.data.entity.EntityMeta
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta
-import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records3.record.dao.RecordsDao
 import ru.citeck.ecos.records3.record.dao.impl.ext.ExtStorageRecordsDao
@@ -134,7 +133,7 @@ class JournalsRegistryConfiguration(
     }
 
     private fun normalizeWsForRegistry(workspace: String): String {
-        if (workspace == ModelUtils.DEFAULT_WORKSPACE_ID) {
+        if (workspaceService.isWorkspaceWithGlobalEntities(workspace)) {
             return ""
         }
         return workspace

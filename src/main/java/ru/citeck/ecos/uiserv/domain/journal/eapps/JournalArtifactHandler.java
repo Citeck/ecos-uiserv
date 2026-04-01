@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.apps.app.domain.handler.EcosArtifactHandler;
-import ru.citeck.ecos.model.lib.utils.ModelUtils;
 import ru.citeck.ecos.model.lib.workspace.IdInWs;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService;
 
@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 public class JournalArtifactHandler implements EcosArtifactHandler<JournalDef> {
 
     private final JournalService journalService;
+    private final WorkspaceService workspaceService;
 
     @Override
     public void deployArtifact(@NotNull JournalDef module) {
@@ -30,7 +31,7 @@ public class JournalArtifactHandler implements EcosArtifactHandler<JournalDef> {
     @Override
     public void listenChanges(@NotNull Consumer<JournalDef> consumer) {
         journalService.onJournalChanged((before, after) -> {
-            if (after.getWorkspace().isBlank() || ModelUtils.DEFAULT_WORKSPACE_ID.equals(after.getWorkspace())) {
+            if (workspaceService.isWorkspaceWithGlobalEntities(after.getWorkspace())) {
                 consumer.accept(after);
             }
         });

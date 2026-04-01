@@ -49,4 +49,3 @@ public class DashboardArtifactHandler implements EcosArtifactHandler<DashboardDt
         return "ui/dashboard";
     }
 }
-

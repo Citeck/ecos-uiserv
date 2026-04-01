@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.domain.board;
 
 import org.springframework.data.domain.Sort;
 import ru.citeck.ecos.model.lib.workspace.IdInWs;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.RecordsServiceFactory;
@@ -25,9 +26,11 @@ public class BoardServiceMock implements BoardService {
     ConcurrentHashMap<String, BoardEntity> data = new ConcurrentHashMap<>();
     private final List<BiConsumer<BoardDef, BoardDef>> changeListeners = new CopyOnWriteArrayList<>();
     PredicateService predicateService;
+    private final WorkspaceService workspaceService;
 
-    public BoardServiceMock(RecordsServiceFactory recordsServiceFactory) {
+    public BoardServiceMock(RecordsServiceFactory recordsServiceFactory, WorkspaceService workspaceService) {
         predicateService = recordsServiceFactory.getPredicateService();
+        this.workspaceService = workspaceService;
     }
 
     @Override
@@ -44,7 +47,7 @@ public class BoardServiceMock implements BoardService {
             valueBefore = BoardMapper.entityToDto(entityBefore).getBoardDef();
         }
 
-        BoardEntity entity = BoardMapper.dtoToEntity(null, boardDef);
+        BoardEntity entity = BoardMapper.dtoToEntity(null, boardDef, workspaceService);
         data.put(boardDef.getId(), entity);
         BoardWithMeta boardWithMeta = BoardMapper.entityToDto(entity);
 
@@ -96,9 +99,10 @@ public class BoardServiceMock implements BoardService {
         return data.values().stream()
             .filter(boardEntity -> {
                 String journalRefStr = boardEntity.getJournalRef();
+                if (journalRefStr == null) return false;
                 int idx = journalRefStr.indexOf('@');
-                String entityJournalLocalId = idx==-1?journalRefStr:
-                    journalRefStr.substring(idx+1);
+                String entityJournalLocalId = idx == -1 ? journalRefStr :
+                    journalRefStr.substring(idx + 1);
                 return journalLocalId.equals(entityJournalLocalId);
             })
             .map(BoardMapper::entityToDto).collect(Collectors.toList());
@@ -109,7 +113,7 @@ public class BoardServiceMock implements BoardService {
         if (typeRef == null)
             return null;
         return data.values().stream()
-            .filter(boardEntity -> typeRef.toString().equals(boardEntity.getJournalRef()))
+            .filter(boardEntity -> typeRef.toString().equals(boardEntity.getTypeRef()))
             .map(BoardMapper::entityToDto).collect(Collectors.toList());
     }
 

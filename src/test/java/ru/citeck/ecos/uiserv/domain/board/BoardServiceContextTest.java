@@ -14,7 +14,6 @@ import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.repo.BoardRepository;
-import ru.citeck.ecos.uiserv.domain.board.service.BoardMapper;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension;
@@ -38,7 +37,7 @@ public class BoardServiceContextTest {
 
     @BeforeEach
     public void createTestBoard() {
-        repository.save(BoardMapper.dtoToEntity(repository, BoardTestData.getTestBoard()));
+        service.save(BoardTestData.getTestBoard());
     }
 
     @Test
