@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import ru.citeck.ecos.records2.predicate.model.Predicates;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.icon.dto.IconDto;
 import ru.citeck.ecos.uiserv.domain.icon.repo.IconEntity;
@@ -16,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -183,7 +185,10 @@ public class IconServiceTest {
         iconService.save(dto2);
         iconService.save(dto3);
 
-        List<IconDto> found = iconService.findAllByFamilyAndType("", "fa");
+        List<IconDto> found = iconService.findAll(
+            Predicates.and(Predicates.eq("family", ""), Predicates.eq("type", "fa")),
+            -1, 0, Collections.emptyList()
+        );
 
         assertEquals(2, found.size());
     }

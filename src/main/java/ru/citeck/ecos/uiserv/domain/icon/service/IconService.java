@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
+import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.app.common.perms.UiServSystemArtifactPerms;
 import ru.citeck.ecos.uiserv.domain.icon.api.records.IconRecords;
 import ru.citeck.ecos.uiserv.domain.icon.repo.IconEntity;
@@ -13,7 +15,10 @@ import ru.citeck.ecos.uiserv.domain.icon.repo.IconRepository;
 import ru.citeck.ecos.uiserv.domain.icon.dto.IconDto;
 import ru.citeck.ecos.webapp.api.constants.AppName;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverter;
+import ru.citeck.ecos.webapp.lib.spring.hibernate.context.predicate.JpaSearchConverterFactory;
 
+import jakarta.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -25,11 +30,16 @@ import java.util.stream.Collectors;
 public class IconService {
     private final IconRepository iconRepository;
     private final UiServSystemArtifactPerms perms;
+    private final JpaSearchConverterFactory jpaSearchConverterFactory;
 
-    public List<IconDto> findAll() {
-        return iconRepository.findAll().stream()
-            .map(this::mapToDto)
-            .collect(Collectors.toList());
+    private JpaSearchConverter<IconEntity> searchConv;
+
+    @PostConstruct
+    public void init() {
+        searchConv = jpaSearchConverterFactory.createConverter(IconEntity.class)
+            // override default "type" → "" exclusion, since IconEntity.type is a real column
+            .withAttMapping("type", "type")
+            .build();
     }
 
     public Optional<IconDto> findById(String id) {
@@ -59,18 +69,15 @@ public class IconService {
         return mapToDto(saved);
     }
 
-    public List<IconDto> findAllByFamilyAndType(String family, String type) {
-        return iconRepository.findAllByFamilyAndType(family, type)
+    public List<IconDto> findAll(Predicate predicate, int max, int skip, List<SortBy> sort) {
+        return searchConv.findAll(iconRepository, predicate, max, skip, sort)
             .stream()
             .map(this::mapToDto)
             .collect(Collectors.toList());
     }
 
-    public List<IconDto> findAllByFamily(String family) {
-        return iconRepository.findAllByFamily(family)
-            .stream()
-            .map(this::mapToDto)
-            .collect(Collectors.toList());
+    public long getCount(Predicate predicate) {
+        return searchConv.getCount(iconRepository, predicate);
     }
 
     public String getCacheKey() {

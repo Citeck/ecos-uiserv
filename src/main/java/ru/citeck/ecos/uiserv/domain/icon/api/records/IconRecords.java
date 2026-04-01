@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.records2.predicate.PredicateService;
+import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records2.predicate.model.Predicates;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao;
 import ru.citeck.ecos.records3.record.dao.atts.RecordAttsDao;
@@ -23,6 +26,7 @@ import ru.citeck.ecos.webapp.lib.perms.RecordPerms;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -52,23 +56,31 @@ public class IconRecords extends AbstractRecordsDao
     @Nullable
     @Override
     public Object queryRecords(@NotNull RecordsQuery recordsQuery) throws Exception {
-        RecsQueryRes<IconDto> result = new RecsQueryRes<>();
 
-        TypeQuery typeQuery = recordsQuery.getQuery(TypeQuery.class);
-        if (typeQuery.family == null && typeQuery.type == null) {
-            result.setRecords(iconService.findAll());
-            return result;
-        }
+        Predicate predicate;
 
-        if (typeQuery.family != null) {
-            if (typeQuery.type != null) {
-                result.setRecords(iconService.findAllByFamilyAndType(typeQuery.family, typeQuery.type));
-            } else {
-                result.setRecords(iconService.findAllByFamily(typeQuery.family));
-            }
+        if (PredicateService.LANGUAGE_PREDICATE.equals(recordsQuery.getLanguage())) {
+            predicate = recordsQuery.getQuery(Predicate.class);
         } else {
-            result.setRecords(iconService.findAllByFamilyAndType("", typeQuery.type));
+            TypeQuery typeQuery = recordsQuery.getQuery(TypeQuery.class);
+            List<Predicate> conditions = new ArrayList<>();
+            if (typeQuery.family != null) {
+                conditions.add(Predicates.eq("family", typeQuery.family));
+            }
+            if (typeQuery.type != null) {
+                conditions.add(Predicates.eq("type", typeQuery.type));
+            }
+            predicate = conditions.isEmpty() ? Predicates.alwaysTrue() : Predicates.and(conditions);
         }
+
+        int skip = recordsQuery.getPage().getSkipCount();
+        int max = recordsQuery.getPage().getMaxItems();
+
+        List<IconDto> icons = iconService.findAll(predicate, max, skip, recordsQuery.getSortBy());
+
+        RecsQueryRes<IconRecord> result = new RecsQueryRes<>();
+        result.setTotalCount(iconService.getCount(predicate));
+        result.setRecords(icons.stream().map(IconRecord::new).toList());
 
         return result;
     }
