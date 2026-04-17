@@ -48,7 +48,7 @@ public class BoardContextlessTest {
             }
         };
         boardService = new BoardServiceMock(recordsServiceFactory, workspaceService);
-        boardArtifactHandler = new BoardArtifactHandler(boardService);
+        boardArtifactHandler = new BoardArtifactHandler(boardService, workspaceService);
         BoardRecordsDao recordsDao = new BoardRecordsDao(boardService, workspaceService);
         recordsServiceFactory.getRecordsService().register(recordsDao);
         ResolvedBoardRecordsDao resolvedBoardRecordsDao = new ResolvedBoardRecordsDao(recordsDao, null, workspaceService);
