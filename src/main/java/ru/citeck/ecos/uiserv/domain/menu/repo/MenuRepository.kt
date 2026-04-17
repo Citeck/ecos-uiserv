@@ -13,6 +13,8 @@ interface MenuRepository :
 
     fun findByExtId(extId: String): MenuEntity?
 
+    fun findByExtIdAndWorkspace(extId: String, workspace: String): MenuEntity?
+
     fun findByWorkspace(workspace: String): List<MenuEntity>
 
     @Query(
@@ -34,6 +36,8 @@ interface MenuRepository :
     fun findAllByAuthoritiesContains(authority: String, workspace: String): List<MenuEntity>
 
     fun deleteByExtId(extId: String)
+
+    fun deleteByExtIdAndWorkspace(extId: String, workspace: String)
 
     @Query("SELECT max(m.lastModifiedDate) FROM MenuEntity m")
     fun getLastModifiedTime(): Instant?

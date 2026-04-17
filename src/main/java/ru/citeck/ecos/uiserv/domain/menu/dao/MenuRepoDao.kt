@@ -31,6 +31,10 @@ class MenuRepoDao(
         return repo.findByExtId(extId)
     }
 
+    override fun findByExtIdAndWorkspace(extId: String, workspace: String): MenuEntity? {
+        return repo.findByExtIdAndWorkspace(extId, workspace)
+    }
+
     override fun findAllByAuthoritiesContains(authority: String, workspace: String): List<MenuEntity> {
         return if (workspace.isEmpty()) {
             repo.findAllByAuthoritiesContains(authority)
@@ -41,6 +45,10 @@ class MenuRepoDao(
 
     override fun deleteByExtId(extId: String) {
         repo.deleteByExtId(extId)
+    }
+
+    override fun deleteByExtIdAndWorkspace(extId: String, workspace: String) {
+        repo.deleteByExtIdAndWorkspace(extId, workspace)
     }
 
     override fun getLastModifiedTime(): Instant {

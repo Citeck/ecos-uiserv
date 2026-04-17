@@ -219,6 +219,16 @@ class DashboardService(
         repo.findByExtId(id).ifPresent { entity: DashboardEntity -> repo.delete(entity) }
     }
 
+    fun removeDashboard(id: String, workspace: String) {
+        if (DEFAULT_DASHBOARDS.contains(id) && AuthContext.isNotRunAsSystem()) {
+            error("You can't delete default dashboard '$id'")
+        }
+        // Rows for the default workspace are persisted with workspace="" (see saveDashboard),
+        // so normalize DEFAULT_WORKSPACE_ID to "" to avoid silent miss on lookup.
+        val fixedWs = if (workspace == DEFAULT_WORKSPACE_ID) "" else workspace
+        repo.findByExtIdAndWorkspace(id, fixedWs).ifPresent { entity -> repo.delete(entity) }
+    }
+
     private fun getEntityForUser(
         recordRef: EntityRef,
         type: EntityRef,

@@ -48,7 +48,7 @@ public class BoardContextlessTest {
             }
         };
         boardService = new BoardServiceMock(recordsServiceFactory, workspaceService);
-        boardArtifactHandler = new BoardArtifactHandler(boardService, workspaceService);
+        boardArtifactHandler = new BoardArtifactHandler(boardService);
         BoardRecordsDao recordsDao = new BoardRecordsDao(boardService, workspaceService);
         recordsServiceFactory.getRecordsService().register(recordsDao);
         ResolvedBoardRecordsDao resolvedBoardRecordsDao = new ResolvedBoardRecordsDao(recordsDao, null, workspaceService);
@@ -66,7 +66,7 @@ public class BoardContextlessTest {
     }
 
     private void testBoard(BoardDef boardDef){
-        boardArtifactHandler.deployArtifact(boardDef);
+        boardArtifactHandler.deployArtifact(boardDef, "");
 
         BoardWithMeta result = boardService.getBoardById(IdInWs.create(boardDef.getId()));
         assertEquals(boardDef, result.getBoardDef());

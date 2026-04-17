@@ -26,6 +26,10 @@ class MenuInMemDao : MenuDao {
         return data[extId]
     }
 
+    override fun findByExtIdAndWorkspace(extId: String, workspace: String): MenuEntity? {
+        return data[extId]?.takeIf { (it.workspace ?: "") == workspace }
+    }
+
     override fun findAllByAuthoritiesContains(authority: String, workspace: String): List<MenuEntity> {
         return if (workspace.isEmpty()) {
             data.values.filter { menu ->
@@ -42,6 +46,10 @@ class MenuInMemDao : MenuDao {
 
     override fun deleteByExtId(extId: String) {
         data.remove(extId)
+    }
+
+    override fun deleteByExtIdAndWorkspace(extId: String, workspace: String) {
+        data[extId]?.takeIf { (it.workspace ?: "") == workspace }?.let { data.remove(extId) }
     }
 
     override fun getLastModifiedTime(): Instant {

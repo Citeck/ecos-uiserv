@@ -11,9 +11,13 @@ interface MenuDao {
 
     fun findByExtId(extId: String): MenuEntity?
 
+    fun findByExtIdAndWorkspace(extId: String, workspace: String): MenuEntity?
+
     fun findAllByAuthoritiesContains(authority: String, workspace: String): List<MenuEntity>
 
     fun deleteByExtId(extId: String)
+
+    fun deleteByExtIdAndWorkspace(extId: String, workspace: String)
 
     fun getLastModifiedTime(): Instant
 

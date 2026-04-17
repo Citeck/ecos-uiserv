@@ -99,11 +99,20 @@ public class MenuService {
     }
 
     public MenuDto upload(MenuDeployArtifact module) {
+        return upload(module, "");
+    }
+
+    public MenuDto upload(MenuDeployArtifact module, String workspace) {
 
         MenuDto menuDto = readerService.readMenu(module.getData(), module.getFilename());
+        // Handler-provided workspace is authoritative — override whatever the JSON payload
+        // embedded to avoid a ws="" deploy silently persisting under a JSON-embedded workspace.
+        menuDto = menuDto.copy().withWorkspace(workspace).build();
 
         MenuDto menuBefore = null;
-        MenuEntity entityBefore = menuDao.findByExtId(menuDto.getId());
+        MenuEntity entityBefore = StringUtils.isBlank(menuDto.getWorkspace())
+            ? menuDao.findByExtId(menuDto.getId())
+            : menuDao.findByExtIdAndWorkspace(menuDto.getId(), menuDto.getWorkspace());
         if (entityBefore != null) {
             menuBefore = mapToDto(entityBefore);
         }
@@ -394,6 +403,13 @@ public class MenuService {
             return;
         }
         menuDao.deleteByExtId(menuId);
+    }
+
+    public void deleteByExtId(String menuId, String workspace) {
+        if (StringUtils.isBlank(menuId) || isDefaultMenu(menuId)) {
+            return;
+        }
+        menuDao.deleteByExtIdAndWorkspace(menuId, workspace);
     }
 
     public void addOnChangeListener(BiConsumer<MenuDto, MenuDto> listener) {

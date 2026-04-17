@@ -123,7 +123,7 @@ open class MenuTestBase {
             artifact.filename = file.name
             artifact.data = file.readBytes()
             artifact.id = Json.mapper.readDataNotNull(artifact.data)["id"].asText()
-            menuArtifactHandler.deployArtifact(artifact)
+            menuArtifactHandler.deployArtifact(artifact, "")
         }
     }
 
