@@ -28,6 +28,7 @@ class Artifact {
     String id
     String filename
     byte[] data
+    String workspace = ""
 
     Artifact() {}
 
@@ -35,6 +36,7 @@ class Artifact {
         this.id = other.id
         this.filename = other.filename
         this.data = other.data
+        this.workspace = other.workspace
     }
 }
 
@@ -91,8 +93,8 @@ return new MenuControllerInterface<Artifact>() {
         try {
             Artifact module = new Artifact()
             module.setFilename(file.getPath().getFileName().toString())
-            module.setId(getMenuId(data, module.getFilename()))
             module.setData(data)
+            fillIdAndWorkspace(module)
             return module
 
         } catch (ParserConfigurationException | IOException | SAXException e) {
@@ -101,19 +103,21 @@ return new MenuControllerInterface<Artifact>() {
         }
     }
 
-    private String getMenuId(byte[] data, String fileName) throws ParserConfigurationException,
-                                                                  IOException, SAXException {
+    private void fillIdAndWorkspace(Artifact module) throws ParserConfigurationException,
+                                                            IOException, SAXException {
 
-        if (fileName.endsWith(".json")) {
+        if (module.filename.endsWith(".json")) {
 
-            return Json.getMapper().read(data, ObjectData.class).get("id").asText()
+            ObjectData json = Json.getMapper().read(module.data, ObjectData.class)
+            module.setId(json.get("id").asText())
+            module.setWorkspace(json.get("workspace").asText(""))
 
         } else {
             DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance()
             DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder()
-            Document document = docBuilder.parse(new ByteArrayInputStream(data))
+            Document document = docBuilder.parse(new ByteArrayInputStream(module.data))
 
-            return document.getElementsByTagName("id").item(0).getTextContent()
+            module.setId(document.getElementsByTagName("id").item(0).getTextContent())
         }
     }
 
@@ -135,6 +139,7 @@ return new MenuControllerInterface<Artifact>() {
     ArtifactMeta getMeta(@NotNull Artifact artifact, @NotNull Unit unit) {
         return ArtifactMeta.create()
             .withId(artifact.id)
+            .withWorkspace(artifact.workspace)
             .build();
     }
 
