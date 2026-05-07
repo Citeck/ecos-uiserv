@@ -27,6 +27,3 @@ columns:
 
   - id: type
     name: { ru: Тип, en: Type }
-
-  - id: key
-    name: { ru: Ключ, en: Key }
