@@ -11,8 +11,6 @@ interface MenuRepository :
     JpaRepository<MenuEntity, Long>,
     JpaSpecificationExecutor<MenuEntity> {
 
-    fun findByExtId(extId: String): MenuEntity?
-
     fun findByExtIdAndWorkspace(extId: String, workspace: String): MenuEntity?
 
     fun findByWorkspace(workspace: String): List<MenuEntity>
@@ -34,8 +32,6 @@ interface MenuRepository :
             "ORDER BY menu.priority DESC"
     )
     fun findAllByAuthoritiesContains(authority: String, workspace: String): List<MenuEntity>
-
-    fun deleteByExtId(extId: String)
 
     fun deleteByExtIdAndWorkspace(extId: String, workspace: String)
 

@@ -88,7 +88,8 @@ open class MenuTestBase {
                     return key
                 }
             },
-            Mockito.mock(EcosAuthoritiesApi::class.java)
+            Mockito.mock(EcosAuthoritiesApi::class.java),
+            modelServices.workspaceService
         )
         records.register(menuRecords)
 

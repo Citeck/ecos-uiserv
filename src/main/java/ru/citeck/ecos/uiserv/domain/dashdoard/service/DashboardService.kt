@@ -60,6 +60,14 @@ class DashboardService(
 
     private val changeListeners: MutableList<BiConsumer<DashboardDto?, DashboardDto>> = CopyOnWriteArrayList()
 
+    private fun normalizeWs(workspace: String?): String {
+        return if (workspace.isNullOrBlank() || workspace == DEFAULT_WORKSPACE_ID) {
+            ""
+        } else {
+            workspace
+        }
+    }
+
     @PostConstruct
     fun init() {
         searchConv = jpaSearchConverterFactory.createConverter(DashboardEntity::class.java).build()
@@ -379,7 +387,7 @@ class DashboardService(
         }
 
         if (EntityRef.isEmpty(dto.typeRef) && EntityRef.isEmpty(dto.appliedToRef)) {
-            optEntity = repo.findByExtId(dto.id)
+            optEntity = repo.findByExtIdAndWorkspace(dto.id, normalizeWs(dto.workspace))
         } else {
             val scope = StringUtils.defaultString(dto.scope)
             optEntity = if (authority == null) {
@@ -433,7 +441,7 @@ class DashboardService(
 
             var extId = dto.id
             if (StringUtils.isNotBlank(extId)) {
-                if (repo.findByExtId(extId).isPresent) {
+                if (repo.findByExtIdAndWorkspace(extId, normalizeWs(dto.workspace)).isPresent) {
                     extId = ""
                 }
             }
@@ -448,7 +456,7 @@ class DashboardService(
                 newDashboard.appliedToRef = EntityRef.toString(appliedToRef)
             }
             newDashboard.scope = StringUtils.defaultString(dto.scope)
-            newDashboard.workspace = dto.workspace
+            newDashboard.workspace = normalizeWs(dto.workspace)
             entityRes = newDashboard
         }
 
