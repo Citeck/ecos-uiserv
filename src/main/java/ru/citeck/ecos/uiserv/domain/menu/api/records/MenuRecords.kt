@@ -14,6 +14,8 @@ import ru.citeck.ecos.commons.data.entity.EntityMeta
 import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.commons.json.YamlUtils.toNonDefaultString
 import ru.citeck.ecos.events2.type.RecordEventsService
+import ru.citeck.ecos.model.lib.utils.ModelUtils
+import ru.citeck.ecos.model.lib.workspace.IdInWs
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records2.predicate.PredicateService
@@ -128,7 +130,22 @@ class MenuRecords(
             record.id = UUID.randomUUID().toString()
         }
         val saved = menuService.save(record.build())
-        return workspaceService.addWsPrefixToId(saved.id, saved.workspace)
+        return addMenuWsPrefixToId(saved.id, saved.workspace)
+    }
+
+    private fun addMenuWsPrefixToId(localId: String, workspace: String): String {
+        // Unlike WorkspaceService.addWsPrefixToId, menus in admin$* workspaces are NOT global —
+        // they belong to their specific workspace and must carry the wsSysId prefix in their id.
+        // Only truly blank/default workspaces are treated as global.
+        if (workspace.isBlank() || workspace == ModelUtils.DEFAULT_WORKSPACE_ID) {
+            return localId
+        }
+        val wsSysId = workspaceService.getWorkspaceSystemId(workspace)
+        if (wsSysId.isBlank()) {
+            return localId
+        }
+        val prefix = wsSysId + IdInWs.WS_DELIM
+        return if (localId.startsWith(prefix)) localId else prefix + localId
     }
 
     override fun delete(recordId: String): DelStatus {
@@ -158,7 +175,7 @@ class MenuRecords(
             return EntityRef.create(
                 AppName.UISERV,
                 ID,
-                workspaceService.addWsPrefixToId(model.id, model.workspace)
+                addMenuWsPrefixToId(model.id, model.workspace)
             )
         }
 
