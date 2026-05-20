@@ -4,13 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.apps.app.domain.handler.ArtifactDeployMeta;
 import ru.citeck.ecos.apps.app.domain.handler.WsAwareArtifactHandler;
 import ru.citeck.ecos.model.lib.workspace.IdInWs;
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceServiceExtensionsKt;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 @Slf4j
@@ -24,12 +28,13 @@ public class FormArtifactHandler implements WsAwareArtifactHandler<EcosFormDef> 
     @Override
     public void deployArtifact(@NotNull EcosFormDef formModel, @NotNull String workspace) {
         log.info("Form artifact received: " + formModel.getId() + " " + formModel.getFormKey());
+        Set<EntityRef> coDeployedRefs = new HashSet<>(ArtifactDeployMeta.getThreadMeta().getCoDeployedArtifacts());
         EcosFormDef.Builder builder = formModel.copy().withWorkspace(workspace);
         EntityRef typeRef = formModel.getTypeRef();
         if (EntityRef.isNotEmpty(typeRef)) {
-            builder.withTypeRef(typeRef.withLocalId(
-                workspaceService.replaceCurrentWsPlaceholderToWsPrefix(typeRef.getLocalId(), workspace)
-            ));
+            builder.withTypeRef(
+                WorkspaceServiceExtensionsKt.bindRefToWorkspace(workspaceService, typeRef, workspace, coDeployedRefs)
+            );
         }
         formService.save(builder.build());
     }
