@@ -50,7 +50,5 @@ public interface DashboardRepository extends JpaRepository<DashboardEntity, Long
         String workspace
     );
 
-    Optional<DashboardEntity> findByExtId(String extId);
-
     Optional<DashboardEntity> findByExtIdAndWorkspace(String extId, String workspace);
 }

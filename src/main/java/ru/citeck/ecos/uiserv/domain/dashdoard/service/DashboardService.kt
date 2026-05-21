@@ -99,12 +99,20 @@ class DashboardService(
         return findAll(Predicates.alwaysTrue(), emptyList(), 1000, 0, emptyList())
     }
 
-    fun getDashboardById(id: String?): Optional<DashboardDto> {
-        return repo.findByExtId(id).map { entity: DashboardEntity -> this.mapToDto(entity) }
+    fun getDashboardById(id: String?, workspace: String?): Optional<DashboardDto> {
+        if (id.isNullOrEmpty()) {
+            return Optional.empty()
+        }
+        return repo.findByExtIdAndWorkspace(id, normalizeWs(workspace))
+            .map { entity: DashboardEntity -> this.mapToDto(entity) }
     }
 
-    fun getDashboardWithMeta(id: String?): Optional<EntityWithMeta<DashboardDto>> {
-        return repo.findByExtId(id).map { entity -> mapToDtoWithMeta(entity) }
+    fun getDashboardWithMeta(id: String?, workspace: String?): Optional<EntityWithMeta<DashboardDto>> {
+        if (id.isNullOrEmpty()) {
+            return Optional.empty()
+        }
+        return repo.findByExtIdAndWorkspace(id, normalizeWs(workspace))
+            .map { entity -> mapToDtoWithMeta(entity) }
     }
 
     fun findAllWithMeta(predicate: Predicate, workspaces: List<String>, max: Int, skip: Int, sort: List<SortBy>): List<EntityWithMeta<DashboardDto>> {
@@ -220,21 +228,13 @@ class DashboardService(
         return currentUserLogin
     }
 
-    fun removeDashboard(id: String?) {
-        if (DEFAULT_DASHBOARDS.contains(id ?: "") && AuthContext.isNotRunAsSystem()) {
-            error("You can't delete default dashboard '$id'")
-        }
-        repo.findByExtId(id).ifPresent { entity: DashboardEntity -> repo.delete(entity) }
-    }
-
     fun removeDashboard(id: String, workspace: String) {
         if (DEFAULT_DASHBOARDS.contains(id) && AuthContext.isNotRunAsSystem()) {
             error("You can't delete default dashboard '$id'")
         }
         // Rows for the default workspace are persisted with workspace="" (see saveDashboard),
-        // so normalize DEFAULT_WORKSPACE_ID to "" to avoid silent miss on lookup.
-        val fixedWs = if (workspace == DEFAULT_WORKSPACE_ID) "" else workspace
-        repo.findByExtIdAndWorkspace(id, fixedWs).ifPresent { entity -> repo.delete(entity) }
+        // so normalize blank/default to "" to avoid silent miss on lookup.
+        repo.findByExtIdAndWorkspace(id, normalizeWs(workspace)).ifPresent { entity -> repo.delete(entity) }
     }
 
     private fun getEntityForUser(

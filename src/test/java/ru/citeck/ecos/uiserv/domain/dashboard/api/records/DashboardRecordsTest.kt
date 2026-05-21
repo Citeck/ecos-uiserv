@@ -14,6 +14,7 @@ import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.context.lib.auth.AuthRole
 import ru.citeck.ecos.model.lib.utils.ModelUtils
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.record.atts.dto.RecordAtts
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
@@ -35,6 +36,8 @@ class DashboardRecordsTest {
     lateinit var dashboardService: DashboardService
     @Autowired
     lateinit var localAppService: LocalAppService
+    @Autowired
+    lateinit var workspaceService: WorkspaceService
 
     val data = ArrayList<DashboardDto>()
 
@@ -86,7 +89,7 @@ class DashboardRecordsTest {
 
             val dashboardData = ObjectData.create(dashboardDataStr)
 
-            listOf("user\$workspace", "custom-workspace", "").forEach { workspace ->
+            listOf("user-workspace", "custom-workspace", "").forEach { workspace ->
 
                 val dashboardDataWithWorkspace = if (workspace.isEmpty()) {
                     dashboardData
@@ -115,7 +118,10 @@ class DashboardRecordsTest {
 
         for (config in data) {
 
-            val dashboardRef = EntityRef.valueOf("dashboard@" + config.id)
+            // Workspace-scoped dashboards are addressed by a workspace-prefixed id
+            // (see DashboardRecord.getRef), mirroring how the journal lists them.
+            val refId = workspaceService.addWsPrefixToId(config.id, config.workspace)
+            val dashboardRef = EntityRef.valueOf("dashboard@$refId")
             assertEquals(
                 config.config.getData(),
                 recordsService.getAtt(dashboardRef, "config?json")
@@ -189,11 +195,52 @@ class DashboardRecordsTest {
         queryWithWs.authority = authority
         queryWithWs.workspace = "custom-workspace"
 
-        queryDashAndExpectId(queryWithWs, "with-type-and-authority-ws-custom-workspace")
-        dashboardService.removeDashboard("with-type-and-authority-ws-custom-workspace")
-        queryDashAndExpectId(queryWithWs, "with-type-ws-custom-workspace")
-        dashboardService.removeDashboard("with-type-ws-custom-workspace")
+        // Workspace dashboards are returned with a workspace-prefixed id (see DashboardRecord.getRef).
+        queryDashAndExpectId(
+            queryWithWs,
+            workspaceService.addWsPrefixToId("with-type-and-authority-ws-custom-workspace", "custom-workspace")
+        )
+        dashboardService.removeDashboard("with-type-and-authority-ws-custom-workspace", "custom-workspace")
+        queryDashAndExpectId(
+            queryWithWs,
+            workspaceService.addWsPrefixToId("with-type-ws-custom-workspace", "custom-workspace")
+        )
+        dashboardService.removeDashboard("with-type-ws-custom-workspace", "custom-workspace")
+        // Both custom-workspace dashboards removed -> falls back to the global dashboard (no prefix).
         queryDashAndExpectId(queryWithWs, "with-type-and-authority")
+    }
+
+    @Test
+    fun getDashboardByIdWithSameExtIdInMultipleWorkspacesTest() {
+
+        // Regression for COREDEV-111: a dashboard deployed via ecos-app into several
+        // workspaces produces multiple rows sharing the same extId. Lookups by id must be
+        // workspace-aware, otherwise the old findByExtId(extId) threw NonUniqueResultException.
+        val sharedId = "shared-multi-ws-dash"
+        AuthContext.runAs("admin", listOf(AuthRole.ADMIN)) {
+            listOf("", "custom-workspace", "another-workspace").forEach { ws ->
+                dashboardService.saveDashboard(
+                    DashboardDto.create()
+                        .withId(sharedId)
+                        .withWorkspace(ws)
+                        .withConfig(ObjectData.create("""{"ws":"$ws"}"""))
+                        .build()
+                )
+            }
+
+            // Each workspace row must be independently resolvable and must not throw.
+            val globalDash = dashboardService.getDashboardById(sharedId, "")
+            assertThat(globalDash).isPresent
+            assertThat(globalDash.get().workspace).isEqualTo("")
+
+            val customWsDash = dashboardService.getDashboardById(sharedId, "custom-workspace")
+            assertThat(customWsDash).isPresent
+            assertThat(customWsDash.get().workspace).isEqualTo("custom-workspace")
+
+            val anotherWsDash = dashboardService.getDashboardById(sharedId, "another-workspace")
+            assertThat(anotherWsDash).isPresent
+            assertThat(anotherWsDash.get().workspace).isEqualTo("another-workspace")
+        }
     }
 
     @Test
@@ -259,6 +306,9 @@ class DashboardRecordsTest {
         assertNotNull(actual)
 
         val expectedConfig = DashboardDto.Builder(expected!!)
+        // Queried records expose a workspace-prefixed id (see DashboardRecord.getRef);
+        // global dashboards keep a plain id.
+        expectedConfig.withId(workspaceService.addWsPrefixToId(expectedConfig.id, expectedConfig.workspace))
         if (EntityRef.isNotEmpty(expectedConfig.appliedToRef) && expectedConfig.appliedToRef.getAppName().isBlank()) {
             expectedConfig.withAppliedToRef(expectedConfig.appliedToRef.withAppName("alfresco"))
         }
@@ -272,7 +322,7 @@ class DashboardRecordsTest {
     @AfterEach
     fun afterEach() {
         dashboardService.getAllDashboards().forEach {
-            dashboardService.removeDashboard(it.id)
+            dashboardService.removeDashboard(it.id, it.workspace)
         }
         data.clear()
     }
