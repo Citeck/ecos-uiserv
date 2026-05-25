@@ -47,7 +47,7 @@ public class DashboardRecordControllerTest {
 
     @BeforeEach
     public void setup() {
-        dashboardService.getAllDashboards().forEach(d -> dashboardService.removeDashboard(d.getId()));
+        dashboardService.getAllDashboards().forEach(d -> dashboardService.removeDashboard(d.getId(), d.getWorkspace()));
     }
 
     @Test

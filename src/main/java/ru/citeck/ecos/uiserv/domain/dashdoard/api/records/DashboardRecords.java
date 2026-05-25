@@ -13,7 +13,10 @@ import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.json.YamlUtils;
 import ru.citeck.ecos.events2.type.RecordEventsService;
+import ru.citeck.ecos.model.lib.workspace.IdInWs;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.records2.RecordConstants;
+import ru.citeck.ecos.records3.record.atts.schema.ScalarType;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
 import ru.citeck.ecos.records3.record.atts.dto.LocalRecordAtts;
@@ -33,6 +36,7 @@ import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
 
 import jakarta.annotation.PostConstruct;
 import ru.citeck.ecos.webapp.api.authority.EcosAuthoritiesApi;
+import ru.citeck.ecos.webapp.api.constants.AppName;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.nio.charset.StandardCharsets;
@@ -56,11 +60,13 @@ public class DashboardRecords extends AbstractRecordsDao
     private final DashboardService dashboardService;
     private final RecordEventsService recordEventsService;
     private final EcosAuthoritiesApi authoritiesApi;
+    private final WorkspaceService workspaceService;
 
     @PostConstruct
     public void init() {
         dashboardService.addChangeListener((before, after) ->
-            recordEventsService.emitRecChanged(before, after, getId(), DashboardRecord::new));
+            recordEventsService.emitRecChanged(before, after, getId(),
+                dto -> new DashboardRecord(dto, workspaceService)));
     }
 
     @NotNull
@@ -72,7 +78,8 @@ public class DashboardRecords extends AbstractRecordsDao
     @NotNull
     @Override
     public DelStatus delete(@NotNull String dashboardId) {
-        dashboardService.removeDashboard(dashboardId);
+        IdInWs idInWs = workspaceService.convertToIdInWs(dashboardId);
+        dashboardService.removeDashboard(idInWs.getId(), idInWs.getWorkspace());
         return DelStatus.OK;
     }
 
@@ -82,7 +89,8 @@ public class DashboardRecords extends AbstractRecordsDao
 
         Optional<DashboardDto> dashboardDto = Optional.empty();
         if (!record.getId().isBlank()) {
-            dashboardDto = dashboardService.getDashboardById(record.getId());
+            IdInWs idInWs = workspaceService.convertToIdInWs(record.getId());
+            dashboardDto = dashboardService.getDashboardById(idInWs.getId(), idInWs.getWorkspace());
             if (dashboardDto.isEmpty()) {
                 throw new IllegalArgumentException("Dashboard with id '" + record.getId() + "' is not found!");
             }
@@ -90,7 +98,10 @@ public class DashboardRecords extends AbstractRecordsDao
         if (dashboardDto.isEmpty()) {
             String newId = record.getAtt("id", "");
             if (!newId.isBlank()) {
-                dashboardDto = dashboardService.getDashboardById(newId);
+                // newId comes from the mutation payload (not the record ref), so it carries no
+                // workspace prefix to parse — take the workspace from the payload's explicit field.
+                String wsForLookup = record.getAtt("workspace", "");
+                dashboardDto = dashboardService.getDashboardById(newId, wsForLookup);
             }
         }
 
@@ -101,12 +112,13 @@ public class DashboardRecords extends AbstractRecordsDao
 
         if (!idBefore.isBlank()
                 && !idBefore.equals(toMutate.getId())
-                && dashboardService.getDashboardById(toMutate.getId()).isPresent()
+                && dashboardService.getDashboardById(toMutate.getId(), toMutate.getWorkspace()).isPresent()
         ) {
             throw new RuntimeException("Record with id '" + toMutate.getId() + "' already exists");
         }
 
-        return dashboardService.saveDashboard(toMutate.build()).getId();
+        DashboardDto saved = dashboardService.saveDashboard(toMutate.build());
+        return workspaceService.addWsPrefixToId(saved.getId(), saved.getWorkspace());
     }
 
     @Nullable
@@ -115,8 +127,9 @@ public class DashboardRecords extends AbstractRecordsDao
         if (dashboardId.isEmpty()) {
             return new DashboardRecord();
         }
-        return dashboardService.getDashboardWithMeta(dashboardId)
-            .map(wm -> new DashboardRecord(wm, authoritiesApi))
+        IdInWs idInWs = workspaceService.convertToIdInWs(dashboardId);
+        return dashboardService.getDashboardWithMeta(idInWs.getId(), idInWs.getWorkspace())
+            .map(wm -> new DashboardRecord(wm, authoritiesApi, workspaceService))
             .orElse(null);
     }
 
@@ -135,7 +148,7 @@ public class DashboardRecords extends AbstractRecordsDao
                 recordsQuery.getPage().getSkipCount(),
                 recordsQuery.getSortBy()
             ).stream()
-                .map(wm -> new DashboardRecord(wm, authoritiesApi))
+                .map(wm -> new DashboardRecord(wm, authoritiesApi, workspaceService))
                 .collect(Collectors.toList());
 
             RecsQueryRes<DashboardRecord> result = new RecsQueryRes<>();
@@ -154,7 +167,7 @@ public class DashboardRecords extends AbstractRecordsDao
             RecsQueryRes<DashboardRecord> result = new RecsQueryRes<>();
             result.setRecords(dashboardService.getAllDashboards()
                 .stream()
-                .map(DashboardRecord::new)
+                .map(dto -> new DashboardRecord(dto, workspaceService))
                 .collect(Collectors.toList()));
 
             return result;
@@ -180,7 +193,7 @@ public class DashboardRecords extends AbstractRecordsDao
             query.workspace,
             query.expandType,
             query.includeForAll
-        ).map(DashboardRecord::new);
+        ).map(dto -> new DashboardRecord(dto, workspaceService));
 
         return dashboard.map(RecsQueryRes::of).orElseGet(RecsQueryRes::new);
     }
@@ -197,6 +210,8 @@ public class DashboardRecords extends AbstractRecordsDao
         private final String lastModifiedBy;
         @Nullable
         private final EcosAuthoritiesApi authoritiesApi;
+        @Nullable
+        private final WorkspaceService workspaceService;
 
         DashboardRecord() {
             this.createdDate = null;
@@ -204,28 +219,47 @@ public class DashboardRecords extends AbstractRecordsDao
             this.createdBy = null;
             this.lastModifiedBy = null;
             this.authoritiesApi = null;
+            this.workspaceService = null;
         }
 
+        // Mutation-only: workspaceService is null, so getRef() yields an un-prefixed id.
+        // Do not use for read/query results — use the (dto, workspaceService) overload there.
         DashboardRecord(DashboardDto dto) {
+            this(dto, null);
+        }
+
+        DashboardRecord(DashboardDto dto, @Nullable WorkspaceService workspaceService) {
             super(dto);
             this.createdDate = null;
             this.lastModifiedDate = null;
             this.createdBy = null;
             this.lastModifiedBy = null;
             this.authoritiesApi = null;
+            this.workspaceService = workspaceService;
         }
 
-        DashboardRecord(EntityWithMeta<DashboardDto> withMeta) {
-            this(withMeta, null);
-        }
-
-        DashboardRecord(EntityWithMeta<DashboardDto> withMeta, @Nullable EcosAuthoritiesApi authoritiesApi) {
+        DashboardRecord(EntityWithMeta<DashboardDto> withMeta,
+                        @Nullable EcosAuthoritiesApi authoritiesApi,
+                        @Nullable WorkspaceService workspaceService) {
             super(withMeta.getEntity());
             this.createdDate = withMeta.getMeta().getCreated();
             this.lastModifiedDate = withMeta.getMeta().getModified();
             this.createdBy = withMeta.getMeta().getCreator();
             this.lastModifiedBy = withMeta.getMeta().getModifier();
             this.authoritiesApi = authoritiesApi;
+            this.workspaceService = workspaceService;
+        }
+
+        // Record id carries the workspace prefix (<wsSystemId>:localId) for workspace-scoped
+        // dashboards, so that the same extId existing in multiple workspaces stays addressable
+        // and resolves to a single row. Mirrors EcosFormRecord. Global dashboards keep a plain id.
+        @AttName(ScalarType.ID_SCHEMA)
+        public EntityRef getRef() {
+            String localId = getId();
+            if (workspaceService != null) {
+                localId = workspaceService.addWsPrefixToId(localId, getWorkspace());
+            }
+            return EntityRef.create(AppName.UISERV, ID, localId);
         }
 
         public String getModuleId() {

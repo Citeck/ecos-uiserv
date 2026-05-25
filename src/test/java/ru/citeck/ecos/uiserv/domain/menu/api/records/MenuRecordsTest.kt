@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import ru.citeck.ecos.model.lib.workspace.IdInWs
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.uiserv.Application
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService
@@ -30,7 +31,7 @@ class MenuRecordsTest {
     fun setup() {
         menuService.getAllMenus()
             .filter { !menuService.isDefaultMenu(it.id) }
-            .forEach { menuService.deleteByExtId(it.id) }
+            .forEach { menuService.delete(IdInWs.create(it.workspace, it.id)) }
     }
 
     @Test

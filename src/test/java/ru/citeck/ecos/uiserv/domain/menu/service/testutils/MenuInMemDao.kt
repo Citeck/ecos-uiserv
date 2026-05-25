@@ -22,10 +22,6 @@ class MenuInMemDao : MenuDao {
         return data.size.toLong()
     }
 
-    override fun findByExtId(extId: String): MenuEntity? {
-        return data[extId]
-    }
-
     override fun findByExtIdAndWorkspace(extId: String, workspace: String): MenuEntity? {
         return data[extId]?.takeIf { (it.workspace ?: "") == workspace }
     }
@@ -42,10 +38,6 @@ class MenuInMemDao : MenuDao {
                     menu.workspace == workspace
             }
         }
-    }
-
-    override fun deleteByExtId(extId: String) {
-        data.remove(extId)
     }
 
     override fun deleteByExtIdAndWorkspace(extId: String, workspace: String) {

@@ -33,7 +33,8 @@ class MenuWorkspaceTest : MenuTestBase() {
         assertDefaultConfigsForUser("pushkin")
 
         workspacesApi.addMember("ws-0", "admin")
-        assertThat(findMenuId("admin", emptyList(), "ws-0")).isEqualTo("test-ws-0")
+        // ws-scoped menus report a workspace-system-id-prefixed record id (mock maps wsId == wsSysId)
+        assertThat(findMenuId("admin", emptyList(), "ws-0")).isEqualTo("ws-0:test-ws-0")
     }
 
     private fun findMenuId(user: String, authorities: List<String>, workspace: String): String {

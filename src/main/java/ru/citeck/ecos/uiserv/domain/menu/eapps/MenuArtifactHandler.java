@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import ru.citeck.ecos.apps.app.domain.handler.WsAwareArtifactHandler;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.utils.NameUtils;
+import ru.citeck.ecos.model.lib.workspace.IdInWs;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDeployArtifact;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService;
@@ -27,7 +28,7 @@ public class MenuArtifactHandler implements WsAwareArtifactHandler<MenuDeployArt
 
     @Override
     public void deleteArtifact(@NotNull String artifactId, @NotNull String workspace) {
-        menuService.deleteByExtId(artifactId, workspace);
+        menuService.delete(IdInWs.create(workspace, artifactId));
     }
 
     @Override

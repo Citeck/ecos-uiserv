@@ -14,6 +14,9 @@ import ru.citeck.ecos.commons.data.entity.EntityMeta
 import ru.citeck.ecos.commons.json.Json.mapper
 import ru.citeck.ecos.commons.json.YamlUtils.toNonDefaultString
 import ru.citeck.ecos.events2.type.RecordEventsService
+import ru.citeck.ecos.model.lib.utils.ModelUtils
+import ru.citeck.ecos.model.lib.workspace.IdInWs
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.model.Predicate
@@ -33,6 +36,7 @@ import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService
 import ru.citeck.ecos.webapp.api.authority.EcosAuthoritiesApi
+import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.nio.charset.StandardCharsets
 import java.time.Instant
@@ -44,7 +48,8 @@ import java.util.stream.Collectors
 class MenuRecords(
     private val menuService: MenuService,
     private val messageResolver: MessageResolver,
-    private val authoritiesApi: EcosAuthoritiesApi
+    private val authoritiesApi: EcosAuthoritiesApi,
+    private val workspaceService: WorkspaceService
 ) : AbstractRecordsDao(),
     RecordAttsDao,
     RecordsQueryDao,
@@ -68,7 +73,7 @@ class MenuRecords(
     override fun getId() = ID
 
     override fun getRecordAtts(recordId: String): MenuRecord {
-        val withMeta = menuService.getMenuWithMeta(recordId).orElse(null)
+        val withMeta = menuService.getMenuWithMeta(workspaceService.convertToIdInWs(recordId)).orElse(null)
             ?: return MenuRecord(MenuDto.EMPTY, null)
         return MenuRecord(withMeta.entity, withMeta.meta)
     }
@@ -125,11 +130,26 @@ class MenuRecords(
             record.id = UUID.randomUUID().toString()
         }
         val saved = menuService.save(record.build())
-        return saved.id
+        return addMenuWsPrefixToId(saved.id, saved.workspace)
+    }
+
+    private fun addMenuWsPrefixToId(localId: String, workspace: String): String {
+        // Unlike WorkspaceService.addWsPrefixToId, menus in admin$* workspaces are NOT global —
+        // they belong to their specific workspace and must carry the wsSysId prefix in their id.
+        // Only truly blank/default workspaces are treated as global.
+        if (workspace.isBlank() || workspace == ModelUtils.DEFAULT_WORKSPACE_ID) {
+            return localId
+        }
+        val wsSysId = workspaceService.getWorkspaceSystemId(workspace)
+        if (wsSysId.isBlank()) {
+            return localId
+        }
+        val prefix = wsSysId + IdInWs.WS_DELIM
+        return if (localId.startsWith(prefix)) localId else prefix + localId
     }
 
     override fun delete(recordId: String): DelStatus {
-        menuService.deleteByExtId(recordId)
+        menuService.delete(workspaceService.convertToIdInWs(recordId))
         return DelStatus.OK
     }
 
@@ -149,6 +169,15 @@ class MenuRecords(
         @AttName("...") val model: MenuDto,
         @Nullable private val meta: EntityMeta?
     ) {
+
+        @AttName("?id")
+        fun getRef(): EntityRef {
+            return EntityRef.create(
+                AppName.UISERV,
+                ID,
+                addMenuWsPrefixToId(model.id, model.workspace)
+            )
+        }
 
         @AttName(RecordConstants.ATT_NOT_EXISTS)
         fun isNotExists(): Boolean {

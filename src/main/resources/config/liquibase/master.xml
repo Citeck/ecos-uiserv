@@ -72,5 +72,6 @@
     <include file="changelog/20251013000000_update_constr_for_journals_n_forms.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20251015000000_add_ws_to_boards.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20251119000000_add_reload_on_focus_to_journal.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20260512000000_update_constr_for_menu_n_dashboards.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

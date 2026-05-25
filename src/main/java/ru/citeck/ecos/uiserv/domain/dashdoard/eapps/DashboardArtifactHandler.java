@@ -4,13 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.apps.app.domain.handler.ArtifactDeployMeta;
 import ru.citeck.ecos.apps.app.domain.handler.WsAwareArtifactHandler;
 import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceServiceExtensionsKt;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -25,10 +29,11 @@ public class DashboardArtifactHandler implements WsAwareArtifactHandler<Dashboar
     @Override
     public void deployArtifact(@NotNull DashboardDto module, @NotNull String workspace) {
         log.info("Dashboard artifact received: {} {}", module.getId(), module.getTypeRef());
+        Set<EntityRef> coDeployedRefs = new HashSet<>(ArtifactDeployMeta.getThreadMeta().getCoDeployedArtifacts());
         AuthContext.runAsSystemJ(() -> {
             DashboardDto.Builder builder = module.copy().withWorkspace(workspace);
             applyRefs(module, builder, ref ->
-                ref.withLocalId(workspaceService.replaceCurrentWsPlaceholderToWsPrefix(ref.getLocalId(), workspace))
+                WorkspaceServiceExtensionsKt.bindRefToWorkspace(workspaceService, ref, workspace, coDeployedRefs)
             );
             dashboardService.saveDashboard(builder.build());
         });

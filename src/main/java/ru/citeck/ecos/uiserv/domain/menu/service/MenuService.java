@@ -12,6 +12,7 @@ import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.config.lib.records.CfgRecordsDao;
 import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.context.lib.auth.AuthGroup;
+import ru.citeck.ecos.model.lib.workspace.IdInWs;
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.commons.data.entity.EntityMeta;
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
@@ -76,7 +77,7 @@ public class MenuService {
     @PostConstruct
     public void init() {
         CONFIGS_TO_REMOVE.forEach(cfg -> {
-            MenuEntity menu = menuDao.findByExtId(cfg);
+            MenuEntity menu = menuDao.findByExtIdAndWorkspace(cfg, "");
             if (menu != null) {
                 MenuDto dtoToRemove = mapToDto(menu);
                 log.info("Remove menu config: {}", Json.getMapper().toString(dtoToRemove));
@@ -110,9 +111,7 @@ public class MenuService {
         menuDto = menuDto.copy().withWorkspace(workspace).build();
 
         MenuDto menuBefore = null;
-        MenuEntity entityBefore = StringUtils.isBlank(menuDto.getWorkspace())
-            ? menuDao.findByExtId(menuDto.getId())
-            : menuDao.findByExtIdAndWorkspace(menuDto.getId(), menuDto.getWorkspace());
+        MenuEntity entityBefore = menuDao.findByExtIdAndWorkspace(menuDto.getId(), normalizeWorkspace(menuDto.getWorkspace()));
         if (entityBefore != null) {
             menuBefore = mapToDto(entityBefore);
         }
@@ -156,18 +155,20 @@ public class MenuService {
             .collect(Collectors.toList());
     }
 
-    public Optional<MenuDto> getMenu(String menuId) {
-        if (StringUtils.isBlank(menuId)) {
+    public Optional<MenuDto> getMenu(IdInWs menuId) {
+        if (StringUtils.isBlank(menuId.getId())) {
             return Optional.empty();
         }
-        return Optional.ofNullable(menuDao.findByExtId(menuId)).map(this::mapToDto);
+        return Optional.ofNullable(menuDao.findByExtIdAndWorkspace(menuId.getId(), normalizeWorkspace(menuId.getWorkspace())))
+            .map(this::mapToDto);
     }
 
-    public Optional<EntityWithMeta<MenuDto>> getMenuWithMeta(String menuId) {
-        if (StringUtils.isBlank(menuId)) {
+    public Optional<EntityWithMeta<MenuDto>> getMenuWithMeta(IdInWs menuId) {
+        if (StringUtils.isBlank(menuId.getId())) {
             return Optional.empty();
         }
-        return Optional.ofNullable(menuDao.findByExtId(menuId)).map(this::mapToDtoWithMeta);
+        return Optional.ofNullable(menuDao.findByExtIdAndWorkspace(menuId.getId(), normalizeWorkspace(menuId.getWorkspace())))
+            .map(this::mapToDtoWithMeta);
     }
 
     public List<EntityWithMeta<MenuDto>> findAllWithMeta(Predicate predicate, List<String> workspaces, int max, int skip, List<SortBy> sort) {
@@ -192,7 +193,8 @@ public class MenuService {
 
     private MenuEntity mapToEntity(MenuDto menuDto) {
 
-        MenuEntity entity = menuDao.findByExtId(menuDto.getId());
+        String workspace = normalizeWorkspace(menuDto.getWorkspace());
+        MenuEntity entity = menuDao.findByExtIdAndWorkspace(menuDto.getId(), workspace);
         if (entity == null) {
             entity = new MenuEntity();
             entity.setExtId(menuDto.getId());
@@ -203,9 +205,16 @@ public class MenuService {
         entity.setAuthorities(new ArrayList<>(menuDto.getAuthorities()));
         entity.setVersion(menuDto.getVersion());
         entity.setItems(Json.getMapper().toString(menuDto.getSubMenu()));
-        entity.setWorkspace(menuDto.getWorkspace());
+        entity.setWorkspace(workspace);
 
         return entity;
+    }
+
+    private static String normalizeWorkspace(String workspace) {
+        if (StringUtils.isBlank(workspace) || DEFAULT_WORKSPACE_ID.equals(workspace)) {
+            return "";
+        }
+        return workspace;
     }
 
     private MenuDto mapToDto(MenuEntity entity) {
@@ -323,14 +332,14 @@ public class MenuService {
         Optional<MenuDto> result;
         if (workspace.isEmpty()) {
             if (intVersion == 1) {
-                result = getMenu(DEFAULT_MENU_V1_ID);
+                result = getMenu(IdInWs.create(DEFAULT_MENU_V1_ID));
             } else {
-                result = getMenu(DEFAULT_MENU_ID);
+                result = getMenu(IdInWs.create(DEFAULT_MENU_ID));
             }
         } else if (workspace.startsWith("user$")) {
-            result = getMenu(DEFAULT_PERSONAL_WS_MENU_ID);
+            result = getMenu(IdInWs.create(DEFAULT_PERSONAL_WS_MENU_ID));
         } else {
-            result = getMenu(DEFAULT_WS_MENU_ID);
+            result = getMenu(IdInWs.create(DEFAULT_WS_MENU_ID));
         }
         return result.orElseThrow(() -> new RuntimeException("Cannot load default menu. Version: " + version));
     }
@@ -358,7 +367,7 @@ public class MenuService {
         }
 
         MenuDto valueBefore = null;
-        MenuEntity entityBefore = menuDao.findByExtId(fixedDto.getId());
+        MenuEntity entityBefore = menuDao.findByExtIdAndWorkspace(fixedDto.getId(), normalizeWorkspace(fixedDto.getWorkspace()));
         if (entityBefore != null && isNewMenuRequired(entityBefore, fixedDto)) {
             fixedDto = fixedDto.copy().withId(UUID.randomUUID().toString()).build();
             entityBefore = null;
@@ -398,18 +407,11 @@ public class MenuService {
         );
     }
 
-    public void deleteByExtId(String menuId) {
-        if (StringUtils.isBlank(menuId) || isDefaultMenu(menuId)) {
+    public void delete(IdInWs menuId) {
+        if (StringUtils.isBlank(menuId.getId()) || isDefaultMenu(menuId.getId())) {
             return;
         }
-        menuDao.deleteByExtId(menuId);
-    }
-
-    public void deleteByExtId(String menuId, String workspace) {
-        if (StringUtils.isBlank(menuId) || isDefaultMenu(menuId)) {
-            return;
-        }
-        menuDao.deleteByExtIdAndWorkspace(menuId, workspace);
+        menuDao.deleteByExtIdAndWorkspace(menuId.getId(), normalizeWorkspace(menuId.getWorkspace()));
     }
 
     public void addOnChangeListener(BiConsumer<MenuDto, MenuDto> listener) {

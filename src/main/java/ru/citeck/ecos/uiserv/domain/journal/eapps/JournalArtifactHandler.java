@@ -3,14 +3,18 @@ package ru.citeck.ecos.uiserv.domain.journal.eapps;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.apps.app.domain.handler.ArtifactDeployMeta;
 import ru.citeck.ecos.apps.app.domain.handler.WsAwareArtifactHandler;
 import ru.citeck.ecos.model.lib.workspace.IdInWs;
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceServiceExtensionsKt;
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalDef;
 import ru.citeck.ecos.uiserv.domain.journal.service.JournalService;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -24,9 +28,10 @@ public class JournalArtifactHandler implements WsAwareArtifactHandler<JournalDef
 
     @Override
     public void deployArtifact(@NotNull JournalDef module, @NotNull String workspace) {
+        Set<EntityRef> coDeployedRefs = new HashSet<>(ArtifactDeployMeta.getThreadMeta().getCoDeployedArtifacts());
         JournalDef.Builder builder = module.copy().withWorkspace(workspace);
         applyRefs(module, builder, ref ->
-            ref.withLocalId(workspaceService.replaceCurrentWsPlaceholderToWsPrefix(ref.getLocalId(), workspace))
+            WorkspaceServiceExtensionsKt.bindRefToWorkspace(workspaceService, ref, workspace, coDeployedRefs)
         );
         journalService.save(builder.build());
     }

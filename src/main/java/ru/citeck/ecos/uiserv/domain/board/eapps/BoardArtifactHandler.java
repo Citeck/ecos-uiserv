@@ -3,14 +3,18 @@ package ru.citeck.ecos.uiserv.domain.board.eapps;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.apps.app.domain.handler.ArtifactDeployMeta;
 import ru.citeck.ecos.apps.app.domain.handler.WsAwareArtifactHandler;
 import ru.citeck.ecos.model.lib.workspace.IdInWs;
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceServiceExtensionsKt;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -23,10 +27,11 @@ public class BoardArtifactHandler implements WsAwareArtifactHandler<BoardDef> {
 
     @Override
     public void deployArtifact(@NotNull BoardDef boardDef, @NotNull String workspace) {
+        Set<EntityRef> coDeployedRefs = new HashSet<>(ArtifactDeployMeta.getThreadMeta().getCoDeployedArtifacts());
         BoardDef copy = new BoardDef(boardDef);
         copy.setWorkspace(workspace);
         applyRefs(copy, ref ->
-            ref.withLocalId(workspaceService.replaceCurrentWsPlaceholderToWsPrefix(ref.getLocalId(), workspace))
+            WorkspaceServiceExtensionsKt.bindRefToWorkspace(workspaceService, ref, workspace, coDeployedRefs)
         );
         service.save(copy);
     }

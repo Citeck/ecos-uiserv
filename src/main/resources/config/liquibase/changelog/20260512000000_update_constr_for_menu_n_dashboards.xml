@@ -1,0 +1,22 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="citeck" id="20260512000000">
+
+        <!-- ecos_menu: the workspace column was added (20240927000000) but never made part of the
+             unique key, and stayed nullable. Bring it in line with journal/forms/board. -->
+        <sql>UPDATE ecos_menu SET workspace = '' WHERE workspace IS NULL</sql>
+        <dropUniqueConstraint tableName="ecos_menu" constraintName="ecos_menu_ext_id_key" uniqueColumns="ext_id"/>
+        <addUniqueConstraint tableName="ecos_menu" columnNames="workspace,ext_id"/>
+        <addDefaultValue tableName="ecos_menu" columnName="workspace" defaultValue=""/>
+        <addNotNullConstraint tableName="ecos_menu" columnName="workspace"/>
+
+        <!-- dashboards: workspace is already NOT NULL (20241009000000) but the unique key is still
+             ext_id only. -->
+        <dropUniqueConstraint tableName="dashboards" constraintName="dashboards_ext_id_key" uniqueColumns="ext_id"/>
+        <addUniqueConstraint tableName="dashboards" columnNames="workspace,ext_id"/>
+        <addDefaultValue tableName="dashboards" columnName="workspace" defaultValue=""/>
+
+    </changeSet>
+
+</databaseChangeLog>

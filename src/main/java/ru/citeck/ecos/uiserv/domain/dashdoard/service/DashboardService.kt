@@ -60,6 +60,14 @@ class DashboardService(
 
     private val changeListeners: MutableList<BiConsumer<DashboardDto?, DashboardDto>> = CopyOnWriteArrayList()
 
+    private fun normalizeWs(workspace: String?): String {
+        return if (workspace.isNullOrBlank() || workspace == DEFAULT_WORKSPACE_ID) {
+            ""
+        } else {
+            workspace
+        }
+    }
+
     @PostConstruct
     fun init() {
         searchConv = jpaSearchConverterFactory.createConverter(DashboardEntity::class.java).build()
@@ -91,12 +99,20 @@ class DashboardService(
         return findAll(Predicates.alwaysTrue(), emptyList(), 1000, 0, emptyList())
     }
 
-    fun getDashboardById(id: String?): Optional<DashboardDto> {
-        return repo.findByExtId(id).map { entity: DashboardEntity -> this.mapToDto(entity) }
+    fun getDashboardById(id: String?, workspace: String?): Optional<DashboardDto> {
+        if (id.isNullOrEmpty()) {
+            return Optional.empty()
+        }
+        return repo.findByExtIdAndWorkspace(id, normalizeWs(workspace))
+            .map { entity: DashboardEntity -> this.mapToDto(entity) }
     }
 
-    fun getDashboardWithMeta(id: String?): Optional<EntityWithMeta<DashboardDto>> {
-        return repo.findByExtId(id).map { entity -> mapToDtoWithMeta(entity) }
+    fun getDashboardWithMeta(id: String?, workspace: String?): Optional<EntityWithMeta<DashboardDto>> {
+        if (id.isNullOrEmpty()) {
+            return Optional.empty()
+        }
+        return repo.findByExtIdAndWorkspace(id, normalizeWs(workspace))
+            .map { entity -> mapToDtoWithMeta(entity) }
     }
 
     fun findAllWithMeta(predicate: Predicate, workspaces: List<String>, max: Int, skip: Int, sort: List<SortBy>): List<EntityWithMeta<DashboardDto>> {
@@ -212,21 +228,13 @@ class DashboardService(
         return currentUserLogin
     }
 
-    fun removeDashboard(id: String?) {
-        if (DEFAULT_DASHBOARDS.contains(id ?: "") && AuthContext.isNotRunAsSystem()) {
-            error("You can't delete default dashboard '$id'")
-        }
-        repo.findByExtId(id).ifPresent { entity: DashboardEntity -> repo.delete(entity) }
-    }
-
     fun removeDashboard(id: String, workspace: String) {
         if (DEFAULT_DASHBOARDS.contains(id) && AuthContext.isNotRunAsSystem()) {
             error("You can't delete default dashboard '$id'")
         }
         // Rows for the default workspace are persisted with workspace="" (see saveDashboard),
-        // so normalize DEFAULT_WORKSPACE_ID to "" to avoid silent miss on lookup.
-        val fixedWs = if (workspace == DEFAULT_WORKSPACE_ID) "" else workspace
-        repo.findByExtIdAndWorkspace(id, fixedWs).ifPresent { entity -> repo.delete(entity) }
+        // so normalize blank/default to "" to avoid silent miss on lookup.
+        repo.findByExtIdAndWorkspace(id, normalizeWs(workspace)).ifPresent { entity -> repo.delete(entity) }
     }
 
     private fun getEntityForUser(
@@ -379,7 +387,7 @@ class DashboardService(
         }
 
         if (EntityRef.isEmpty(dto.typeRef) && EntityRef.isEmpty(dto.appliedToRef)) {
-            optEntity = repo.findByExtId(dto.id)
+            optEntity = repo.findByExtIdAndWorkspace(dto.id, normalizeWs(dto.workspace))
         } else {
             val scope = StringUtils.defaultString(dto.scope)
             optEntity = if (authority == null) {
@@ -433,7 +441,7 @@ class DashboardService(
 
             var extId = dto.id
             if (StringUtils.isNotBlank(extId)) {
-                if (repo.findByExtId(extId).isPresent) {
+                if (repo.findByExtIdAndWorkspace(extId, normalizeWs(dto.workspace)).isPresent) {
                     extId = ""
                 }
             }
@@ -448,7 +456,7 @@ class DashboardService(
                 newDashboard.appliedToRef = EntityRef.toString(appliedToRef)
             }
             newDashboard.scope = StringUtils.defaultString(dto.scope)
-            newDashboard.workspace = dto.workspace
+            newDashboard.workspace = normalizeWs(dto.workspace)
             entityRes = newDashboard
         }
 
