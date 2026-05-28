@@ -146,7 +146,7 @@ class JournalsRegistryConfiguration(
                 EntityRef.create(
                     AppName.UISERV,
                     JournalRecordsDao.ID,
-                    journal.journalDef.id
+                    workspaceService.addWsPrefixToId(journal.journalDef.id, journal.journalDef.workspace)
                 )
             )
         }
