@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.domain.ecostype.config
 import jakarta.annotation.PostConstruct
 import org.springframework.context.annotation.Configuration
 import ru.citeck.ecos.model.lib.utils.ModelUtils
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
@@ -11,7 +12,8 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 @Configuration
 class EcosTypesComponent(
-    private val typesRegistry: EcosTypesRegistry
+    private val typesRegistry: EcosTypesRegistry,
+    private val workspaceService: WorkspaceService
 ) {
 
     private val parentByType = ConcurrentHashMap<EntityRef, EntityRef>()
@@ -54,29 +56,48 @@ class EcosTypesComponent(
             parentByType[typeRef] = newParentRef
         }
 
-        updateRefs(journalByType, typeByJournal, typeRef, type.journalRef)
-        updateRefs(formByType, typeByForm, typeRef, type.formRef)
-        updateRefs(boardByType, typeByBoard, typeRef, type.boardRef)
+        val typeWs = type.workspace
+        updateRefs(journalByType, typeByJournal, typeRef, typeWs, type.journalRef)
+        updateRefs(formByType, typeByForm, typeRef, typeWs, type.formRef)
+        updateRefs(boardByType, typeByBoard, typeRef, typeWs, type.boardRef)
     }
 
     private fun updateRefs(
         refByTypeMap: MutableMap<EntityRef, EntityRef>,
         typeByRefMap: MutableMap<EntityRef, EntityRef>,
         typeRef: EntityRef,
+        typeWorkspace: String,
         newRef: EntityRef?
     ) {
         val newRefNotNull = newRef ?: EntityRef.EMPTY
         val prevRef = refByTypeMap[typeRef] ?: EntityRef.EMPTY
 
-        if (newRef != prevRef) {
-            if (EntityRef.isNotEmpty(prevRef)) {
-                typeByRefMap.remove(prevRef)
-            }
-            if (EntityRef.isNotEmpty(newRef)) {
-                typeByRefMap[newRefNotNull] = typeRef
-            }
-            refByTypeMap[typeRef] = newRefNotNull
+        if (newRefNotNull == prevRef) {
+            return
         }
+
+        // Forward direction (refByType) records what a type points at, always.
+        if (EntityRef.isNotEmpty(newRefNotNull)) {
+            refByTypeMap[typeRef] = newRefNotNull
+        } else {
+            refByTypeMap.remove(typeRef)
+        }
+
+        // Reverse direction (typeByRef) is gated: we only index "type-of-X"
+        // associations where the ref's encoded workspace matches the type's
+        // workspace. Cross-workspace refs (WS→default bare refs, etc.) stay
+        // out of the reverse index — see review-notes / task COREDEV-111.
+        if (EntityRef.isNotEmpty(prevRef)) {
+            typeByRefMap.remove(prevRef, typeRef)
+        }
+        if (EntityRef.isNotEmpty(newRefNotNull) && refMatchesWorkspace(newRefNotNull, typeWorkspace)) {
+            typeByRefMap[newRefNotNull] = typeRef
+        }
+    }
+
+    private fun refMatchesWorkspace(ref: EntityRef, typeWorkspace: String): Boolean {
+        val refWs = workspaceService.convertToIdInWs(ref.getLocalId()).workspace
+        return refWs == typeWorkspace
     }
 
     fun addOnTypeChangedListener(listener: (TypeDef) -> Unit) {

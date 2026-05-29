@@ -62,7 +62,8 @@ class EcosResolvedFormRecordsDao(
     private fun mapToResolvedRecord(form: EcosFormRecord): ResolvedFormRecord {
         var typeRef = form.def.typeRef
         if (EntityRef.isEmpty(typeRef)) {
-            typeRef = ecosTypeService.getTypeRefByForm(EntityRef.create("uiserv", "form", form.def.id))
+            val localId = workspaceService.addWsPrefixToId(form.def.id, form.def.workspace)
+            typeRef = ecosTypeService.getTypeRefByForm(EntityRef.create("uiserv", "form", localId))
         }
         val typeInfo = ecosTypeService.getTypeInfo(typeRef)
         return ResolvedFormRecord(form, typeInfo, formService, workspaceService)
