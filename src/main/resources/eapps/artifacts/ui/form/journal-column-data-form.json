@@ -8,6 +8,7 @@
   "description": {},
   "customModule": "",
   "typeRef": "",
+  "workspace": "",
   "width": "lg",
   "system": true,
   "i18n": {
@@ -64,7 +65,6 @@
           "en": "Column Settings",
           "ru": "Настройки колонки"
         },
-        "collapsible": false,
         "type": "panel",
         "input": false,
         "components": [
@@ -254,7 +254,6 @@
           "en": "Column Formatter",
           "ru": "Форматтер колонки"
         },
-        "collapsible": false,
         "type": "panel",
         "input": false,
         "components": [
@@ -324,7 +323,6 @@
                   "en": "Script Configuration",
                   "ru": "Конфигурация скрипта"
                 },
-                "collapsible": false,
                 "customConditional": "show = _.get(data, 'formatter.type') === 'script';",
                 "type": "panel",
                 "input": false,
@@ -347,7 +345,9 @@
                     "codeAs": "javascript",
                     "as": "javascript",
                     "rows": 15,
-                    "refreshOn": ["_originalConfig"],
+                    "refreshOn": [
+                      "_originalConfig"
+                    ],
                     "optionalWhenDisabled": false,
                     "clearOnHide": false,
                     "calculateValue": "value = _.get(data, 'formatter._originalConfig.fn') || '';",
@@ -378,7 +378,9 @@
                     "type": "datamap",
                     "input": true,
                     "clearOnHide": false,
-                    "refreshOn": ["_originalConfig"],
+                    "refreshOn": [
+                      "_originalConfig"
+                    ],
                     "calculateValue": "value = _.get(data, 'formatter._originalConfig.vars') || {};",
                     "allowCalculateOverride": true,
                     "valueComponent": {
@@ -388,7 +390,8 @@
                       },
                       "key": "value",
                       "type": "textfield",
-                      "input": true
+                      "input": true,
+                      "defaultValue": "Value"
                     }
                   }
                 ]
@@ -403,7 +406,6 @@
                   "en": "Colored Formatter Configuration",
                   "ru": "Конфигурация цветового форматтера"
                 },
-                "collapsible": false,
                 "customConditional": "show = _.get(data, 'formatter.type') === 'colored';",
                 "type": "panel",
                 "input": false,
@@ -442,7 +444,9 @@
                               "en": "If enabled, shows colored dot indicator instead of cell background"
                             },
                             "clearOnHide": false,
-                            "refreshOn": ["_originalConfig"],
+                            "refreshOn": [
+                              "_originalConfig"
+                            ],
                             "logic": [
                               {
                                 "name": "setInitialValue",
@@ -480,28 +484,448 @@
                               "en": "Color Mapping"
                             },
                             "key": "_coloredColorMap",
+                            "tooltip": {
+                              "ru": "Сопоставление значений с цветами. Ключ - значение ячейки, значение - цвет фона и цвет шрифта (CSS название или HEX код)",
+                              "en": "Map values to colors. Key - cell value, value - background color and font color (CSS name or HEX code)"
+                            },
                             "keyLabel": {
                               "ru": "Значение",
                               "en": "Value"
                             },
-                            "tooltip": {
-                              "ru": "Сопоставление значений с цветами. Ключ - значение ячейки, значение - цвет (CSS название или HEX код)",
-                              "en": "Map values to colors. Key - cell value, value - color (CSS name or HEX code)"
-                            },
+                            "clearOnHide": false,
+                            "refreshOn": [],
+                            "calculateValue": "var valueObj = _.get(data, 'formatter._originalConfig.color') || {};\ntry {\n      var values = Object.values(valueObj);\n      if (values.length > 0){\n        var oldFormat = values[0].backgroundColor === undefined \n          && values[0].color === undefined;\n        if (oldFormat) {\n            for (const [key, style] of Object.entries(valueObj)) {\n              if (style !== undefined && style.color === undefined\n                  && style.backgroundColor === undefined){\n                     valueObj[key] = { backgroundColor: style};\n                }\n            }\n            value = valueObj;\n        } else {\n          value = valueObj; \n        }\n      }\n} catch (e) {\n   console.error(e);\n}",
+                            "allowCalculateOverride": true,
+                            "optionalWhenDisabled": false,
                             "type": "datamap",
                             "input": true,
-                            "clearOnHide": false,
-                            "calculateValue": "value = _.get(data, 'formatter._originalConfig.color') || {};",
-                            "allowCalculateOverride": true,
                             "valueComponent": {
                               "label": {
-                                "ru": "Цвет",
-                                "en": "Color"
+                                "ru": "Фон и цвет шрифта"
                               },
                               "key": "value",
-                              "type": "textfield",
-                              "input": true
-                            }
+                              "refreshOn": [],
+                              "optionalWhenDisabled": false,
+                              "type": "container",
+                              "input": true,
+                              "defaultValue": "Value",
+                              "components": [
+                                {
+                                  "label": {
+                                    "ru": "Columns"
+                                  },
+                                  "key": "colorColumns",
+                                  "columns": [
+                                    {
+                                      "components": [
+                                        {
+                                          "label": {
+                                            "ru": "Фон"
+                                          },
+                                          "key": "backgroundColor",
+                                          "hideLabel": true,
+                                          "tooltip": {
+                                            "ru": "Фон для значения",
+                                            "en": "Background"
+                                          },
+                                          "tableView": true,
+                                          "defaultValue": "",
+                                          "refreshOn": [],
+                                          "optionalWhenDisabled": false,
+                                          "logic": [],
+                                          "type": "textfield",
+                                          "input": true,
+                                          "tags": [],
+                                          "widget": {
+                                            "type": "",
+                                            "format": "yyyy-MM-dd hh:mm a",
+                                            "dateFormat": "yyyy-MM-dd hh:mm a",
+                                            "saveAs": "text"
+                                          },
+                                          "placeholder": "",
+                                          "prefix": "",
+                                          "customClass": "",
+                                          "suffix": "",
+                                          "multiple": false,
+                                          "protected": false,
+                                          "unique": false,
+                                          "persistent": true,
+                                          "hidden": false,
+                                          "clearOnHide": true,
+                                          "dataGridLabel": false,
+                                          "labelPosition": "top",
+                                          "labelWidth": 30,
+                                          "labelMargin": 3,
+                                          "description": "",
+                                          "errorLabel": "",
+                                          "tabindex": "",
+                                          "disabled": false,
+                                          "autofocus": false,
+                                          "dbIndex": false,
+                                          "customDefaultValue": "",
+                                          "calculateValue": "",
+                                          "allowCalculateOverride": false,
+                                          "clearOnRefresh": false,
+                                          "validateOn": "change",
+                                          "validate": {
+                                            "required": false,
+                                            "custom": "",
+                                            "customPrivate": false,
+                                            "customMessage": "",
+                                            "json": "",
+                                            "minLength": "",
+                                            "maxLength": "",
+                                            "minWords": "",
+                                            "maxWords": "",
+                                            "pattern": ""
+                                          },
+                                          "conditional": {
+                                            "show": "",
+                                            "when": "",
+                                            "eq": "",
+                                            "json": ""
+                                          },
+                                          "alwaysEnabled": false,
+                                          "attributes": {},
+                                          "customConditional": "",
+                                          "disableInlineEdit": false,
+                                          "encrypted": false,
+                                          "mask": false,
+                                          "properties": {},
+                                          "shortcut": "",
+                                          "triggerChangeWhenCalculate": false,
+                                          "addAnother": "Добавить ещё",
+                                          "inputType": "text",
+                                          "inputMask": "",
+                                          "allowMultipleMasks": false,
+                                          "showWordCount": false,
+                                          "showCharCount": false,
+                                          "inputFormat": "plain",
+                                          "isTypeahead": false,
+                                          "hintData": {
+                                            "custom": "",
+                                            "values": "",
+                                            "json": ""
+                                          },
+                                          "id": "egp32t8"
+                                        }
+                                      ],
+                                      "type": "column",
+                                      "input": false,
+                                      "key": "column",
+                                      "tableView": true,
+                                      "label": "",
+                                      "logic": [],
+                                      "tags": [],
+                                      "index": 0,
+                                      "xs": 0,
+                                      "sm": 12,
+                                      "md": 6,
+                                      "lg": 0,
+                                      "xl": 0,
+                                      "classes": "",
+                                      "hideOnChildrenHidden": false,
+                                      "placeholder": "",
+                                      "prefix": "",
+                                      "customClass": "",
+                                      "suffix": "",
+                                      "multiple": false,
+                                      "defaultValue": null,
+                                      "protected": false,
+                                      "unique": false,
+                                      "persistent": true,
+                                      "hidden": false,
+                                      "clearOnHide": false,
+                                      "dataGridLabel": false,
+                                      "labelPosition": "top",
+                                      "labelWidth": 30,
+                                      "labelMargin": 3,
+                                      "description": "",
+                                      "errorLabel": "",
+                                      "tooltip": "",
+                                      "hideLabel": false,
+                                      "tabindex": "",
+                                      "disabled": false,
+                                      "autofocus": false,
+                                      "dbIndex": false,
+                                      "customDefaultValue": "",
+                                      "calculateValue": "",
+                                      "allowCalculateOverride": false,
+                                      "widget": null,
+                                      "refreshOn": "",
+                                      "clearOnRefresh": false,
+                                      "validateOn": "change",
+                                      "validate": {
+                                        "required": false,
+                                        "custom": "",
+                                        "customPrivate": false,
+                                        "customMessage": "",
+                                        "json": ""
+                                      },
+                                      "conditional": {
+                                        "show": "",
+                                        "when": "",
+                                        "eq": "",
+                                        "json": ""
+                                      },
+                                      "alwaysEnabled": false,
+                                      "attributes": {},
+                                      "customConditional": "",
+                                      "disableInlineEdit": false,
+                                      "encrypted": false,
+                                      "mask": false,
+                                      "properties": {},
+                                      "shortcut": "",
+                                      "triggerChangeWhenCalculate": false,
+                                      "addAnother": "Добавить ещё",
+                                      "width": 6,
+                                      "offset": 0,
+                                      "push": 0,
+                                      "pull": 0,
+                                      "id": "edmpdg"
+                                    },
+                                    {
+                                      "index": 1,
+                                      "type": "column",
+                                      "input": false,
+                                      "key": "column",
+                                      "tableView": true,
+                                      "label": "",
+                                      "logic": [],
+                                      "tags": [],
+                                      "components": [
+                                        {
+                                          "label": {
+                                            "ru": "Цвет шрифта"
+                                          },
+                                          "key": "color",
+                                          "hideLabel": true,
+                                          "tooltip": {
+                                            "ru": "Цвет шрифта",
+                                            "en": "Font colour"
+                                          },
+                                          "tableView": true,
+                                          "defaultValue": "",
+                                          "refreshOn": [],
+                                          "optionalWhenDisabled": false,
+                                          "logic": [],
+                                          "type": "textfield",
+                                          "input": true,
+                                          "tags": [],
+                                          "widget": {
+                                            "type": "",
+                                            "format": "yyyy-MM-dd hh:mm a",
+                                            "dateFormat": "yyyy-MM-dd hh:mm a",
+                                            "saveAs": "text"
+                                          },
+                                          "inputMasks": [
+                                            {}
+                                          ],
+                                          "reorder": false,
+                                          "dataSrc": "",
+                                          "placeholder": "",
+                                          "prefix": "",
+                                          "customClass": "",
+                                          "suffix": "",
+                                          "multiple": false,
+                                          "protected": false,
+                                          "unique": false,
+                                          "persistent": true,
+                                          "hidden": false,
+                                          "clearOnHide": true,
+                                          "dataGridLabel": false,
+                                          "labelPosition": "top",
+                                          "labelWidth": 30,
+                                          "labelMargin": 3,
+                                          "description": "",
+                                          "errorLabel": "",
+                                          "tabindex": "",
+                                          "disabled": false,
+                                          "autofocus": false,
+                                          "dbIndex": false,
+                                          "customDefaultValue": "",
+                                          "calculateValue": "",
+                                          "allowCalculateOverride": false,
+                                          "clearOnRefresh": false,
+                                          "validateOn": "change",
+                                          "validate": {
+                                            "required": false,
+                                            "custom": "",
+                                            "customPrivate": false,
+                                            "customMessage": "",
+                                            "json": "",
+                                            "minLength": "",
+                                            "maxLength": "",
+                                            "minWords": "",
+                                            "maxWords": "",
+                                            "pattern": ""
+                                          },
+                                          "conditional": {
+                                            "show": "",
+                                            "when": "",
+                                            "eq": "",
+                                            "json": ""
+                                          },
+                                          "alwaysEnabled": false,
+                                          "attributes": {},
+                                          "customConditional": "",
+                                          "disableInlineEdit": false,
+                                          "encrypted": false,
+                                          "mask": false,
+                                          "properties": {},
+                                          "shortcut": "",
+                                          "triggerChangeWhenCalculate": false,
+                                          "addAnother": "Добавить ещё",
+                                          "inputType": "text",
+                                          "inputMask": "",
+                                          "allowMultipleMasks": false,
+                                          "showWordCount": false,
+                                          "showCharCount": false,
+                                          "inputFormat": "plain",
+                                          "isTypeahead": false,
+                                          "hintData": {
+                                            "custom": "",
+                                            "values": "",
+                                            "json": ""
+                                          },
+                                          "id": "emg0p6"
+                                        }
+                                      ],
+                                      "hideOnChildrenHidden": false,
+                                      "placeholder": "",
+                                      "prefix": "",
+                                      "customClass": "",
+                                      "suffix": "",
+                                      "multiple": false,
+                                      "defaultValue": null,
+                                      "protected": false,
+                                      "unique": false,
+                                      "persistent": true,
+                                      "hidden": false,
+                                      "clearOnHide": false,
+                                      "dataGridLabel": false,
+                                      "labelPosition": "top",
+                                      "labelWidth": 30,
+                                      "labelMargin": 3,
+                                      "description": "",
+                                      "errorLabel": "",
+                                      "tooltip": "",
+                                      "hideLabel": false,
+                                      "tabindex": "",
+                                      "disabled": false,
+                                      "autofocus": false,
+                                      "dbIndex": false,
+                                      "customDefaultValue": "",
+                                      "calculateValue": "",
+                                      "allowCalculateOverride": false,
+                                      "widget": null,
+                                      "refreshOn": "",
+                                      "clearOnRefresh": false,
+                                      "validateOn": "change",
+                                      "validate": {
+                                        "required": false,
+                                        "custom": "",
+                                        "customPrivate": false,
+                                        "customMessage": "",
+                                        "json": ""
+                                      },
+                                      "conditional": {
+                                        "show": "",
+                                        "when": "",
+                                        "eq": "",
+                                        "json": ""
+                                      },
+                                      "alwaysEnabled": false,
+                                      "attributes": {},
+                                      "customConditional": "",
+                                      "disableInlineEdit": false,
+                                      "encrypted": false,
+                                      "mask": false,
+                                      "properties": {},
+                                      "shortcut": "",
+                                      "triggerChangeWhenCalculate": false,
+                                      "addAnother": "Добавить ещё",
+                                      "classes": "",
+                                      "xs": 0,
+                                      "sm": 12,
+                                      "md": 6,
+                                      "lg": 0,
+                                      "xl": 0,
+                                      "width": 6,
+                                      "offset": 0,
+                                      "push": 0,
+                                      "pull": 0,
+                                      "id": "eit3dlw"
+                                    }
+                                  ],
+                                  "oneColumnInViewMode": false,
+                                  "tableView": false,
+                                  "logic": [],
+                                  "type": "columns",
+                                  "input": false,
+                                  "tags": [],
+                                  "placeholder": "",
+                                  "prefix": "",
+                                  "customClass": "",
+                                  "suffix": "",
+                                  "multiple": false,
+                                  "defaultValue": null,
+                                  "protected": false,
+                                  "unique": false,
+                                  "persistent": false,
+                                  "hidden": false,
+                                  "clearOnHide": false,
+                                  "dataGridLabel": false,
+                                  "labelPosition": "top",
+                                  "labelWidth": 30,
+                                  "labelMargin": 3,
+                                  "description": "",
+                                  "errorLabel": "",
+                                  "tooltip": "",
+                                  "hideLabel": false,
+                                  "tabindex": "",
+                                  "disabled": false,
+                                  "autofocus": false,
+                                  "dbIndex": false,
+                                  "customDefaultValue": "",
+                                  "calculateValue": "",
+                                  "allowCalculateOverride": false,
+                                  "widget": null,
+                                  "refreshOn": "",
+                                  "clearOnRefresh": false,
+                                  "validateOn": "change",
+                                  "validate": {
+                                    "required": false,
+                                    "custom": "",
+                                    "customPrivate": false,
+                                    "customMessage": "",
+                                    "json": ""
+                                  },
+                                  "conditional": {
+                                    "show": "",
+                                    "when": "",
+                                    "eq": "",
+                                    "json": ""
+                                  },
+                                  "alwaysEnabled": false,
+                                  "attributes": {},
+                                  "customConditional": "",
+                                  "disableInlineEdit": false,
+                                  "encrypted": false,
+                                  "mask": false,
+                                  "properties": {},
+                                  "shortcut": "",
+                                  "triggerChangeWhenCalculate": false,
+                                  "addAnother": "Добавить ещё",
+                                  "inlineColumns": false,
+                                  "autoAdjust": false,
+                                  "hideOnChildrenHidden": false,
+                                  "id": "e51spu"
+                                }
+                              ],
+                              "reorder": false
+                            },
+                            "reorder": false
                           }
                         ]
                       }
@@ -542,7 +966,16 @@
               },
               {
                 "key": "config",
-                "refreshOn": ["type", "_configOther", "_scriptFn", "_scriptVars", "_coloredDefaultColor", "_coloredShowPointer", "_coloredColorMap", "_coloredFn"],
+                "refreshOn": [
+                  "type",
+                  "_configOther",
+                  "_scriptFn",
+                  "_scriptVars",
+                  "_coloredDefaultColor",
+                  "_coloredShowPointer",
+                  "_coloredColorMap",
+                  "_coloredFn"
+                ],
                 "calculateValue": "var type = _.get(data, 'formatter.type');\nif (type === 'script') {\n    value = {};\n    var fn = _.get(data, 'formatter._scriptFn');\n    if (!fn) fn = _.get(data, 'formatter._originalConfig.fn');\n    if (fn) value.fn = fn;\n    var vars = _.get(data, 'formatter._scriptVars');\n    if (!vars || Object.keys(vars).length === 0) vars = _.get(data, 'formatter._originalConfig.vars');\n    if (vars && Object.keys(vars).length > 0) value.vars = vars;\n} else if (type === 'colored') {\n    value = {};\n    var defColor = _.get(data, 'formatter._coloredDefaultColor');\n    if (!defColor) defColor = _.get(data, 'formatter._originalConfig.defaultColor');\n    if (defColor) value.defaultColor = defColor;\n    var showPtr = _.get(data, 'formatter._coloredShowPointer');\n    if (showPtr === undefined || showPtr === null) showPtr = _.get(data, 'formatter._originalConfig.showPointer');\n    if (showPtr === true) value.showPointer = true;\n    var colorMap = _.get(data, 'formatter._coloredColorMap');\n    if (!colorMap || Object.keys(colorMap).length === 0) colorMap = _.get(data, 'formatter._originalConfig.color');\n    if (colorMap && Object.keys(colorMap).length > 0) value.color = colorMap;\n    var fn = _.get(data, 'formatter._coloredFn');\n    if (!fn) fn = _.get(data, 'formatter._originalConfig.fn');\n    if (fn) value.fn = fn;\n} else {\n    value = _.get(data, 'formatter._configOther') || _.get(data, 'formatter._originalConfig') || {};\n}",
                 "type": "hidden",
                 "input": true
