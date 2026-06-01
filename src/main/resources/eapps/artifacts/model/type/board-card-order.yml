@@ -1,0 +1,32 @@
+---
+id: board-card-order
+name:
+  ru: Порядок карточек доски
+  en: Board card order
+
+system: true
+storageType: DEFAULT
+sourceId: uiserv/board-card-order
+
+model:
+  attributes:
+    - id: boardRef
+      type: ENTITY_REF
+      mandatory: true
+      index:
+        enabled: true
+    - id: cardRef
+      type: ENTITY_REF
+      mandatory: true
+      index:
+        enabled: true
+    - id: columnId
+      type: TEXT
+      mandatory: true
+    - id: rankKey
+      type: TEXT
+      mandatory: true
+    - id: grouping
+      type: TEXT
+      index:
+        enabled: true

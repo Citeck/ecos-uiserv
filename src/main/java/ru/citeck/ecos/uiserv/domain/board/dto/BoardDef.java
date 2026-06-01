@@ -55,6 +55,14 @@ public class BoardDef {
         return typeRef;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public String getWorkspace() {
+        return workspace;
+    }
+
     public enum CardFieldsLabelLayout {
         /**
          * Indicates that the label should be displayed to the left of the input field.

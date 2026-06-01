@@ -19,12 +19,14 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class BoardServiceMock implements BoardService {
 
     ConcurrentHashMap<String, BoardEntity> data = new ConcurrentHashMap<>();
     private final List<BiConsumer<BoardDef, BoardDef>> changeListeners = new CopyOnWriteArrayList<>();
+    private final List<Consumer<BoardDef>> deleteListeners = new CopyOnWriteArrayList<>();
     PredicateService predicateService;
     private final WorkspaceService workspaceService;
 
@@ -35,7 +37,11 @@ public class BoardServiceMock implements BoardService {
 
     @Override
     public void delete(IdInWs id) {
-        data.remove(id.getId());
+        BoardEntity removed = data.remove(id.getId());
+        if (removed != null) {
+            BoardDef deleted = BoardMapper.entityToDto(removed).getBoardDef();
+            deleteListeners.forEach(listener -> listener.accept(deleted));
+        }
     }
 
     @Override
@@ -120,5 +126,10 @@ public class BoardServiceMock implements BoardService {
     @Override
     public void onBoardChanged(BiConsumer<BoardDef, BoardDef> listener) {
         changeListeners.add(listener);
+    }
+
+    @Override
+    public void onBoardDeleted(Consumer<BoardDef> listener) {
+        deleteListeners.add(listener);
     }
 }
