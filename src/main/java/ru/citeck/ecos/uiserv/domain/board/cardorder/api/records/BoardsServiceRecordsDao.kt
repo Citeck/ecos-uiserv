@@ -2,11 +2,9 @@ package ru.citeck.ecos.uiserv.domain.board.cardorder.api.records
 
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.DataValue
-import ru.citeck.ecos.records2.RecordConstants
-import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao
-import ru.citeck.ecos.uiserv.domain.board.cardorder.dto.MoveCardConfig
+import ru.citeck.ecos.uiserv.domain.board.cardorder.dto.MoveCardAction
 import ru.citeck.ecos.uiserv.domain.board.cardorder.service.BoardCardOrderService
 
 /**
@@ -34,11 +32,15 @@ class BoardsServiceRecordsDao(
         val config = record.config ?: DataValue.createObj()
         when (action) {
             ACTION_MOVE_CARD -> {
-                val cfg = config.getAs(MoveCardConfig::class.java)
+                val cfg = config.getAs(MoveCardAction::class.java)
                     ?: error("Invalid config for action '$action'")
-                // `_workspace` is attached automatically by the UI's record.save(); order is
-                // workspaceScope=PRIVATE so the move is scoped/isolated by it.
-                service.moveCard(cfg, record.workspace ?: "")
+                // Workspace travels inside `config` (config.workspace): the sibling `_workspace`
+                // control-att isn't delivered to a custom mutate DTO. The value is client-supplied but
+                // NOT a trusted-and-unchecked scope: board-card-order is workspaceScope=PRIVATE, so
+                // ecos-data authorizes it — create enforces the caller's workspace membership (a workspace
+                // the user can't access fails the create and rolls back the move), and reads filter by the
+                // user's available workspaces. So it can't grant cross-workspace access.
+                service.moveCard(cfg, cfg.workspace)
             }
             else -> error("Unknown action: '$action'")
         }
@@ -48,8 +50,5 @@ class BoardsServiceRecordsDao(
     class Command {
         var action: String? = null
         var config: DataValue? = null
-
-        @AttName(RecordConstants.ATT_WORKSPACE)
-        var workspace: String? = null
     }
 }

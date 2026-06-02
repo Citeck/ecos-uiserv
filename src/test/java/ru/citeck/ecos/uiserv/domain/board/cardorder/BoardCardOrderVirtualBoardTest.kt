@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.uiserv.Application
-import ru.citeck.ecos.uiserv.domain.board.cardorder.dto.MoveCardConfig
+import ru.citeck.ecos.uiserv.domain.board.cardorder.dto.MoveCardAction
 import ru.citeck.ecos.uiserv.domain.board.cardorder.service.BoardCardOrderService
 import ru.citeck.ecos.uiserv.domain.board.cardorder.test.BoardCardTestFixture
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension
@@ -44,7 +44,7 @@ class BoardCardOrderVirtualBoardTest {
 
     @Test
     fun `move and load work on a type-virtual board`() = AuthContext.runAsSystem {
-        service.moveCard(MoveCardConfig(fixture.boardRef, fixture.card("c1"), fixture.firstColumnId, afterCard = null))
+        service.moveCard(MoveCardAction(fixture.boardRef, fixture.card("c1"), fixture.firstColumnId, afterCard = null))
         val col = service.getBoardCards(fixture.boardRef, null, null).first { it.columnId == fixture.firstColumnId }
         assertEquals(fixture.card("c1"), col.cards.first())
     }

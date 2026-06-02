@@ -19,7 +19,7 @@ import ru.citeck.ecos.uiserv.domain.board.cardorder.dto.BoardInfo
 import ru.citeck.ecos.uiserv.domain.board.cardorder.dto.CardRec
 import ru.citeck.ecos.uiserv.domain.board.cardorder.dto.ColumnContent
 import ru.citeck.ecos.uiserv.domain.board.cardorder.dto.JournalInfo
-import ru.citeck.ecos.uiserv.domain.board.cardorder.dto.MoveCardConfig
+import ru.citeck.ecos.uiserv.domain.board.cardorder.dto.MoveCardAction
 import ru.citeck.ecos.uiserv.domain.board.cardorder.repo.BoardCardOrderRepo
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
@@ -111,14 +111,14 @@ class BoardCardOrderService(
     // ---- public write API ----
 
     /**
-     * Moves [MoveCardConfig.card] into [MoveCardConfig.column], positioned right after
-     * [MoveCardConfig.afterCard] (or on top of the ranked section when afterCard is null/empty).
+     * Moves [MoveCardAction.card] into [MoveCardAction.column], positioned right after
+     * [MoveCardAction.afterCard] (or on top of the ranked section when afterCard is null/empty).
      * Changing the column also changes the card's `_status`. Returns the assigned rank key.
      */
     @Transactional
-    fun moveCard(cfg: MoveCardConfig, workspace: String = ""): String = doMoveCard(cfg, normalizeWorkspace(workspace), 0)
+    fun moveCard(cfg: MoveCardAction, workspace: String = ""): String = doMoveCard(cfg, normalizeWorkspace(workspace), 0)
 
-    private fun doMoveCard(cfg: MoveCardConfig, workspace: String, rebalanceDepth: Int): String {
+    private fun doMoveCard(cfg: MoveCardAction, workspace: String, rebalanceDepth: Int): String {
         require(EntityRef.isNotEmpty(cfg.board)) { "board is required" }
         require(EntityRef.isNotEmpty(cfg.card)) { "card is required" }
         require(cfg.column.isNotBlank()) { "column is required" }

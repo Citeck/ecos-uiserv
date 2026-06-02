@@ -54,6 +54,31 @@ class BoardsServiceRecordsDaoTest {
     }
 
     @Test
+    fun `move-card persists order under the config workspace`() = AuthContext.runAsSystem {
+        records.mutate(
+            EntityRef.create("uiserv", "boards-service", ""),
+            mapOf(
+                "action" to "move-card",
+                "config" to mapOf(
+                    "board" to fixture.boardRef.toString(),
+                    "card" to fixture.card("c1").toString(),
+                    "column" to "col1",
+                    "afterCard" to null,
+                    "workspace" to "wsX"
+                )
+            )
+        )
+        // The move (c1 -> top) must be visible when reading the SAME workspace it was written in.
+        val inWs = service.getBoardCards(fixture.boardRef, null, null, "", workspace = "wsX")
+            .first { it.columnId == "col1" }
+        assertEquals(fixture.card("c1"), inWs.cards.first())
+        // ...and NOT leak into another workspace's view.
+        val otherWs = service.getBoardCards(fixture.boardRef, null, null, "", workspace = "wsY")
+            .first { it.columnId == "col1" }
+        assertEquals(fixture.card("c3"), otherWs.cards.first())
+    }
+
+    @Test
     fun `unknown action fails`() {
         assertFailsWith<Exception> {
             AuthContext.runAsSystem {
