@@ -2,6 +2,8 @@ package ru.citeck.ecos.uiserv.domain.board.cardorder.api.records
 
 import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.DataValue
+import ru.citeck.ecos.records2.RecordConstants
+import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
 import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao
 import ru.citeck.ecos.uiserv.domain.board.cardorder.dto.MoveCardConfig
@@ -34,7 +36,9 @@ class BoardsServiceRecordsDao(
             ACTION_MOVE_CARD -> {
                 val cfg = config.getAs(MoveCardConfig::class.java)
                     ?: error("Invalid config for action '$action'")
-                service.moveCard(cfg)
+                // `_workspace` is attached automatically by the UI's record.save(); order is
+                // workspaceScope=PRIVATE so the move is scoped/isolated by it.
+                service.moveCard(cfg, record.workspace ?: "")
             }
             else -> error("Unknown action: '$action'")
         }
@@ -44,5 +48,8 @@ class BoardsServiceRecordsDao(
     class Command {
         var action: String? = null
         var config: DataValue? = null
+
+        @AttName(RecordConstants.ATT_WORKSPACE)
+        var workspace: String? = null
     }
 }

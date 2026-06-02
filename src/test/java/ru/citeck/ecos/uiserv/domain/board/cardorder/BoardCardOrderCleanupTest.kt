@@ -35,7 +35,7 @@ class BoardCardOrderCleanupTest {
 
     @Test
     fun `deleting a board removes its order records`() = AuthContext.runAsSystem {
-        repo.upsert(fixture.boardRef.toString(), "", fixture.card("c1").toString(), "col1", "g0")
+        repo.upsert(fixture.boardRef.toString(), fixture.workspace, "", fixture.card("c1").toString(), "col1", "g0")
         assertEquals(1, repo.findByBoard(fixture.boardRef.toString()).size)
 
         boardService.delete(fixture.boardId)

@@ -49,7 +49,16 @@ class BoardCardsRecordsDao(
                 maxItems = cfg.maxItems?.takeIf { it > 0 } ?: defaultMaxItems
             )
         }
-        val columns = service.getBoardCards(query.board, columnPages, query.filter, query.grouping, defaultMaxItems)
+        // Order is workspaceScope=PRIVATE: scope the read to the workspace the UI is viewing.
+        val workspace = recordsQuery.workspaces.firstOrNull() ?: ""
+        val columns = service.getBoardCards(
+            query.board,
+            columnPages,
+            query.filter,
+            query.grouping,
+            defaultMaxItems,
+            workspace
+        )
         val res = RecsQueryRes<ColumnRecord>()
         res.setRecords(columns.map { ColumnRecord(query.board, it.columnId, it.name, it.totalCount, it.cards) })
         res.setTotalCount(columns.size.toLong())

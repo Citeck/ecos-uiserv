@@ -3,6 +3,8 @@ package ru.citeck.ecos.uiserv.domain.board.cardorder.service
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import ru.citeck.ecos.context.lib.auth.AuthContext
+import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records2.predicate.model.Predicate
@@ -35,18 +37,26 @@ class BoardCardOrderService(
     private val cardsHardCap = 10_000
 
     /**
-     * Canonical board key stored in the `boardRef` ENTITY_REF attribute: `uiserv/board@<localId>`.
-     * Any incoming boardRef form (bare id, board@id, rboard@id) maps to the same key, and it matches
-     * the key the delete-cleanup listener builds.
+     * Board identity stored in the `boardRef` ENTITY_REF attribute: `uiserv/board@<localId>`. This is the
+     * board's own reference (carrying the board's own workspace prefix, if any) — independent of the order
+     * workspace, which is a separate column. Any incoming boardRef form (bare id, board@id, rboard@id) maps
+     * to the same key, matching the canonical key the delete-cleanup listener builds.
      */
     private fun boardKey(boardRef: EntityRef): String = EntityRef.create(Application.NAME, "board", boardRef.getLocalId()).toString()
 
-    /** Remove a board's ordering records when the board itself is deleted. */
+    /** Order records are workspaceScope=PRIVATE; a blank order workspace maps to the default workspace. */
+    private fun normalizeWorkspace(workspace: String): String = workspace.ifBlank { ModelUtils.DEFAULT_WORKSPACE_ID }
+
+    /**
+     * Remove a board's ordering records when the board itself is deleted. Order may exist in several
+     * (viewing) workspaces independent of the board's own workspace, so cleanup runs across all of them.
+     */
     @PostConstruct
     fun registerListeners() {
         boardService.onBoardDeleted { deleted ->
             val localId = workspaceService.addWsPrefixToId(deleted.id, deleted.workspace)
-            orderRepo.deleteByBoard(EntityRef.create(Application.NAME, "board", localId).toString())
+            val key = EntityRef.create(Application.NAME, "board", localId).toString()
+            AuthContext.runAsSystem { orderRepo.deleteByBoard(key) }
         }
     }
 
@@ -71,9 +81,12 @@ class BoardCardOrderService(
         columnPages: List<ColumnPageReq>?,
         filter: Predicate?,
         grouping: String = BoardCardOrderDesc.GROUPING_FLAT,
-        defaultMaxItems: Int = DEFAULT_MAX_ITEMS
+        defaultMaxItems: Int = DEFAULT_MAX_ITEMS,
+        workspace: String = ""
     ): List<ColumnContent> {
+        val ws = normalizeWorkspace(workspace)
         val board = resolveBoard(boardRef)
+        val boardRefStr = boardKey(boardRef)
         val colById = board.columns.associateBy { it.id }
         val reqs = if (columnPages.isNullOrEmpty()) {
             board.columns.map { ColumnPageReq(it.id, 0, defaultMaxItems) }
@@ -85,7 +98,7 @@ class BoardCardOrderService(
         val byStatus = loadCardsByStatus(board, neededCols, filter)
         return reqs.mapNotNull { req ->
             val col = colById[req.columnId] ?: return@mapNotNull null
-            val ordered = mergeColumn(boardRef, grouping, col.id, byStatus[col.id].orEmpty())
+            val ordered = mergeColumn(boardRefStr, ws, grouping, col.id, byStatus[col.id].orEmpty())
             ColumnContent(
                 columnId = col.id,
                 name = col.name,
@@ -103,9 +116,9 @@ class BoardCardOrderService(
      * Changing the column also changes the card's `_status`. Returns the assigned rank key.
      */
     @Transactional
-    fun moveCard(cfg: MoveCardConfig): String = doMoveCard(cfg, 0)
+    fun moveCard(cfg: MoveCardConfig, workspace: String = ""): String = doMoveCard(cfg, normalizeWorkspace(workspace), 0)
 
-    private fun doMoveCard(cfg: MoveCardConfig, rebalanceDepth: Int): String {
+    private fun doMoveCard(cfg: MoveCardConfig, workspace: String, rebalanceDepth: Int): String {
         require(EntityRef.isNotEmpty(cfg.board)) { "board is required" }
         require(EntityRef.isNotEmpty(cfg.card)) { "card is required" }
         require(cfg.column.isNotBlank()) { "column is required" }
@@ -128,7 +141,7 @@ class BoardCardOrderService(
         // Effective rank falls back to the flat ("") order for cards not yet ranked in this grouping,
         // so a freshly-grouped view inherits the flat manual order as its baseline. New keys are
         // written to this grouping, evolving it independently from there.
-        val rankByCard = effectiveRankByCard(boardRefStr, grouping, cfg.column).toMutableMap()
+        val rankByCard = effectiveRankByCard(boardRefStr, workspace, grouping, cfg.column).toMutableMap()
 
         // 3. fold the unranked prefix (created-desc) into rank keys below the smallest existing key
         val unranked = cards.filter { rankByCard[it.ref.toString()] == null }
@@ -140,7 +153,7 @@ class BoardCardOrderService(
                 val seeds = RankKeys.seedSpread(unranked.size)
                 unranked.forEachIndexed { index, card ->
                     rankByCard[card.ref.toString()] = seeds[index]
-                    orderRepo.upsert(boardRefStr, grouping, card.ref.toString(), cfg.column, seeds[index])
+                    orderRepo.upsert(boardRefStr, workspace, grouping, card.ref.toString(), cfg.column, seeds[index])
                 }
             } else {
                 val firstRankedKey = rankByCard.getValue(rankedSorted.first().ref.toString())
@@ -148,11 +161,11 @@ class BoardCardOrderService(
                 for (card in unranked) {
                     val key = RankKeys.between(lowerKey, firstRankedKey)
                     if (key.length > RankKeys.MAX_RANK_LEN) {
-                        rebalanceForRetry(rebalanceDepth, boardRefStr, grouping, cfg.column)
-                        return doMoveCard(cfg, rebalanceDepth + 1)
+                        rebalanceForRetry(rebalanceDepth, boardRefStr, workspace, grouping, cfg.column)
+                        return doMoveCard(cfg, workspace, rebalanceDepth + 1)
                     }
                     rankByCard[card.ref.toString()] = key
-                    orderRepo.upsert(boardRefStr, grouping, card.ref.toString(), cfg.column, key)
+                    orderRepo.upsert(boardRefStr, workspace, grouping, card.ref.toString(), cfg.column, key)
                     lowerKey = key
                 }
             }
@@ -176,10 +189,10 @@ class BoardCardOrderService(
 
         val newKey = RankKeys.between(prevKey, nextKey)
         if (newKey.length > RankKeys.MAX_RANK_LEN) {
-            rebalanceForRetry(rebalanceDepth, boardRefStr, grouping, cfg.column)
-            return doMoveCard(cfg, rebalanceDepth + 1)
+            rebalanceForRetry(rebalanceDepth, boardRefStr, workspace, grouping, cfg.column)
+            return doMoveCard(cfg, workspace, rebalanceDepth + 1)
         }
-        orderRepo.upsert(boardRefStr, grouping, cfg.card.toString(), cfg.column, newKey)
+        orderRepo.upsert(boardRefStr, workspace, grouping, cfg.card.toString(), cfg.column, newKey)
         return newKey
     }
 
@@ -187,22 +200,22 @@ class BoardCardOrderService(
      * Rebalance a column's keys when a freshly computed key overflows [RankKeys.MAX_RANK_LEN], so the
      * caller can retry the move once. Fails fast if a key still overflows after a rebalance already ran.
      */
-    private fun rebalanceForRetry(rebalanceDepth: Int, boardKey: String, grouping: String, columnId: String) {
+    private fun rebalanceForRetry(rebalanceDepth: Int, boardKey: String, workspace: String, grouping: String, columnId: String) {
         check(rebalanceDepth < 1) {
             "Rank key still exceeds ${RankKeys.MAX_RANK_LEN} after rebalance " +
-                "(board=$boardKey, grouping='$grouping', column=$columnId)"
+                "(board=$boardKey, workspace='$workspace', grouping='$grouping', column=$columnId)"
         }
-        rebalanceColumn(boardKey, grouping, columnId)
+        rebalanceColumn(boardKey, workspace, grouping, columnId)
     }
 
-    /** Re-spread all ranked cards of (board, grouping, column) using fresh seed keys, preserving current order. */
+    /** Re-spread all ranked cards of (board, workspace, grouping, column) using fresh seed keys, preserving current order. */
     @Transactional
-    internal fun rebalanceColumn(boardRef: String, grouping: String, columnId: String) {
-        val orderRecs = orderRepo.findByBoardAndColumn(boardRef, grouping, columnId)
+    internal fun rebalanceColumn(boardRef: String, workspace: String, grouping: String, columnId: String) {
+        val orderRecs = orderRepo.findByBoardAndColumn(boardRef, workspace, grouping, columnId)
             .sortedWith(compareBy({ it.rankKey }, { it.cardRef }))
         if (orderRecs.isEmpty()) return
         val seeds = RankKeys.seedSpread(orderRecs.size)
-        orderRecs.forEachIndexed { index, rec -> orderRepo.upsert(boardRef, grouping, rec.cardRef, columnId, seeds[index]) }
+        orderRecs.forEachIndexed { index, rec -> orderRepo.upsert(boardRef, workspace, grouping, rec.cardRef, columnId, seeds[index]) }
     }
 
     // ---- internals ----
@@ -310,21 +323,21 @@ class BoardCardOrderService(
      * the flat ("") ranks for cards not yet ranked in this grouping. For the flat board, this is just
      * the flat ranks. Lets a freshly-grouped view inherit the flat manual order as its baseline.
      */
-    private fun effectiveRankByCard(boardKey: String, grouping: String, columnId: String): Map<String, String> {
-        val primary = orderRepo.findByBoardAndColumn(boardKey, grouping, columnId)
+    private fun effectiveRankByCard(boardKey: String, workspace: String, grouping: String, columnId: String): Map<String, String> {
+        val primary = orderRepo.findByBoardAndColumn(boardKey, workspace, grouping, columnId)
             .associate { it.cardRef to it.rankKey }
         if (grouping == BoardCardOrderDesc.GROUPING_FLAT) {
             return primary
         }
-        val flat = orderRepo.findByBoardAndColumn(boardKey, BoardCardOrderDesc.GROUPING_FLAT, columnId)
+        val flat = orderRepo.findByBoardAndColumn(boardKey, workspace, BoardCardOrderDesc.GROUPING_FLAT, columnId)
             .associate { it.cardRef to it.rankKey }
         return flat + primary // grouping-specific rank overrides the flat fallback
     }
 
     /** unranked (by _created desc) ++ ranked (by rankKey asc). Stale order recs (columnId != _status) ignored. */
-    private fun mergeColumn(boardRef: EntityRef, grouping: String, columnId: String, cards: List<CardRec>): List<CardRec> {
+    private fun mergeColumn(boardKey: String, workspace: String, grouping: String, columnId: String, cards: List<CardRec>): List<CardRec> {
         if (cards.isEmpty()) return emptyList()
-        val rankByCard = effectiveRankByCard(boardKey(boardRef), grouping, columnId)
+        val rankByCard = effectiveRankByCard(boardKey, workspace, grouping, columnId)
         val ranked = ArrayList<Pair<CardRec, String>>()
         val unranked = ArrayList<CardRec>()
         for (card in cards) {

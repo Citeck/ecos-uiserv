@@ -106,7 +106,7 @@ class BoardCardTestFixture(
     }
 
     fun setOrder(cardId: String, columnId: String, rankKey: String, grouping: String = "") {
-        orderRepo.upsert(boardRef.toString(), grouping, card(cardId).toString(), columnId, rankKey)
+        orderRepo.upsert(boardRef.toString(), WORKSPACE, grouping, card(cardId).toString(), columnId, rankKey)
     }
 
     fun setStatus(cardId: String, status: String) {

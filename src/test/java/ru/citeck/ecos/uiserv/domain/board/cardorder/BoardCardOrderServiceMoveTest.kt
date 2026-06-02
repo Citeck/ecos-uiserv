@@ -95,4 +95,23 @@ class BoardCardOrderServiceMoveTest {
         val flat = service.getBoardCards(fixture.boardRef, null, null, "").first { it.columnId == "col1" }
         assertEquals(listOf(fixture.card("c1"), fixture.card("c2"), fixture.card("c3")), flat.cards)
     }
+
+    @Test
+    fun `order is isolated per workspace`() = AuthContext.runAsSystem {
+        // move c1 to top only in workspace wsA
+        service.moveCard(
+            MoveCardConfig(fixture.boardRef, fixture.card("c1"), "col1", afterCard = null),
+            workspace = "wsA"
+        )
+
+        // wsA sees the manual order (c1 materialized to top)
+        val wsA = service.getBoardCards(fixture.boardRef, null, null, "", workspace = "wsA")
+            .first { it.columnId == "col1" }
+        assertEquals(listOf(fixture.card("c1"), fixture.card("c3"), fixture.card("c2")), wsA.cards)
+
+        // wsB has no order of its own -> falls back to created-desc, unaffected by wsA's move
+        val wsB = service.getBoardCards(fixture.boardRef, null, null, "", workspace = "wsB")
+            .first { it.columnId == "col1" }
+        assertEquals(listOf(fixture.card("c3"), fixture.card("c2"), fixture.card("c1")), wsB.cards)
+    }
 }
