@@ -103,6 +103,109 @@ class BoardCardsRecordsDaoTest {
         assertEquals(0, col1.cards.size)
     }
 
+    @Test
+    fun `column defaults to a 25-card page when maxItems is not specified`() = AuthContext.runAsSystem {
+        fixture.cleanupCardsOnly()
+        repeat(60) { fixture.createCard("d$it", "col1") }
+        val res = records.query(
+            RecordsQuery.create {
+                withSourceId("board-cards")
+                withQuery(dataObj("board", fixture.boardRef.toString(), "columns", listOf(mapOf("id" to "col1"))))
+            },
+            ColAtts::class.java
+        )
+        val col1 = res.getRecords().first { it.columnId == "col1" }
+        assertEquals(25, col1.cards.size)
+        // totalCount is the TRUE column size (from the query COUNT), not the fetched window — so the UI's
+        // "load more" knows there are 60 cards even though only the first 25-card page was returned.
+        assertEquals(60L, col1.totalCount)
+    }
+
+    @Test
+    fun `explicit maxItems below the floor is raised to 25`() = AuthContext.runAsSystem {
+        fixture.clearRecordedCardQueries()
+        records.query(
+            RecordsQuery.create {
+                withSourceId("board-cards")
+                withQuery(
+                    dataObj("board", fixture.boardRef.toString(), "columns", listOf(mapOf("id" to "col1", "maxItems" to 5)))
+                )
+            },
+            ColAtts::class.java
+        )
+        // maxItems 5 < floor 25 -> fetch floored to 25, independent of the default page size
+        assertEquals(25, fixture.recordedCardQueries.last().page.maxItems)
+    }
+
+    @Test
+    fun `card query fetch defaults to the 25-card floor`() = AuthContext.runAsSystem {
+        fixture.clearRecordedCardQueries()
+        records.query(
+            RecordsQuery.create {
+                withSourceId("board-cards")
+                withQuery(dataObj("board", fixture.boardRef.toString(), "columns", listOf(mapOf("id" to "col1"))))
+            },
+            ColAtts::class.java
+        )
+        val cardQuery = fixture.recordedCardQueries.last()
+        assertEquals(25, cardQuery.page.maxItems)
+    }
+
+    @Test
+    fun `fetch adds skipCount on top of the page floor`() = AuthContext.runAsSystem {
+        fixture.clearRecordedCardQueries()
+        records.query(
+            RecordsQuery.create {
+                withSourceId("board-cards")
+                withQuery(
+                    dataObj(
+                        "board",
+                        fixture.boardRef.toString(),
+                        "columns",
+                        listOf(mapOf("id" to "col1", "skipCount" to 10, "maxItems" to 5))
+                    )
+                )
+            },
+            ColAtts::class.java
+        )
+        // skipCount(10) + max(floor 25, maxItems 5) = 35, NOT max(25, 10+5) = 25
+        assertEquals(35, fixture.recordedCardQueries.last().page.maxItems)
+    }
+
+    @Test
+    fun `request maxItems above the floor raises the fetch limit`() = AuthContext.runAsSystem {
+        fixture.cleanupCardsOnly()
+        repeat(100) { fixture.createCard("d$it", "col1") }
+        fixture.clearRecordedCardQueries()
+        val res = records.query(
+            RecordsQuery.create {
+                withSourceId("board-cards")
+                withQuery(
+                    dataObj("board", fixture.boardRef.toString(), "columns", listOf(mapOf("id" to "col1", "maxItems" to 80)))
+                )
+            },
+            ColAtts::class.java
+        )
+        val col1 = res.getRecords().first { it.columnId == "col1" }
+        assertEquals(80, col1.cards.size)
+        assertEquals(80, fixture.recordedCardQueries.last().page.maxItems)
+    }
+
+    @Test
+    fun `card query is scoped to the viewing workspace`() = AuthContext.runAsSystem {
+        fixture.clearRecordedCardQueries()
+        records.query(
+            RecordsQuery.create {
+                withSourceId("board-cards")
+                withWorkspaces(listOf("myws"))
+                withQuery(dataObj("board", fixture.boardRef.toString(), "columns", listOf(mapOf("id" to "col1"))))
+            },
+            ColAtts::class.java
+        )
+        val cardQuery = fixture.recordedCardQueries.last()
+        assertEquals(listOf("myws"), cardQuery.workspaces)
+    }
+
     private fun dataObj(vararg kv: Any): ObjectData {
         val d = ObjectData.create()
         var i = 0

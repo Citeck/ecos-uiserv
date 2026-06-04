@@ -6,8 +6,11 @@ import ru.citeck.ecos.model.lib.status.dto.StatusDef
 import ru.citeck.ecos.model.lib.type.dto.TypeModelDef
 import ru.citeck.ecos.model.lib.workspace.IdInWs
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
+import ru.citeck.ecos.records2.predicate.PredicateService
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.record.dao.impl.mem.InMemDataRecordsDao
+import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
+import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.Application
 import ru.citeck.ecos.uiserv.domain.board.cardorder.repo.BoardCardOrderRepo
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef
@@ -17,6 +20,7 @@ import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
 import java.time.Instant
+import java.util.Collections
 
 /**
  * Test fixture for the board card-ordering feature. Sets up:
@@ -44,7 +48,16 @@ class BoardCardTestFixture(
         const val WORKSPACE = "default"
         val CREATED_BASE: Instant = Instant.parse("2020-01-01T00:00:00Z")
 
-        private var cardDao: InMemDataRecordsDao? = null
+        private var cardDao: RecordingCardDao? = null
+    }
+
+    /**
+     * Predicate queries the card source received during this run — for asserting query shape (scope/cap).
+     */
+    val recordedCardQueries: List<RecordsQuery> get() = cardDao?.recordedQueries() ?: emptyList()
+
+    fun clearRecordedCardQueries() {
+        cardDao?.clearRecordedQueries()
     }
 
     lateinit var boardRef: EntityRef
@@ -119,7 +132,7 @@ class BoardCardTestFixture(
 
     private fun registerCardSourceAndType() {
         if (cardDao == null) {
-            val dao = InMemDataRecordsDao(CARD_SOURCE)
+            val dao = RecordingCardDao(CARD_SOURCE)
             recordsService.register(dao)
             cardDao = dao
         }
@@ -169,4 +182,40 @@ class BoardCardTestFixture(
             recordsService.delete(cardRefs.values.toList())
         }
     }
+}
+
+/**
+ * In-mem card source that records the predicate queries it receives (so tests can assert query shape) and
+ * reports a realistic [RecsQueryRes.getTotalCount] — the full filtered count, not just the page size — the
+ * way a real DbRecordsDao does, so board-cards totalCount behaviour is exercised faithfully.
+ */
+class RecordingCardDao(id: String) : InMemDataRecordsDao(id) {
+
+    private val queries = Collections.synchronizedList(ArrayList<RecordsQuery>())
+
+    override fun queryRecords(recsQuery: RecordsQuery): Any {
+        if (recsQuery.language != PredicateService.LANGUAGE_PREDICATE) {
+            return super.queryRecords(recsQuery)
+        }
+        queries.add(recsQuery)
+        val page = super.queryRecords(recsQuery) as List<*>
+        // Full count: same predicate with no paging (-1 = unlimited). Uses super (not this) so the count
+        // probe is NOT itself recorded — recordedQueries must keep only the real page query.
+        val total = (
+            super.queryRecords(
+                recsQuery.copy {
+                    withMaxItems(-1)
+                    withSkipCount(0)
+                }
+            ) as List<*>
+            ).size
+        return RecsQueryRes<Any>().also {
+            it.setRecords(page)
+            it.setTotalCount(total.toLong())
+        }
+    }
+
+    fun recordedQueries(): List<RecordsQuery> = synchronized(queries) { ArrayList(queries) }
+
+    fun clearRecordedQueries() = synchronized(queries) { queries.clear() }
 }

@@ -44,7 +44,11 @@ class BoardCardOrderVirtualBoardTest {
 
     @Test
     fun `move and load work on a type-virtual board`() = AuthContext.runAsSystem {
-        service.moveCard(MoveCardAction(fixture.boardRef, fixture.card("c1"), fixture.firstColumnId, afterCard = null))
+        val before = service.getBoardCards(fixture.boardRef, null, null)
+            .first { it.columnId == fixture.firstColumnId }.cards
+        service.moveCard(
+            MoveCardAction(fixture.boardRef, fixture.card("c1"), fixture.firstColumnId, afterCard = null, cards = before)
+        )
         val col = service.getBoardCards(fixture.boardRef, null, null).first { it.columnId == fixture.firstColumnId }
         assertEquals(fixture.card("c1"), col.cards.first())
     }

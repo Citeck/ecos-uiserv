@@ -37,24 +37,8 @@ class BoardsServiceRecordsDaoTest {
 
     @Test
     fun `move-card action moves the card`() = AuthContext.runAsSystem {
-        records.mutate(
-            EntityRef.create("uiserv", "boards-service", ""),
-            mapOf(
-                "action" to "move-card",
-                "config" to mapOf(
-                    "board" to fixture.boardRef.toString(),
-                    "card" to fixture.card("c1").toString(),
-                    "column" to "col1",
-                    "afterCard" to null
-                )
-            )
-        )
-        val col1 = service.getBoardCards(fixture.boardRef, null, null).first { it.columnId == "col1" }
-        assertEquals(fixture.card("c1"), col1.cards.first())
-    }
-
-    @Test
-    fun `move-card persists order under the config workspace`() = AuthContext.runAsSystem {
+        val before = service.getBoardCards(fixture.boardRef, null, null)
+            .first { it.columnId == "col1" }.cards.map { it.toString() }
         records.mutate(
             EntityRef.create("uiserv", "boards-service", ""),
             mapOf(
@@ -64,7 +48,29 @@ class BoardsServiceRecordsDaoTest {
                     "card" to fixture.card("c1").toString(),
                     "column" to "col1",
                     "afterCard" to null,
-                    "workspace" to "wsX"
+                    "cards" to before
+                )
+            )
+        )
+        val col1 = service.getBoardCards(fixture.boardRef, null, null).first { it.columnId == "col1" }
+        assertEquals(fixture.card("c1"), col1.cards.first())
+    }
+
+    @Test
+    fun `move-card persists order under the config workspace`() = AuthContext.runAsSystem {
+        val before = service.getBoardCards(fixture.boardRef, null, null, "", workspace = "wsX")
+            .first { it.columnId == "col1" }.cards.map { it.toString() }
+        records.mutate(
+            EntityRef.create("uiserv", "boards-service", ""),
+            mapOf(
+                "action" to "move-card",
+                "config" to mapOf(
+                    "board" to fixture.boardRef.toString(),
+                    "card" to fixture.card("c1").toString(),
+                    "column" to "col1",
+                    "afterCard" to null,
+                    "workspace" to "wsX",
+                    "cards" to before
                 )
             )
         )
