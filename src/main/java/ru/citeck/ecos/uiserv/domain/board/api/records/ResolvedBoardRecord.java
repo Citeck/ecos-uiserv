@@ -16,6 +16,7 @@ import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ResolvedBoardRecord {
 
@@ -53,7 +54,13 @@ public class ResolvedBoardRecord {
         return boardDef;
     }
 
-    public List<BoardColumnDef> getColumns() {
+    public List<ResolvedBoardColumn> getColumns() {
+        return resolveColumnDefs().stream()
+            .map(ResolvedBoardColumn::new)
+            .collect(Collectors.toList());
+    }
+
+    private List<BoardColumnDef> resolveColumnDefs() {
         if (boardDef == null) {
             return Collections.emptyList();
         }

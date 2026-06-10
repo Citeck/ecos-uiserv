@@ -11,6 +11,7 @@ import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public interface BoardService {
 
@@ -35,6 +36,8 @@ public interface BoardService {
     );
 
     void onBoardChanged(BiConsumer<BoardDef, BoardDef> listener);
+
+    void onBoardDeleted(Consumer<BoardDef> listener);
 
     List<BoardWithMeta> getBoardsForJournal(EntityRef journalRef);
 

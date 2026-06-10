@@ -1,0 +1,43 @@
+---
+id: board-card-order
+name:
+  ru: Порядок карточек доски
+  en: Board card order
+
+system: true
+storageType: DEFAULT
+sourceId: uiserv/board-card-order
+
+# Card order is private per workspace: ecos-data isolates records by a workspace column
+# (assigned from the `_workspace` att on create, filtered by `workspaces` on query) and
+# enforces workspace-membership access. The service always stamps `_workspace` on create
+# (blank -> default), so no type-level defaultWorkspace fallback is needed.
+workspaceScope: PRIVATE
+
+model:
+  attributes:
+    - id: boardRef
+      type: ENTITY_REF
+      mandatory: true
+      index:
+        enabled: true
+    - id: cardRef
+      type: ENTITY_REF
+      mandatory: true
+      index:
+        enabled: true
+    - id: columnId
+      type: TEXT
+      mandatory: true
+    - id: rankKey
+      type: TEXT
+      mandatory: true
+    # Snapshot of the card's _statusModified taken when the rank was written (the "link key").
+    # A mismatch with the live value means the card left the column (or left and came back)
+    # after ranking - the rank is stale. Null on rows written before this attribute existed.
+    - id: cardStatusModified
+      type: DATETIME
+    - id: grouping
+      type: TEXT
+      index:
+        enabled: true

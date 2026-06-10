@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -40,6 +41,7 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository repository;
     private final WorkspaceService workspaceService;
     private final List<BiConsumer<BoardDef, BoardDef>> changeListeners = new CopyOnWriteArrayList<>();
+    private final List<Consumer<BoardDef>> deleteListeners = new CopyOnWriteArrayList<>();
 
     private final JpaSearchConverterFactory jpaSearchConverterFactory;
     private JpaSearchConverter<BoardEntity> searchConv;
@@ -96,7 +98,13 @@ public class BoardServiceImpl implements BoardService {
     @Transactional
     public void delete(IdInWs id) {
         Assert.notNull(id, "Deleted board ID must not be null");
-        repository.findByExtIdAndWorkspace(id.getId(), id.getWorkspace()).ifPresent(repository::delete);
+        repository.findByExtIdAndWorkspace(id.getId(), id.getWorkspace()).ifPresent(entity -> {
+            BoardDef deletedBoardDef = BoardMapper.entityToDto(entity).getBoardDef();
+            repository.delete(entity);
+            for (Consumer<BoardDef> listener : deleteListeners) {
+                listener.accept(deletedBoardDef);
+            }
+        });
     }
 
     @Override
@@ -134,6 +142,11 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public void onBoardChanged(BiConsumer<BoardDef, BoardDef> listener) {
         changeListeners.add(listener);
+    }
+
+    @Override
+    public void onBoardDeleted(Consumer<BoardDef> listener) {
+        deleteListeners.add(listener);
     }
 
     @Override

@@ -8,6 +8,10 @@ ecos:
         url: jdbc:postgresql://localhost:14523/ecos_uiserv
         username: uiserv
         password: uiservpassword
+      main-xa-aware:
+        url: jdbc:postgresql://localhost:14523/ecos_uiserv
+        username: uiserv
+        password: uiservpassword
     x509:
       keys:
         application:
