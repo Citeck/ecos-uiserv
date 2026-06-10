@@ -12,6 +12,7 @@ import ru.citeck.ecos.records3.record.dao.impl.mem.InMemDataRecordsDao
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.Application
+import ru.citeck.ecos.uiserv.domain.board.cardorder.dto.OrderRec
 import ru.citeck.ecos.uiserv.domain.board.cardorder.repo.BoardCardOrderRepo
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef
@@ -104,14 +105,16 @@ class BoardCardTestFixture(
     fun card(id: String): EntityRef = cardRefs.getValue(id)
 
     fun createCard(id: String, status: String): EntityRef {
-        val created = CREATED_BASE.plusSeconds(createdSeq.toLong())
-        createdSeq++
+        // _statusModified starts equal to _created (the status is assigned at creation); an explicit
+        // status change advances it (see [setStatus]) — mirroring emodel, where mutating _status bumps it.
+        val ts = nextInstant().toString()
         val ref = recordsService.create(
             CARD_SOURCE,
             mapOf(
                 "id" to id,
                 "_status" to status,
-                "_created" to created.toString()
+                "_created" to ts,
+                "_statusModified" to ts
             )
         )
         cardRefs[id] = ref
@@ -119,12 +122,32 @@ class BoardCardTestFixture(
     }
 
     fun setOrder(cardId: String, columnId: String, rankKey: String, grouping: String = "") {
-        orderRepo.upsert(boardRef.toString(), WORKSPACE, grouping, card(cardId).toString(), columnId, rankKey)
+        // a manually written rank carries the card's live link key, the same way a real move stamps it
+        orderRepo.upsert(boardRef.toString(), WORKSPACE, grouping, card(cardId).toString(), columnId, rankKey, statusModifiedOf(cardId))
     }
 
-    fun setStatus(cardId: String, status: String) {
-        recordsService.mutate(card(cardId), mapOf("_status" to status))
+    fun statusModifiedOf(cardId: String): Instant? = recordsService.getAtt(card(cardId), "_statusModified").getAs(Instant::class.java)
+
+    /** Direct `_statusModified` write (e.g. a value with sub-milli precision) WITHOUT a status change. */
+    fun setStatusModified(cardId: String, ts: Instant) {
+        recordsService.mutate(card(cardId), mapOf("_statusModified" to ts.toString()))
     }
+
+    /** Raw rank row with an explicit link key — for staleness/drift scenarios [setOrder] can't produce. */
+    fun setOrderWithLinkKey(cardId: String, columnId: String, rankKey: String, linkKey: Instant?, grouping: String = "") {
+        orderRepo.upsert(boardRef.toString(), WORKSPACE, grouping, card(cardId).toString(), columnId, rankKey, linkKey)
+    }
+
+    fun orderRows(columnId: String, grouping: String = ""): List<OrderRec> = orderRepo.findByBoardAndColumn(boardRef.toString(), WORKSPACE, grouping, columnId)
+
+    fun setStatus(cardId: String, status: String) {
+        // a real status change advances _statusModified to a freshly newer instant, so the card surfaces
+        // at the top of the unranked block in its new column (the board sorts unranked by _statusModified).
+        recordsService.mutate(card(cardId), mapOf("_status" to status, "_statusModified" to nextInstant().toString()))
+    }
+
+    /** Monotonically increasing instant (creation timestamps and status-change timestamps share the clock). */
+    private fun nextInstant(): Instant = CREATED_BASE.plusSeconds((createdSeq++).toLong())
 
     fun statusOf(cardId: String): String = recordsService.getAtt(card(cardId), "_status?str").asText()
 
@@ -155,11 +178,20 @@ class BoardCardTestFixture(
         )
     }
 
-    private fun saveBoard(columnIds: List<String>) {
+    /**
+     * Re-saves the test board with manual ordering toggled. Ordering rides the board's `canDrag`
+     * setting, stored as `readOnly = !canDrag` — a default (drag-enabled) board has ordering on.
+     */
+    fun setCardOrderEnabled(enabled: Boolean) {
+        saveBoard(listOf("col1", "col2"), enabled)
+    }
+
+    private fun saveBoard(columnIds: List<String>, cardOrderEnabled: Boolean = true) {
         val def = BoardDef(BOARD_ID)
         def.workspace = WORKSPACE
         def.name = MLText("Board card drag test")
         def.typeRef = TYPE_REF
+        def.readOnly = !cardOrderEnabled
         def.columns = columnIds.map {
             BoardColumnDef.create().withId(it).withName(MLText(it)).build()
         }

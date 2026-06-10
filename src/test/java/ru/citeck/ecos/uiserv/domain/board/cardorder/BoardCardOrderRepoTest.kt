@@ -8,6 +8,7 @@ import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.uiserv.Application
 import ru.citeck.ecos.uiserv.domain.board.cardorder.repo.BoardCardOrderRepo
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension
+import java.time.Instant
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
@@ -77,11 +78,58 @@ class BoardCardOrderRepoTest {
     }
 
     @Test
+    fun `upsert stores the card's status-modified link key`() = AuthContext.runAsSystem {
+        val lkBoard = "uiserv/board@repoLinkKey"
+        val ts = Instant.parse("2020-01-01T00:00:01Z")
+        repo.upsert(lkBoard, ws, "", "emodel/x@t1", "col1", "g0", ts)
+        repo.upsert(lkBoard, ws, "", "emodel/x@t2", "col1", "n0") // no link key (legacy row shape)
+
+        val rows = repo.findByBoardAndColumn(lkBoard, ws, "", "col1").sortedBy { it.rankKey }
+        assertEquals(ts, rows[0].cardStatusModified)
+        assertNull(rows[1].cardStatusModified)
+
+        repo.deleteByBoard(lkBoard)
+    }
+
+    @Test
     fun `deleteByBoard removes all rows of a board across groupings`() = AuthContext.runAsSystem {
         val delBoard = "uiserv/board@repoDelete"
         repo.upsert(delBoard, ws, "", "emodel/x@d1", "col1", "g0")
         repo.upsert(delBoard, ws, "assignee", "emodel/x@d1", "col1", "g0")
         repo.deleteByBoard(delBoard)
         assertEquals(0, repo.findByBoard(delBoard).size)
+    }
+
+    @Test
+    fun `column read truncates at the cap deterministically by rankKey`() = AuthContext.runAsSystem {
+        val capBoard = "uiserv/board@repoCap"
+        val prevCap = repo.maxItems
+        try {
+            repo.upsert(capBoard, ws, "", "emodel/x@r1", "col1", "z0")
+            repo.upsert(capBoard, ws, "", "emodel/x@r2", "col1", "a0")
+            repo.upsert(capBoard, ws, "", "emodel/x@r3", "col1", "n0")
+            repo.maxItems = 2
+            // the TOP of the curated order survives the cap (rankKey asc), not an arbitrary slice
+            assertEquals(listOf("a0", "n0"), repo.findByBoardAndColumn(capBoard, ws, "", "col1").map { it.rankKey })
+        } finally {
+            repo.maxItems = prevCap
+            repo.deleteByBoard(capBoard)
+        }
+    }
+
+    @Test
+    fun `deleteByBoard removes all rows even beyond the query cap`() = AuthContext.runAsSystem {
+        val bigBoard = "uiserv/board@repoBigDelete"
+        val prevCap = repo.maxItems
+        try {
+            repeat(5) { repo.upsert(bigBoard, ws, "", "emodel/x@b$it", "col1", "k$it") }
+            // one capped read sees only 2 of 5 rows — the delete must loop until nothing is left
+            repo.maxItems = 2
+            repo.deleteByBoard(bigBoard)
+            assertEquals(0, repo.findByBoard(bigBoard).size)
+        } finally {
+            repo.maxItems = prevCap
+            repo.deleteByBoard(bigBoard)
+        }
     }
 }

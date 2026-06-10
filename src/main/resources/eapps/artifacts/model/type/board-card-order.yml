@@ -32,6 +32,11 @@ model:
     - id: rankKey
       type: TEXT
       mandatory: true
+    # Snapshot of the card's _statusModified taken when the rank was written (the "link key").
+    # A mismatch with the live value means the card left the column (or left and came back)
+    # after ranking - the rank is stale. Null on rows written before this attribute existed.
+    - id: cardStatusModified
+      type: DATETIME
     - id: grouping
       type: TEXT
       index:

@@ -19,12 +19,16 @@ import ru.citeck.ecos.webapp.api.entity.EntityRef
  * ```
  * {
  *   board: <boardRef>,
- *   columns: [ { id, skipCount?, maxItems? }, ... ]?,   // omit/empty -> all board columns
+ *   columns: [ { id, skipCount?, maxItems?, additionalFilter? }, ... ]?,  // omit/empty -> all board columns
  *   maxItemsPerColumn?: <int>,                          // default page size when a column omits maxItems
  *   filter?: <predicate>                                // AND-ed into every column (search/journal/swimlane row)
  * }
+ * `additionalFilter` is the column's own extra predicate (e.g. the `hideOldItems` cutoff); it constrains
+ * both that column's page and its `totalCount`.
  * ```
- * Returns one record per requested column: `{ columnId, totalCount, cards[] }`, cards in persisted order.
+ * Returns one record per requested column: `{ columnId, totalCount, cards[] }`, cards in persisted order:
+ * the "new" block (cards whose `_statusModified` is newer than every rank's link key, ts desc), then the
+ * manually ranked block (rankKey asc), then the unranked tail (older never-ranked cards, ts desc).
  */
 @Component
 class BoardCardsRecordsDao(
@@ -46,7 +50,8 @@ class BoardCardsRecordsDao(
             BoardCardOrderService.ColumnPageReq(
                 columnId = cfg.id,
                 skipCount = cfg.skipCount ?: 0,
-                maxItems = cfg.maxItems?.takeIf { it > 0 } ?: defaultMaxItems
+                maxItems = cfg.maxItems?.takeIf { it > 0 } ?: defaultMaxItems,
+                additionalFilter = cfg.additionalFilter
             )
         }
         // Order is workspaceScope=PRIVATE: scope the read to the workspace the UI is viewing.
@@ -79,6 +84,9 @@ class BoardCardsRecordsDao(
         var id: String = ""
         var skipCount: Int? = null
         var maxItems: Int? = null
+
+        /** Extra predicate AND-ed into this column's card query (the UI sends the column's `additionalFilter`). */
+        var additionalFilter: Predicate? = null
     }
 
     /** Synthetic record representing one board column with the requested page of its cards. */

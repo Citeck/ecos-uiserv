@@ -11,7 +11,9 @@ import ru.citeck.ecos.webapp.api.entity.EntityRef
 class BoardInfo(
     @AttName("typeRef?id") val typeRef: EntityRef = EntityRef.EMPTY,
     @AttName("journalRef?id") val journalRef: EntityRef = EntityRef.EMPTY,
-    @AttName("columns[]?json") val columns: List<ColumnDef> = emptyList()
+    @AttName("columns[]?json") val columns: List<ColumnDef> = emptyList(),
+    /** The board's stored inverse of the `canDrag` setting; readOnly gates the card-order machinery off. */
+    @AttName("readOnly?bool") val readOnly: Boolean = false
 ) {
     class ColumnDef(
         val id: String = "",

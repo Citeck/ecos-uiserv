@@ -104,6 +104,35 @@ class BoardCardsRecordsDaoTest {
     }
 
     @Test
+    fun `per-column additionalFilter constrains both the page and the totalCount`() = AuthContext.runAsSystem {
+        // additionalFilter is the column's own extra predicate (e.g. the hideOldItems cutoff). One that
+        // contradicts the column status must zero out BOTH the cards AND the totalCount — proving it reaches
+        // the COUNT, which is the whole point of sending it in the query (the column "Всего" honours it).
+        val res = records.query(
+            RecordsQuery.create {
+                withSourceId("board-cards")
+                withQuery(
+                    dataObj(
+                        "board",
+                        fixture.boardRef.toString(),
+                        "columns",
+                        listOf(
+                            mapOf(
+                                "id" to "col1",
+                                "additionalFilter" to mapOf("t" to "eq", "att" to "_status", "val" to "col2")
+                            )
+                        )
+                    )
+                )
+            },
+            ColAtts::class.java
+        )
+        val col1 = res.getRecords().first { it.columnId == "col1" }
+        assertEquals(0L, col1.totalCount)
+        assertEquals(0, col1.cards.size)
+    }
+
+    @Test
     fun `column defaults to a 25-card page when maxItems is not specified`() = AuthContext.runAsSystem {
         fixture.cleanupCardsOnly()
         repeat(60) { fixture.createCard("d$it", "col1") }
