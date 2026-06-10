@@ -14,6 +14,7 @@ import ru.citeck.ecos.uiserv.domain.board.cardorder.service.BoardCardOrderServic
 import ru.citeck.ecos.uiserv.domain.board.cardorder.test.BoardCardTestFixture
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 @ExtendWith(EcosSpringExtension::class)
 @SpringBootTest(classes = [Application::class])
@@ -152,17 +153,45 @@ class BoardCardOrderServiceMoveTest {
     }
 
     @Test
+    fun `move deletes rows without a link key (no legacy support)`() = AuthContext.runAsSystem {
+        // rows not produced by this code (pre-link-key leftovers) are stale by definition:
+        // a move into the column reclaims them; the manual order they encoded is NOT preserved
+        fixture.setOrderWithLinkKey("c2", "col1", "n0", null, null)
+        fixture.setOrderWithLinkKey("c1", "col1", "x0", null, null)
+        service.moveCard(MoveCardAction(fixture.boardRef, fixture.card("c3"), "col1", afterCard = null, cards = col1Order()))
+        // the leftovers are gone; the move materialized the displayed list with full stamps
+        val rows = fixture.orderRows("col1")
+        assertEquals(3, rows.size)
+        for (row in rows) {
+            val cardId = cardIdByRef(row.cardRef)
+            assertEquals(fixture.statusModifiedOf(cardId), row.cardStatusModified, "link key of $cardId")
+            assertNotNull(row.orderedAt, "curation time of $cardId")
+        }
+        assertEquals(listOf(fixture.card("c3"), fixture.card("c2"), fixture.card("c1")), col1Order())
+    }
+
+    @Test
     fun `dropping into the unranked tail folds it at its displayed position`() = AuthContext.runAsSystem {
         fixture.setOrder("c2", "col1", "n0")
-        // display: [c3 (new block), c2 (ranked), c1 (tail)] — drag c3 to the very bottom, below the tail card
-        service.moveCard(MoveCardAction(fixture.boardRef, fixture.card("c3"), "col1", afterCard = fixture.card("c1"), cards = col1Order()))
-        // c1 must materialize AT its displayed place (below c2), not jump above the ranked block
-        assertEquals(listOf(fixture.card("c2"), fixture.card("c1"), fixture.card("c3")), col1Order())
+        val d1 = fixture.createCard("d1", "col1") // statused after the curation -> new block
+        // display: [d1 (new block), c2 (ranked), c3, c1 (tail)] — drag d1 to the very bottom
+        assertEquals(listOf(d1, fixture.card("c2"), fixture.card("c3"), fixture.card("c1")), col1Order())
+        service.moveCard(MoveCardAction(fixture.boardRef, d1, "col1", afterCard = fixture.card("c1"), cards = listOf(fixture.card("c2"), fixture.card("c3"), fixture.card("c1"), d1)))
+        // the tail (c3, c1) must materialize AT its displayed place below c2, not jump above the ranked block
+        assertEquals(listOf(fixture.card("c2"), fixture.card("c3"), fixture.card("c1"), d1), col1Order())
     }
 
     @Test
     fun `truncated prefix folds above ranked cards outside the list`() = AuthContext.runAsSystem {
-        fixture.setOrder("c1", "col1", "x0") // ranked; will NOT be included in the sent list
+        // c1 ranked with a curation time older than every other card -> they all form the new block;
+        // c1 itself will NOT be included in the sent list
+        fixture.setOrderWithLinkKey(
+            "c1",
+            "col1",
+            "x0",
+            fixture.statusModifiedOf("c1"),
+            BoardCardTestFixture.CREATED_BASE.plusNanos(1)
+        )
         val c4 = fixture.createCard("c4", "col1")
         val c5 = fixture.createCard("c5", "col1")
         // display: [c5, c4, c3, c2 (new block), c1 (ranked)]; drop c5 after c4, sending only the

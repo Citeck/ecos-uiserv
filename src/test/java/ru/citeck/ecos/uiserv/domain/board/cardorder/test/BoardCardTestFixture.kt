@@ -14,6 +14,7 @@ import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.Application
 import ru.citeck.ecos.uiserv.domain.board.cardorder.dto.OrderRec
 import ru.citeck.ecos.uiserv.domain.board.cardorder.repo.BoardCardOrderRepo
+import ru.citeck.ecos.uiserv.domain.board.cardorder.service.BoardCardOrderService
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnDef
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService
@@ -38,7 +39,8 @@ class BoardCardTestFixture(
     private val boardService: BoardService,
     private val workspaceService: WorkspaceService,
     private val typesRegistry: EcosTypesRegistry,
-    private val orderRepo: BoardCardOrderRepo
+    private val orderRepo: BoardCardOrderRepo,
+    private val cardOrderService: BoardCardOrderService
 ) {
 
     companion object {
@@ -74,6 +76,7 @@ class BoardCardTestFixture(
 
     fun init() {
         registerCardSourceAndType()
+        bindServiceClock()
         saveBoard(listOf("col1", "col2"))
         clearData()
         createCard("c1", "col1")
@@ -84,6 +87,7 @@ class BoardCardTestFixture(
     /** Virtual board: a type with statuses and NO saved board (board id = type$<typeId>). */
     fun initVirtualBoard() {
         registerCardSourceAndType()
+        bindServiceClock()
         // no saved board; rboard synthesizes columns from the type's statuses
         boardLocalId = "type\$$TYPE_ID"
         boardRef = EntityRef.create(Application.NAME, "board", boardLocalId)
@@ -91,6 +95,15 @@ class BoardCardTestFixture(
         createCard("c1", "col1")
         createCard("c2", "col1")
         createCard("c3", "col1")
+    }
+
+    /**
+     * Card timestamps, fixture-written order rows and the service's curation clock (`orderedAt` stamps)
+     * all draw from ONE synthetic monotonic scale — so "statused after/before the last curation"
+     * scenarios are deterministic instead of comparing synthetic card instants with the wall clock.
+     */
+    private fun bindServiceClock() {
+        cardOrderService.clock = { nextInstant() }
     }
 
     fun cleanup() {
@@ -122,20 +135,24 @@ class BoardCardTestFixture(
     }
 
     fun setOrder(cardId: String, columnId: String, rankKey: String, grouping: String = "") {
-        // a manually written rank carries the card's live link key, the same way a real move stamps it
-        orderRepo.upsert(boardRef.toString(), WORKSPACE, grouping, card(cardId).toString(), columnId, rankKey, statusModifiedOf(cardId))
+        // a manually written rank mirrors a real move: the card's live link key + a fresh curation time
+        orderRepo.upsert(
+            boardRef.toString(),
+            WORKSPACE,
+            grouping,
+            card(cardId).toString(),
+            columnId,
+            rankKey,
+            statusModifiedOf(cardId),
+            nextInstant()
+        )
     }
 
     fun statusModifiedOf(cardId: String): Instant? = recordsService.getAtt(card(cardId), "_statusModified").getAs(Instant::class.java)
 
-    /** Direct `_statusModified` write (e.g. a value with sub-milli precision) WITHOUT a status change. */
-    fun setStatusModified(cardId: String, ts: Instant) {
-        recordsService.mutate(card(cardId), mapOf("_statusModified" to ts.toString()))
-    }
-
-    /** Raw rank row with an explicit link key — for staleness/drift scenarios [setOrder] can't produce. */
-    fun setOrderWithLinkKey(cardId: String, columnId: String, rankKey: String, linkKey: Instant?, grouping: String = "") {
-        orderRepo.upsert(boardRef.toString(), WORKSPACE, grouping, card(cardId).toString(), columnId, rankKey, linkKey)
+    /** Raw rank row with explicit link key and curation time — for staleness/skew scenarios [setOrder] can't produce. */
+    fun setOrderWithLinkKey(cardId: String, columnId: String, rankKey: String, linkKey: Instant?, orderedAt: Instant?, grouping: String = "") {
+        orderRepo.upsert(boardRef.toString(), WORKSPACE, grouping, card(cardId).toString(), columnId, rankKey, linkKey, orderedAt)
     }
 
     fun orderRows(columnId: String, grouping: String = ""): List<OrderRec> = orderRepo.findByBoardAndColumn(boardRef.toString(), WORKSPACE, grouping, columnId)

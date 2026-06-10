@@ -12,6 +12,8 @@ class OrderRec(
     val columnId: String = "",
     val rankKey: String = "",
     val grouping: String = "",
-    /** The card's `_statusModified` at ranking time (link key); null on pre-link-key rows. */
-    val cardStatusModified: Instant? = null
+    /** The card's `_statusModified` at ranking time (link key); a row without it is stale. */
+    val cardStatusModified: Instant? = null,
+    /** When the column's ordering was last curated via this row (the new-block anchor source). */
+    val orderedAt: Instant? = null
 )

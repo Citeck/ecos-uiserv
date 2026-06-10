@@ -71,7 +71,8 @@ class BoardCardOrderRepo(private val recordsService: RecordsService) {
         cardRef: String,
         columnId: String,
         rankKey: String,
-        cardStatusModified: Instant? = null
+        cardStatusModified: Instant? = null,
+        orderedAt: Instant? = null
     ) {
         val existing = findByBoardAndCard(boardRef, workspace, grouping, cardRef)
         val atts = mutableMapOf<String, Any?>(
@@ -80,7 +81,8 @@ class BoardCardOrderRepo(private val recordsService: RecordsService) {
             BoardCardOrderDesc.ATT_CARD_REF to cardRef,
             BoardCardOrderDesc.ATT_COLUMN_ID to columnId,
             BoardCardOrderDesc.ATT_RANK_KEY to rankKey,
-            BoardCardOrderDesc.ATT_CARD_STATUS_MODIFIED to cardStatusModified
+            BoardCardOrderDesc.ATT_CARD_STATUS_MODIFIED to cardStatusModified,
+            BoardCardOrderDesc.ATT_ORDERED_AT to orderedAt
         )
         if (existing == null) {
             // Workspace is immutable for a record, so it is set only on create.

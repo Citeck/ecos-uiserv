@@ -13,9 +13,14 @@ import ru.citeck.ecos.uiserv.domain.board.cardorder.service.BoardCardOrderServic
 import ru.citeck.ecos.uiserv.domain.board.cardorder.service.BoardCardOrderService.ColumnPageReq
 import ru.citeck.ecos.uiserv.domain.board.cardorder.test.BoardCardTestFixture
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension
-import java.time.temporal.ChronoUnit
 import kotlin.test.assertEquals
 
+/**
+ * Display contract of a curated column: `[statused after the last curation, ts desc]` ++
+ * `[ranked, rankKey asc]` ++ `[older never-ranked, ts desc]`. The "last curation" anchor is the max
+ * `orderedAt` over the column's valid rank rows — all fixture timestamps (cards, rows, the service's
+ * curation clock) share one synthetic monotonic scale, so before/after relations are deterministic.
+ */
 @ExtendWith(EcosSpringExtension::class)
 @SpringBootTest(classes = [Application::class])
 class BoardCardOrderServiceLoadTest {
@@ -54,13 +59,13 @@ class BoardCardOrderServiceLoadTest {
     }
 
     @Test
-    fun `never-ranked cards older than the newest rank sink below the ranked block`() = AuthContext.runAsSystem {
-        // only c2 is ranked -> anchor = c2's link key. c3 (newer) is the "new" block on top;
-        // c1 (older, never ranked) is the tail BELOW the ranked block — still visible, still counted.
-        fixture.setOrder("c2", "col1", "n0")
+    fun `cards statused after the last curation float above, the rest sink to the tail`() = AuthContext.runAsSystem {
+        fixture.setOrder("c2", "col1", "n0") // the curation act = the anchor
+        val d1 = fixture.createCard("d1", "col1") // statused AFTER the curation -> the new block, on top
+        // c3/c1 were statused BEFORE the curation and left unranked -> the tail, below the ranked block
         val col1 = service.getBoardCards(fixture.boardRef, null, null).first { it.columnId == "col1" }
-        assertEquals(listOf(fixture.card("c3"), fixture.card("c2"), fixture.card("c1")), col1.cards)
-        assertEquals(3L, col1.totalCount)
+        assertEquals(listOf(d1, fixture.card("c2"), fixture.card("c3"), fixture.card("c1")), col1.cards)
+        assertEquals(4L, col1.totalCount)
     }
 
     @Test
@@ -74,24 +79,25 @@ class BoardCardOrderServiceLoadTest {
     }
 
     @Test
-    fun `stale ranks do not raise the new-block anchor`() = AuthContext.runAsSystem {
-        fixture.setOrder("c1", "col1", "g0")
-        fixture.setOrder("c3", "col1", "n0") // newest link key...
-        fixture.setStatus("c3", "col2") // ...but the row is stale now (card left the column)
-        // the anchor must come from VALID ranks only (= c1): c2 is newer than c1 -> new block, on top.
-        // An anchor wrongly taken from c3's stale row would sink c2 into the tail below c1.
+    fun `stale rows do not contribute their curation time to the anchor`() = AuthContext.runAsSystem {
+        fixture.setOrder("c1", "col1", "g0") // the last VALID curation
+        val d1 = fixture.createCard("d1", "col1") // statused after it
+        fixture.setOrder("c3", "col1", "z0") // a newer curation...
+        fixture.setStatus("c3", "col2") // ...whose row is stale now (the card left the column)
+        // the anchor must come from VALID rows only (c1's curation): d1 is the new block on top.
+        // The stale row's newer curation time would wrongly sink d1 into the tail below c1.
         val col1 = service.getBoardCards(fixture.boardRef, null, null).first { it.columnId == "col1" }
-        assertEquals(listOf(fixture.card("c2"), fixture.card("c1")), col1.cards)
-        assertEquals(2L, col1.totalCount)
+        assertEquals(listOf(d1, fixture.card("c1"), fixture.card("c2")), col1.cards)
+        assertEquals(3L, col1.totalCount)
     }
 
     @Test
     fun `manual order is ignored on a no-drag (readOnly) board`() = AuthContext.runAsSystem {
         fixture.setOrder("c1", "col1", "a0")
         fixture.setOrder("c2", "col1", "b0")
-        // canDrag on (fixture default): anchor = c2's link key -> [c3 (new block), c1 (a0), c2 (b0)]
+        // canDrag on (fixture default): ranked [c1, c2], pre-curation c3 in the tail
         val ordered = service.getBoardCards(fixture.boardRef, null, null).first { it.columnId == "col1" }
-        assertEquals(listOf(fixture.card("c3"), fixture.card("c1"), fixture.card("c2")), ordered.cards)
+        assertEquals(listOf(fixture.card("c1"), fixture.card("c2"), fixture.card("c3")), ordered.cards)
         // canDrag off (readOnly = true): plain query order (status-modified desc), the rank table is not consulted
         fixture.setCardOrderEnabled(false)
         val plain = service.getBoardCards(fixture.boardRef, null, null).first { it.columnId == "col1" }
@@ -107,33 +113,51 @@ class BoardCardOrderServiceLoadTest {
         fixture.setOrder("c1", "col1", "g0") // flat rank written AFTER the re-entry: valid
         fixture.setOrder("c2", "col1", "n0") // flat, valid
         // the stale assignee row must NOT shadow c1's valid flat fallback: c1 is ranked g0 (top),
-        // c2 ranked n0, c3 (older than the anchor = c1's fresh link key) is the tail
+        // c2 ranked n0, c3 (statused before the flat curations) is the tail
         val col1 = service.getBoardCards(fixture.boardRef, null, null, "assignee").first { it.columnId == "col1" }
         assertEquals(listOf(fixture.card("c1"), fixture.card("c2"), fixture.card("c3")), col1.cards)
     }
 
     @Test
-    fun `sub-milli link-key drift does not hide a ranked card under an active filter`() = AuthContext.runAsSystem {
-        // live _statusModified gets a sub-milli component; the stored link key is the same instant
-        // truncated to millis — valid by the millis-equality rule, but strictly BELOW the live value,
-        // so the live card lands in the new-block window (> anchor), not the tail window (<= anchor)
-        val live = fixture.statusModifiedOf("c2")!!.plusNanos(500_000)
-        fixture.setStatusModified("c2", live)
-        fixture.setOrderWithLinkKey("c2", "col1", "n0", live.truncatedTo(ChronoUnit.MILLIS))
-        // any non-null filter activates the ranked-confirmation path; this one matches everything in col1
+    fun `rows without a link key are ignored (no legacy support)`() = AuthContext.runAsSystem {
+        // a row not produced by this code (pre-link-key leftover) is simply stale: the column renders
+        // as if the row didn't exist; the next move into the column deletes it
+        fixture.setOrderWithLinkKey("c2", "col1", "n0", null, null)
+        val col1 = service.getBoardCards(fixture.boardRef, null, null).first { it.columnId == "col1" }
+        assertEquals(listOf(fixture.card("c3"), fixture.card("c2"), fixture.card("c1")), col1.cards)
+    }
+
+    @Test
+    fun `cards statused within the skew margin before the curation still float above`() = AuthContext.runAsSystem {
+        // the anchor is on uiserv's clock, card timestamps on the card source's: a card statused a
+        // sub-margin moment "before" the curation may actually be newer — it must not sink into the tail
+        val curationAt = fixture.statusModifiedOf("c3")!!.plusMillis(300)
+        fixture.setOrderWithLinkKey("c2", "col1", "n0", fixture.statusModifiedOf("c2"), curationAt)
+        // boundary = curation - 500ms < ts(c3): c3 floats above the ranked block; c1 (a full second older) is the tail
+        val col1 = service.getBoardCards(fixture.boardRef, null, null).first { it.columnId == "col1" }
+        assertEquals(listOf(fixture.card("c3"), fixture.card("c2"), fixture.card("c1")), col1.cards)
+    }
+
+    @Test
+    fun `a ranked card ahead of the anchor (clock skew) is not hidden under an active filter`() = AuthContext.runAsSystem {
+        // the card's _statusModified (card-source clock) is ahead of the row's orderedAt (uiserv clock):
+        // the valid ranked card lands in the new-block query window, not the tail window — with a filter
+        // active it must still be confirmed as matching (via the union of both windows)
+        val live = fixture.statusModifiedOf("c2")!!
+        fixture.setOrderWithLinkKey("c2", "col1", "n0", live, live.minusMillis(1))
         val filter = Predicates.eq("_status", "col1")
         val col1 = service.getBoardCards(fixture.boardRef, null, filter).first { it.columnId == "col1" }
         assertEquals(listOf(fixture.card("c3"), fixture.card("c2"), fixture.card("c1")), col1.cards)
     }
 
     @Test
-    fun `ranked cards follow unranked, by rankKey asc`() = AuthContext.runAsSystem {
+    fun `ranked cards order by rankKey asc`() = AuthContext.runAsSystem {
         fixture.setOrder("c1", "col1", "g0")
         fixture.setOrder("c2", "col1", "n0")
-        // c3 has no order record -> unranked, on top
+        // c3 has no rank and was statused before the curations -> the tail
         val cols = service.getBoardCards(fixture.boardRef, null, null)
         val col1 = cols.first { it.columnId == "col1" }
-        assertEquals(listOf(fixture.card("c3"), fixture.card("c1"), fixture.card("c2")), col1.cards)
+        assertEquals(listOf(fixture.card("c1"), fixture.card("c2"), fixture.card("c3")), col1.cards)
     }
 
     @Test
@@ -158,7 +182,7 @@ class BoardCardOrderServiceLoadTest {
     @Test
     fun `flat order ignores grouping-specific ranks`() = AuthContext.runAsSystem {
         // grouping ranks order c1(g0) before c2(n0); if the flat view erroneously used them the
-        // result would be [c3, c1, c2] — distinct from the correct status-modified-desc [c3, c2, c1].
+        // result would be [c1, c2, c3] — distinct from the correct status-modified-desc [c3, c2, c1].
         fixture.setOrder("c1", "col1", "g0", grouping = "assignee")
         fixture.setOrder("c2", "col1", "n0", grouping = "assignee")
         val col1 = service.getBoardCards(fixture.boardRef, null, null, "").first { it.columnId == "col1" }
@@ -171,9 +195,9 @@ class BoardCardOrderServiceLoadTest {
         // arrange a flat order, then view under a grouping with no grouping-specific ranks
         fixture.setOrder("c1", "col1", "g0", grouping = "")
         fixture.setOrder("c2", "col1", "n0", grouping = "")
-        // c3 unranked everywhere -> on top; then flat-ordered c1, c2
+        // the flat baseline is inherited: ranked [c1, c2]; pre-curation c3 in the tail
         val col1 = service.getBoardCards(fixture.boardRef, null, null, "assignee").first { it.columnId == "col1" }
-        assertEquals(listOf(fixture.card("c3"), fixture.card("c1"), fixture.card("c2")), col1.cards)
+        assertEquals(listOf(fixture.card("c1"), fixture.card("c2"), fixture.card("c3")), col1.cards)
     }
 
     @Test
@@ -183,7 +207,7 @@ class BoardCardOrderServiceLoadTest {
         // under "assignee", pin c2 above c1 (overriding flat); c1 keeps its flat fallback
         fixture.setOrder("c2", "col1", "a0", grouping = "assignee")
         val col1 = service.getBoardCards(fixture.boardRef, null, null, "assignee").first { it.columnId == "col1" }
-        // c3 unranked on top; then c2 (a0) before c1 (g0 via fallback)
-        assertEquals(listOf(fixture.card("c3"), fixture.card("c2"), fixture.card("c1")), col1.cards)
+        // ranked: c2 (a0) before c1 (g0 via fallback); pre-curation c3 in the tail
+        assertEquals(listOf(fixture.card("c2"), fixture.card("c1"), fixture.card("c3")), col1.cards)
     }
 }

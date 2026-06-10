@@ -34,8 +34,13 @@ model:
       mandatory: true
     # Snapshot of the card's _statusModified taken when the rank was written (the "link key").
     # A mismatch with the live value means the card left the column (or left and came back)
-    # after ranking - the rank is stale. Null on rows written before this attribute existed.
+    # after ranking - the rank is stale. A row without it is treated as stale.
     - id: cardStatusModified
+      type: DATETIME
+    # When the column's ordering was last curated (the move that wrote/updated this row).
+    # The column's "new block" shows only cards whose _statusModified is newer than the max
+    # orderedAt over the column's valid rows.
+    - id: orderedAt
       type: DATETIME
     - id: grouping
       type: TEXT

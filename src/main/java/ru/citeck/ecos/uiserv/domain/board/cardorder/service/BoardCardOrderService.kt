@@ -28,6 +28,7 @@ import ru.citeck.ecos.uiserv.domain.board.dto.BoardColumnFilters
 import ru.citeck.ecos.uiserv.domain.board.service.BoardService
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.webapp.api.entity.EntityRef
+import java.time.Duration
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.Callable
@@ -54,6 +55,15 @@ class BoardCardOrderService(
 
     /** Order records are workspaceScope=PRIVATE; a blank order workspace maps to the default workspace. */
     private fun normalizeWorkspace(workspace: String): String = workspace.ifBlank { ModelUtils.DEFAULT_WORKSPACE_ID }
+
+    /**
+     * Curation-time source for [BoardCardOrderDesc.ATT_ORDERED_AT] stamps. Mutable for tests only:
+     * the test fixture aligns it with its synthetic card-timestamp scale, so "statused after the last
+     * move" scenarios stay deterministic. The anchor comparison is cross-clock by nature (uiserv
+     * stamps vs the card source's `_statusModified`) — skew up to [ANCHOR_SKEW_MARGIN] is absorbed by
+     * the read-side boundary shift (see [loadColumnContent]).
+     */
+    internal var clock: () -> Instant = { Instant.now() }
 
     /**
      * Remove a board's ordering records when the board itself is deleted. Order may exist in several
@@ -245,6 +255,10 @@ class BoardCardOrderService(
         // back (the rank is from a previous "life"). Rows accumulate otherwise, because nothing deletes them
         // when a card leaves a column outside the move API (external `_status` changes, deletes).
         orderRepo.deleteRecords(colRows.invalid.map { it.recordRef })
+
+        // This move is a curation act: every row it writes is stamped with the same [BoardCardOrderDesc.ATT_ORDERED_AT].
+        val touch = clock()
+
         // Effective rank falls back to the flat ("") order for cards not yet ranked in this grouping,
         // so a freshly-grouped view inherits the flat manual order as its baseline. New keys are
         // written to this grouping, evolving it independently thereafter.
@@ -264,7 +278,8 @@ class BoardCardOrderService(
                 ref.toString(),
                 cfg.column,
                 key,
-                live[ref.toString()]?.statusModified
+                live[ref.toString()]?.statusModified,
+                touch
             )
         }
         if (rankByCard.isEmpty()) {
@@ -333,7 +348,8 @@ class BoardCardOrderService(
             cfg.card.toString(),
             cfg.column,
             newKey,
-            live[cfg.card.toString()]?.statusModified
+            live[cfg.card.toString()]?.statusModified,
+            touch
         )
         return newKey
     }
@@ -358,8 +374,17 @@ class BoardCardOrderService(
         if (orderRecs.isEmpty()) return
         val seeds = RankKeys.seedSpread(orderRecs.size)
         orderRecs.forEachIndexed { index, rec ->
-            // re-spreads keys only; each row keeps its link key (see BoardCardOrderDesc.ATT_CARD_STATUS_MODIFIED)
-            orderRepo.upsert(boardRef, workspace, grouping, rec.cardRef, columnId, seeds[index], rec.cardStatusModified)
+            // re-spreads keys only; each row keeps its link key and curation time
+            orderRepo.upsert(
+                boardRef,
+                workspace,
+                grouping,
+                rec.cardRef,
+                columnId,
+                seeds[index],
+                rec.cardStatusModified,
+                rec.orderedAt
+            )
         }
     }
 
@@ -438,6 +463,13 @@ class BoardCardOrderService(
 
         /** Page size for live-state getAtts batches (see [loadLiveStates]). */
         private const val LIVE_STATE_BATCH = 500
+
+        /**
+         * How far back from the anchor the new-block boundary sits (see [loadColumnContent]). Covers
+         * uiserv-vs-card-source clock skew up to this value; beyond it (broken NTP) a card statused
+         * right after a move can still sink into the tail.
+         */
+        private val ANCHOR_SKEW_MARGIN: Duration = Duration.ofMillis(500)
 
         /**
          * Cards are segmented and ordered by status-recency, not creation: a card whose `_status` just
@@ -544,12 +576,13 @@ class BoardCardOrderService(
     /**
      * A rank row counts only while its card is still in the column AND the card's `_statusModified` still
      * equals the snapshot taken when the rank was written (the link key): any later status change — leaving
-     * the column, or leaving and coming back — makes the row stale. Rows written before the link key existed
-     * (null snapshot) fall back to the status-only check.
+     * the column, or leaving and coming back — makes the row stale. A row WITHOUT a link key (not produced
+     * by this code, e.g. a pre-link-key leftover) is stale too: ignored on read, reclaimed by the move-path
+     * prune. There is deliberately NO legacy-row support — old deployments clean the order table instead.
      */
     private fun isRowValid(row: OrderRec, live: LiveCardState?, columnId: String): Boolean {
         if (live == null || live.status != columnId) return false
-        val stored = row.cardStatusModified ?: return true
+        val stored = row.cardStatusModified ?: return false
         return sameInstant(stored, live.statusModified)
     }
 
@@ -574,21 +607,20 @@ class BoardCardOrderService(
     private class OrderedColumn(val refs: List<EntityRef>, val totalCount: Long)
 
     /**
-     * One column's display order and authoritative count. Columns with link-key-stamped valid ranks load as
-     * THREE segments partitioned by `anchor = max(link key over valid ranks)`:
+     * One column's display order and authoritative count. A curated column loads as THREE segments
+     * partitioned by `anchor = max(orderedAt over valid ranks)` — when the ordering was last curated:
      *
-     *   [`_statusModified` > anchor: the "new" block, ts desc — cards that entered the column after the last
-     *    materialization; always on top]
+     *   [`_statusModified` > anchor: the "new" block, ts desc — cards whose status changed after the
+     *    last curation act; always on top]
      *   ++ [valid ranked rows, rankKey asc — read from the order table, NOT window-dependent]
-     *   ++ [`_statusModified` <= anchor and never ranked: the tail, ts desc — cards beyond the materialized
-     *    window at move time; below the curated block]
+     *   ++ [`_statusModified` <= anchor and never ranked: the tail, ts desc — cards the curator saw
+     *    (or could have seen) and left unranked; below the curated block]
      *
      * totalCount = COUNT(> anchor) + COUNT(<= anchor) = the full filtered column count. Columns with no
-     * rows, or whose valid rows are all legacy (null link key), keep the single-window behavior (unranked
-     * prefix ++ ranked) — which is also the no-migration path for pre-link-key data.
+     * valid rows keep the single-window behavior (plain query order).
      *
      * With [additionalFilter]/[filter] active a ranked card must also match them; membership in the
-     * tail-query window is the confirmation. A matching ranked card missed by that window in a huge column
+     * query windows is the confirmation. A matching ranked card missed by those windows in a huge column
      * degrades to "shown when its page is reached" — the same accepted limitation the old single-window
      * model had for ALL ranked cards, now confined to the filtered case.
      */
@@ -611,20 +643,30 @@ class BoardCardOrderService(
             return OrderedColumn(res.getRecords(), res.getTotalCount())
         }
         val validRows = loadColumnRows(boardKey, workspace, grouping, col.id).validByCard.values
-        val anchor = validRows.mapNotNull { it.cardStatusModified }.maxOrNull()
+        // The anchor = when the column's ordering was last CURATED (max orderedAt over valid rows) —
+        // deliberately NOT the cards' own `_statusModified` snapshots: those lag behind reality (a
+        // within-column move doesn't bump them at all), so a never-ranked card with a merely newer
+        // status change would float above a freshly arranged column forever.
+        val anchor = validRows.mapNotNull { it.orderedAt }.maxOrNull()
         if (anchor == null) {
-            // no link-key-stamped valid ranks: an uncurated column, or legacy (pre-link-key) rows only —
-            // single-window load, unranked prefix ++ ranked (the no-migration path)
+            // no valid ranks -> an uncurated column: plain single-window query order
             val res = queryColumnRefs(cardsSourceId, basePredicate, col, additionalFilter, filter, null, workspace, fetch)
             return OrderedColumn(mergeRefs(res.getRecords(), validRows.associate { it.cardRef to it.rankKey }), res.getTotalCount())
         }
+        // The boundary is the anchor shifted back by the skew margin: the anchor is on uiserv's clock,
+        // `_statusModified` on the card source's — if the card source's clock lagged, a card statused
+        // right after a move would compute as "before" it and silently sink into the tail. The margin
+        // absorbs NTP-level skew; the price is benign: cards statused within the margin BEFORE the move
+        // float above the fresh order — same as if the move had happened half a second later — and the
+        // next move folds them in.
+        val boundary = anchor.minus(ANCHOR_SKEW_MARGIN)
         val newRes = queryColumnRefs(
             cardsSourceId,
             basePredicate,
             col,
             additionalFilter,
             filter,
-            ValuePredicate(ATT_STATUS_MODIFIED, ValuePredicate.Type.GT, anchor),
+            ValuePredicate(ATT_STATUS_MODIFIED, ValuePredicate.Type.GT, boundary),
             workspace,
             fetch
         )
@@ -634,7 +676,7 @@ class BoardCardOrderService(
             col,
             additionalFilter,
             filter,
-            ValuePredicate(ATT_STATUS_MODIFIED, ValuePredicate.Type.LE, anchor),
+            ValuePredicate(ATT_STATUS_MODIFIED, ValuePredicate.Type.LE, boundary),
             workspace,
             fetch + validRows.size
         )
@@ -643,16 +685,16 @@ class BoardCardOrderService(
         val restWindow = restRes.getRecords()
         val filtersActive = additionalFilter != null || filter != null
         val ranked = if (filtersActive) {
-            // confirm against BOTH windows: sub-milli drift between the stored link key and the live value
-            // can land a valid ranked card in the new-block window instead of the tail window — it must
-            // still count as filter-matching there
+            // confirm against BOTH windows: a valid ranked card can land in the new-block window instead
+            // of the tail window (its `_statusModified` is in the card source's clock domain, the anchor
+            // in uiserv's — skew can put it above) — it must still count as filter-matching there
             val matching = restWindow.mapTo(HashSet()) { it.toString() }
             newRes.getRecords().mapTo(matching) { it.toString() }
             rankedSorted.filter { it.cardRef in matching }.map { EntityRef.valueOf(it.cardRef) }
         } else {
             rankedSorted.map { EntityRef.valueOf(it.cardRef) }
         }
-        // ranked refs can surface in the query windows (legacy null-link-key ranks; sub-milli anchor drift) — dedupe
+        // ranked refs can surface in the query windows (clock skew puts them above the boundary) — dedupe
         val newBlock = newRes.getRecords().filter { it.toString() !in rankedRefs }
         val tail = restWindow.filter { it.toString() !in rankedRefs }
         return OrderedColumn(newBlock + ranked + tail, newRes.getTotalCount() + restRes.getTotalCount())
