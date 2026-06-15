@@ -318,23 +318,22 @@ class BoardCardOrderService(
             }
         }
 
-        // 4. fully-ranked display order, excluding the moved card
-        val displayNow = cards.asSequence()
-            .filter { it != cfg.card }
-            .sortedWith(compareBy({ rankByCard.getValue(it.toString()) }, { it.toString() }))
-            .toList()
-
-        // 5. find insertion neighbours by `afterCard` (afterCard not in the list -> treat as top)
+        // 4. insertion neighbours, resolved against the WHOLE column order (every valid ranked card
+        // except the moved one, held in rankByCard) — NOT just the client-sent list. The list may be a
+        // truncated prefix that omits cards living in the target gap; taking the next ref FROM IT would
+        // (a) recompute the same midpoint key as a gap-resident card — a duplicate that later makes
+        // RankKeys.between throw ("Invalid order: prev=X next=X") — and (b) drop the card a few rows off
+        // its intended slot. Resolving against the full order keeps the new key unique and adjacent:
+        //   prevKey = afterCard's rank (null when afterCard is absent/unranked -> drop to the top)
+        //   nextKey = the smallest rank strictly greater than prevKey == afterCard's true successor
+        //             (null -> append after the column's last card)
+        val movedRefStr = cfg.card.toString()
         val afterRef = cfg.afterCard?.takeIf { EntityRef.isNotEmpty(it) }
-        val afterIdx = if (afterRef == null) -1 else displayNow.indexOfFirst { it == afterRef }
-        val prevKey: String? = if (afterIdx >= 0) rankByCard.getValue(displayNow[afterIdx].toString()) else null
-        val nextKey: String? = when {
-            afterIdx >= 0 && afterIdx + 1 < displayNow.size -> rankByCard.getValue(displayNow[afterIdx + 1].toString())
-            // drop to the very top: above every ranked card of the column, listed or not
-            afterIdx < 0 -> rankByCard.filterKeys { it != cfg.card.toString() }.values.minOrNull()
-            // drop after the last listed card: after everything known
-            else -> null
-        }
+        val prevKey: String? = afterRef?.let { rankByCard[it.toString()] }
+        val nextKey: String? = rankByCard.asSequence()
+            .filter { it.key != movedRefStr && (prevKey == null || it.value > prevKey) }
+            .minByOrNull { it.value }
+            ?.value
 
         val newKey = RankKeys.between(prevKey, nextKey)
         if (newKey.length > RankKeys.MAX_RANK_LEN) {

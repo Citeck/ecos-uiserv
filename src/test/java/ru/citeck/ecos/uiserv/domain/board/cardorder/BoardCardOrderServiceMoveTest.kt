@@ -241,6 +241,46 @@ class BoardCardOrderServiceMoveTest {
     }
 
     @Test
+    fun `insertion neighbour is the column successor, not the sent-list neighbour`() = AuthContext.runAsSystem {
+        // col1 ranked as c1 < c4 < c2 < c3. c4 sits in the gap between c1 and c2; the client list won't
+        // include it (a truncated window, as a long column sends in production).
+        fixture.setOrder("c1", "col1", "a0")
+        fixture.setOrder("c2", "col1", "n0")
+        fixture.setOrder("c3", "col1", "z0")
+        val c4 = fixture.createCard("c4", "col1")
+        fixture.setOrder("c4", "col1", "g") // a0 < g < n0 -> between c1 and c2
+        assertEquals(listOf(fixture.card("c1"), c4, fixture.card("c2"), fixture.card("c3")), col1Order())
+
+        // move c3 to right after c1, sending a TRUNCATED list that omits the gap card c4. Taking the
+        // next ref from this list (c2) would recompute between(a0, n0) == "g" — a duplicate of c4's key.
+        service.moveCard(
+            MoveCardAction(
+                fixture.boardRef,
+                fixture.card("c3"),
+                "col1",
+                afterCard = fixture.card("c1"),
+                cards = listOf(fixture.card("c1"), fixture.card("c2"), fixture.card("c3"))
+            )
+        )
+        // c3 lands immediately after c1 (before c4), and rank keys stay unique
+        assertEquals(listOf(fixture.card("c1"), fixture.card("c3"), c4, fixture.card("c2")), col1Order())
+        val keys = fixture.orderRows("col1").map { it.rankKey }
+        assertEquals(keys.size, keys.toSet().size, "rank keys must stay unique: $keys")
+
+        // a follow-up insert between c3 and c4 must NOT throw "Invalid order: prev=X next=X"
+        service.moveCard(
+            MoveCardAction(
+                fixture.boardRef,
+                fixture.card("c2"),
+                "col1",
+                afterCard = fixture.card("c3"),
+                cards = col1Order()
+            )
+        )
+        assertEquals(listOf(fixture.card("c1"), fixture.card("c3"), fixture.card("c2"), c4), col1Order())
+    }
+
+    @Test
     fun `order is isolated per workspace`() = AuthContext.runAsSystem {
         // move c1 to top only in workspace wsA
         service.moveCard(

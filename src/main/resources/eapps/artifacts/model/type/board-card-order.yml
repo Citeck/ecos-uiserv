@@ -12,6 +12,14 @@ sourceId: uiserv/board-card-order
 # (assigned from the `_workspace` att on create, filtered by `workspaces` on query) and
 # enforces workspace-membership access. The service always stamps `_workspace` on create
 # (blank -> default), so no type-level defaultWorkspace fallback is needed.
+#
+# `workspaceScope: PRIVATE` is kept for the write-side membership check, but it CANNOT scope
+# reads/writes to EXACTLY the viewing workspace: a `withWorkspaces([ws])` query is always
+# expanded to that workspace PLUS its nested ones (WorkspaceServiceImpl.expandWorkspaces),
+# so a parent board would pick up — and a move would overwrite — a child workspace's order.
+# The plain `workspace` attribute below pins the exact viewing workspace via an ordinary `eq`
+# predicate (AND-ed with the expanded condition by the DAO), the same approach the
+# `workspace-visit` type uses. The order workspace is independent of the board's own workspace.
 workspaceScope: PRIVATE
 
 model:
@@ -44,5 +52,13 @@ model:
       type: DATETIME
     - id: grouping
       type: TEXT
+      index:
+        enabled: true
+    # The viewing workspace this order belongs to, as an exact (non-expanded) scope key. ENTITY_REF
+    # (emodel/workspace@<id>) so it is stored as a Long ref id and filtered by an indexed `eq`. See the
+    # workspaceScope comment above for why the PRIVATE `_workspace` control att alone is not enough.
+    - id: workspace
+      type: ENTITY_REF
+      mandatory: true
       index:
         enabled: true

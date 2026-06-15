@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import ru.citeck.ecos.context.lib.auth.AuthContext
+import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records2.predicate.model.Predicates
 import ru.citeck.ecos.records3.RecordsService
@@ -30,7 +31,9 @@ class BoardCardOrderDaoContextTest {
                 BoardCardOrderDesc.ATT_COLUMN_ID to "col1",
                 BoardCardOrderDesc.ATT_RANK_KEY to "g0",
                 // board-card-order is workspaceScope=PRIVATE -> a workspace is required on create
-                RecordConstants.ATT_WORKSPACE to "wsCtxTest"
+                RecordConstants.ATT_WORKSPACE to "wsCtxTest",
+                // exact (non-expanded) scope key, mandatory on this type
+                BoardCardOrderDesc.ATT_WS to ModelUtils.getWorkspaceRef("wsCtxTest")
             )
         )
         assertEquals("g0", recordsService.getAtt(ref, BoardCardOrderDesc.ATT_RANK_KEY).asText())

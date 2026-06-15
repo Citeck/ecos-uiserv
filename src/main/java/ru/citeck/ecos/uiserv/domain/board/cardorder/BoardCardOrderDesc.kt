@@ -31,4 +31,12 @@ object BoardCardOrderDesc {
     /** Grouping context the order belongs to: "" = flat board, or the swimlane grouping attribute id. */
     const val ATT_GROUPING = "grouping"
     const val GROUPING_FLAT = ""
+
+    /**
+     * The viewing workspace this order belongs to, as an EXACT scope key (ENTITY_REF emodel/workspace@id).
+     * Distinct from the PRIVATE `_workspace` control att (`RecordConstants.ATT_WORKSPACE`): that one is
+     * always expanded to nested workspaces on query, so it can't isolate a parent board from a child's
+     * order. This plain attribute is filtered by an ordinary `eq` and pins exactly one workspace.
+     */
+    const val ATT_WS = "workspace"
 }

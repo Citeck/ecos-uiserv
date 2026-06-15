@@ -5,6 +5,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import ru.citeck.ecos.context.lib.auth.AuthContext
+import ru.citeck.ecos.model.lib.utils.ModelUtils
+import ru.citeck.ecos.records2.RecordConstants
+import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.uiserv.Application
 import ru.citeck.ecos.uiserv.domain.board.cardorder.repo.BoardCardOrderRepo
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension
@@ -18,6 +21,9 @@ class BoardCardOrderRepoTest {
 
     @Autowired
     lateinit var repo: BoardCardOrderRepo
+
+    @Autowired
+    lateinit var recordsService: RecordsService
 
     private val board = "uiserv/board@repoTest"
     private val ws = "default"
@@ -75,6 +81,36 @@ class BoardCardOrderRepoTest {
         assertEquals(2, repo.findByBoard(wsBoard).size)
         repo.deleteByBoard(wsBoard)
         assertEquals(0, repo.findByBoard(wsBoard).size)
+    }
+
+    @Test
+    fun `read is scoped to the exact workspace, not the expandable PRIVATE _workspace`() = AuthContext.runAsSystem {
+        // A withWorkspaces([ws]) query is expanded to the workspace PLUS its nested ones, so a row of a
+        // CHILD workspace would pass a PARENT board's `_workspace` filter. We can't wire nested workspaces
+        // in this context, but the leaking row has exactly this shape: its PRIVATE `_workspace` is in the
+        // queried set, yet its EXACT workspace differs. Build that row directly and assert it is excluded.
+        val leakBoard = "uiserv/board@repoWsScope"
+        recordsService.create(
+            BoardCardOrderDesc.SOURCE_ID,
+            mapOf(
+                BoardCardOrderDesc.ATT_BOARD_REF to leakBoard,
+                BoardCardOrderDesc.ATT_CARD_REF to "emodel/x@leak",
+                BoardCardOrderDesc.ATT_COLUMN_ID to "col1",
+                BoardCardOrderDesc.ATT_RANK_KEY to "g0",
+                BoardCardOrderDesc.ATT_GROUPING to "",
+                // passes withWorkspaces(["wsA"])...
+                RecordConstants.ATT_WORKSPACE to "wsA",
+                // ...but the exact scope key says it belongs to wsB
+                BoardCardOrderDesc.ATT_WS to ModelUtils.getWorkspaceRef("wsB")
+            )
+        )
+        // a normal wsA row to prove the read still returns exact-ws matches
+        repo.upsert(leakBoard, "wsA", "", "emodel/x@own", "col1", "n0")
+
+        val wsA = repo.findByBoardAndColumn(leakBoard, "wsA", "", "col1")
+        assertEquals(listOf("emodel/x@own"), wsA.map { it.cardRef }, "wsA read must skip the wsB-scoped row")
+
+        repo.deleteByBoard(leakBoard)
     }
 
     @Test

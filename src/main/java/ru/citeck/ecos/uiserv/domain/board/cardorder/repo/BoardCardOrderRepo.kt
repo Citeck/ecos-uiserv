@@ -2,6 +2,7 @@ package ru.citeck.ecos.uiserv.domain.board.cardorder.repo
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
+import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.Predicates
@@ -85,8 +86,11 @@ class BoardCardOrderRepo(private val recordsService: RecordsService) {
             BoardCardOrderDesc.ATT_ORDERED_AT to orderedAt
         )
         if (existing == null) {
-            // Workspace is immutable for a record, so it is set only on create.
+            // Workspace is immutable for a record, so it is set only on create. `_workspace` (PRIVATE
+            // scope) drives membership access; the plain `workspace` ref is the EXACT, non-expanded
+            // scope key used by reads/lookups (see [query]).
             atts[RecordConstants.ATT_WORKSPACE] = workspace
+            atts[BoardCardOrderDesc.ATT_WS] = ModelUtils.getWorkspaceRef(workspace)
             recordsService.create(BoardCardOrderDesc.SOURCE_ID, atts)
         } else {
             recordsService.mutate(existing.recordRef, atts)
@@ -113,12 +117,24 @@ class BoardCardOrderRepo(private val recordsService: RecordsService) {
         if (refs.isNotEmpty()) recordsService.delete(refs.toList())
     }
 
-    /** [workspace] = null scopes to all workspaces available to the caller (system => every workspace). */
+    /**
+     * [workspace] = null scopes to all workspaces available to the caller (system => every workspace) —
+     * used by the board-wide cleanup. When non-null it pins EXACTLY that workspace: `withWorkspaces`
+     * alone is expanded to nested workspaces by the PRIVATE-scope DAO, so the order of a parent board
+     * would leak in (and a move's upsert lookup would resolve) a child workspace's rows. The extra
+     * `eq(workspace, ref)` on the plain ENTITY_REF attribute is AND-ed by the DAO and narrows the
+     * expanded set back to the single viewing workspace.
+     */
     private fun query(workspace: String?, predicate: Predicate): List<OrderRec> {
+        val effectivePredicate = if (workspace != null) {
+            Predicates.and(predicate, Predicates.eq(BoardCardOrderDesc.ATT_WS, ModelUtils.getWorkspaceRef(workspace)))
+        } else {
+            predicate
+        }
         return recordsService.query(
             RecordsQuery.create {
                 withSourceId(BoardCardOrderDesc.SOURCE_ID)
-                withQuery(predicate)
+                withQuery(effectivePredicate)
                 if (workspace != null) {
                     withWorkspaces(listOf(workspace))
                 }
