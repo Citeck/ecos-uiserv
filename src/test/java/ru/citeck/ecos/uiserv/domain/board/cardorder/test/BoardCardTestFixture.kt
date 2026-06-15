@@ -134,6 +134,25 @@ class BoardCardTestFixture(
         return ref
     }
 
+    /**
+     * Card with NO `_statusModified` — mirrors a source that doesn't populate the optional attribute (e.g.
+     * JIRA-imported issues). It can still hold a valid rank via the created-based link-key fallback.
+     */
+    fun createCardWithoutStatusModified(id: String, status: String): EntityRef {
+        val ts = nextInstant().toString()
+        val ref = recordsService.create(
+            CARD_SOURCE,
+            mapOf(
+                "id" to id,
+                "_status" to status,
+                "_created" to ts
+                // intentionally no _statusModified
+            )
+        )
+        cardRefs[id] = ref
+        return ref
+    }
+
     fun setOrder(cardId: String, columnId: String, rankKey: String, grouping: String = "") {
         // a manually written rank mirrors a real move: the card's live link key + a fresh curation time
         orderRepo.upsert(
@@ -143,12 +162,17 @@ class BoardCardTestFixture(
             card(cardId).toString(),
             columnId,
             rankKey,
-            statusModifiedOf(cardId),
+            linkKeyOf(cardId),
             nextInstant()
         )
     }
 
     fun statusModifiedOf(cardId: String): Instant? = recordsService.getAtt(card(cardId), "_statusModified").getAs(Instant::class.java)
+
+    fun createdOf(cardId: String): Instant? = recordsService.getAtt(card(cardId), "_created").getAs(Instant::class.java)
+
+    /** The card's link-key marker as the service computes it: `_statusModified`, or `_created` when absent. */
+    fun linkKeyOf(cardId: String): Instant? = statusModifiedOf(cardId) ?: createdOf(cardId)
 
     /** Raw rank row with explicit link key and curation time — for staleness/skew scenarios [setOrder] can't produce. */
     fun setOrderWithLinkKey(cardId: String, columnId: String, rankKey: String, linkKey: Instant?, orderedAt: Instant?, grouping: String = "") {

@@ -278,7 +278,7 @@ class BoardCardOrderService(
                 ref.toString(),
                 cfg.column,
                 key,
-                live[ref.toString()]?.statusModified,
+                live[ref.toString()]?.linkKey,
                 touch
             )
         }
@@ -347,7 +347,7 @@ class BoardCardOrderService(
             cfg.card.toString(),
             cfg.column,
             newKey,
-            live[cfg.card.toString()]?.statusModified,
+            live[cfg.card.toString()]?.linkKey,
             touch
         )
         return newKey
@@ -451,7 +451,10 @@ class BoardCardOrderService(
                 withLanguage(PredicateService.LANGUAGE_PREDICATE)
                 withQuery(predicate)
                 withWorkspaces(listOf(workspace))
-                withSortBy(SortBy(ATT_STATUS_MODIFIED, false))
+                // Primary sort by status-recency; `_created` desc is the tiebreaker so cards whose source
+                // doesn't populate `_statusModified` (all tie on null) still get a stable, meaningful order
+                // (creation desc) instead of an undefined one — consistent with the created-based link key.
+                withSortBy(listOf(SortBy(ATT_STATUS_MODIFIED, false), SortBy(ATT_CREATED, false)))
                 withMaxItems(maxItems)
             }
         )
@@ -477,6 +480,9 @@ class BoardCardOrderService(
          * is the rank rows' link key (see [BoardCardOrderDesc.ATT_CARD_STATUS_MODIFIED]).
          */
         private const val ATT_STATUS_MODIFIED = "_statusModified"
+
+        /** Tiebreaker for the unranked sort when `_statusModified` is absent (see [queryColumnRefs]). */
+        private const val ATT_CREATED = "_created"
     }
 
     internal fun resolveCardsSourceAndPredicate(board: ResolvedBoard): Pair<String, Predicate> {
@@ -547,7 +553,21 @@ class BoardCardOrderService(
         return ColumnRows(validByCard, invalid, live)
     }
 
-    private class LiveCardState(val status: String, val statusModified: Instant?)
+    private class LiveCardState(val status: String, val statusModified: Instant?, val created: Instant?) {
+        /**
+         * The card's link-key marker: its status-change time, or — for sources that don't populate
+         * `_statusModified` (it is an OPTIONAL attribute; the board reads cards from arbitrary universal
+         * sources, ecos-data being only one) — its creation time. The fallback is purely ADDITIVE: it only
+         * fills the transient gap while `_statusModified` is null. The moment a status actually changes the
+         * source stamps `_statusModified` (a move's status mutation does exactly this), so the marker
+         * becomes the real value and round-trip (left-and-returned) detection works as normal — a stored
+         * `created` then no longer matches the live (now non-null) `_statusModified`, so the row goes stale.
+         * `_created` is always present and immutable, so a source that NEVER stamps `_statusModified` keeps
+         * a stable, persisting rank (only round-trip detection is impossible there — there is no signal).
+         * Applied symmetrically on write (upsert) and read ([isRowValid]).
+         */
+        val linkKey: Instant? get() = statusModified ?: created
+    }
 
     /**
      * Live `_status` / `_statusModified` for [cardRefs], batched by [LIVE_STATE_BATCH] (a deeply curated
@@ -560,12 +580,17 @@ class BoardCardOrderService(
         for (chunk in cardRefs.chunked(LIVE_STATE_BATCH)) {
             val atts = recordsService.getAtts(
                 chunk.map { EntityRef.valueOf(it) },
-                mapOf("status" to "_status?str", "statusModified" to "_statusModified")
+                mapOf(
+                    "status" to "_status?str",
+                    "statusModified" to "_statusModified",
+                    "created" to "_created"
+                )
             )
             chunk.forEachIndexed { i, ref ->
                 result[ref] = LiveCardState(
                     atts[i].getAtt("status").asText(),
-                    atts[i].getAtt("statusModified").getAs(Instant::class.java)
+                    atts[i].getAtt("statusModified").getAs(Instant::class.java),
+                    atts[i].getAtt("created").getAs(Instant::class.java)
                 )
             }
         }
@@ -582,7 +607,7 @@ class BoardCardOrderService(
     private fun isRowValid(row: OrderRec, live: LiveCardState?, columnId: String): Boolean {
         if (live == null || live.status != columnId) return false
         val stored = row.cardStatusModified ?: return false
-        return sameInstant(stored, live.statusModified)
+        return sameInstant(stored, live.linkKey)
     }
 
     /** Millisecond-precision equality: sub-milli precision may be lost in storage/serialization round-trips. */
@@ -669,13 +694,24 @@ class BoardCardOrderService(
             workspace,
             fetch
         )
+        // Tail window = `<= boundary` OR `_statusModified` empty. A card whose source doesn't populate
+        // `_statusModified` (an optional attribute) matches NEITHER `> boundary` nor `<= boundary` (any
+        // comparison with null is not-true), so without the empty branch it would vanish from a curated
+        // column entirely — gone from both segments AND from totalCount. Its home is the tail (it can hold a
+        // valid rank via the created-based link key, but unranked it belongs below the curated block).
+        // `> boundary` still excludes nulls, so the two windows stay disjoint and totalCount counts each card
+        // exactly once.
+        val restSegment = Predicates.or(
+            ValuePredicate(ATT_STATUS_MODIFIED, ValuePredicate.Type.LE, boundary),
+            Predicates.empty(ATT_STATUS_MODIFIED)
+        )
         val restRes = queryColumnRefs(
             cardsSourceId,
             basePredicate,
             col,
             additionalFilter,
             filter,
-            ValuePredicate(ATT_STATUS_MODIFIED, ValuePredicate.Type.LE, boundary),
+            restSegment,
             workspace,
             fetch + validRows.size
         )

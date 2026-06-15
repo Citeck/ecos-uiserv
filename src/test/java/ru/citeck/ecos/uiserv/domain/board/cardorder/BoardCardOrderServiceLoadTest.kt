@@ -69,6 +69,45 @@ class BoardCardOrderServiceLoadTest {
     }
 
     @Test
+    fun `a card without status-modified still renders in the tail of a curated column`() = AuthContext.runAsSystem {
+        // rank c2 -> the column is curated (anchor != null), so the load splits it into `> boundary` /
+        // `<= boundary` windows. d1 has NO _statusModified: it matches neither window (null comparisons are
+        // not-true). Without the empty-branch it vanishes entirely — here it must land in the tail and count.
+        fixture.setOrder("c2", "col1", "n0")
+        val d1 = fixture.createCardWithoutStatusModified("d1", "col1")
+        val col1 = service.getBoardCards(fixture.boardRef, null, null).first { it.columnId == "col1" }
+        assertEquals(listOf(fixture.card("c2"), fixture.card("c3"), fixture.card("c1"), d1), col1.cards)
+        assertEquals(4L, col1.totalCount)
+    }
+
+    @Test
+    fun `a card without status-modified holds a valid rank via the created fallback`() = AuthContext.runAsSystem {
+        // cards from sources that don't populate _statusModified (e.g. JIRA-imported issues) have it null.
+        // Without the _created fallback link key every row is born stale (link key null) -> anchor null ->
+        // manual order never persists. With the fallback the rank is valid and the card renders as ranked.
+        val d1 = fixture.createCardWithoutStatusModified("d1", "col1")
+        fixture.setOrder("d1", "col1", "a0") // ranked top via the created-based link key
+        fixture.setOrder("c2", "col1", "n0") // a normal (statused) card, ranked below
+        // ranked: d1 (a0) then c2 (n0); c1/c3 are pre-curation, unranked -> the tail
+        val col1 = service.getBoardCards(fixture.boardRef, null, null).first { it.columnId == "col1" }
+        assertEquals(listOf(d1, fixture.card("c2"), fixture.card("c3"), fixture.card("c1")), col1.cards)
+        assertEquals(4L, col1.totalCount)
+    }
+
+    @Test
+    fun `unranked cards without status-modified order by created desc`() = AuthContext.runAsSystem {
+        // col2 holds only cards whose source doesn't populate _statusModified: they all tie on the primary
+        // sort key (null), so the order would be undefined without the _created desc tiebreaker. e3 is created
+        // last -> it must come first.
+        val e1 = fixture.createCardWithoutStatusModified("e1", "col2")
+        val e2 = fixture.createCardWithoutStatusModified("e2", "col2")
+        val e3 = fixture.createCardWithoutStatusModified("e3", "col2")
+        val col2 = service.getBoardCards(fixture.boardRef, null, null).first { it.columnId == "col2" }
+        assertEquals(listOf(e3, e2, e1), col2.cards)
+        assertEquals(3L, col2.totalCount)
+    }
+
+    @Test
     fun `a card that left and re-entered the column loses its stale rank`() = AuthContext.runAsSystem {
         fixture.setOrder("c1", "col1", "a0") // would pin c1 to the top of the ranked block
         fixture.setStatus("c1", "col2")
