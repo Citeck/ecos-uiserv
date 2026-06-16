@@ -13,6 +13,7 @@ import ru.citeck.ecos.records2.predicate.model.Predicates
 import ru.citeck.ecos.records2.predicate.model.ValuePredicate
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
 import ru.citeck.ecos.records3.RecordsService
+import ru.citeck.ecos.records3.record.dao.query.dto.query.Consistency
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
@@ -107,7 +108,8 @@ class BoardCardOrderService(
         filter: Predicate?,
         grouping: String = BoardCardOrderDesc.GROUPING_FLAT,
         defaultMaxItems: Int = DEFAULT_MAX_ITEMS,
-        workspace: String = ""
+        workspace: String = "",
+        consistency: Consistency = Consistency.DEFAULT
     ): List<ColumnContent> {
         val ws = normalizeWorkspace(workspace)
         val board = resolveBoard(boardRef)
@@ -121,10 +123,11 @@ class BoardCardOrderService(
             columnPages
         }
         require(reqs.any { colById.containsKey(it.columnId) }) { "No known columns requested for board $boardRef" }
-        val (cardsSourceId, basePredicate) = resolveCardsSourceAndPredicate(board)
+        val (cardsSourceId, basePredicate, cardsTypeRef) = resolveCardsSourceAndPredicate(board)
         // Each column's order is composed concurrently (see [loadColumnContents]); paging stays on this thread.
         val resByReq = loadColumnContents(
-            reqs, colById, cardsSourceId, basePredicate, filter, ws, boardRefStr, grouping, board.cardOrderEnabled
+            reqs, colById, cardsSourceId, basePredicate, filter, ws, boardRefStr, grouping, board.cardOrderEnabled,
+            consistency, cardsTypeRef.getLocalId()
         )
         return reqs.mapIndexedNotNull { idx, req ->
             val col = colById[req.columnId] ?: return@mapIndexedNotNull null
@@ -157,7 +160,9 @@ class BoardCardOrderService(
         workspace: String,
         boardKey: String,
         grouping: String,
-        cardOrderEnabled: Boolean
+        cardOrderEnabled: Boolean,
+        consistency: Consistency,
+        cardsType: String
     ): List<OrderedColumn> {
         val scopeData = ecosContext.getScopeData()
         return Executors.newVirtualThreadPerTaskExecutor().use { executor ->
@@ -175,7 +180,7 @@ class BoardCardOrderService(
                         ecosContext.newScope(scopeData).use {
                             loadColumnContent(
                                 cardsSourceId, basePredicate, col, additionalFilter, filter,
-                                workspace, boardKey, grouping, fetch, cardOrderEnabled
+                                workspace, boardKey, grouping, fetch, cardOrderEnabled, consistency, cardsType
                             )
                         }
                     }
@@ -432,7 +437,9 @@ class BoardCardOrderService(
         filter: Predicate?,
         segmentFilter: Predicate?,
         workspace: String,
-        maxItems: Int
+        maxItems: Int,
+        consistency: Consistency,
+        cardsType: String
     ): RecsQueryRes<EntityRef> {
         val statusPredicate = if (additionalFilter != null) {
             Predicates.and(Predicates.eq("_status", col.id), additionalFilter)
@@ -451,6 +458,8 @@ class BoardCardOrderService(
                 withLanguage(PredicateService.LANGUAGE_PREDICATE)
                 withQuery(predicate)
                 withWorkspaces(listOf(workspace))
+                withEcosType(cardsType)
+                withConsistency(consistency)
                 // Primary sort by status-recency; `_created` desc is the tiebreaker so cards whose source
                 // doesn't populate `_statusModified` (all tie on null) still get a stable, meaningful order
                 // (creation desc) instead of an undefined one — consistent with the created-based link key.
@@ -485,14 +494,19 @@ class BoardCardOrderService(
         private const val ATT_CREATED = "_created"
     }
 
-    internal fun resolveCardsSourceAndPredicate(board: ResolvedBoard): Pair<String, Predicate> {
+    /**
+     * The card source: its sourceId, the base predicate, and the cards' TYPE. The type is required to
+     * query the source correctly — its source is a generic DAO that resolves attributes by type, so
+     * without it type-specific attributes (e.g. associations) are not resolved.
+     */
+    internal fun resolveCardsSourceAndPredicate(board: ResolvedBoard): Triple<String, Predicate, EntityRef> {
         if (EntityRef.isNotEmpty(board.journalRef)) {
             val j = recordsService.getAtts(board.journalRef, JournalInfo::class.java)
             if (EntityRef.isNotEmpty(j.typeRef)) {
-                return typeSourceId(j.typeRef) to j.predicate
+                return Triple(typeSourceId(j.typeRef), j.predicate, j.typeRef)
             }
         }
-        return typeSourceId(board.typeRef) to VoidPredicate.INSTANCE
+        return Triple(typeSourceId(board.typeRef), VoidPredicate.INSTANCE, board.typeRef)
     }
 
     private fun typeSourceId(typeRef: EntityRef): String {
@@ -658,12 +672,14 @@ class BoardCardOrderService(
         boardKey: String,
         grouping: String,
         fetch: Int,
-        cardOrderEnabled: Boolean
+        cardOrderEnabled: Boolean,
+        consistency: Consistency,
+        cardsType: String
     ): OrderedColumn {
         if (!cardOrderEnabled) {
             // manual ordering is off for this board: plain query order, the rank table is not consulted
             // (no order-row reads, no live-state batches) — the pre-ordering behavior
-            val res = queryColumnRefs(cardsSourceId, basePredicate, col, additionalFilter, filter, null, workspace, fetch)
+            val res = queryColumnRefs(cardsSourceId, basePredicate, col, additionalFilter, filter, null, workspace, fetch, consistency, cardsType)
             return OrderedColumn(res.getRecords(), res.getTotalCount())
         }
         val validRows = loadColumnRows(boardKey, workspace, grouping, col.id).validByCard.values
@@ -674,7 +690,7 @@ class BoardCardOrderService(
         val anchor = validRows.mapNotNull { it.orderedAt }.maxOrNull()
         if (anchor == null) {
             // no valid ranks -> an uncurated column: plain single-window query order
-            val res = queryColumnRefs(cardsSourceId, basePredicate, col, additionalFilter, filter, null, workspace, fetch)
+            val res = queryColumnRefs(cardsSourceId, basePredicate, col, additionalFilter, filter, null, workspace, fetch, consistency, cardsType)
             return OrderedColumn(mergeRefs(res.getRecords(), validRows.associate { it.cardRef to it.rankKey }), res.getTotalCount())
         }
         // The boundary is the anchor shifted back by the skew margin: the anchor is on uiserv's clock,
@@ -692,7 +708,9 @@ class BoardCardOrderService(
             filter,
             ValuePredicate(ATT_STATUS_MODIFIED, ValuePredicate.Type.GT, boundary),
             workspace,
-            fetch
+            fetch,
+            consistency,
+            cardsType
         )
         // Tail window = `<= boundary` OR `_statusModified` empty. A card whose source doesn't populate
         // `_statusModified` (an optional attribute) matches NEITHER `> boundary` nor `<= boundary` (any
@@ -713,7 +731,9 @@ class BoardCardOrderService(
             filter,
             restSegment,
             workspace,
-            fetch + validRows.size
+            fetch + validRows.size,
+            consistency,
+            cardsType
         )
         val rankedSorted = validRows.sortedWith(compareBy({ it.rankKey }, { it.cardRef }))
         val rankedRefs = rankedSorted.mapTo(HashSet()) { it.cardRef }

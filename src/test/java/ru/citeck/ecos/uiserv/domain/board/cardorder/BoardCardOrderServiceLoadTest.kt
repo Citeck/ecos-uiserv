@@ -8,12 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.records2.predicate.model.Predicates
+import ru.citeck.ecos.records3.record.dao.query.dto.query.Consistency
 import ru.citeck.ecos.uiserv.Application
 import ru.citeck.ecos.uiserv.domain.board.cardorder.service.BoardCardOrderService
 import ru.citeck.ecos.uiserv.domain.board.cardorder.service.BoardCardOrderService.ColumnPageReq
 import ru.citeck.ecos.uiserv.domain.board.cardorder.test.BoardCardTestFixture
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * Display contract of a curated column: `[statused after the last curation, ts desc]` ++
@@ -92,6 +94,19 @@ class BoardCardOrderServiceLoadTest {
         val col1 = service.getBoardCards(fixture.boardRef, null, null).first { it.columnId == "col1" }
         assertEquals(listOf(d1, fixture.card("c2"), fixture.card("c3"), fixture.card("c1")), col1.cards)
         assertEquals(4L, col1.totalCount)
+    }
+
+    @Test
+    fun `card source queries carry the cards type and inherit the requested consistency`() = AuthContext.runAsSystem {
+        // ecosType: the card source is a generic DAO; without the type a text search over an association
+        // attribute resolves against `base` and crashes the SQL. consistency: must propagate so a search
+        // behaves like the journal grid (EVENTUAL), not be silently downgraded.
+        fixture.clearRecordedCardQueries()
+        service.getBoardCards(fixture.boardRef, listOf(ColumnPageReq("col1", 0, 10)), null, consistency = Consistency.EVENTUAL)
+        val queries = fixture.recordedCardQueries
+        assertTrue(queries.isNotEmpty(), "expected at least one card-source query")
+        assertTrue(queries.all { it.consistency == Consistency.EVENTUAL }, "card queries must inherit EVENTUAL")
+        assertTrue(queries.all { it.ecosType == BoardCardTestFixture.TYPE_ID }, "card queries must carry the board's card type")
     }
 
     @Test

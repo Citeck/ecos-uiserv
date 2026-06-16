@@ -62,7 +62,8 @@ class BoardCardsRecordsDao(
             query.filter,
             query.grouping,
             defaultMaxItems,
-            workspace
+            workspace,
+            recordsQuery.consistency
         )
         val res = RecsQueryRes<ColumnRecord>()
         res.setRecords(columns.map { ColumnRecord(query.board, it.columnId, it.name, it.totalCount, it.cards) })
