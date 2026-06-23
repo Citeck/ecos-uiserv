@@ -76,6 +76,7 @@ public class ThemeController {
             return ResponseEntity.notFound().build();
         }
         headers.setContentType(getFontMediaType(fontId));
+        headers.setContentDisposition(ContentDisposition.empty());
         return new HttpEntity<>(bytes, headers);
     }
 
