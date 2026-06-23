@@ -186,7 +186,7 @@ public class ThemeRecords extends AbstractRecordsDao implements RecordsQueryDao,
 
             Map<String, byte[]> resources = new HashMap<>();
             for (EcosFile file : theme.findFiles()) {
-                String name = file.getName();
+                String name = file.getName().toLowerCase();
                 if (ThemeService.RES_EXTENSIONS.stream().anyMatch(name::endsWith)) {
                     String path = "/" + theme.getPath().relativize(file.getPath()).toString();
                     resources.put(path, file.readAsBytes());
