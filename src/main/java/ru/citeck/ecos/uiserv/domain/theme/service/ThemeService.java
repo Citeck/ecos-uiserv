@@ -190,7 +190,7 @@ public class ThemeService {
         return resourcesCache.getUnchecked(new ResourceKey(themeId, RES_TYPE_STYLE, name));
     }
 
-    private String fixName(String name){
+    private String fixName(String name) {
         if (name.charAt(0) != '/') {
             return '/' + name;
         }
