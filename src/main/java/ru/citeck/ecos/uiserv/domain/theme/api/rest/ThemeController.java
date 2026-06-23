@@ -66,16 +66,16 @@ public class ThemeController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setCacheControl(CacheControl.maxAge(4, TimeUnit.HOURS)
+            .mustRevalidate()
             .cachePublic()
         );
 
         ResourceData data = themeService.getFont(themeId, fontId);
         byte[] bytes = data.getData();
         if (bytes == null || bytes.length == 0) {
-            return getNotFoundImageEntity(headers);
+            return ResponseEntity.notFound().build();
         }
         headers.setContentType(getFontMediaType(fontId));
-        headers.setContentDisposition(ContentDisposition.empty());
         return new HttpEntity<>(bytes, headers);
     }
 
@@ -118,15 +118,14 @@ public class ThemeController {
     private MediaType getFontMediaType(String fileName) {
         //see ThemeService.RES_EXTENSIONS
         String fontType = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
-        MediaType mediaType = switch (fontType) {
+        return switch (fontType) {
             case "woff2" -> MediaType.parseMediaType("font/woff2");
             case "woff" -> MediaType.parseMediaType("font/woff");
             case "ttf" -> MediaType.parseMediaType("font/ttf");
             case "otf" -> MediaType.parseMediaType("font/otf");
             case "eot" -> MediaType.parseMediaType("application/vnd.ms-fontobject");
-            default -> throw new IllegalStateException("Unknown font type: " + fileName);
+            default -> throw new IllegalStateException("Unknown font type: " + fontType);
         };
-        return mediaType;
     }
 
     public HttpEntity<byte[]> getNotFoundImageEntity(HttpHeaders headers) {
