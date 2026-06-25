@@ -54,10 +54,12 @@ public class ThemeService {
     public static final String RES_TYPE_IMAGE = "image";
     public static final String ACTIVE_THEME_ID = "active";
     public static final String RES_TYPE_STYLE = "style";
+    public static final String RES_TYPE_FONT = "font";
     public static final String ICON_REF_PREFIX = "uiserv/" + IconRecords.ID + "@";
 
     // ThemeController.groovy should has the same constants
-    public static final List<String> RES_EXTENSIONS = Arrays.asList("png", "jpeg", "jpg", "ico", "svg", "css");
+    public static final List<String> RES_EXTENSIONS = Arrays.asList("png", "jpeg", "jpg", "ico", "svg", "css",
+        "ttf", "otf", "woff", "woff2", "eot");
 
     private static final ResourceData EMPTY_RESOURCE = new ResourceData(null, null);
 
@@ -184,10 +186,25 @@ public class ThemeService {
         if (!name.endsWith(".css")) {
             name = name + ".css";
         }
-        if (name.charAt(0) != '/') {
-            name = '/' + name;
-        }
+        name = fixName(name);
         return resourcesCache.getUnchecked(new ResourceKey(themeId, RES_TYPE_STYLE, name));
+    }
+
+    private String fixName(String name) {
+        if (name.charAt(0) != '/') {
+            return '/' + name;
+        }
+        return name;
+    }
+
+    @NotNull
+    public ResourceData getFont(String themeId, String name) {
+        if (StringUtils.isBlank(name)) {
+            return EMPTY_RESOURCE;
+        }
+        themeId = fixThemeId(themeId);
+        name = fixName(name);
+        return resourcesCache.getUnchecked(new ResourceKey(themeId, RES_TYPE_FONT, name));
     }
 
     @NotNull
