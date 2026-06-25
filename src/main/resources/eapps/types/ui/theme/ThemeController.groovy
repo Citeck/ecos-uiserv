@@ -28,9 +28,10 @@ class Artifact {
 
 return new ArtifactController<Artifact, Unit>() {
 
-    // ThemeService should has the same constants
+    // ThemeService should have the same constants
     public static final List<String> META_EXTENSIONS = Arrays.asList("yml", "yaml", "json");
-    public static final List<String> RES_EXTENSIONS = Arrays.asList("png", "jpeg", "jpg", "svg", "ico", "css");
+    public static final List<String> RES_EXTENSIONS = Arrays.asList("png", "jpeg", "jpg", "svg", "ico", "css",
+        "ttf", "otf", "woff", "woff2", "eot");
 
     private static final Logger log = LoggerFactory.getLogger(ArtifactController.class)
 
