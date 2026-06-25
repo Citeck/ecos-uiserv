@@ -54,8 +54,9 @@ return new ArtifactController<Artifact, Unit>() {
 
             Path metaParentPath = metaFile.parent.getPath()
             module.resources = new HashMap<>()
-
-            for (EcosFile file : metaFile.parent.findFiles("**.{" + RES_EXTENSIONS.join(",") +"}")) {
+            for (EcosFile file : metaFile.parent.findFiles("**.{" + RES_EXTENSIONS.join(",")
+                + "," + RES_EXTENSIONS.stream().map(it -> it.toUpperCase()).toList().join(",")
+                + "}")) {
 
                 String path = metaParentPath
                     .relativize(file.getPath())
