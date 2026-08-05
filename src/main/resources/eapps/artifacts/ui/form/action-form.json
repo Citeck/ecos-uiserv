@@ -523,6 +523,8 @@
                     ],
                     "calculateValue": "value = _.get(data, 'scriptFnLoaded._config', '') || '';",
                     "allowCalculateOverride": true,
+                    "aiEnabled": true,
+                    "scriptContextType": "ui_action",
                     "type": "textarea",
                     "input": true
                   },
