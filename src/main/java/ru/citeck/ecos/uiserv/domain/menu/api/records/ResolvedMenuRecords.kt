@@ -18,6 +18,7 @@ import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDef
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
+import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.api.entity.toEntityRef
 import kotlin.collections.ArrayList
@@ -44,6 +45,30 @@ class ResolvedMenuRecords(
 
         private const val ROLE_WS_MANAGER = AuthRole.PREFIX + "WS_MANAGER"
         private const val ROLE_WS_USER = AuthRole.PREFIX + "WS_USER"
+
+        /**
+         * Menus which are being resolved by the current thread right now.
+         */
+        private val resolvingMenus = ThreadLocal.withInitial { LinkedHashSet<EntityRef>() }
+
+        private inline fun <T> doWithMenuInResolving(menuRef: EntityRef, action: () -> T): T {
+            if (menuRef.isEmpty()) {
+                return action.invoke()
+            }
+            val menus = resolvingMenus.get()
+            if (!menus.add(menuRef)) {
+                // menu was already registered by the outer call
+                return action.invoke()
+            }
+            try {
+                return action.invoke()
+            } finally {
+                menus.remove(menuRef)
+                if (menus.isEmpty()) {
+                    resolvingMenus.remove()
+                }
+            }
+        }
     }
 
     override fun getId() = ID
@@ -82,11 +107,11 @@ class ResolvedMenuRecords(
     ) {
 
         fun getSubMenu(): SubMenus {
-            return SubMenus(workspace, menu.model.subMenu)
+            return SubMenus(workspace, menu.getRef(), menu.model.subMenu)
         }
     }
 
-    inner class SubMenus(workspace: String, originalDef: Map<String, SubMenuDef>) {
+    inner class SubMenus(workspace: String, menuRef: EntityRef, originalDef: Map<String, SubMenuDef>) {
 
         private val subMenus: Map<String, SubMenuDef>
 
@@ -122,7 +147,9 @@ class ResolvedMenuRecords(
             currentAuth.getAuthorities().forEach {
                 currentUserWithAuthorities.add(it.lowercase())
             }
-            subMenus = processMenuItems(originalDef)
+            subMenus = doWithMenuInResolving(normalizeMenuRef(menuRef)) {
+                processMenuItems(originalDef)
+            }
         }
 
         fun getUser(): SubMenuDef {
@@ -249,6 +276,17 @@ class ResolvedMenuRecords(
                 isUserWsManager() ||
                 allowedFor.contains(ROLE_WS_USER) &&
                 isUserWsMember()
+        }
+
+        /**
+         * Menu may be referenced in different ways ('menu@id', 'uiserv/menu@id', 'uiserv/rmenu@id'),
+         * but for the recursion check we should compare menus by the same normalized form.
+         */
+        private fun normalizeMenuRef(menuRef: EntityRef): EntityRef {
+            if (menuRef.getLocalId().isEmpty()) {
+                return EntityRef.EMPTY
+            }
+            return menuRef.withSourceId(MenuRecords.ID).withDefaultAppName(AppName.UISERV)
         }
 
         private fun processMenuItems(
@@ -385,10 +423,23 @@ class ResolvedMenuRecords(
                     return
                 }
 
-                val configToInclude = recordsService.getAtt(
-                    menuRef.withSourceId(ID),
-                    "subMenu.${context.subMenuType}?json"
-                )
+                val menuRefToInclude = normalizeMenuRef(menuRef)
+                if (resolvingMenus.get().contains(menuRefToInclude)) {
+                    log.warn {
+                        "Recursive $ITEM_TYPE_INCLUDE_MENU was detected and will be skipped. " +
+                            "Menu to include: '$menuRefToInclude' " +
+                            "Menus in resolving: ${resolvingMenus.get()} " +
+                            "SubMenu: '${context.subMenuType}' Item path: ${context.path}"
+                    }
+                    return
+                }
+
+                val configToInclude = doWithMenuInResolving(menuRefToInclude) {
+                    recordsService.getAtt(
+                        menuRef.withSourceId(ID),
+                        "subMenu.${context.subMenuType}?json"
+                    )
+                }
 
                 configToInclude.getAs(SubMenuDef::class.java)?.items?.let {
                     result.addAll(it)

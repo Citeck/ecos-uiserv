@@ -1,0 +1,14 @@
+{
+  "left": {
+    "items": [
+      {
+        "id": "rec-self-link-0",
+        "type": "LINK"
+      },
+      {
+        "id": "rec-self-link-1",
+        "type": "LINK"
+      }
+    ]
+  }
+}

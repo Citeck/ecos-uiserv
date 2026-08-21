@@ -1,0 +1,14 @@
+{
+  "left": {
+    "items": [
+      {
+        "id": "rec-a-link-0",
+        "type": "LINK"
+      },
+      {
+        "id": "rec-b-link-0",
+        "type": "LINK"
+      }
+    ]
+  }
+}

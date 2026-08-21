@@ -1,0 +1,20 @@
+{
+  "id": "rec-menu-a",
+  "subMenu": {
+    "left": {
+      "items": [
+        {
+          "id": "rec-a-link-0",
+          "type": "LINK"
+        },
+        {
+          "id": "rec-a-inc-b",
+          "type": "INCLUDE_MENU",
+          "config": {
+            "menuRef": "uiserv/menu@rec-menu-b"
+          }
+        }
+      ]
+    }
+  }
+}

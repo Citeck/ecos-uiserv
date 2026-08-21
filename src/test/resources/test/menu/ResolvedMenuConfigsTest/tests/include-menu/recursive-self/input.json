@@ -1,0 +1,13 @@
+{
+  "left": {
+    "items": [
+      {
+        "id": "main-rec-self-left-0",
+        "type": "INCLUDE_MENU",
+        "config": {
+          "menuRef": "uiserv/menu@rec-self-menu"
+        }
+      }
+    ]
+  }
+}

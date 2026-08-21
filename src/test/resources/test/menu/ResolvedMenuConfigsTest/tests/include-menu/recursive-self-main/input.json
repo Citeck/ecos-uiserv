@@ -1,0 +1,17 @@
+{
+  "left": {
+    "items": [
+      {
+        "id": "main-self-inc-0",
+        "type": "INCLUDE_MENU",
+        "config": {
+          "menuRef": "uiserv/menu@test-menu"
+        }
+      },
+      {
+        "id": "main-self-link-0",
+        "type": "LINK"
+      }
+    ]
+  }
+}

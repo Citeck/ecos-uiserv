@@ -1,0 +1,24 @@
+{
+  "id": "rec-self-menu",
+  "subMenu": {
+    "left": {
+      "items": [
+        {
+          "id": "rec-self-link-0",
+          "type": "LINK"
+        },
+        {
+          "id": "rec-self-inc-0",
+          "type": "INCLUDE_MENU",
+          "config": {
+            "menuRef": "uiserv/menu@rec-self-menu"
+          }
+        },
+        {
+          "id": "rec-self-link-1",
+          "type": "LINK"
+        }
+      ]
+    }
+  }
+}
