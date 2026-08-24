@@ -31,7 +31,9 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -220,6 +222,67 @@ public class ResolvedJournalRecordsDaoTest {
         );
         List<EntityRef> actionsList = recordAtts.getJournalDef().getActions();
         assertThat(actionsList).isEqualTo(expected);
+    }
+
+    @Test
+    void defaultSortableByColumnTypeTest() {
+        journalEntity.setColumns(
+            "[" +
+                "{\"id\":\"textCol\",\"type\":\"TEXT\"}," +
+                "{\"id\":\"numberCol\",\"type\":\"NUMBER\"}," +
+                "{\"id\":\"booleanCol\",\"type\":\"BOOLEAN\"}," +
+                "{\"id\":\"dateCol\",\"type\":\"DATE\"}," +
+                "{\"id\":\"datetimeCol\",\"type\":\"DATETIME\"}," +
+                "{\"id\":\"noTypeCol\"}," +
+                "{\"id\":\"mltextCol\",\"type\":\"MLTEXT\"}," +
+                "{\"id\":\"jsonCol\",\"type\":\"JSON\"}," +
+                "{\"id\":\"assocCol\",\"type\":\"ASSOC\"}," +
+                "{\"id\":\"personCol\",\"type\":\"PERSON\"}," +
+                "{\"id\":\"authorityCol\",\"type\":\"AUTHORITY\"}," +
+                "{\"id\":\"authorityGroupCol\",\"type\":\"AUTHORITY_GROUP\"}," +
+                "{\"id\":\"entityRefCol\",\"type\":\"ENTITY_REF\"}," +
+                "{\"id\":\"contentCol\",\"type\":\"CONTENT\"}," +
+                "{\"id\":\"binaryCol\",\"type\":\"BINARY\"}," +
+                "{\"id\":\"optionsCol\",\"type\":\"OPTIONS\"}," +
+                "{\"id\":\"notSearchableTextCol\",\"type\":\"TEXT\",\"searchable\":false}," +
+                "{\"id\":\"explicitSortableMlTextCol\",\"type\":\"MLTEXT\",\"sortable\":true}," +
+                "{\"id\":\"explicitNotSortableTextCol\",\"type\":\"TEXT\",\"sortable\":false}" +
+            "]"
+        );
+        journalRepository.save(journalEntity);
+
+        ResolvedJournalDef recordAtts = (ResolvedJournalDef) testDao.getRecordAtts(journalEntity.getExtId());
+        Map<String, Boolean> sortableById = new HashMap<>();
+        for (ResolvedColumnDef column : recordAtts.getColumnsEval().invoke()) {
+            sortableById.put(column.getColumn().getId(), column.getColumn().getSortable());
+        }
+
+        assertAll(
+            // sorting is enabled by default only for types which are stored in a sortable form
+            () -> assertThat(sortableById.get("textCol")).isTrue(),
+            () -> assertThat(sortableById.get("numberCol")).isTrue(),
+            () -> assertThat(sortableById.get("booleanCol")).isTrue(),
+            () -> assertThat(sortableById.get("dateCol")).isTrue(),
+            () -> assertThat(sortableById.get("datetimeCol")).isTrue(),
+            // column without explicit type is resolved to TEXT
+            () -> assertThat(sortableById.get("noTypeCol")).isTrue(),
+
+            () -> assertThat(sortableById.get("mltextCol")).isFalse(),
+            () -> assertThat(sortableById.get("jsonCol")).isFalse(),
+            () -> assertThat(sortableById.get("assocCol")).isFalse(),
+            () -> assertThat(sortableById.get("personCol")).isFalse(),
+            () -> assertThat(sortableById.get("authorityCol")).isFalse(),
+            () -> assertThat(sortableById.get("authorityGroupCol")).isFalse(),
+            () -> assertThat(sortableById.get("entityRefCol")).isFalse(),
+            () -> assertThat(sortableById.get("contentCol")).isFalse(),
+            () -> assertThat(sortableById.get("binaryCol")).isFalse(),
+            () -> assertThat(sortableById.get("optionsCol")).isFalse(),
+
+            () -> assertThat(sortableById.get("notSearchableTextCol")).isFalse(),
+            // explicit config always wins
+            () -> assertThat(sortableById.get("explicitSortableMlTextCol")).isTrue(),
+            () -> assertThat(sortableById.get("explicitNotSortableTextCol")).isFalse()
+        );
     }
 
     @Test

@@ -55,6 +55,20 @@ class ResolvedJournalRecordsDao(
     companion object {
         const val ID = "rjournal"
 
+        /**
+         * Attribute types which may be sorted by default.
+         * Other types (MLTEXT, JSON, assoc-like and so on) are stored in a form
+         * which doesn't allow to sort by them in a meaningful way,
+         * so sorting for them should be enabled explicitly in a journal config.
+         */
+        private val DEFAULT_SORTABLE_TYPES = EnumSet.of(
+            AttributeType.TEXT,
+            AttributeType.NUMBER,
+            AttributeType.BOOLEAN,
+            AttributeType.DATE,
+            AttributeType.DATETIME
+        )
+
         private val log = KotlinLogging.logger {}
     }
 
@@ -329,7 +343,7 @@ class ResolvedJournalRecordsDao(
                 column.searchableByText = column.searchable
             }
             if (column.sortable == null) {
-                column.sortable = column.searchable != false && column.type != AttributeType.ASSOC
+                column.sortable = column.searchable != false && DEFAULT_SORTABLE_TYPES.contains(column.type)
             }
             if (column.groupable == null) {
                 val computed = typeAtts[column.id]?.computed ?: ComputedAttDef.EMPTY
