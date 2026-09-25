@@ -35,6 +35,7 @@ import ru.citeck.ecos.uiserv.domain.menu.api.records.MenuRecords.MenuMutRecord
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService
+import ru.citeck.ecos.uiserv.domain.menu.service.utils.MenuWorkspaceRefs
 import ru.citeck.ecos.webapp.api.authority.EcosAuthoritiesApi
 import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
@@ -129,7 +130,12 @@ class MenuRecords(
         if (MenuService.DEFAULT_MENUS.contains(record.id)) {
             record.id = UUID.randomUUID().toString()
         }
-        val saved = menuService.save(record.build())
+        val menu = record.build()
+        // artifact-upload import: CURRENT_WS: placeholders in item refs -> target ws prefix
+        val withBoundRefs = MenuWorkspaceRefs.rewrite(menu) { ref ->
+            ref.withLocalId(workspaceService.replaceCurrentWsPlaceholderToWsPrefix(ref.getLocalId(), menu.workspace))
+        }
+        val saved = menuService.save(withBoundRefs)
         return addMenuWsPrefixToId(saved.id, saved.workspace)
     }
 
@@ -250,11 +256,16 @@ class MenuRecords(
         }
 
         fun getData(): ByteArray {
-            return toNonDefaultString(toJson()).toByteArray(StandardCharsets.UTF_8)
+            val data = MenuWorkspaceRefs.rewrite(model) { ref ->
+                ref.withLocalId(workspaceService.replaceWsPrefixToCurrentWsPlaceholder(ref.getLocalId()))
+            }.copy().withWorkspace("").build()
+            return toNonDefaultString(data).toByteArray(StandardCharsets.UTF_8)
         }
     }
 
     inner class MenuMutRecord(model: MenuDto?) : MenuDto.Builder(model ?: MenuDto.EMPTY) {
+
+        private val originalId = model?.id ?: ""
 
         override fun withSubMenu(subMenu: Map<String, SubMenuDef>?): MenuDto.Builder {
             val newSubMenu = HashMap(this.subMenu)
@@ -268,10 +279,24 @@ class MenuRecords(
             withId(moduleId)
         }
 
+        @JsonProperty(RecordConstants.ATT_WORKSPACE)
+        fun withCtxWorkspace(workspace: String) {
+            if (originalId.isNotBlank() && originalId != id) {
+                withWorkspace(EntityRef.valueOf(workspace).getLocalId())
+            } else {
+                withWorkspace(workspaceService.getUpdatedWsInMutation(this.workspace, workspace))
+            }
+        }
+
         @JsonProperty("_content")
         fun setContent(content: List<ObjectData>) {
             val dataUriContent = content[0].get("url", "")
             val data = mapper.read(dataUriContent, ObjectData::class.java)!!
+            // Exported artifacts carry "workspace": "" — it must not reset the workspace
+            // of the mutation context when `_workspace` is applied before `_content`
+            if (data["workspace"].asText().isBlank()) {
+                data.remove("workspace")
+            }
             mapper.applyData(this, data)
         }
     }

@@ -4,14 +4,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Configuration;
+import ru.citeck.ecos.apps.app.domain.handler.ArtifactDeployMeta;
 import ru.citeck.ecos.apps.app.domain.handler.WsAwareArtifactHandler;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.utils.NameUtils;
 import ru.citeck.ecos.model.lib.workspace.IdInWs;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceServiceExtensionsKt;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDeployArtifact;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
 import ru.citeck.ecos.uiserv.domain.menu.service.MenuService;
+import ru.citeck.ecos.uiserv.domain.menu.service.utils.MenuWorkspaceRefs;
+import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 @Slf4j
@@ -20,10 +27,15 @@ import java.util.function.BiConsumer;
 public class MenuArtifactHandler implements WsAwareArtifactHandler<MenuDeployArtifact> {
 
     private final MenuService menuService;
+    private final WorkspaceService workspaceService;
 
     @Override
     public void deployArtifact(@NotNull MenuDeployArtifact menuModule, @NotNull String workspace) {
-        menuService.upload(menuModule, workspace);
+        Set<EntityRef> coDeployedRefs = new HashSet<>(ArtifactDeployMeta.getThreadMeta().getCoDeployedArtifacts());
+        MenuDto menu = MenuWorkspaceRefs.rewrite(menuService.readMenu(menuModule), ref ->
+            WorkspaceServiceExtensionsKt.bindRefToWorkspace(workspaceService, ref, workspace, coDeployedRefs)
+        );
+        menuService.upload(menu, workspace);
     }
 
     @Override
@@ -39,7 +51,9 @@ public class MenuArtifactHandler implements WsAwareArtifactHandler<MenuDeployArt
                 return;
             }
             String workspace = after.getWorkspace() == null ? "" : after.getWorkspace();
-            MenuDto stripped = after.copy().withWorkspace("").build();
+            MenuDto stripped = MenuWorkspaceRefs.rewrite(after, ref ->
+                ref.withLocalId(workspaceService.replaceWsPrefixToCurrentWsPlaceholder(ref.getLocalId()))
+            ).copy().withWorkspace("").build();
 
             MenuDeployArtifact artifact = new MenuDeployArtifact();
             artifact.setFilename(NameUtils.escape(stripped.getId()) + ".json");
