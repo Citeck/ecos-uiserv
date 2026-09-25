@@ -104,11 +104,18 @@ public class MenuService {
     }
 
     public MenuDto upload(MenuDeployArtifact module, String workspace) {
+        return upload(readMenu(module), workspace);
+    }
 
-        MenuDto menuDto = readerService.readMenu(module.getData(), module.getFilename());
+    public MenuDto readMenu(MenuDeployArtifact module) {
+        return readerService.readMenu(module.getData(), module.getFilename());
+    }
+
+    public MenuDto upload(MenuDto menu, String workspace) {
+
         // Handler-provided workspace is authoritative — override whatever the JSON payload
         // embedded to avoid a ws="" deploy silently persisting under a JSON-embedded workspace.
-        menuDto = menuDto.copy().withWorkspace(workspace).build();
+        MenuDto menuDto = menu.copy().withWorkspace(workspace).build();
 
         MenuDto menuBefore = null;
         MenuEntity entityBefore = menuDao.findByExtIdAndWorkspace(menuDto.getId(), normalizeWorkspace(menuDto.getWorkspace()));

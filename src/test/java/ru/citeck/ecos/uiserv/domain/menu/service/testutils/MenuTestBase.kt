@@ -12,6 +12,7 @@ import ru.citeck.ecos.config.lib.records.CfgRecordsDao
 import ru.citeck.ecos.config.lib.service.EcosConfigServiceFactory
 import ru.citeck.ecos.model.lib.ModelServiceFactory
 import ru.citeck.ecos.model.lib.utils.ModelUtils
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.RecordsServiceFactory
 import ru.citeck.ecos.test.commons.EcosWebAppApiMock
@@ -41,6 +42,8 @@ open class MenuTestBase {
     protected lateinit var menuDao: MenuDao
     protected lateinit var menuService: MenuService
     protected lateinit var resolvedMenuRecords: ResolvedMenuRecords
+    protected lateinit var menuRecords: MenuRecords
+    protected lateinit var workspaceService: WorkspaceService
     protected lateinit var records: RecordsService
 
     protected lateinit var menuArtifactHandler: MenuArtifactHandler
@@ -81,7 +84,8 @@ open class MenuTestBase {
             recordsServices.recordsService
         )
 
-        val menuRecords = MenuRecords(
+        workspaceService = modelServices.workspaceService
+        menuRecords = MenuRecords(
             menuService,
             object : MessageResolver {
                 override fun getMessage(key: String): String {
@@ -105,11 +109,11 @@ open class MenuTestBase {
             }?.id?.let { ModelUtils.getTypeRef(it) }
         }
 
-        val workspaceService = ModelServiceFactory().workspaceService
-        resolvedMenuRecords = ResolvedMenuRecords(menuRecords, ecosTypeService, workspaceService)
+        val resolvedWorkspaceService = ModelServiceFactory().workspaceService
+        resolvedMenuRecords = ResolvedMenuRecords(menuRecords, ecosTypeService, resolvedWorkspaceService)
         records.register(resolvedMenuRecords)
 
-        menuArtifactHandler = MenuArtifactHandler(menuService)
+        menuArtifactHandler = MenuArtifactHandler(menuService, modelServices.workspaceService)
 
         typesInfo.clear()
     }
