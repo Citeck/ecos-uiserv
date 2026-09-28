@@ -59,7 +59,7 @@ class ActionWorkspaceRepoTest {
         val stored = actionRepository.findAll().filter { it.extId == ID }
         assertThat(stored.map { it.workspace }).containsExactlyInAnyOrder("", "ws-a", "ws-b")
 
-        assertThat(actionService.getAction(IdInWs.create("ws-a", ID))!!.name.getClosest()).isEqualTo("name-ws-a")
+        assertThat(AuthContext.runAsSystem { actionService.getAction(IdInWs.create("ws-a", ID)) }!!.name.getClosest()).isEqualTo("name-ws-a")
         assertThat(actionService.getAction(IdInWs.create(ID))!!.name.getClosest()).isEqualTo("name-default")
 
         val globalAndWsA = actionDao.getActions(

@@ -80,12 +80,26 @@ class ActionService(
         return provider.getAction(localId)
     }
 
+    /**
+     * An action in workspace is available only for members of the workspace, admins and system.
+     * Unavailable action is resolved as absent.
+     */
     fun getAction(id: IdInWs): ActionDto? {
         val workspace = actionEntityMapper.toStorageWorkspace(id.workspace)
         if (workspace.isEmpty()) {
             return getAction(id.id)
         }
+        if (!isReadAllowed(workspace)) {
+            log.debug { "Action '$id' is not available for user '${AuthContext.getCurrentUser()}'" }
+            return null
+        }
         return actionEntityMapper.toDto(actionDao.getAction(id.id, workspace))
+    }
+
+    private fun isReadAllowed(workspace: String): Boolean {
+        return AuthContext.isRunAsSystemOrAdmin() ||
+            workspaceService.isRunAsSystemOrWsSystem(workspace) ||
+            workspaceService.isUserMemberOf(AuthContext.getCurrentUser(), workspace)
     }
 
     /**
@@ -194,7 +208,7 @@ class ActionService(
         for (ref in actionRefs) {
             val actionDto = getAction(ref.getLocalId())
             if (actionDto == null) {
-                log.error { "Action doesn't exists: $ref" }
+                log.error { "Action doesn't exists or isn't available: $ref" }
             } else if (actionDto.workspace.isNotEmpty()) {
                 // ids in the result are matched with requested refs
                 // and must not collide with global actions or actions from other workspaces

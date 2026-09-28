@@ -34,6 +34,10 @@ class ActionWorkspaceTest : ActionsTestBase() {
         AuthContext.runAsSystem { actionService.updateAction(action) }
     }
 
+    private fun sysGetAction(id: String): ActionDto? = AuthContext.runAsSystem { actionService.getAction(id) }
+
+    private fun sysGetAction(id: IdInWs): ActionDto? = AuthContext.runAsSystem { actionService.getAction(id) }
+
     private fun actionRef(localId: String) = EntityRef.create("uiserv", ActionRecords.ID, localId)
 
     private fun getName(localId: String): String {
@@ -49,23 +53,23 @@ class ActionWorkspaceTest : ActionsTestBase() {
 
         assertThat(actionDao.getCount()).isEqualTo(3)
 
-        assertThat(actionService.getAction("act")!!.name.getClosest()).isEqualTo("act-")
-        assertThat(actionService.getAction("act")!!.workspace).isEmpty()
+        assertThat(sysGetAction("act")!!.name.getClosest()).isEqualTo("act-")
+        assertThat(sysGetAction("act")!!.workspace).isEmpty()
 
-        val wsAction = actionService.getAction("$WS_1:act")!!
+        val wsAction = sysGetAction("$WS_1:act")!!
         assertThat(wsAction.id).isEqualTo("act")
         assertThat(wsAction.workspace).isEqualTo(WS_1)
         assertThat(wsAction.name.getClosest()).isEqualTo("act-$WS_1")
 
-        assertThat(actionService.getAction("$WS_2:act")!!.name.getClosest()).isEqualTo("act-$WS_2")
-        assertThat(actionService.getAction("unknown-ws:act")).isNull()
-        assertThat(actionService.getAction("$WS_1:unknown")).isNull()
+        assertThat(sysGetAction("$WS_2:act")!!.name.getClosest()).isEqualTo("act-$WS_2")
+        assertThat(sysGetAction("unknown-ws:act")).isNull()
+        assertThat(sysGetAction("$WS_1:unknown")).isNull()
 
         // global workspaces are stored as global
         createAction("admin-act", "admin\$workspace")
         createAction("default-act", "default")
-        assertThat(actionService.getAction("admin-act")).isNotNull
-        assertThat(actionService.getAction("default-act")).isNotNull
+        assertThat(sysGetAction("admin-act")).isNotNull
+        assertThat(sysGetAction("default-act")).isNotNull
     }
 
     @Test
@@ -187,7 +191,7 @@ class ActionWorkspaceTest : ActionsTestBase() {
         }
         assertThat(ref).isEqualTo(actionRef("act"))
         assertThat(getName("act")).isEqualTo("changed")
-        assertThat(actionService.getAction("$WS_1:act")).isNull()
+        assertThat(sysGetAction("$WS_1:act")).isNull()
 
         // action in workspace edited from the global context stays in workspace
         val wsRef = AuthContext.runAs(USER) {
@@ -232,8 +236,8 @@ class ActionWorkspaceTest : ActionsTestBase() {
 
         AuthContext.runAs(USER) { records.delete(actionRef("$WS_1:act")) }
 
-        assertThat(actionService.getAction("$WS_1:act")).isNull()
-        assertThat(actionService.getAction("act")).isNotNull
+        assertThat(sysGetAction("$WS_1:act")).isNull()
+        assertThat(sysGetAction("act")).isNotNull
     }
 
     @Test
@@ -245,7 +249,7 @@ class ActionWorkspaceTest : ActionsTestBase() {
             AuthContext.runAs(USER) { records.delete(actionRef("$WS_1:act")) }
         }.hasMessageContaining("Permission denied")
 
-        assertThat(actionService.getAction("$WS_1:act")).isNotNull
+        assertThat(sysGetAction("$WS_1:act")).isNotNull
     }
 
     @Test
@@ -307,6 +311,7 @@ class ActionWorkspaceTest : ActionsTestBase() {
     @Test
     fun `actions of a type in workspace are resolved for records`() {
 
+        userWorkspaces.add(WS_1)
         createAction("act", "")
         createAction("act", WS_1)
         createAction("other", WS_1)
@@ -314,30 +319,34 @@ class ActionWorkspaceTest : ActionsTestBase() {
         val record = EntityRef.valueOf("test/rec@1")
         val requested = listOf(actionRef("$WS_1:other"), actionRef("act"), actionRef("$WS_1:act"))
 
-        val forRecords = actionService.getActionsForRecords(listOf(record), requested)
+        val forRecords = AuthContext.runAs(USER) { actionService.getActionsForRecords(listOf(record), requested) }
         assertThat(forRecords.actions.map { it.id }).containsExactly("$WS_1:other", "act", "$WS_1:act")
         assertThat(forRecords.actions.map { it.name.getClosest() }).containsExactly("other-$WS_1", "act-", "act-$WS_1")
         assertThat(forRecords.recordActions[record]).containsExactlyInAnyOrder("$WS_1:other", "act", "$WS_1:act")
 
         records.register(RecordActionsRecords(actionService))
-        val recordActions = records.queryOne(
-            RecordsQuery.create()
-                .withSourceId("record-actions")
-                .withQuery(ObjectData.create().set("records", listOf(record)).set("actions", requested))
-                .build(),
-            listOf("actions[]?id", "records[]?num")
-        )!!
+        val recordActions = AuthContext.runAs(USER) {
+            records.queryOne(
+                RecordsQuery.create()
+                    .withSourceId("record-actions")
+                    .withQuery(ObjectData.create().set("records", listOf(record)).set("actions", requested))
+                    .build(),
+                listOf("actions[]?id", "records[]?num")
+            )!!
+        }
         assertThat(recordActions["actions[]?id"].asStrList()).hasSize(3)
         assertThat(recordActions["records[]?num"].map { it.asLong() }).containsExactly(0b111L)
 
         // action query by records keeps the requested order and doesn't mix up actions with the same id
-        val res = records.query(
-            RecordsQuery.create()
-                .withSourceId(ActionRecords.ID)
-                .withQuery(ObjectData.create().set("records", listOf(record.toString())).set("actions", requested))
-                .build(),
-            listOf("actions[]?json")
-        )
+        val res = AuthContext.runAs(USER) {
+            records.query(
+                RecordsQuery.create()
+                    .withSourceId(ActionRecords.ID)
+                    .withQuery(ObjectData.create().set("records", listOf(record.toString())).set("actions", requested))
+                    .build(),
+                listOf("actions[]?json")
+            )
+        }
         val actions = res.getRecords()[0]["actions[]?json"]
         assertThat(actions.map { it["id"].asText() }).containsExactly("$WS_1:other", "act", "$WS_1:act")
         assertThat(actions.map { it["name"]["en"].asText() }).containsExactly("other-$WS_1", "act-", "act-$WS_1")
@@ -357,9 +366,9 @@ class ActionWorkspaceTest : ActionsTestBase() {
             handler.deployArtifact(artifact, WS_1)
         }
 
-        assertThat(actionService.getAction("act")).isNotNull
-        assertThat(actionService.getAction("$WS_1:act")!!.name.getClosest()).isEqualTo("from-app")
-        assertThat(actionService.getAction(IdInWs.create(WS_1, "act"))).isNotNull
+        assertThat(sysGetAction("act")).isNotNull
+        assertThat(sysGetAction("$WS_1:act")!!.name.getClosest()).isEqualTo("from-app")
+        assertThat(sysGetAction(IdInWs.create(WS_1, "act"))).isNotNull
         assertThat(artifact.workspace).isEmpty()
 
         assertThat(changes.map { it.second }).containsExactly("", WS_1)
@@ -367,8 +376,8 @@ class ActionWorkspaceTest : ActionsTestBase() {
         assertThat(changes.map { it.first.id }).containsOnly("act")
 
         AuthContext.runAsSystem { handler.deleteArtifact("act", WS_1) }
-        assertThat(actionService.getAction("$WS_1:act")).isNull()
-        assertThat(actionService.getAction("act")).isNotNull
+        assertThat(sysGetAction("$WS_1:act")).isNull()
+        assertThat(sysGetAction("act")).isNotNull
     }
 
     @Test
@@ -381,7 +390,7 @@ class ActionWorkspaceTest : ActionsTestBase() {
             records.mutate(actionRef(""), ObjectData.create().set("moduleId", "$WS_1:act").set("type", "t"))
         }
         assertThat(ref).isEqualTo(actionRef("$WS_1:act"))
-        assertThat(actionService.getAction("$WS_1:act")!!.id).isEqualTo("act")
+        assertThat(sysGetAction("$WS_1:act")!!.id).isEqualTo("act")
 
         // same workspace in the context
         val ref2 = AuthContext.runAs(USER) {

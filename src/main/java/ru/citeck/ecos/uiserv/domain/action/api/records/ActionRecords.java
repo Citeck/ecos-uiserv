@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.MLText;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.commons.json.YamlUtils;
-import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.context.lib.i18n.I18nContext;
 import ru.citeck.ecos.events2.type.RecordEventsService;
 import ru.citeck.ecos.model.lib.type.repo.TypesRepo;
@@ -142,12 +141,7 @@ public class ActionRecords extends AbstractRecordsDao
         if (recordId.isEmpty()) {
             return new ActionRecord();
         }
-        IdInWs idInWs = workspaceService.convertToIdInWs(recordId);
-        if (!workspaceService.isWorkspaceWithGlobalEntities(idInWs.getWorkspace())
-            && !AuthContext.isRunAsSystemOrAdmin()
-            && !workspaceService.isUserMemberOf(AuthContext.getCurrentUser(), idInWs.getWorkspace())) {
-            return EmptyAttValue.INSTANCE;
-        }
+        // access to actions in workspace is checked by the service
         ActionDto action = actionService.getAction(recordId);
         if (action == null) {
             return EmptyAttValue.INSTANCE;
