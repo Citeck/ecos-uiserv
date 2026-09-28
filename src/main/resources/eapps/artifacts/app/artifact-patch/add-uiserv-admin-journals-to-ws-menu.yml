@@ -33,6 +33,15 @@ config:
           type: JOURNAL
           config:
             recordRef: uiserv/journal@ecos-forms
+        - id: ui-actions
+          label:
+            ru: Действия
+            en: Actions
+          icon: ui/icon@i-leftmenu-tools
+          hidden: false
+          type: JOURNAL
+          config:
+            recordRef: uiserv/journal@ui-actions
         - id: ecos-menus
           label:
             ru: Меню
