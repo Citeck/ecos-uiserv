@@ -51,6 +51,7 @@ class DashboardService(
             "site-dashboard",
             "person-dashboard",
             "orgstructure-person-dashboard",
+            "orgstructure-dashboard",
             "default-doclib-dashboard",
             "base-type-dashboard"
         )

@@ -1,0 +1,154 @@
+{
+  "id": "orgstructure-dashboard",
+  "typeRef": "emodel/type@orgstructure-dashboard",
+  "appliedToRef": "",
+  "authority": null,
+  "scope": "orgstructure",
+  "priority": 0,
+  "config": {
+    "layouts": [
+      {
+        "id": "layout_8778ea07-af49-4075-a664-2ac04aeacf3b",
+        "tab": {
+          "label": {
+            "ru": "Оргструктура",
+            "en": "Orgstructure"
+          },
+          "idLayout": "layout_8778ea07-af49-4075-a664-2ac04aeacf3b"
+        },
+        "type": "1-column",
+        "columns": [
+          {
+            "widgets": [
+              {
+                "dndId": "b4aa3038-4454-414c-ad42-c1fa02c99050",
+                "name": "html",
+                "label": "HTML",
+                "id": "d25c721c-e391-4ec9-894c-226d5e363964",
+                "props": {
+                  "id": "d25c721c-e391-4ec9-894c-226d5e363964",
+                  "config": {
+                    "title": {
+                      "ru": "Профиль пользователя",
+                      "en": "User profile"
+                    },
+                    "htmlString": {
+                      "ru": "<div style=\"text-align: center; font-weight: 700; color: #767676;\">Откройте профиль пользователя</div>",
+                      "en": "<div style=\"text-align: center; font-weight: 700; color: #767676;\">Open a user profile</div>"
+                    },
+                    "isWysiwygMode": false
+                  }
+                },
+                "description": "Оргструктура"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "mobile": [
+      {
+        "id": "layout_3aad577a-93dc-46e1-8c4f-2604594388f5",
+        "tab": {
+          "label": {
+            "ru": "Оргструктура",
+            "en": "Orgstructure"
+          },
+          "idLayout": "layout_3aad577a-93dc-46e1-8c4f-2604594388f5"
+        },
+        "type": "mobile",
+        "columns": [
+          {
+            "widgets": [
+              {
+                "dndId": "fae2c914-fae1-465a-8600-8e2df00de704",
+                "name": "html",
+                "label": "HTML",
+                "id": "d25c721c-e391-4ec9-894c-226d5e363964",
+                "props": {
+                  "id": "d25c721c-e391-4ec9-894c-226d5e363964",
+                  "config": {
+                    "title": {
+                      "ru": "Профиль пользователя",
+                      "en": "User profile"
+                    },
+                    "htmlString": {
+                      "ru": "<div style=\"text-align: center; font-weight: 700; color: #767676;\">Откройте профиль пользователя</div>",
+                      "en": "<div style=\"text-align: center; font-weight: 700; color: #767676;\">Open a user profile</div>"
+                    },
+                    "isWysiwygMode": false
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "v2": {
+      "widgets": [
+        {
+          "dndId": "b4aa3038-4454-414c-ad42-c1fa02c99050",
+          "name": "html",
+          "label": "HTML",
+          "id": "d25c721c-e391-4ec9-894c-226d5e363964",
+          "props": {
+            "id": "d25c721c-e391-4ec9-894c-226d5e363964",
+            "config": {
+              "widgetDisplayCondition": null,
+              "elementsDisplayCondition": {},
+              "title": {
+                "ru": "Профиль пользователя",
+                "en": "User profile"
+              },
+              "htmlString": {
+                "ru": "<div style=\"text-align: center; font-weight: 700; color: #767676;\">Откройте профиль пользователя</div>",
+                "en": "<div style=\"text-align: center; font-weight: 700; color: #767676;\">Open a user profile</div>"
+              },
+              "isWysiwygMode": false
+            }
+          },
+          "description": "Оргструктура"
+        }
+      ],
+      "desktop": [
+        {
+          "id": "layout_8778ea07-af49-4075-a664-2ac04aeacf3b",
+          "tab": {
+            "label": {
+              "ru": "Оргструктура",
+              "en": "Orgstructure"
+            },
+            "idLayout": "layout_8778ea07-af49-4075-a664-2ac04aeacf3b"
+          },
+          "type": "1-column",
+          "columns": [
+            {
+              "widgets": ["d25c721c-e391-4ec9-894c-226d5e363964"]
+            }
+          ]
+        }
+      ],
+      "mobile": [
+        {
+          "id": "layout_3aad577a-93dc-46e1-8c4f-2604594388f5",
+          "tab": {
+            "label": {
+              "ru": "Оргструктура",
+              "en": "Orgstructure"
+            },
+            "idLayout": "layout_3aad577a-93dc-46e1-8c4f-2604594388f5"
+          },
+          "type": "mobile",
+          "columns": [
+            {
+              "widgets": ["d25c721c-e391-4ec9-894c-226d5e363964"]
+            }
+          ]
+        }
+      ]
+    },
+    "version": "v2"
+  },
+  "attributes": {}
+}
