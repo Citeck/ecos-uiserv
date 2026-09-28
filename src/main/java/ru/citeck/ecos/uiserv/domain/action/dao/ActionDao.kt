@@ -12,7 +12,10 @@ interface ActionDao {
 
     fun getCount(predicate: Predicate): Long
 
-    fun getAction(id: String): ActionEntity?
+    /**
+     * @param workspace storage workspace of the action: empty string for a global action
+     */
+    fun getAction(id: String, workspace: String): ActionEntity?
 
     fun save(entity: ActionEntity): ActionEntity
 

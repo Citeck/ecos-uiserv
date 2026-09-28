@@ -18,6 +18,12 @@ public class ActionDto {
 
     private String id;
 
+    /**
+     * Workspace the action belongs to. Empty string means a global action.
+     * Not a part of the artifact: stripped on export and set by the deployer.
+     */
+    private String workspace = "";
+
     private MLText name;
     private MLText pluralName;
 
@@ -50,6 +56,7 @@ public class ActionDto {
     public ActionDto(ActionDto other) {
 
         this.id = other.id;
+        this.workspace = other.workspace;
         this.name = other.name;
         this.pluralName = other.pluralName;
         this.type = other.type;
@@ -75,6 +82,14 @@ public class ActionDto {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getWorkspace() {
+        return workspace;
+    }
+
+    public void setWorkspace(String workspace) {
+        this.workspace = workspace != null ? workspace : "";
     }
 
     public MLText getName() {

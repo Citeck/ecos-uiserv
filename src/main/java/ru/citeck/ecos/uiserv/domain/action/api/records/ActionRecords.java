@@ -18,8 +18,14 @@ import ru.citeck.ecos.context.lib.i18n.I18nContext;
 import ru.citeck.ecos.events2.type.RecordEventsService;
 import ru.citeck.ecos.model.lib.type.repo.TypesRepo;
 import ru.citeck.ecos.model.lib.type.service.utils.TypeUtils;
+import ru.citeck.ecos.model.lib.workspace.IdInWs;
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
+import ru.citeck.ecos.records2.RecordConstants;
 import ru.citeck.ecos.records2.predicate.PredicateService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
+import ru.citeck.ecos.records2.predicate.model.VoidPredicate;
+import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
+import ru.citeck.ecos.records3.record.atts.schema.ScalarType;
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.utils.StringUtils;
@@ -39,7 +45,6 @@ import ru.citeck.ecos.webapp.api.constants.AppName;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import jakarta.annotation.PostConstruct;
-import ru.citeck.ecos.webapp.lib.perms.RecordPerms;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -62,12 +67,19 @@ public class ActionRecords extends AbstractRecordsDao
     private RecordEventsService recordEventsService;
     private final TypesRepo typesRepo;
     private final UiServSystemArtifactPerms perms;
+    private final WorkspaceService workspaceService;
 
     @Autowired
-    public ActionRecords(ActionService actionService, TypesRepo typesRepo, UiServSystemArtifactPerms perms) {
+    public ActionRecords(
+        ActionService actionService,
+        TypesRepo typesRepo,
+        UiServSystemArtifactPerms perms,
+        WorkspaceService workspaceService
+    ) {
         this.actionService = actionService;
         this.typesRepo = typesRepo;
         this.perms = perms;
+        this.workspaceService = workspaceService;
     }
 
     @PostConstruct
@@ -89,18 +101,37 @@ public class ActionRecords extends AbstractRecordsDao
 
     @Override
     public ActionRecord getRecToMutate(@NotNull String recordId) throws Exception {
-        Object recordAtts = getRecordAtts(recordId);
-        if (!(recordAtts instanceof ActionRecord)) {
+        if (recordId.isEmpty()) {
+            return new ActionRecord();
+        }
+        ActionDto action = actionService.getAction(recordId);
+        if (action == null) {
             throw new RuntimeException("Action doesn't found: '" + recordId + "'");
         }
-        return (ActionRecord) recordAtts;
+        return new ActionRecord(action);
     }
 
     @NotNull
     @Override
     public String saveMutatedRec(ActionRecord actionRecord) throws Exception {
+        // the id may be passed with a workspace prefix ('<wsSysId>:id').
+        // Stored as is, it would be a global action which can't be resolved by its ref
+        IdInWs idInWs = workspaceService.convertToIdInWs(StringUtils.defaultString(actionRecord.getId()));
+        if (!idInWs.getWorkspace().isEmpty()) {
+            actionRecord.setId(idInWs.getId());
+        }
+        String workspace = actionRecord.resolveWorkspaceToSave();
+        if (!idInWs.getWorkspace().isEmpty()) {
+            if (workspaceService.isWorkspaceWithGlobalEntities(workspace)) {
+                workspace = idInWs.getWorkspace();
+            } else if (!workspace.equals(idInWs.getWorkspace())) {
+                throw new IllegalArgumentException("Workspace of the action id '" + idInWs
+                    + "' doesn't match the action workspace '" + workspace + "'");
+            }
+        }
+        actionRecord.setWorkspace(workspace);
         actionService.updateAction(actionRecord);
-        return actionRecord.getId();
+        return actionService.getRefLocalId(actionRecord);
     }
 
     @Nullable
@@ -110,6 +141,7 @@ public class ActionRecords extends AbstractRecordsDao
         if (recordId.isEmpty()) {
             return new ActionRecord();
         }
+        // access to actions in workspace is checked by the service
         ActionDto action = actionService.getAction(recordId);
         if (action == null) {
             return EmptyAttValue.INSTANCE;
@@ -136,25 +168,17 @@ public class ActionRecords extends AbstractRecordsDao
             int max = recordsQuery.getPage().getMaxItems();
             int skip = recordsQuery.getPage().getSkipCount();
 
-            List<ActionDto> actions;
+            Predicate predicate = VoidPredicate.INSTANCE;
+            List<SortBy> sortBy = Collections.emptyList();
 
             if (PredicateService.LANGUAGE_PREDICATE.equals(recordsQuery.getLanguage())) {
-
-                Predicate predicate = recordsQuery.getQuery(Predicate.class);
-
-                actions = actionService.getActions(
-                    predicate,
-                    max,
-                    skip,
-                    recordsQuery.getSortBy()
-                );
-                result.setTotalCount(actionService.getCount(predicate));
-
-            } else {
-
-                actions = actionService.getActions(max, skip);
-                result.setTotalCount(actionService.getCount());
+                predicate = recordsQuery.getQuery(Predicate.class);
+                sortBy = recordsQuery.getSortBy();
             }
+            List<String> workspaces = recordsQuery.getWorkspaces();
+
+            List<ActionDto> actions = actionService.getActions(predicate, workspaces, max, skip, sortBy);
+            result.setTotalCount(actionService.getCount(predicate, workspaces));
 
             result.setRecords(actions.stream()
                 .map(ActionRecord::new)
@@ -446,11 +470,47 @@ public class ActionRecords extends AbstractRecordsDao
 
     public class ActionRecord extends ActionDto {
 
+        /**
+         * Id of the action before mutation. Empty for a new action.
+         */
+        private final String originalId;
+        /**
+         * Workspace from the mutation context (_workspace attribute).
+         */
+        private String ctxWorkspace;
+
         public ActionRecord(ActionDto model) {
             super(model);
+            originalId = StringUtils.defaultString(model.getId());
         }
 
         public ActionRecord() {
+            originalId = "";
+        }
+
+        @AttName(ScalarType.ID_SCHEMA)
+        public EntityRef getRef() {
+            return EntityRef.create(AppName.UISERV, ActionRecords.ID, actionService.getRefLocalId(this));
+        }
+
+        @JsonProperty(RecordConstants.ATT_WORKSPACE)
+        public void setCtxWorkspace(String workspace) {
+            this.ctxWorkspace = workspace;
+        }
+
+        /**
+         * A new action and a copy of an action (id is changed) are created in the context workspace.
+         * An existing action keeps its workspace.
+         * Resolved on save because attributes may be applied in any order.
+         */
+        public String resolveWorkspaceToSave() {
+            if (ctxWorkspace == null || (!originalId.isEmpty() && originalId.equals(getId()))) {
+                return getWorkspace();
+            }
+            if (originalId.isEmpty()) {
+                return workspaceService.getUpdatedWsInMutation(getWorkspace(), ctxWorkspace);
+            }
+            return workspaceService.getUpdatedWsInMutation("", ctxWorkspace);
         }
 
         public String getModuleId() {
@@ -487,15 +547,20 @@ public class ActionRecords extends AbstractRecordsDao
 
         @JsonValue
         public ActionDto toJson() {
-            return new ActionDto(this);
+            ActionDto dto = new ActionDto(this);
+            dto.setWorkspace("");
+            return dto;
         }
 
         public byte[] getData() {
             return YamlUtils.toNonDefaultString(toJson()).getBytes(StandardCharsets.UTF_8);
         }
 
-        public RecordPerms getPermissions() {
-           return perms.getPerms(EntityRef.create(AppName.UISERV, ActionRecords.ID, getId()));
+        public Object getPermissions() {
+            if (!workspaceService.isWorkspaceWithGlobalEntities(getWorkspace())) {
+                return new WsActionPerms(getWorkspace(), workspaceService);
+            }
+            return perms.getPerms(EntityRef.create(AppName.UISERV, ActionRecords.ID, getId()));
         }
 
     }

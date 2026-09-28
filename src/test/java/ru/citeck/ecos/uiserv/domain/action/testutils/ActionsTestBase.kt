@@ -2,7 +2,11 @@ package ru.citeck.ecos.uiserv.domain.action.testutils
 
 import org.junit.jupiter.api.BeforeEach
 import org.mockito.Mockito
+import ru.citeck.ecos.model.lib.ModelServiceFactory
 import ru.citeck.ecos.model.lib.type.repo.DefaultTypesRepo
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
+import ru.citeck.ecos.model.lib.workspace.api.WorkspaceApi
+import ru.citeck.ecos.model.lib.workspace.api.WsMembershipType
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.RecordsServiceFactory
 import ru.citeck.ecos.test.commons.EcosWebAppApiMock
@@ -22,6 +26,17 @@ open class ActionsTestBase {
     protected lateinit var mapper: ActionEntityMapper
     protected lateinit var actionDao: ActionDao
     protected lateinit var perms: UiServSystemArtifactPerms
+    protected lateinit var workspaceService: WorkspaceService
+
+    /**
+     * Workspaces of every user in tests. Workspace id is equal to its system id.
+     */
+    protected val userWorkspaces: MutableSet<String> = mutableSetOf()
+
+    /**
+     * Workspaces where every user in tests is a manager.
+     */
+    protected val managedWorkspaces: MutableSet<String> = mutableSetOf()
 
     @BeforeEach
     fun before() {
@@ -34,8 +49,28 @@ open class ActionsTestBase {
             }
         }
 
+        val modelServices = ModelServiceFactory()
+        modelServices.setWorkspaceApi(object : WorkspaceApi {
+            override fun getNestedWorkspaces(workspaces: Collection<String>): List<Set<String>> {
+                return workspaces.map { emptySet() }
+            }
+            override fun getUserWorkspaces(user: String, membershipType: WsMembershipType): Set<String> {
+                return userWorkspaces
+            }
+            override fun isUserManagerOf(user: String, workspace: String): Boolean {
+                return managedWorkspaces.contains(workspace)
+            }
+            override fun mapIdentifiers(
+                identifiers: List<String>,
+                mappingType: WorkspaceApi.IdMappingType
+            ): List<String> {
+                return identifiers
+            }
+        })
+        workspaceService = modelServices.workspaceService
+
         actionDao = ActionInMemDao(recordsServices.predicateService)
-        mapper = ActionEntityMapper(actionDao)
+        mapper = ActionEntityMapper(actionDao, workspaceService)
         perms = Mockito.mock(UiServSystemArtifactPerms::class.java)
 
         val actionsDaoProvider = DaoActionsProvider(actionDao, mapper)
@@ -48,7 +83,8 @@ open class ActionsTestBase {
             evaluatorService,
             mapper,
             actionDao,
-            perms
+            perms,
+            workspaceService
         )
         actionService.setActionProviders(listOf(actionsDaoProvider))
 
@@ -56,7 +92,8 @@ open class ActionsTestBase {
             ActionRecords(
                 actionService,
                 DefaultTypesRepo(),
-                perms
+                perms,
+                workspaceService
             )
         )
     }

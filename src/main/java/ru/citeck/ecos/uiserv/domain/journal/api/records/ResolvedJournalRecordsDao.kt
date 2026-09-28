@@ -137,6 +137,8 @@ class ResolvedJournalRecordsDao(
         }
 
         val actions = ArrayList(journalBuilder.actions)
+        // JournalActionsProvider loads the journal by this id, so a journal in workspace needs the prefix
+        val journalRefLocalId = workspaceService.addWsPrefixToId(journalBuilder.id, journalBuilder.workspace)
         journalBuilder.withActionsDef(
             actionsDef.map {
                 val localId = if (it.id.isBlank()) {
@@ -146,7 +148,7 @@ class ResolvedJournalRecordsDao(
                     it.id
                 }
                 val action = it.copy()
-                action.withId("journal$${journalBuilder.id}$$localId")
+                action.withId("journal$$journalRefLocalId$$localId")
                 actions.add(EntityRef.create("uiserv", "action", action.id))
                 action.build()
             }

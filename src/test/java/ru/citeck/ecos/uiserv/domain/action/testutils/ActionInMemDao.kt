@@ -11,7 +11,7 @@ import ru.citeck.ecos.uiserv.domain.action.repo.ActionEntity
 
 class ActionInMemDao(private val predicateService: PredicateService) : ActionDao {
 
-    private val data: MutableMap<String, ActionEntity> = mutableMapOf()
+    private val data: MutableMap<Pair<String, String>, ActionEntity> = mutableMapOf()
 
     override fun getActions(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<ActionEntity> {
 
@@ -30,7 +30,7 @@ class ActionInMemDao(private val predicateService: PredicateService) : ActionDao
         val result = mutableListOf<ActionEntity>()
         for (i in skip until actions.size) {
             result.add(actions[i])
-            if (result.size >= max) {
+            if (max >= 0 && result.size >= max) {
                 break
             }
         }
@@ -45,16 +45,16 @@ class ActionInMemDao(private val predicateService: PredicateService) : ActionDao
         return predicateService.filter(data.values, predicate).size.toLong()
     }
 
-    override fun getAction(id: String): ActionEntity? {
-        return data[id]
+    override fun getAction(id: String, workspace: String): ActionEntity? {
+        return data[workspace to id]
     }
 
     override fun save(entity: ActionEntity): ActionEntity {
-        data[entity.extId] = entity
+        data[entity.workspace to entity.extId] = entity
         return entity
     }
 
     override fun delete(action: ActionEntity) {
-        data.remove(action.extId)
+        data.remove(action.workspace to action.extId)
     }
 }

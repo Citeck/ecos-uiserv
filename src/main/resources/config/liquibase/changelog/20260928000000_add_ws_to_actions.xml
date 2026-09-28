@@ -1,0 +1,18 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="citeck" id="20260928000000">
+
+        <!-- actions become workspace-scoped like journal/forms/board: '' is the global workspace -->
+        <addColumn tableName="actions">
+            <column name="workspace" type="VARCHAR"/>
+        </addColumn>
+        <sql>UPDATE actions SET workspace = '' WHERE workspace IS NULL</sql>
+        <dropUniqueConstraint tableName="actions" constraintName="actions_ext_id_key" uniqueColumns="ext_id"/>
+        <addUniqueConstraint tableName="actions" columnNames="workspace,ext_id"/>
+        <addDefaultValue tableName="actions" columnName="workspace" defaultValue=""/>
+        <addNotNullConstraint tableName="actions" columnName="workspace"/>
+
+    </changeSet>
+
+</databaseChangeLog>
