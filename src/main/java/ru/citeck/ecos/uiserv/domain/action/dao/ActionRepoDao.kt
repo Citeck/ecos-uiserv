@@ -34,8 +34,8 @@ class ActionRepoDao(
         return searchConv.getCount(repo, predicate)
     }
 
-    override fun getAction(id: String): ActionEntity? {
-        return repo.findByExtId(id)
+    override fun getAction(id: String, workspace: String): ActionEntity? {
+        return repo.findByExtIdAndWorkspace(id, workspace)
     }
 
     override fun save(entity: ActionEntity): ActionEntity {

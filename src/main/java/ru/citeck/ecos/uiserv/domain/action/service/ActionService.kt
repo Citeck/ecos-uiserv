@@ -4,7 +4,12 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.context.lib.auth.AuthContext
+import ru.citeck.ecos.model.lib.workspace.IdInWs
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
+import ru.citeck.ecos.records2.predicate.PredicateUtils
 import ru.citeck.ecos.records2.predicate.model.Predicate
+import ru.citeck.ecos.records2.predicate.model.Predicates
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
 import ru.citeck.ecos.uiserv.app.common.perms.UiServSystemArtifactPerms
@@ -29,16 +34,29 @@ class ActionService(
     private val evaluatorsService: RecordEvaluatorService,
     private val actionEntityMapper: ActionEntityMapper,
     private val actionDao: ActionDao,
-    private val perms: UiServSystemArtifactPerms
+    private val perms: UiServSystemArtifactPerms,
+    private val workspaceService: WorkspaceService
 ) {
     companion object {
         val log = KotlinLogging.logger {}
+
+        private const val ARTIFACT_TYPE_ID = "action"
     }
 
     private val actionProviders: MutableMap<String, ActionsProvider> = ConcurrentHashMap()
     private var changeListeners: MutableList<(ActionDto?, ActionDto) -> Unit> = CopyOnWriteArrayList()
 
+    /**
+     * Resolve action by the local id of its ref: 'id' for a global action,
+     * '<wsSysId>:id' for an action in workspace or '<provider>$id' for provided actions.
+     * The returned dto has a bare id and the workspace in [ActionDto.workspace].
+     */
     fun getAction(id: String): ActionDto? {
+
+        val idInWs = workspaceService.convertToIdInWs(id)
+        if (idInWs.workspace.isNotEmpty()) {
+            return getAction(idInWs)
+        }
 
         val providerDelimIdx = id.indexOf('$')
 
@@ -62,30 +80,65 @@ class ActionService(
         return provider.getAction(localId)
     }
 
-    fun getCount(): Long {
-        return actionDao.getCount()
+    fun getAction(id: IdInWs): ActionDto? {
+        val workspace = actionEntityMapper.toStorageWorkspace(id.workspace)
+        if (workspace.isEmpty()) {
+            return getAction(id.id)
+        }
+        return actionEntityMapper.toDto(actionDao.getAction(id.id, workspace))
     }
 
-    fun getCount(predicate: Predicate): Long {
-        return actionDao.getCount(predicate)
+    /**
+     * Local id of the action ref: bare id for a global action and '<wsSysId>:id' for an action in workspace.
+     */
+    fun getRefLocalId(action: ActionDto): String {
+        val id: String = action.id ?: ""
+        if (id.isEmpty()) {
+            return id
+        }
+        return workspaceService.addWsPrefixToId(id, action.workspace ?: "")
     }
 
-    fun getActions(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<ActionDto> {
-        return getActionEntities(predicate, max, skip, sort).mapNotNull { actionEntityMapper.toDto(it) }
+    fun getCount(predicate: Predicate, workspaces: List<String>): Long {
+        val fullPredicate = withWorkspacesCondition(predicate, workspaces) ?: return 0
+        return actionDao.getCount(fullPredicate)
     }
 
-    fun getActions(predicate: Predicate, max: Int, skip: Int): List<ActionDto> {
-        return getActionEntities(predicate, max, skip).mapNotNull { actionEntityMapper.toDto(it) }
+    fun getActions(
+        predicate: Predicate,
+        workspaces: List<String>,
+        max: Int,
+        skip: Int,
+        sort: List<SortBy>
+    ): List<ActionDto> {
+        val fullPredicate = withWorkspacesCondition(predicate, workspaces) ?: return emptyList()
+        return getActionEntities(fullPredicate, max, skip, sort).mapNotNull { actionEntityMapper.toDto(it) }
     }
 
-    fun getActions(max: Int, skip: Int): List<ActionDto> {
-        return getActionEntities(max, skip).mapNotNull { actionEntityMapper.toDto(it) }
+    /**
+     * Restrict the query to workspaces available for the current user.
+     * Null means that no workspace is available and the result is empty.
+     */
+    private fun withWorkspacesCondition(predicate: Predicate, workspaces: List<String>): Predicate? {
+        val wsPredicate = workspaceService.buildAvailableWorkspacesPredicate(
+            AuthContext.getCurrentRunAsAuth(),
+            workspaces
+        )
+        return if (PredicateUtils.isAlwaysFalse(wsPredicate)) {
+            null
+        } else if (PredicateUtils.isAlwaysTrue(wsPredicate)) {
+            predicate
+        } else {
+            Predicates.and(predicate, wsPredicate)
+        }
     }
 
     fun updateAction(action: ActionDto) {
-        perms.checkWrite(EntityRef.create(AppName.UISERV, ActionRecords.ID, action.id))
 
-        val before = actionDao.getAction(action.id)?.let { actionEntityMapper.toDto(it) }
+        val workspace = actionEntityMapper.toStorageWorkspace(action.workspace)
+        checkWrite(IdInWs.create(workspace, action.id))
+
+        val before = actionDao.getAction(action.id, workspace)?.let { actionEntityMapper.toDto(it) }
 
         var actionEntity = actionEntityMapper.toEntity(action)
         actionEntity = actionDao.save(actionEntity)
@@ -100,14 +153,39 @@ class ActionService(
         changeListeners.add(action)
     }
 
+    /**
+     * @param id local id of the action ref ('id' or '<wsSysId>:id')
+     */
     fun deleteAction(id: String?) {
         id ?: return
+        deleteAction(workspaceService.convertToIdInWs(id))
+    }
 
-        perms.checkWrite(EntityRef.create(AppName.UISERV, ActionRecords.ID, id))
+    fun deleteAction(id: IdInWs) {
 
-        val action = actionDao.getAction(id)
+        val workspace = actionEntityMapper.toStorageWorkspace(id.workspace)
+        checkWrite(IdInWs.create(workspace, id.id))
+
+        val action = actionDao.getAction(id.id, workspace)
         if (action != null) {
             actionDao.delete(action)
+        }
+    }
+
+    /**
+     * Global actions are system artifacts and may be changed by admins only.
+     * Actions in workspace may be changed by the workspace managers too.
+     */
+    private fun checkWrite(id: IdInWs) {
+        if (id.workspace.isEmpty()) {
+            perms.checkWrite(EntityRef.create(AppName.UISERV, ActionRecords.ID, id.id))
+            return
+        }
+        val user = AuthContext.getCurrentUser()
+        if (!workspaceService.getArtifactsWritePermission(user, id.workspace, ARTIFACT_TYPE_ID)) {
+            throw IllegalAccessException(
+                "Permission denied. You can't create or change actions in workspace '${id.workspace}'"
+            )
         }
     }
 
@@ -117,6 +195,12 @@ class ActionService(
             val actionDto = getAction(ref.getLocalId())
             if (actionDto == null) {
                 log.error { "Action doesn't exists: $ref" }
+            } else if (actionDto.workspace.isNotEmpty()) {
+                // ids in the result are matched with requested refs
+                // and must not collide with global actions or actions from other workspaces
+                val actionWithRefId = ActionDto(actionDto)
+                actionWithRefId.id = getRefLocalId(actionDto)
+                result.add(actionWithRefId)
             } else {
                 result.add(actionDto)
             }
@@ -198,14 +282,6 @@ class ActionService(
 
     private fun getActionEntities(predicate: Predicate, max: Int, skip: Int, sort: List<SortBy>): List<ActionEntity> {
         return actionDao.getActions(predicate, max, skip, sort)
-    }
-
-    private fun getActionEntities(predicate: Predicate, max: Int, skip: Int): List<ActionEntity> {
-        return actionDao.getActions(predicate, max, skip, emptyList())
-    }
-
-    private fun getActionEntities(max: Int, skip: Int): List<ActionEntity> {
-        return actionDao.getActions(VoidPredicate.INSTANCE, max, skip, emptyList())
     }
 
     fun addActionProvider(provider: ActionsProvider) {

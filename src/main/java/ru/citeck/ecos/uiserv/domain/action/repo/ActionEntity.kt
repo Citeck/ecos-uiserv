@@ -14,8 +14,13 @@ class ActionEntity : AbstractAuditingEntity() {
     @SequenceGenerator(name = "hibernate_sequence")
     val id: Long? = null
 
-    @Column(unique = true)
     lateinit var extId: String
+
+    /**
+     * Workspace the action belongs to. Empty string means a global action.
+     * Unique key is (workspace, extId).
+     */
+    var workspace: String = ""
 
     var name: String? = null
     var type: String? = null

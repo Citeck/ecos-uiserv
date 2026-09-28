@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface ActionRepository extends JpaRepository<ActionEntity, Long>,
     JpaSpecificationExecutor<ActionEntity> {
 
-    ActionEntity findByExtId(String extId);
+    ActionEntity findByExtIdAndWorkspace(String extId, String workspace);
 }

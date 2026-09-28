@@ -6,6 +6,7 @@ import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json.mapper
+import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.uiserv.domain.action.dao.ActionDao
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionConfirmDef
@@ -18,8 +19,21 @@ import ru.citeck.ecos.uiserv.domain.evaluator.repo.EvaluatorEntity
 
 @Component
 class ActionEntityMapper(
-    private val actionDao: ActionDao
+    private val actionDao: ActionDao,
+    private val workspaceService: WorkspaceService
 ) {
+
+    /**
+     * Workspace as it is stored in the actions table: global workspaces
+     * (blank, default, admin$...) are stored as empty string.
+     */
+    fun toStorageWorkspace(workspace: String?): String {
+        return if (workspaceService.isWorkspaceWithGlobalEntities(workspace)) {
+            ""
+        } else {
+            workspace!!
+        }
+    }
 
     fun toDto(actionEntity: ActionEntity?): ActionDto? {
 
@@ -28,6 +42,7 @@ class ActionEntityMapper(
         val action = ActionDto()
 
         action.id = actionEntity.extId
+        action.workspace = actionEntity.workspace
         action.icon = actionEntity.icon
         action.name = mapper.read(actionEntity.name, MLText::class.java)
         action.pluralName = mapper.read(actionEntity.pluralName, MLText::class.java)
@@ -80,10 +95,12 @@ class ActionEntityMapper(
 
     fun toEntity(action: ActionDto): ActionEntity {
 
-        var actionEntity = actionDao.getAction(action.id)
+        val workspace = toStorageWorkspace(action.workspace)
+        var actionEntity = actionDao.getAction(action.id, workspace)
         if (actionEntity == null) {
             actionEntity = ActionEntity()
             actionEntity.extId = action.id
+            actionEntity.workspace = workspace
         }
         actionEntity.icon = action.icon
         actionEntity.name = mapper.toString(action.name)
