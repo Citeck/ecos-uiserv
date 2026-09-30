@@ -1,0 +1,159 @@
+{
+  "id": "config-journals-pagination",
+  "formKey": "",
+  "title": {},
+  "description": {},
+  "customModule": "",
+  "typeRef": "",
+  "width": "sm",
+  "system": true,
+  "i18n": {},
+  "definition": {
+    "components": [
+      {
+        "type": "container",
+        "key": "_value",
+        "input": true,
+        "hideLabel": true,
+        "label": {
+          "ru": "Значение",
+          "en": "Value"
+        },
+        "components": [
+          {
+            "type": "panel",
+            "key": "journalsPagePanel",
+            "input": false,
+            "title": {
+              "ru": "Страница журнала",
+              "en": "Journal page"
+            },
+            "components": [
+              {
+                "type": "container",
+                "key": "journalsPage",
+                "input": true,
+                "hideLabel": true,
+                "label": {
+                  "ru": "Страница журнала",
+                  "en": "Journal page"
+                },
+                "components": [
+                  {
+                    "type": "ecosSelect",
+                    "key": "pageSizeMode",
+                    "input": true,
+                    "label": {
+                      "ru": "Количество строк",
+                      "en": "Number of rows"
+                    },
+                    "dataSrc": "values",
+                    "data": {
+                      "values": [
+                        {
+                          "label": {
+                            "ru": "Автоматически, по высоте окна",
+                            "en": "Automatic, fits the window height"
+                          },
+                          "value": "AUTO"
+                        },
+                        {
+                          "label": {
+                            "ru": "Фиксированное",
+                            "en": "Fixed"
+                          },
+                          "value": "FIXED"
+                        }
+                      ]
+                    },
+                    "defaultValue": "AUTO",
+                    "validate": {
+                      "required": true
+                    }
+                  },
+                  {
+                    "type": "number",
+                    "key": "pageSize",
+                    "input": true,
+                    "label": {
+                      "ru": "Строк на странице",
+                      "en": "Rows per page"
+                    },
+                    "decimalLimit": 0,
+                    "requireDecimal": false,
+                    "validate": {
+                      "required": true,
+                      "min": 1,
+                      "max": 1000,
+                      "integer": true
+                    },
+                    "customConditional": "show = _.get(data, '_value.journalsPage.pageSizeMode') === 'FIXED';"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "columns",
+        "key": "buttons-columns",
+        "columns": [
+          {
+            "md": 3,
+            "type": "column",
+            "input": false,
+            "index": 0
+          },
+          {
+            "md": 3,
+            "type": "column",
+            "input": false,
+            "index": 1
+          },
+          {
+            "md": 3,
+            "type": "column",
+            "input": false,
+            "index": 2,
+            "components": [
+              {
+                "type": "button",
+                "key": "cancel",
+                "label": {
+                  "ru": "Отменить",
+                  "en": "Cancel"
+                },
+                "action": "event",
+                "event": "cancel",
+                "block": true,
+                "input": true
+              }
+            ]
+          },
+          {
+            "md": 3,
+            "type": "column",
+            "input": false,
+            "index": 3,
+            "components": [
+              {
+                "type": "button",
+                "theme": "primary",
+                "key": "submit",
+                "label": {
+                  "ru": "Сохранить",
+                  "en": "Save"
+                },
+                "block": true,
+                "input": true
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "attributes": {},
+  "notExists": false
+}
