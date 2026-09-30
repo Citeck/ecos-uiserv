@@ -1,0 +1,11 @@
+---
+id: journals-pagination
+name:
+  ru: Пагинация журналов
+  en: Journals pagination
+value:
+  journalsPage:
+    pageSizeMode: AUTO
+valueDef:
+  type: JSON
+  formRef: 'uiserv/form@config-journals-pagination'
