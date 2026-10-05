@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct
 import org.springframework.context.annotation.Configuration
 import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
+import ru.citeck.ecos.uiserv.app.common.utils.TypeBasedAutoArtifactUtils
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.model.type.dto.TypeDef
 import ru.citeck.ecos.webapp.lib.model.type.registry.EcosTypesRegistry
@@ -96,7 +97,9 @@ class EcosTypesComponent(
     }
 
     private fun refMatchesWorkspace(ref: EntityRef, typeWorkspace: String): Boolean {
-        val refWs = workspaceService.convertToIdInWs(ref.getLocalId()).workspace
+        // an auto journal/form of a type (type$<type localId>) is in the workspace of its type
+        val wsRef = TypeBasedAutoArtifactUtils.getAutoArtifactTypeRef(ref) ?: ref
+        val refWs = workspaceService.convertToIdInWs(wsRef.getLocalId()).workspace
         return refWs == typeWorkspace
     }
 

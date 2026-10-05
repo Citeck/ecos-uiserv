@@ -12,7 +12,7 @@ system: true
 
 actions:
   - uiserv/action@debug-form
-  - uiserv/action@ecos-module-download
+  - uiserv/action@download-base64-data-json
   - uiserv/action@module-copy
   - uiserv/action@open-localization-action-form
   - uiserv/action@open-form-builder

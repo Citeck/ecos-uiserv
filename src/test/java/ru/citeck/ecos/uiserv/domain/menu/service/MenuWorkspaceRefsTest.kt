@@ -7,7 +7,6 @@ import org.mockito.kotlin.whenever
 import ru.citeck.ecos.apps.app.domain.handler.ArtifactDeployMeta
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json
-import ru.citeck.ecos.commons.json.YamlUtils
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.model.lib.workspace.IdInWs
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService
@@ -49,7 +48,12 @@ class MenuWorkspaceRefsTest : MenuTestBase() {
             expectedRefs("CURRENT_WS:")
         )
         assertThat(nonRefValues(exported)).containsExactlyInAnyOrder(GLOBAL_JOURNAL, URL)
-        assertThat(String(exported.toBytes(), StandardCharsets.UTF_8)).doesNotContain("@$WS_A:")
+        assertThat(autoItemIds(exported)).containsExactlyInAnyOrder(
+            "AUTO-J-CURRENT_WS:type-mul13f2d",
+            "AUTO-J-co-type-mul13f2e"
+        )
+        assertThat(String(exported.toBytes(), StandardCharsets.UTF_8))
+            .doesNotContain("@$WS_A:", "\$$WS_A:", "AUTO-J-$WS_A:")
     }
 
     @Test
@@ -64,7 +68,11 @@ class MenuWorkspaceRefsTest : MenuTestBase() {
     fun `artifact deploy into another workspace binds placeholders to it`() {
 
         val artifact = toArtifact(exportWsMenu())
-        deploy(artifact, WS_B, listOf(EntityRef.valueOf("uiserv/journal@co-deployed")))
+        deploy(
+            artifact,
+            WS_B,
+            listOf(EntityRef.valueOf("uiserv/journal@co-deployed"), EntityRef.valueOf("emodel/type@co-type"))
+        )
 
         val deployed = menuService.getMenu(IdInWs.create(WS_B, MENU_ID)).orElseThrow()
 
@@ -73,6 +81,13 @@ class MenuWorkspaceRefsTest : MenuTestBase() {
         assertThat(nonRefValues(deployed)).containsExactlyInAnyOrder(GLOBAL_JOURNAL, URL)
         assertThat(findItem(deployed, "co-deployed").config["recordRef"].asText())
             .isEqualTo("uiserv/journal@$WS_B:co-deployed")
+        // the auto journal follows its type: co-deployed type -> journal of the type in the target ws
+        assertThat(findItem(deployed, "co-type-journal").config["recordRef"].asText())
+            .isEqualTo("uiserv/journal@type\$$WS_B:co-type")
+        assertThat(autoItemIds(deployed)).containsExactlyInAnyOrder(
+            "AUTO-J-$WS_B:type-mul13f2d",
+            "AUTO-J-$WS_B:co-type-mul13f2e"
+        )
     }
 
     @Test
@@ -85,6 +100,7 @@ class MenuWorkspaceRefsTest : MenuTestBase() {
 
         assertThat(deployed.workspace).isEmpty()
         assertThat(refsOf(deployed)).containsExactlyInAnyOrderElementsOf(expectedRefs(""))
+        assertThat(autoItemIds(deployed)).containsExactlyInAnyOrder("AUTO-J-type-mul13f2d", "AUTO-J-co-type-mul13f2e")
         assertThat(nonRefValues(deployed)).containsExactlyInAnyOrder(GLOBAL_JOURNAL, URL)
     }
 
@@ -117,14 +133,16 @@ class MenuWorkspaceRefsTest : MenuTestBase() {
         saveWsMenu()
 
         val record = menuRecords.getRecordAtts("$WS_A:$MENU_ID")
-        val exported = Json.mapper.convert(
-            YamlUtils.read(String(record.getData(), StandardCharsets.UTF_8)),
-            MenuDto::class.java
-        )!!
+        // json like the menu artifact: a downloaded menu must be deployable from an application
+        val exported = Json.mapper.read(record.getData(), MenuDto::class.java)!!
 
         assertThat(exported.workspace).isEmpty()
         assertThat(refsOf(exported)).containsExactlyInAnyOrderElementsOf(expectedRefs("CURRENT_WS:"))
         assertThat(nonRefValues(exported)).containsExactlyInAnyOrder(GLOBAL_JOURNAL, URL)
+        assertThat(autoItemIds(exported)).containsExactlyInAnyOrder(
+            "AUTO-J-CURRENT_WS:type-mul13f2d",
+            "AUTO-J-co-type-mul13f2e"
+        )
         // ?json stays as is — it is not an export format
         assertThat(Json.mapper.convert(record.toJson(), MenuDto::class.java)!!.workspace).isEqualTo(WS_A)
     }
@@ -134,7 +152,7 @@ class MenuWorkspaceRefsTest : MenuTestBase() {
 
         saveWsMenu()
         val data = menuRecords.getRecordAtts("$WS_A:$MENU_ID").getData()
-        val content = "data:application/x-yaml;base64," + Base64.getEncoder().encodeToString(data)
+        val content = "data:application/json;base64," + Base64.getEncoder().encodeToString(data)
 
         val ref = AuthContext.runAsSystem {
             records.mutate(
@@ -150,6 +168,10 @@ class MenuWorkspaceRefsTest : MenuTestBase() {
         val uploaded = menuService.getMenu(IdInWs.create(WS_B, MENU_ID)).orElseThrow()
         assertThat(refsOf(uploaded)).containsExactlyInAnyOrderElementsOf(expectedRefs("$WS_B:"))
         assertThat(nonRefValues(uploaded)).containsExactlyInAnyOrder(GLOBAL_JOURNAL, URL)
+        assertThat(autoItemIds(uploaded)).containsExactlyInAnyOrder(
+            "AUTO-J-$WS_B:type-mul13f2d",
+            "AUTO-J-co-type-mul13f2e"
+        )
     }
 
     @Test
@@ -230,7 +252,9 @@ class MenuWorkspaceRefsTest : MenuTestBase() {
             "emodel/doc@${prefix}record",
             "uiserv/form@${prefix}form",
             "eproc/bpmn-def@${prefix}process",
-            "uiserv/journal@${prefix}deep"
+            "uiserv/journal@${prefix}deep",
+            "uiserv/journal@type\$${prefix}type",
+            "uiserv/form@type\$${prefix}type"
         )
     }
 
@@ -243,6 +267,7 @@ class MenuWorkspaceRefsTest : MenuTestBase() {
                     item("journal-in-section", "JOURNAL", "recordRef" to "uiserv/journal@$WS_A:journal-in-section"),
                     item("global-journal", "JOURNAL", "recordRef" to GLOBAL_JOURNAL),
                     item("co-deployed", "JOURNAL", "recordRef" to "uiserv/journal@co-deployed"),
+                    item("co-type-journal", "JOURNAL", "recordRef" to "uiserv/journal@type\$co-type"),
                     item(
                         "sub-section",
                         "SECTION",
@@ -251,6 +276,10 @@ class MenuWorkspaceRefsTest : MenuTestBase() {
                         )
                     ),
                     item("dashboard", "DASHBOARD", "dashboardId" to "uiserv/dashboard@$WS_A:dash"),
+                    // auto journal of a workspace type: the ws prefix follows the 'type$' prefix
+                    // auto item of a workspace type: TypeInWsCreatedListener finds it by the type id in its id
+                    item("AUTO-J-$WS_A:type-mul13f2d", "JOURNAL", "recordRef" to "uiserv/journal@type\$$WS_A:type"),
+                    item("AUTO-J-co-type-mul13f2e", "JOURNAL"),
                     item("link", "ARBITRARY", "url" to URL)
                 )
             )
@@ -273,7 +302,12 @@ class MenuWorkspaceRefsTest : MenuTestBase() {
                 "recordRef" to "emodel/doc@$WS_A:record",
                 "formRef" to "uiserv/form@$WS_A:form"
             ),
-            item("start-workflow", "START_WORKFLOW", "processDef" to "eproc/bpmn-def@$WS_A:process")
+            item("start-workflow", "START_WORKFLOW", "processDef" to "eproc/bpmn-def@$WS_A:process"),
+            item(
+                "edit-with-type-form",
+                "EDIT_RECORD",
+                "formRef" to "uiserv/form@type\$$WS_A:type"
+            )
         )
         return MenuDto.create()
             .withId(MENU_ID)
@@ -347,13 +381,17 @@ class MenuWorkspaceRefsTest : MenuTestBase() {
         return result
     }
 
+    private fun autoItemIds(menu: MenuDto): List<String> {
+        return allItems(menu).map { it.id }.filter { it.startsWith("AUTO-J-") }
+    }
+
     private fun findItem(menu: MenuDto, id: String): MenuItemDef {
         return allItems(menu).single { it.id == id }
     }
 
     private fun refsOf(menu: MenuDto): List<String> {
         return allItems(menu)
-            .filter { it.id != "global-journal" && it.id != "co-deployed" }
+            .filter { it.id != "global-journal" && it.id != "co-deployed" && it.id != "co-type-journal" }
             .flatMap { item -> MenuWorkspaceRefs.REF_CONFIG_KEYS.mapNotNull { item.config[it].asText().ifEmpty { null } } }
     }
 

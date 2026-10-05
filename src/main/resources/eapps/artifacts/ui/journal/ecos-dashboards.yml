@@ -9,7 +9,7 @@ properties: {upd: true}
 system: true
 
 actions:
-  - uiserv/action@ecos-module-download
+  - uiserv/action@download-base64-data-json
   - uiserv/action@delete
   - uiserv/action@edit
   - uiserv/action@edit-json

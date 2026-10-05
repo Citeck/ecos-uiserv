@@ -55,6 +55,23 @@ class EcosTypesComponentTest {
     }
 
     @Test
+    fun `auto journal and form of a workspace type are indexed`() {
+        // type$<type localId>: the ws prefix of the auto artifact follows the 'type$' prefix
+        fireType(
+            id = "${wsAPrefix}my-type",
+            workspace = wsA,
+            formRef = EntityRef.valueOf("uiserv/form@type\$${wsAPrefix}my-type"),
+            journalRef = EntityRef.valueOf("uiserv/journal@type\$${wsAPrefix}my-type"),
+            boardRef = EntityRef.EMPTY,
+        )
+
+        assertThat(component.getTypeRefByForm(EntityRef.valueOf("uiserv/form@type\$${wsAPrefix}my-type")).getLocalId())
+            .isEqualTo("${wsAPrefix}my-type")
+        assertThat(component.getTypeRefByJournal(EntityRef.valueOf("uiserv/journal@type\$${wsAPrefix}my-type")).getLocalId())
+            .isEqualTo("${wsAPrefix}my-type")
+    }
+
+    @Test
     fun `cross-workspace ref WS to default is not indexed`() {
         // type in ws-A pointing to a global form/journal/board via bare ref —
         // legitimate platform-wise but must not be findable as the type-of-F

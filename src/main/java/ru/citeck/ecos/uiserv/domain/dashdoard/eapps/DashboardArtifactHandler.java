@@ -11,12 +11,12 @@ import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.model.lib.workspace.WorkspaceServiceExtensionsKt;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
+import ru.citeck.ecos.uiserv.domain.dashdoard.service.utils.DashboardWorkspaceRefs;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 @Slf4j
 @Component
@@ -31,11 +31,10 @@ public class DashboardArtifactHandler implements WsAwareArtifactHandler<Dashboar
         log.info("Dashboard artifact received: {} {}", module.getId(), module.getTypeRef());
         Set<EntityRef> coDeployedRefs = new HashSet<>(ArtifactDeployMeta.getThreadMeta().getCoDeployedArtifacts());
         AuthContext.runAsSystemJ(() -> {
-            DashboardDto.Builder builder = module.copy().withWorkspace(workspace);
-            applyRefs(module, builder, ref ->
+            DashboardDto bound = DashboardWorkspaceRefs.rewrite(module, ref ->
                 WorkspaceServiceExtensionsKt.bindRefToWorkspace(workspaceService, ref, workspace, coDeployedRefs)
             );
-            dashboardService.saveDashboard(builder.build());
+            dashboardService.saveDashboard(bound.copy().withWorkspace(workspace).build());
         });
     }
 
@@ -49,11 +48,10 @@ public class DashboardArtifactHandler implements WsAwareArtifactHandler<Dashboar
         dashboardService.addChangeListener((before, after) -> {
             if (after != null) {
                 String workspace = after.getWorkspace();
-                DashboardDto.Builder builder = after.copy().withWorkspace("");
-                applyRefs(after, builder, ref ->
+                DashboardDto stripped = DashboardWorkspaceRefs.rewrite(after, ref ->
                     ref.withLocalId(workspaceService.replaceWsPrefixToCurrentWsPlaceholder(ref.getLocalId()))
                 );
-                consumer.accept(builder.build(), workspace);
+                consumer.accept(stripped.copy().withWorkspace("").build(), workspace);
             }
         });
     }
@@ -62,14 +60,5 @@ public class DashboardArtifactHandler implements WsAwareArtifactHandler<Dashboar
     @Override
     public String getArtifactType() {
         return "ui/dashboard";
-    }
-
-    private void applyRefs(DashboardDto source, DashboardDto.Builder builder, Function<EntityRef, EntityRef> transform) {
-        if (EntityRef.isNotEmpty(source.getTypeRef())) {
-            builder.withTypeRef(transform.apply(source.getTypeRef()));
-        }
-        if (EntityRef.isNotEmpty(source.getAppliedToRef())) {
-            builder.withAppliedToRef(transform.apply(source.getAppliedToRef()));
-        }
     }
 }
