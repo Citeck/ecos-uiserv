@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import ru.citeck.ecos.commons.data.ObjectData;
 import ru.citeck.ecos.commons.json.Json;
-import ru.citeck.ecos.commons.json.YamlUtils;
 import ru.citeck.ecos.events2.type.RecordEventsService;
 import ru.citeck.ecos.model.lib.workspace.IdInWs;
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
@@ -33,6 +32,7 @@ import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
+import ru.citeck.ecos.uiserv.domain.dashdoard.service.utils.DashboardWorkspaceRefs;
 
 import jakarta.annotation.PostConstruct;
 import ru.citeck.ecos.webapp.api.authority.EcosAuthoritiesApi;
@@ -110,6 +110,11 @@ public class DashboardRecords extends AbstractRecordsDao
 
         Json.getMapper().applyData(toMutate, record.getAtts());
 
+        // the module upload form sends the journal workspace in _workspace (after _content),
+        // it is applied only to a dashboard without a workspace, like for journals and boards
+        String ctxWorkspace = record.getAtt(RecordConstants.ATT_WORKSPACE, "");
+        toMutate.withWorkspace(workspaceService.getUpdatedWsInMutation(toMutate.getWorkspace(), ctxWorkspace));
+
         if (!idBefore.isBlank()
                 && !idBefore.equals(toMutate.getId())
                 && dashboardService.getDashboardById(toMutate.getId(), toMutate.getWorkspace()).isPresent()
@@ -117,7 +122,12 @@ public class DashboardRecords extends AbstractRecordsDao
             throw new RuntimeException("Record with id '" + toMutate.getId() + "' already exists");
         }
 
-        DashboardDto saved = dashboardService.saveDashboard(toMutate.build());
+        // uploaded export: CURRENT_WS: placeholders -> prefix of the dashboard workspace
+        String workspace = toMutate.getWorkspace();
+        DashboardDto toSave = DashboardWorkspaceRefs.rewrite(toMutate.build(), ref ->
+            ref.withLocalId(workspaceService.replaceCurrentWsPlaceholderToWsPrefix(ref.getLocalId(), workspace))
+        );
+        DashboardDto saved = dashboardService.saveDashboard(toSave);
         return workspaceService.addWsPrefixToId(saved.getId(), saved.getWorkspace());
     }
 
@@ -316,6 +326,10 @@ public class DashboardRecords extends AbstractRecordsDao
 
             String dataUriContent = content.getFirst().get("url", "");
             ObjectData data = Json.getMapper().read(dataUriContent, ObjectData.class);
+            // downloaded dashboards carry "workspace": "" — it must not reset the workspace of the mutation
+            if (data != null && data.get("workspace").asText().isBlank()) {
+                data.remove("workspace");
+            }
 
             Json.getMapper().applyData(this, data);
         }
@@ -326,7 +340,15 @@ public class DashboardRecords extends AbstractRecordsDao
         }
 
         public byte[] getData() {
-            return YamlUtils.toNonDefaultString(toJson()).getBytes(StandardCharsets.UTF_8);
+            DashboardDto data = toJson();
+            if (workspaceService != null) {
+                data = DashboardWorkspaceRefs.rewrite(data, ref ->
+                    ref.withLocalId(workspaceService.replaceWsPrefixToCurrentWsPlaceholder(ref.getLocalId()))
+                );
+            }
+            // json like the dashboard artifact, so a downloaded file can be put into an application as is
+            return Json.getMapper().toPrettyStringNotNull(data.copy().withWorkspace("").build())
+                .getBytes(StandardCharsets.UTF_8);
         }
     }
 

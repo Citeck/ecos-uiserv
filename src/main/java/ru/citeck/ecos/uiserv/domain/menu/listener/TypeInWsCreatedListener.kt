@@ -41,7 +41,11 @@ class TypeInWsCreatedListener(
 
     companion object {
         private val log = KotlinLogging.logger {}
-        private const val AUTO_JOURNAL_MENU_ITEM_ID_PREFIX = "AUTO-J-"
+
+        /**
+         * Auto menu items are found by id: `AUTO-J-<type localId>-<creation time in radix 36>`
+         */
+        const val AUTO_JOURNAL_MENU_ITEM_ID_PREFIX = "AUTO-J-"
 
         private const val JOURNAL_REF_SRC_ID = "uiserv/journal"
         private const val SECTION_ITEMS_JSON_PATH = "$..[?(@.id == \"sections\")].items"

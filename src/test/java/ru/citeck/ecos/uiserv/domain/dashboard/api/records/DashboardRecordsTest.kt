@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import ru.citeck.ecos.apps.app.service.LocalAppService
 import ru.citeck.ecos.commons.data.ObjectData
+import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.context.lib.auth.AuthRole
 import ru.citeck.ecos.model.lib.utils.ModelUtils
@@ -24,6 +25,7 @@ import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import ru.citeck.ecos.webapp.lib.spring.test.extension.EcosSpringExtension
+import java.util.Base64
 import kotlin.collections.ArrayList
 
 @ExtendWith(EcosSpringExtension::class)
@@ -298,6 +300,53 @@ class DashboardRecordsTest {
         val query = Query()
         action.invoke(query)
         return query
+    }
+
+    @Test
+    fun `download of a workspace dashboard is json with placeholders and upload binds them`() {
+
+        // COREDEV-580: the dashboards journal downloads ?data, which must not leak the source workspace
+        val sourceWs = "custom-workspace"
+        val typeRef = "emodel/type@" + workspaceService.addWsPrefixToId("ws-type", sourceWs)
+        AuthContext.runAsSystem {
+            dashboardService.saveDashboard(
+                DashboardDto.create()
+                    .withId("downloaded")
+                    .withWorkspace(sourceWs)
+                    .withTypeRef(EntityRef.valueOf(typeRef))
+                    .build()
+            )
+        }
+
+        val ref = EntityRef.valueOf("dashboard@" + workspaceService.addWsPrefixToId("downloaded", sourceWs))
+        val data = AuthContext.runAsSystem { recordsService.getAtt(ref, "data").asText() }
+        val exported = Json.mapper.readNotNull(Base64.getDecoder().decode(data), ObjectData::class.java)
+
+        assertThat(exported["workspace"].asText()).isEmpty()
+        assertThat(exported["typeRef"].asText()).isEqualTo("emodel/type@CURRENT_WS:ws-type")
+
+        // the module upload form of a workspace journal sends the file in _content and the journal
+        // workspace in _workspace; the attribute order must not matter.
+        // A type has one dashboard per workspace, so each order goes to its own workspace
+        for ((idx, contentFirst) in listOf(true, false).withIndex()) {
+            val targetWs = "another-workspace-$idx"
+            exported["id"] = "uploaded-$idx"
+            val content = "data:application/json;base64," +
+                Base64.getEncoder().encodeToString(Json.mapper.toBytesNotNull(exported))
+            val contentAtt = "_content" to listOf(mapOf("url" to content))
+            val wsAtt = "_workspace" to "emodel/workspace@$targetWs"
+            val atts = ObjectData.create(
+                if (contentFirst) linkedMapOf(contentAtt, wsAtt) else linkedMapOf(wsAtt, contentAtt)
+            )
+            AuthContext.runAs("admin", listOf(AuthRole.ADMIN)) {
+                recordsService.mutate(RecordAtts(EntityRef.valueOf("dashboard@"), atts))
+            }
+
+            val uploaded = dashboardService.getDashboardById("uploaded-$idx", targetWs).orElseThrow()
+            assertThat(uploaded.typeRef.getLocalId())
+                .isEqualTo(workspaceService.addWsPrefixToId("ws-type", targetWs))
+            assertThat(dashboardService.getDashboardById("uploaded-$idx", "")).isEmpty()
+        }
     }
 
     private fun assertDto(expected: DashboardDto?, actual: DashboardDto?) {

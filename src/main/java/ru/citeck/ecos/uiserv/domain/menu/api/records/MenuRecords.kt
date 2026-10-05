@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.data.entity.EntityMeta
 import ru.citeck.ecos.commons.json.Json.mapper
-import ru.citeck.ecos.commons.json.YamlUtils.toNonDefaultString
 import ru.citeck.ecos.events2.type.RecordEventsService
 import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.model.lib.workspace.IdInWs
@@ -259,7 +258,8 @@ class MenuRecords(
             val data = MenuWorkspaceRefs.rewrite(model) { ref ->
                 ref.withLocalId(workspaceService.replaceWsPrefixToCurrentWsPlaceholder(ref.getLocalId()))
             }.copy().withWorkspace("").build()
-            return toNonDefaultString(data).toByteArray(StandardCharsets.UTF_8)
+            // json like the menu artifact, so a downloaded file can be put into an application as is
+            return mapper.toPrettyStringNotNull(data).toByteArray(StandardCharsets.UTF_8)
         }
     }
 

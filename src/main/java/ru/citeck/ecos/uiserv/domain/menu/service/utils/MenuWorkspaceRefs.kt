@@ -4,6 +4,8 @@ import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuItemDef
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef
+import ru.citeck.ecos.uiserv.domain.menu.listener.TypeInWsCreatedListener
+import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.util.function.Function
 
@@ -14,6 +16,10 @@ import java.util.function.Function
  * [REF_CONFIG_KEYS], for every item of every sub menu (left/create/user), recursively through
  * nested `items`, and returns a copy. Values that the transform leaves unchanged keep their original
  * text. Non-ref fields (incl. workspace) are left untouched — callers set workspace separately.
+ *
+ * Ids of auto items of workspace types (`AUTO-J-ws:my-type-<time>`, see [TypeInWsCreatedListener])
+ * hold the type id too — the listener finds its item by it when the type changes, so the type id
+ * in them is converted like a type ref.
  *
  * Every site that converts menu refs to/from the `CURRENT_WS:` placeholder routes through here so
  * the covered set cannot drift between export and the import paths:
@@ -99,8 +105,27 @@ object MenuWorkspaceRefs {
         }
 
         return item.copy()
+            .withId(rewriteAutoItemId(item.id, transform))
             .withConfig(newConfig ?: item.config)
             .withItems(newItems)
             .build()
+    }
+
+    private fun rewriteAutoItemId(id: String, transform: Function<EntityRef, EntityRef>): String {
+        val prefix = TypeInWsCreatedListener.AUTO_JOURNAL_MENU_ITEM_ID_PREFIX
+        if (!id.startsWith(prefix)) {
+            return id
+        }
+        // the creation time suffix is a radix 36 number without dashes
+        val typeId = id.substring(prefix.length).substringBeforeLast('-', "")
+        if (typeId.isEmpty()) {
+            return id
+        }
+        val newTypeId = transform.apply(EntityRef.create(AppName.EMODEL, "type", typeId)).getLocalId()
+        return if (newTypeId == typeId) {
+            id
+        } else {
+            prefix + newTypeId + id.substring(prefix.length + typeId.length)
+        }
     }
 }
