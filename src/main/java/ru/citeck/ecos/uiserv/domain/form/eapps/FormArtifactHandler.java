@@ -11,6 +11,7 @@ import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.model.lib.workspace.WorkspaceServiceExtensionsKt;
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef;
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService;
+import ru.citeck.ecos.uiserv.domain.form.service.utils.FormWorkspaceRefs;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.util.HashSet;
@@ -29,28 +30,20 @@ public class FormArtifactHandler implements WsAwareArtifactHandler<EcosFormDef> 
     public void deployArtifact(@NotNull EcosFormDef formModel, @NotNull String workspace) {
         log.info("Form artifact received: " + formModel.getId() + " " + formModel.getFormKey());
         Set<EntityRef> coDeployedRefs = new HashSet<>(ArtifactDeployMeta.getThreadMeta().getCoDeployedArtifacts());
-        EcosFormDef.Builder builder = formModel.copy().withWorkspace(workspace);
-        EntityRef typeRef = formModel.getTypeRef();
-        if (EntityRef.isNotEmpty(typeRef)) {
-            builder.withTypeRef(
-                WorkspaceServiceExtensionsKt.bindRefToWorkspace(workspaceService, typeRef, workspace, coDeployedRefs)
-            );
-        }
-        formService.save(builder.build());
+        EcosFormDef bound = FormWorkspaceRefs.rewrite(formModel, ref ->
+            WorkspaceServiceExtensionsKt.bindRefToWorkspace(workspaceService, ref, workspace, coDeployedRefs)
+        );
+        formService.save(bound.copy().withWorkspace(workspace).build());
     }
 
     @Override
     public void listenChanges(@NotNull BiConsumer<EcosFormDef, String> listener) {
         formService.addChangeListener((before, after) -> {
             String workspace = after.getWorkspace() != null ? after.getWorkspace() : "";
-            EcosFormDef.Builder builder = after.copy().withWorkspace("");
-            EntityRef typeRef = after.getTypeRef();
-            if (EntityRef.isNotEmpty(typeRef)) {
-                builder.withTypeRef(typeRef.withLocalId(
-                    workspaceService.replaceWsPrefixToCurrentWsPlaceholder(typeRef.getLocalId())
-                ));
-            }
-            listener.accept(builder.build(), workspace);
+            EcosFormDef stripped = FormWorkspaceRefs.rewrite(after, ref -> ref.withLocalId(
+                workspaceService.replaceWsPrefixToCurrentWsPlaceholder(ref.getLocalId())
+            ));
+            listener.accept(stripped.copy().withWorkspace("").build(), workspace);
         });
     }
 

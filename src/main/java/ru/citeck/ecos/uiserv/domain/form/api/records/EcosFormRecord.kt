@@ -10,6 +10,7 @@ import ru.citeck.ecos.records3.record.atts.schema.ScalarType
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.atts.value.AttValue
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
+import ru.citeck.ecos.uiserv.domain.form.service.utils.FormWorkspaceRefs
 import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.nio.charset.StandardCharsets
@@ -63,15 +64,9 @@ class EcosFormRecord(
     }
 
     fun getData(): ByteArray {
-        val data = def.copy {
-            withWorkspace("")
-
-            var typeLocalId = def.typeRef.getLocalId()
-            if (typeLocalId.isNotBlank()) {
-                typeLocalId = workspaceService.replaceWsPrefixToCurrentWsPlaceholder(typeLocalId)
-                withTypeRef(def.typeRef.withLocalId(typeLocalId))
-            }
-        }
+        val data = FormWorkspaceRefs.rewrite(def) { ref ->
+            ref.withLocalId(workspaceService.replaceWsPrefixToCurrentWsPlaceholder(ref.getLocalId()))
+        }.copy().withWorkspace("").build()
         return Json.mapper.toPrettyStringNotNull(data).toByteArray(StandardCharsets.UTF_8)
     }
 

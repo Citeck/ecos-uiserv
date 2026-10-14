@@ -1,6 +1,7 @@
 package ru.citeck.ecos.uiserv.domain.dashdoard.service.utils
 
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto
+import ru.citeck.ecos.uiserv.domain.workspace.ComponentWorkspaceRefs
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.util.function.Function
 
@@ -16,7 +17,7 @@ object DashboardWorkspaceRefs {
 
     @JvmStatic
     fun rewrite(dashboard: DashboardDto, transform: Function<EntityRef, EntityRef>): DashboardDto {
-        val builder = dashboard.copy()
+        val builder = dashboard.copy().withConfig(ComponentWorkspaceRefs.rewrite(dashboard.config, transform))
         if (EntityRef.isNotEmpty(dashboard.typeRef)) {
             builder.withTypeRef(transform.apply(dashboard.typeRef))
         }

@@ -25,6 +25,7 @@ import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
 import ru.citeck.ecos.uiserv.domain.form.registry.FormsRegistryConfiguration
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
+import ru.citeck.ecos.uiserv.domain.form.service.utils.FormWorkspaceRefs
 import ru.citeck.ecos.uiserv.domain.workspace.service.WorkspaceUiService
 import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
@@ -111,13 +112,10 @@ class EcosFormRecordsDao(
 
         checkPermissions(record.workspace)
 
-        var typeLocalId = record.typeRef.getLocalId()
-        if (typeLocalId.isNotBlank()) {
-            typeLocalId = workspaceService.replaceCurrentWsPlaceholderToWsPrefix(typeLocalId, record.workspace)
-            record.withTypeRef(record.typeRef.withLocalId(typeLocalId))
+        val bound = FormWorkspaceRefs.rewrite(record.build()) { ref ->
+            ref.withLocalId(workspaceService.replaceCurrentWsPlaceholderToWsPrefix(ref.getLocalId(), record.workspace))
         }
-
-        val recAfterSave = ecosFormService.save(record.build())
+        val recAfterSave = ecosFormService.save(bound)
         return workspaceService.addWsPrefixToId(recAfterSave.id, recAfterSave.workspace)
     }
 

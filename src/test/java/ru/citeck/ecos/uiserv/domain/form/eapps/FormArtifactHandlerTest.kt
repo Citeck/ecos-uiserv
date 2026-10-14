@@ -9,6 +9,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import ru.citeck.ecos.apps.app.domain.handler.ArtifactDeployMeta
+import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.model.lib.workspace.IdInWs
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
@@ -58,6 +59,18 @@ class FormArtifactHandlerTest {
         val saved = deploy(artifact, listOf(EntityRef.valueOf("emodel/type@my-type")))
 
         assertThat(saved.typeRef.toString()).isEqualTo("emodel/type@global-type")
+    }
+
+    @Test
+    fun `deploy rebinds nested component journal placeholders`() {
+        val artifact = EcosFormDef.create()
+            .withId("my-form")
+            .withDefinition(ObjectData.create("""{"components":[{"journalId":"CURRENT_WS:purpose","source":{"journal":{"journalId":"uiserv/journal@CURRENT_WS:purpose"}}}]}"""))
+            .build()
+        val saved = deploy(artifact, emptyList())
+        assertThat(saved.definition.toString()).contains("custom-sys-id:purpose")
+        assertThat(saved.definition.toString()).doesNotContain("CURRENT_WS:")
+        assertThat(artifact.definition.toString()).contains("CURRENT_WS:purpose")
     }
 
     private fun deploy(artifact: EcosFormDef, coDeployed: List<EntityRef>): EcosFormDef {

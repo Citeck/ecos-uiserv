@@ -312,6 +312,7 @@ class DashboardRecordsTest {
             dashboardService.saveDashboard(
                 DashboardDto.create()
                     .withId("downloaded")
+                    .withConfig(ObjectData.create("""{"v2":{"widgets":[{"props":{"config":{"v2":{"journalId":"$sourceWs:nested-journal"}}}}]}}"""))
                     .withWorkspace(sourceWs)
                     .withTypeRef(EntityRef.valueOf(typeRef))
                     .build()
@@ -323,6 +324,7 @@ class DashboardRecordsTest {
         val exported = Json.mapper.readNotNull(Base64.getDecoder().decode(data), ObjectData::class.java)
 
         assertThat(exported["workspace"].asText()).isEmpty()
+        assertThat(exported["config"].toString()).contains("CURRENT_WS:nested-journal")
         assertThat(exported["typeRef"].asText()).isEqualTo("emodel/type@CURRENT_WS:ws-type")
 
         // the module upload form of a workspace journal sends the file in _content and the journal
@@ -343,6 +345,7 @@ class DashboardRecordsTest {
             }
 
             val uploaded = dashboardService.getDashboardById("uploaded-$idx", targetWs).orElseThrow()
+            assertThat(uploaded.config.toString()).contains("$targetWs:nested-journal")
             assertThat(uploaded.typeRef.getLocalId())
                 .isEqualTo(workspaceService.addWsPrefixToId("ws-type", targetWs))
             assertThat(dashboardService.getDashboardById("uploaded-$idx", "")).isEmpty()

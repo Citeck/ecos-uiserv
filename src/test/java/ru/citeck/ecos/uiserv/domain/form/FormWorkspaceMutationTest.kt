@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.form
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
@@ -12,11 +13,44 @@ import ru.citeck.ecos.model.lib.workspace.IdInWs
 import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records3.record.atts.dto.RecordAtts
 import ru.citeck.ecos.uiserv.domain.form.api.records.EcosFormMutRecord
+import ru.citeck.ecos.uiserv.domain.form.api.records.EcosFormRecord
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
 import ru.citeck.ecos.webapp.api.entity.EntityRef
+import ru.citeck.ecos.webapp.lib.spring.context.WorkspaceApiMock
 import java.util.Base64
 
 class FormWorkspaceMutationTest : FormsTestBase() {
+
+    @Test
+    fun `records export and content import rebind nested journals`() {
+        val form = EcosFormDef.create().withId("nested-form").withWorkspace("source")
+            .withDefinition(ObjectData.create("""{"components":[{"journalId":"type${'$'}source:purpose","source":{"journal":{"journalId":"source:journal"}}}]}"""))
+            .build()
+        ecosFormService.save(form)
+        AuthContext.runAsSystem {
+            val factory = ModelServiceFactory()
+            factory.setWorkspaceApi(WorkspaceApiMock())
+            val bytes = EcosFormRecord("uiserv", "form", form, factory.workspaceService).getData()
+            val encoded = Base64.getEncoder().encodeToString(bytes)
+            val exported = Json.mapper.readNotNull(Base64.getDecoder().decode(encoded), ObjectData::class.java)
+            assertThat(exported["definition"].toString())
+                .contains("type\$CURRENT_WS:purpose", "CURRENT_WS:journal")
+            val content = "data:application/json;base64," + encoded
+            val attrs = ObjectData.create(
+                mapOf(
+                    ".att(n:\"_self\"){as(n:\"content-data\"){json}}" to ObjectData.create()
+                        .set("storage", "base64").set("name", "form.json").set("url", content)
+                        .set("size", bytes.size).set("type", "application/json"),
+                    "_workspace" to "target"
+                )
+            )
+            recordsService.mutate(RecordAtts(EntityRef.valueOf("form@"), attrs))
+            val saved = ecosFormService.getFormById(IdInWs.create("target", "nested-form")).orElseThrow()
+            assertThat(saved.definition.toString())
+                .contains("type\$target:purpose", "target:journal").doesNotContain("CURRENT_WS:")
+            assertThat(form.definition.toString()).contains("source:purpose")
+        }
+    }
 
     @Test
     fun testJacksonAppliesWorkspaceAttribute() {
