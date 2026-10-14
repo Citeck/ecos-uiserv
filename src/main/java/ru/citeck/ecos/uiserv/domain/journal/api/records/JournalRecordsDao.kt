@@ -20,6 +20,7 @@ import ru.citeck.ecos.model.lib.utils.ModelUtils
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.RecordConstants
 import ru.citeck.ecos.records2.predicate.PredicateService
+import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records3.record.atts.schema.ScalarType
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.atts.value.AttValue
@@ -31,6 +32,9 @@ import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefPredicateUtils
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefUtils
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceScopingUtils
 import ru.citeck.ecos.uiserv.domain.ecostype.service.EcosTypeService
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalActionDef
 import ru.citeck.ecos.uiserv.domain.journal.dto.JournalColumnDef
@@ -102,11 +106,26 @@ class JournalRecordsDao(
 
             if (recsQuery.language == PredicateService.LANGUAGE_PREDICATE) {
 
-                val queryRes = recordsService.query(
-                    recsQuery.copy()
-                        .withSourceId(JournalsRegistryConfiguration.JOURNALS_REGISTRY_SOURCE_ID)
-                        .build()
+                val predicate = WorkspaceRefPredicateUtils.mapWorkspaceRefPredicate(
+                    recsQuery.getQuery(Predicate::class.java),
+                    WorkspaceRefPredicateUtils.globalWsRuleOf(workspaceService)
                 )
+                val skipWorkspaceScoping =
+                    WorkspaceRefPredicateUtils.isWorkspaceScopingSkipAllowed(predicate)
+
+                val registryQueryBuilder = recsQuery.copy()
+                    .withSourceId(JournalsRegistryConfiguration.JOURNALS_REGISTRY_SOURCE_ID)
+                    .withQuery(predicate)
+                if (skipWorkspaceScoping) {
+                    registryQueryBuilder.withWorkspaces(emptyList())
+                }
+                val registryQuery = registryQueryBuilder.build()
+                // Registry scoping follows auth, so cross-workspace admin queries require system auth.
+                val queryRes = if (skipWorkspaceScoping) {
+                    AuthContext.runAsSystem { recordsService.query(registryQuery) }
+                } else {
+                    recordsService.query(registryQuery)
+                }
 
                 val journals = journalService.getAll(
                     queryRes.getRecords().map {
@@ -137,9 +156,7 @@ class JournalRecordsDao(
             JournalWithMeta(false)
         } else {
             val idInWs = workspaceService.convertToIdInWs(recordId)
-            if (!workspaceService.isWorkspaceWithGlobalEntities(idInWs.workspace) &&
-                !workspaceService.isUserMemberOf(AuthContext.getCurrentUser(), idInWs.workspace)
-            ) {
+            if (!WorkspaceScopingUtils.isArtifactReadable(workspaceService, idInWs.workspace)) {
                 JournalWithMeta(false)
             } else {
                 journalService.getJournalById(idInWs) ?: JournalWithMeta(false)
@@ -252,6 +269,10 @@ class JournalRecordsDao(
 
         fun getActionsDef(): List<ActionDefRecord> {
             return journalDef?.actionsDef?.map { ActionDefRecord(it) } ?: emptyList()
+        }
+
+        fun getWorkspaceRef(): EntityRef {
+            return WorkspaceRefUtils.getWorkspaceRefOrDefault(journalDef?.workspace)
         }
 
         @AttName("?disp")

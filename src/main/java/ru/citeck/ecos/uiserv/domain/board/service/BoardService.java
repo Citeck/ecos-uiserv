@@ -25,14 +25,15 @@ public interface BoardService {
 
     long getCount();
 
-    long getCount(Predicate predicate, List<String> workspaces);
+    long getCount(Predicate predicate, List<String> workspaces, boolean skipWorkspaceScoping);
 
     List<BoardWithMeta> getAll(
         Predicate predicate,
         List<String> workspaces,
         int maxItems,
         int skipCount,
-        List<SortBy> sort
+        List<SortBy> sort,
+        boolean skipWorkspaceScoping
     );
 
     void onBoardChanged(BiConsumer<BoardDef, BoardDef> listener);

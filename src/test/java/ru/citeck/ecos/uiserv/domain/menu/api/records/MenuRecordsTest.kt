@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import ru.citeck.ecos.context.lib.auth.AuthContext
+import ru.citeck.ecos.context.lib.auth.AuthRole
 import ru.citeck.ecos.model.lib.workspace.IdInWs
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.uiserv.Application
@@ -60,5 +62,33 @@ class MenuRecordsTest {
 
         assertThat(atts.get("creator").asText()).isNotBlank()
         assertThat(atts.get("modifier").asText()).isNotBlank()
+    }
+
+    @Test
+    fun workspaceRefReturnsCorrectEntityRef() {
+        val id = UUID.randomUUID().toString()
+        val ref = AuthContext.runAs("admin", listOf(AuthRole.ADMIN)) {
+            recordsService.mutate(
+                RECORD_SOURCE,
+                mapOf("id" to id, "authorities" to listOf("GROUP_EVERYONE"), "workspace" to "test-ws")
+            )
+        }
+
+        val wsRef = AuthContext.runAs("admin", listOf(AuthRole.ADMIN)) {
+            recordsService.getAtt(ref, "workspaceRef?id").asText()
+        }
+        assertThat(wsRef).isEqualTo("emodel/workspace@test-ws")
+    }
+
+    @Test
+    fun workspaceRefReturnsDefaultForGlobalMenu() {
+        val id = UUID.randomUUID().toString()
+        val ref = recordsService.mutate(
+            RECORD_SOURCE,
+            mapOf("id" to id, "authorities" to listOf("GROUP_EVERYONE"))
+        )
+
+        val wsRef = recordsService.getAtt(ref, "workspaceRef?id").asText()
+        assertThat(wsRef).isEqualTo("emodel/workspace@default")
     }
 }

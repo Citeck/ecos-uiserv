@@ -16,6 +16,7 @@ import ru.citeck.ecos.records3.record.atts.value.AttValue;
 import ru.citeck.ecos.uiserv.Application;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefUtils;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
 import java.nio.charset.StandardCharsets;
@@ -82,6 +83,12 @@ public class BoardRecord {
             return null;
         }
         return ref.withLocalId(workspaceService.replaceWsPrefixToCurrentWsPlaceholder(ref.getLocalId()));
+    }
+
+    public EntityRef getWorkspaceRef() {
+        BoardDef def = getBoardDef();
+        String ws = def != null ? def.getWorkspace() : null;
+        return WorkspaceRefUtils.getWorkspaceRefOrDefault(ws);
     }
 
     public String getEcosType() {

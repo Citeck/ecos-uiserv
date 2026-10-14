@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder
 import ru.citeck.ecos.commons.data.DataValue
 import ru.citeck.ecos.commons.json.serialization.annotation.IncludeNonDefault
-import ru.citeck.ecos.webapp.api.constants.AppName
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefUtils
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 
 @IncludeNonDefault
@@ -30,11 +30,7 @@ open class MenuDto(
 
     @JsonIgnore
     fun getWorkspaceRef(): EntityRef {
-        return if (workspace.isEmpty()) {
-            EntityRef.EMPTY
-        } else {
-            EntityRef.create(AppName.EMODEL, "workspace", workspace)
-        }
+        return WorkspaceRefUtils.getWorkspaceRefOrDefault(workspace)
     }
 
     fun copy(): Builder {
@@ -83,10 +79,6 @@ open class MenuDto(
         fun withWorkspace(workspace: String?): Builder {
             this.workspace = workspace ?: ""
             return this
-        }
-
-        fun withWorkspaceRef(workspaceRef: EntityRef?): Builder {
-            return withWorkspace(workspaceRef?.getLocalId())
         }
 
         open fun withSubMenu(subMenu: Map<String, SubMenuDef>?): Builder {

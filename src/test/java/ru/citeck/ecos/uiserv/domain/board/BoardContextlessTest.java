@@ -22,6 +22,7 @@ import ru.citeck.ecos.webapp.api.EcosWebAppApi;
 import ru.citeck.ecos.webapp.api.constants.AppName;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -82,6 +83,32 @@ public class BoardContextlessTest {
         recordsService.delete(getRef(boardDef));
         boardFromRecords = recordsService.getAtts(getRef(boardDef), BoardDef.class);
         assertNull(boardFromRecords.getName());
+    }
+
+    @Test
+    public void workspaceRefReturnsCorrectEntityRef() {
+        BoardDef boardDef = new BoardDef("board-ws-test");
+        boardDef.setWorkspace("custom-workspace");
+        BoardWithMeta withMeta = new BoardWithMeta(boardDef);
+        var record = new ru.citeck.ecos.uiserv.domain.board.api.records.BoardRecord(withMeta, workspaceService);
+        assertThat(record.getWorkspaceRef()).isEqualTo(EntityRef.create(AppName.EMODEL, "workspace", "custom-workspace"));
+    }
+
+    @Test
+    public void workspaceRefReturnsDefaultForGlobalBoard() {
+        BoardDef boardDef = new BoardDef("board-global-test");
+        boardDef.setWorkspace("");
+        BoardWithMeta withMeta = new BoardWithMeta(boardDef);
+        var record = new ru.citeck.ecos.uiserv.domain.board.api.records.BoardRecord(withMeta, workspaceService);
+        assertThat(record.getWorkspaceRef()).isEqualTo(EntityRef.create(AppName.EMODEL, "workspace", "default"));
+    }
+
+    @Test
+    public void workspaceRefReturnsDefaultForNullWorkspace() {
+        BoardDef boardDef = new BoardDef("board-null-ws");
+        BoardWithMeta withMeta = new BoardWithMeta(boardDef);
+        var record = new ru.citeck.ecos.uiserv.domain.board.api.records.BoardRecord(withMeta, workspaceService);
+        assertThat(record.getWorkspaceRef()).isEqualTo(EntityRef.create(AppName.EMODEL, "workspace", "default"));
     }
 
     private EntityRef getRef(BoardDef boardDef) {

@@ -24,6 +24,7 @@ import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.QueryPage;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefPredicateUtils;
 import ru.citeck.ecos.uiserv.app.common.api.records.Utils;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
@@ -123,17 +124,27 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
             int skipCount = page.getSkipCount();
             if (PredicateService.LANGUAGE_PREDICATE.equals(recordsQuery.getLanguage())) {
                 Predicate predicate = recordsQuery.getQuery(Predicate.class);
+                Predicate mappedPredicate =
+                    WorkspaceRefPredicateUtils.mapWorkspaceRefPredicate(
+                        predicate, WorkspaceRefPredicateUtils.globalWsRuleOf(workspaceService)
+                    );
+                boolean skipWorkspaceScoping =
+                    WorkspaceRefPredicateUtils.isWorkspaceScopingSkipAllowed(mappedPredicate);
+
                 result.setRecords(
                     boardService.getAll(
-                        predicate,
+                        mappedPredicate,
                         recordsQuery.getWorkspaces(),
                         maxItems,
                         skipCount,
-                        recordsQuery.getSortBy()
+                        recordsQuery.getSortBy(),
+                        skipWorkspaceScoping
                     ).stream()
                     .map(it -> new BoardRecord(it, workspaceService))
                     .collect(Collectors.toList()));
-                result.setTotalCount(boardService.getCount(predicate, recordsQuery.getWorkspaces()));
+                result.setTotalCount(boardService.getCount(
+                    mappedPredicate, recordsQuery.getWorkspaces(), skipWorkspaceScoping
+                ));
             } else {
                 log.warn("Unsupported query language '{}'", recordsQuery.getLanguage());
                 result.setRecords(Collections.emptyList());

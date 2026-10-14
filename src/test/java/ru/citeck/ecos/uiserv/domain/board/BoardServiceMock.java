@@ -64,7 +64,7 @@ public class BoardServiceMock implements BoardService {
     }
 
     @Override
-    public List<BoardWithMeta> getAll(Predicate predicate, List<String> workspaces, int maxItems, int skipCount, List<SortBy> sort) {
+    public List<BoardWithMeta> getAll(Predicate predicate, List<String> workspaces, int maxItems, int skipCount, List<SortBy> sort, boolean skipWorkspaceScoping) {
         return predicateService.filter(data.values(), predicate)
             .stream().map(BoardMapper::entityToDto).collect(Collectors.toList());
     }
@@ -78,8 +78,8 @@ public class BoardServiceMock implements BoardService {
     }
 
     @Override
-    public long getCount(Predicate predicate, List<String> workspaces) {
-        return this.getAll(predicate, workspaces, 0, 0, null).size();
+    public long getCount(Predicate predicate, List<String> workspaces, boolean skipWorkspaceScoping) {
+        return this.getAll(predicate, workspaces, 0, 0, null, skipWorkspaceScoping).size();
     }
 
     @Override

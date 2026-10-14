@@ -43,6 +43,18 @@ columns:
     name: { ru: Название, en: Name }
     type: TEXT
 
+  - id: workspaceRef
+    name:
+      ru: Рабочее пространство
+      en: Workspace
+    type: ASSOC
+    editor:
+      type: journal
+      config:
+        journalId: "workspaces-journal"
+    sortable: false
+    editable: false
+
   - id: system
     type: BOOLEAN
     name: { ru: Системный журнал, en: System journal }

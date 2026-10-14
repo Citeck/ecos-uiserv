@@ -25,5 +25,17 @@ columns:
     name: { ru: Имя, en: Name }
     type: TEXT
 
+  - id: workspaceRef
+    name:
+      ru: Рабочее пространство
+      en: Workspace
+    type: ASSOC
+    editor:
+      type: journal
+      config:
+        journalId: "workspaces-journal"
+    sortable: false
+    editable: false
+
   - id: type
     name: { ru: Тип, en: Type }

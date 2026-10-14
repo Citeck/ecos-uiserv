@@ -17,12 +17,12 @@ import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.commons.data.entity.EntityMeta;
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
-import ru.citeck.ecos.records2.predicate.model.Predicates;
 import ru.citeck.ecos.records3.RecordsService;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.domain.menu.dao.MenuDao;
 import ru.citeck.ecos.uiserv.domain.menu.repo.MenuEntity;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDeployArtifact;
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceScopingUtils;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef;
 import ru.citeck.ecos.uiserv.domain.menu.service.format.MenuReaderService;
@@ -137,22 +137,11 @@ public class MenuService {
         return menuDao.getAllAuthoritiesWithMenu();
     }
 
-    public long getCount(Predicate predicate, List<String> workspaces) {
-        var predicateForQuery = Predicates.and(
-            predicate,
-            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentRunAsAuth(), workspaces)
+    public long getCount(Predicate predicate, List<String> workspaces, boolean skipWorkspaceScoping) {
+        Predicate predicateForQuery = WorkspaceScopingUtils.applyScoping(
+            predicate, workspaces, skipWorkspaceScoping, workspaceService
         );
         return menuDao.getCount(predicateForQuery);
-    }
-
-    public List<MenuDto> findAll(Predicate predicate, List<String> workspaces, int max, int skip, List<SortBy> sort) {
-        var predicateForQuery = Predicates.and(
-            predicate,
-            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentRunAsAuth(), workspaces)
-        );
-        return menuDao.findAll(predicateForQuery, max, skip, sort).stream()
-            .map(this::mapToDto)
-            .collect(Collectors.toList());
     }
 
     public List<MenuDto> getAllMenus() {
@@ -178,10 +167,9 @@ public class MenuService {
             .map(this::mapToDtoWithMeta);
     }
 
-    public List<EntityWithMeta<MenuDto>> findAllWithMeta(Predicate predicate, List<String> workspaces, int max, int skip, List<SortBy> sort) {
-        var predicateForQuery = Predicates.and(
-            predicate,
-            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentRunAsAuth(), workspaces)
+    public List<EntityWithMeta<MenuDto>> findAllWithMeta(Predicate predicate, List<String> workspaces, int max, int skip, List<SortBy> sort, boolean skipWorkspaceScoping) {
+        Predicate predicateForQuery = WorkspaceScopingUtils.applyScoping(
+            predicate, workspaces, skipWorkspaceScoping, workspaceService
         );
         return menuDao.findAll(predicateForQuery, max, skip, sort).stream()
             .map(this::mapToDtoWithMeta)

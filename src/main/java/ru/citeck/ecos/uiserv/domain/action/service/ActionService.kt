@@ -9,10 +9,10 @@ import ru.citeck.ecos.model.lib.workspace.IdInWs
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.predicate.PredicateUtils
 import ru.citeck.ecos.records2.predicate.model.Predicate
-import ru.citeck.ecos.records2.predicate.model.Predicates
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
 import ru.citeck.ecos.uiserv.app.common.perms.UiServSystemArtifactPerms
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceScopingUtils
 import ru.citeck.ecos.uiserv.domain.action.api.records.ActionRecords
 import ru.citeck.ecos.uiserv.domain.action.dao.ActionDao
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto
@@ -113,38 +113,37 @@ class ActionService(
         return workspaceService.addWsPrefixToId(id, action.workspace ?: "")
     }
 
-    fun getCount(predicate: Predicate, workspaces: List<String>): Long {
-        val fullPredicate = withWorkspacesCondition(predicate, workspaces) ?: return 0
+    @JvmOverloads
+    fun getCount(predicate: Predicate, workspaces: List<String>, skipWorkspaceScoping: Boolean = false): Long {
+        val fullPredicate = withWorkspacesCondition(predicate, workspaces, skipWorkspaceScoping) ?: return 0
         return actionDao.getCount(fullPredicate)
     }
 
+    @JvmOverloads
     fun getActions(
         predicate: Predicate,
         workspaces: List<String>,
         max: Int,
         skip: Int,
-        sort: List<SortBy>
+        sort: List<SortBy>,
+        skipWorkspaceScoping: Boolean = false
     ): List<ActionDto> {
-        val fullPredicate = withWorkspacesCondition(predicate, workspaces) ?: return emptyList()
+        val fullPredicate = withWorkspacesCondition(predicate, workspaces, skipWorkspaceScoping) ?: return emptyList()
         return getActionEntities(fullPredicate, max, skip, sort).mapNotNull { actionEntityMapper.toDto(it) }
     }
 
-    /**
-     * Restrict the query to workspaces available for the current user.
-     * Null means that no workspace is available and the result is empty.
-     */
-    private fun withWorkspacesCondition(predicate: Predicate, workspaces: List<String>): Predicate? {
-        val wsPredicate = workspaceService.buildAvailableWorkspacesPredicate(
-            AuthContext.getCurrentRunAsAuth(),
-            workspaces
+    private fun withWorkspacesCondition(
+        predicate: Predicate,
+        workspaces: List<String>,
+        skipWorkspaceScoping: Boolean
+    ): Predicate? {
+        val fullPredicate = WorkspaceScopingUtils.applyScoping(
+            predicate,
+            workspaces,
+            skipWorkspaceScoping,
+            workspaceService
         )
-        return if (PredicateUtils.isAlwaysFalse(wsPredicate)) {
-            null
-        } else if (PredicateUtils.isAlwaysTrue(wsPredicate)) {
-            predicate
-        } else {
-            Predicates.and(predicate, wsPredicate)
-        }
+        return fullPredicate.takeUnless { PredicateUtils.isAlwaysFalse(it) }
     }
 
     fun updateAction(action: ActionDto) {

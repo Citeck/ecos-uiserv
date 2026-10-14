@@ -29,6 +29,7 @@ import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDtoDao
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefPredicateUtils
 import ru.citeck.ecos.uiserv.domain.i18n.service.MessageResolver
 import ru.citeck.ecos.uiserv.domain.menu.api.records.MenuRecords.MenuMutRecord
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
@@ -89,16 +90,25 @@ class MenuRecords(
         }
         if (recsQuery.language == PredicateService.LANGUAGE_PREDICATE) {
             val predicate = recsQuery.getQuery(Predicate::class.java)
+            val mappedPredicate =
+                WorkspaceRefPredicateUtils.mapWorkspaceRefPredicate(
+                    predicate,
+                    WorkspaceRefPredicateUtils.blankOrDefaultWsRule()
+                )
+            val skipWorkspaceScoping =
+                WorkspaceRefPredicateUtils.isWorkspaceScopingSkipAllowed(mappedPredicate)
+
             val records = menuService.findAllWithMeta(
-                predicate,
+                mappedPredicate,
                 recsQuery.workspaces,
                 recsQuery.page.maxItems,
                 recsQuery.page.skipCount,
-                recsQuery.sortBy
+                recsQuery.sortBy,
+                skipWorkspaceScoping
             ).map { MenuRecord(it.entity, it.meta) }
             val result = RecsQueryRes<Any>()
             result.setRecords(records)
-            result.setTotalCount(menuService.getCount(predicate, recsQuery.workspaces))
+            result.setTotalCount(menuService.getCount(mappedPredicate, recsQuery.workspaces, skipWorkspaceScoping))
             return result
         }
         if ("criteria" != recsQuery.language) {

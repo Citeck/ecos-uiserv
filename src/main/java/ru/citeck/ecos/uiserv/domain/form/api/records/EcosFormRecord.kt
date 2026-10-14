@@ -9,9 +9,9 @@ import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records3.record.atts.schema.ScalarType
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.atts.value.AttValue
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefUtils
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
 import ru.citeck.ecos.uiserv.domain.form.service.utils.FormWorkspaceRefs
-import ru.citeck.ecos.webapp.api.constants.AppName
 import ru.citeck.ecos.webapp.api.entity.EntityRef
 import java.nio.charset.StandardCharsets
 
@@ -49,13 +49,7 @@ class EcosFormRecord(
     }
 
     fun getWorkspaceRef(): EntityRef {
-        return def.workspace.let {
-            if (it.isBlank()) {
-                EntityRef.EMPTY
-            } else {
-                EntityRef.create(AppName.EMODEL, "workspace", it)
-            }
-        }
+        return WorkspaceRefUtils.getWorkspaceRefOrDefault(def.workspace)
     }
 
     @JsonValue

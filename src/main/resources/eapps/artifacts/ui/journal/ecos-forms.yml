@@ -50,6 +50,18 @@ columns:
     type: MLTEXT
     sortable: false
 
+  - id: workspaceRef
+    name:
+      ru: Рабочее пространство
+      en: Workspace
+    type: ASSOC
+    editor:
+      type: journal
+      config:
+        journalId: "workspaces-journal"
+    sortable: false
+    editable: false
+
   - id: system
     type: BOOLEAN
     name: { ru: Системная форма, en: System form }

@@ -32,6 +32,18 @@ columns:
   - id: authority
     name: { ru: Пользователь или группа, en: User or group }
 
+  - id: workspaceRef
+    name:
+      ru: Рабочее пространство
+      en: Workspace
+    type: ASSOC
+    editor:
+      type: journal
+      config:
+        journalId: "workspaces-journal"
+    sortable: false
+    editable: false
+
   - id: _created
     name:
       ru: Дата создания

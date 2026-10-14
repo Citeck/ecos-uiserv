@@ -8,13 +8,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import ru.citeck.ecos.context.lib.auth.AuthContext;
 import ru.citeck.ecos.model.lib.workspace.IdInWs;
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
 import ru.citeck.ecos.records2.predicate.model.Predicate;
-import ru.citeck.ecos.records2.predicate.model.Predicates;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy;
 import ru.citeck.ecos.uiserv.Application;
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceScopingUtils;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
 import ru.citeck.ecos.uiserv.domain.board.repo.BoardEntity;
@@ -113,11 +112,11 @@ public class BoardServiceImpl implements BoardService {
         List<String> workspaces,
         int maxItems,
         int skipCount,
-        List<SortBy> sort
+        List<SortBy> sort,
+        boolean skipWorkspaceScoping
     ) {
-        var predicateForQuery = Predicates.and(
-            predicate,
-            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentRunAsAuth(), workspaces)
+        Predicate predicateForQuery = WorkspaceScopingUtils.applyScoping(
+            predicate, workspaces, skipWorkspaceScoping, workspaceService
         );
         return searchConv.findAll(repository, predicateForQuery, maxItems, skipCount, sort)
             .stream()
@@ -131,10 +130,9 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public long getCount(Predicate predicate, List<String> workspaces) {
-        var predicateForQuery = Predicates.and(
-            predicate,
-            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentRunAsAuth(), workspaces)
+    public long getCount(Predicate predicate, List<String> workspaces, boolean skipWorkspaceScoping) {
+        Predicate predicateForQuery = WorkspaceScopingUtils.applyScoping(
+            predicate, workspaces, skipWorkspaceScoping, workspaceService
         );
         return searchConv.getCount(repository, predicateForQuery);
     }

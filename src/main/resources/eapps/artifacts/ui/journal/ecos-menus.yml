@@ -32,6 +32,18 @@ columns:
   - id: defaultMenuForJournal
     name: { ru: Меню по умолчанию, en: Default menu }
 
+  - id: workspaceRef
+    name:
+      ru: Рабочее пространство
+      en: Workspace
+    type: ASSOC
+    editor:
+      type: journal
+      config:
+        journalId: "workspaces-journal"
+    sortable: false
+    editable: false
+
   - id: _created
     name:
       ru: Дата создания

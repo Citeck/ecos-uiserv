@@ -18,6 +18,7 @@ import ru.citeck.ecos.records2.predicate.model.Predicates
 import ru.citeck.ecos.records3.RecordsService
 import ru.citeck.ecos.records3.record.atts.schema.annotation.AttName
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceScopingUtils
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto
 import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardEntity
 import ru.citeck.ecos.uiserv.domain.dashdoard.repo.DashboardRepository
@@ -73,10 +74,12 @@ class DashboardService(
         searchConv = jpaSearchConverterFactory.createConverter(DashboardEntity::class.java).build()
     }
 
-    fun getCount(predicate: Predicate, workspaces: List<String>): Long {
-        val predicateForQuery = Predicates.and(
+    fun getCount(predicate: Predicate, workspaces: List<String>, skipWorkspaceScoping: Boolean = false): Long {
+        val predicateForQuery = WorkspaceScopingUtils.applyScoping(
             predicate,
-            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentRunAsAuth(), workspaces)
+            workspaces,
+            skipWorkspaceScoping,
+            workspaceService
         )
         return searchConv.getCount(repo, predicateForQuery)
     }
@@ -85,10 +88,19 @@ class DashboardService(
         return findAll(Predicates.eq("workspace", workspace), emptyList(), 1000, 0, emptyList())
     }
 
-    fun findAll(predicate: Predicate, workspaces: List<String>, max: Int, skip: Int, sort: List<SortBy>): List<DashboardDto> {
-        val predicateForQuery = Predicates.and(
+    fun findAll(
+        predicate: Predicate,
+        workspaces: List<String>,
+        max: Int,
+        skip: Int,
+        sort: List<SortBy>,
+        skipWorkspaceScoping: Boolean = false
+    ): List<DashboardDto> {
+        val predicateForQuery = WorkspaceScopingUtils.applyScoping(
             predicate,
-            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentRunAsAuth(), workspaces)
+            workspaces,
+            skipWorkspaceScoping,
+            workspaceService
         )
         return searchConv.findAll(repo, predicateForQuery, max, skip, sort).stream()
             .map { entity: DashboardEntity -> this.mapToDto(entity) }
@@ -115,10 +127,19 @@ class DashboardService(
             .map { entity -> mapToDtoWithMeta(entity) }
     }
 
-    fun findAllWithMeta(predicate: Predicate, workspaces: List<String>, max: Int, skip: Int, sort: List<SortBy>): List<EntityWithMeta<DashboardDto>> {
-        val predicateForQuery = Predicates.and(
+    fun findAllWithMeta(
+        predicate: Predicate,
+        workspaces: List<String>,
+        max: Int,
+        skip: Int,
+        sort: List<SortBy>,
+        skipWorkspaceScoping: Boolean = false
+    ): List<EntityWithMeta<DashboardDto>> {
+        val predicateForQuery = WorkspaceScopingUtils.applyScoping(
             predicate,
-            workspaceService.buildAvailableWorkspacesPredicate(AuthContext.getCurrentRunAsAuth(), workspaces)
+            workspaces,
+            skipWorkspaceScoping,
+            workspaceService
         )
         return searchConv.findAll(repo, predicateForQuery, max, skip, sort).map { entity -> mapToDtoWithMeta(entity) }
     }

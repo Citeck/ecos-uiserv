@@ -265,6 +265,21 @@ class DashboardRecordsTest {
         )
     }
 
+    @Test
+    fun workspaceRefReturnsCorrectEntityRef() {
+        val refId = workspaceService.addWsPrefixToId("with-type-ws-custom-workspace", "custom-workspace")
+        val ref = EntityRef.valueOf("dashboard@$refId")
+        val wsRef = recordsService.getAtt(ref, "workspaceRef?id").asText()
+        assertThat(wsRef).isEqualTo("emodel/workspace@custom-workspace")
+    }
+
+    @Test
+    fun workspaceRefReturnsDefaultForGlobalDashboard() {
+        val ref = EntityRef.valueOf("dashboard@with-type")
+        val wsRef = recordsService.getAtt(ref, "workspaceRef?id").asText()
+        assertThat(wsRef).isEqualTo("emodel/workspace@default")
+    }
+
     private fun queryDashDto(action: Query.() -> Unit): DashboardDto? {
         return queryDashDto(createDashQuery(action))
     }

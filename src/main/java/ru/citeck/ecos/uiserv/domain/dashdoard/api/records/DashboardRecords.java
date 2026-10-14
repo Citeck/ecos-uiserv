@@ -29,6 +29,8 @@ import ru.citeck.ecos.records3.record.dao.mutate.RecordMutateDao;
 import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefPredicateUtils;
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefUtils;
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
@@ -150,20 +152,27 @@ public class DashboardRecords extends AbstractRecordsDao
         if (recordsQuery.getLanguage().equals(PredicateService.LANGUAGE_PREDICATE)) {
 
             Predicate predicate = recordsQuery.getQuery(Predicate.class);
+            Predicate mappedPredicate =
+                WorkspaceRefPredicateUtils.mapWorkspaceRefPredicate(
+                    predicate, WorkspaceRefPredicateUtils.blankOrDefaultWsRule()
+                );
+            boolean skipWorkspaceScoping =
+                WorkspaceRefPredicateUtils.isWorkspaceScopingSkipAllowed(mappedPredicate);
 
             List<DashboardRecord> records = dashboardService.findAllWithMeta(
-                predicate,
+                mappedPredicate,
                 recordsQuery.getWorkspaces(),
                 recordsQuery.getPage().getMaxItems(),
                 recordsQuery.getPage().getSkipCount(),
-                recordsQuery.getSortBy()
+                recordsQuery.getSortBy(),
+                skipWorkspaceScoping
             ).stream()
                 .map(wm -> new DashboardRecord(wm, authoritiesApi, workspaceService))
                 .collect(Collectors.toList());
 
             RecsQueryRes<DashboardRecord> result = new RecsQueryRes<>();
             result.setRecords(records);
-            result.setTotalCount(dashboardService.getCount(predicate, recordsQuery.getWorkspaces()));
+            result.setTotalCount(dashboardService.getCount(mappedPredicate, recordsQuery.getWorkspaces(), skipWorkspaceScoping));
 
             return result;
         }
@@ -319,6 +328,10 @@ public class DashboardRecords extends AbstractRecordsDao
                 return null;
             }
             return authoritiesApi.getPersonRef(lastModifiedBy);
+        }
+
+        public EntityRef getWorkspaceRef() {
+            return WorkspaceRefUtils.getWorkspaceRefOrDefault(getWorkspace());
         }
 
         @JsonProperty("_content")

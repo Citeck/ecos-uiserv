@@ -9,8 +9,6 @@ import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.events2.type.RecordEventsService
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
 import ru.citeck.ecos.records2.predicate.PredicateService
-import ru.citeck.ecos.records2.predicate.PredicateUtils
-import ru.citeck.ecos.records2.predicate.model.AttributePredicate
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.VoidPredicate
 import ru.citeck.ecos.records3.record.dao.AbstractRecordsDao
@@ -22,6 +20,8 @@ import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.dao.query.dto.query.SortBy
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefPredicateUtils
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceScopingUtils
 import ru.citeck.ecos.uiserv.domain.form.dto.EcosFormDef
 import ru.citeck.ecos.uiserv.domain.form.registry.FormsRegistryConfiguration
 import ru.citeck.ecos.uiserv.domain.form.service.EcosFormService
@@ -142,9 +142,7 @@ class EcosFormRecordsDao(
             toRecord(EcosFormDef.create().build())
         } else {
             val idInWs = workspaceService.convertToIdInWs(recordId)
-            if (!workspaceService.isWorkspaceWithGlobalEntities(idInWs.workspace) &&
-                !workspaceService.isUserMemberOf(AuthContext.getCurrentUser(), idInWs.workspace)
-            ) {
+            if (!WorkspaceScopingUtils.isArtifactReadable(workspaceService, idInWs.workspace)) {
                 return null
             }
             ecosFormService.getFormById(idInWs)
@@ -184,17 +182,13 @@ class EcosFormRecordsDao(
             recsQuery = workspaceUiService.prepareQueryWithSystemFilterIfRequired(recsQuery)
             val (max, skipCount) = recsQuery.page
             if (PredicateService.LANGUAGE_PREDICATE == recsQuery.language) {
-                val predicate = PredicateUtils.mapAttributePredicates(
-                    recsQuery.getQuery(Predicate::class.java)
-                ) { pred: AttributePredicate ->
-                    if (ATTS_MAPPING.containsKey(pred.getAttribute())) {
-                        val copy = pred.copy<AttributePredicate>()
-                        copy.setAttribute(ATTS_MAPPING[pred.getAttribute()])
-                        copy
-                    } else {
-                        pred
-                    }
-                }
+                val predicate = WorkspaceRefPredicateUtils.mapWorkspaceRefPredicate(
+                    recsQuery.getQuery(Predicate::class.java),
+                    WorkspaceRefPredicateUtils.globalWsRuleOf(workspaceService),
+                    ATTS_MAPPING
+                )
+                val skipWorkspaceScoping =
+                    WorkspaceRefPredicateUtils.isWorkspaceScopingSkipAllowed(predicate)
                 val mappedSortBy = recsQuery.sortBy.map { sortBy: SortBy ->
                     if (ATTS_MAPPING.containsKey(sortBy.attribute)) {
                         sortBy.copy { this.attribute = ATTS_MAPPING[sortBy.attribute]!! }
@@ -202,18 +196,26 @@ class EcosFormRecordsDao(
                         sortBy
                     }
                 }
-                val registryQuery = recsQuery.copy()
+                val registryQueryBuilder = recsQuery.copy()
                     .withSourceId(FormsRegistryConfiguration.FORMS_REGISTRY_SOURCE_ID)
                     .withQuery(predicate)
                     .withSortBy(mappedSortBy)
-                    .build()
-                val queryRes = recordsService.query(registryQuery)
-                val journals = ecosFormService.getFormsByIds(
+                if (skipWorkspaceScoping) {
+                    registryQueryBuilder.withWorkspaces(emptyList())
+                }
+                val registryQuery = registryQueryBuilder.build()
+                // Registry scoping follows auth, so cross-workspace admin queries require system auth.
+                val queryRes = if (skipWorkspaceScoping) {
+                    AuthContext.runAsSystem { recordsService.query(registryQuery) }
+                } else {
+                    recordsService.query(registryQuery)
+                }
+                val forms = ecosFormService.getFormsByIds(
                     queryRes.getRecords().map {
                         workspaceService.convertToIdInWs(it.getLocalId())
                     }
                 )
-                result.setRecords(journals.map { toRecord(it.entity) })
+                result.setRecords(forms.map { toRecord(it.entity) })
                 result.setTotalCount(queryRes.getTotalCount())
             } else {
 

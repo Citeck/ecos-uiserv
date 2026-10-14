@@ -39,6 +39,8 @@ import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.uiserv.app.common.perms.UiServSystemArtifactPerms;
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefPredicateUtils;
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefUtils;
 import ru.citeck.ecos.uiserv.domain.action.service.ActionService;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto;
 import ru.citeck.ecos.webapp.api.constants.AppName;
@@ -177,8 +179,15 @@ public class ActionRecords extends AbstractRecordsDao
             }
             List<String> workspaces = recordsQuery.getWorkspaces();
 
-            List<ActionDto> actions = actionService.getActions(predicate, workspaces, max, skip, sortBy);
-            result.setTotalCount(actionService.getCount(predicate, workspaces));
+            Predicate mappedPredicate = WorkspaceRefPredicateUtils.mapWorkspaceRefPredicate(
+                predicate, WorkspaceRefPredicateUtils.globalWsRuleOf(workspaceService),
+                Map.of("moduleId", "extId")
+            );
+            boolean skipWorkspaceScoping = WorkspaceRefPredicateUtils.isWorkspaceScopingSkipAllowed(mappedPredicate);
+            List<ActionDto> actions = actionService.getActions(
+                mappedPredicate, workspaces, max, skip, sortBy, skipWorkspaceScoping
+            );
+            result.setTotalCount(actionService.getCount(mappedPredicate, workspaces, skipWorkspaceScoping));
 
             result.setRecords(actions.stream()
                 .map(ActionRecord::new)
@@ -511,6 +520,10 @@ public class ActionRecords extends AbstractRecordsDao
                 return workspaceService.getUpdatedWsInMutation(getWorkspace(), ctxWorkspace);
             }
             return workspaceService.getUpdatedWsInMutation("", ctxWorkspace);
+        }
+
+        public EntityRef getWorkspaceRef() {
+            return WorkspaceRefUtils.getWorkspaceRefOrDefault(getWorkspace());
         }
 
         public String getModuleId() {
