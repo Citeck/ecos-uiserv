@@ -280,6 +280,31 @@ class DashboardRecordsTest {
         assertThat(wsRef).isEqualTo("emodel/workspace@default")
     }
 
+    @Test
+    fun testOrgstructureDefaultDashboard() {
+
+        localAppService.deployLocalArtifacts("ui/dashboard")
+
+        val typeRef = ModelUtils.getTypeRef("orgstructure-dashboard")
+
+        queryDashAndExpectId(
+            createDashQuery {
+                this.typeRef = typeRef
+                this.scope = "orgstructure"
+            },
+            "orgstructure-dashboard"
+        )
+
+        // The dashboard belongs to the orgstructure page and is not found outside its scope
+        queryDashAndExpectId(
+            createDashQuery {
+                this.typeRef = typeRef
+                this.isExpandType = false
+            },
+            ""
+        )
+    }
+
     private fun queryDashDto(action: Query.() -> Unit): DashboardDto? {
         return queryDashDto(createDashQuery(action))
     }

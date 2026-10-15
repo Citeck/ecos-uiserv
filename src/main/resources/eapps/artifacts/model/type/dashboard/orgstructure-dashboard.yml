@@ -1,0 +1,10 @@
+---
+id: orgstructure-dashboard
+
+name:
+  en: Orgstructure dashboard
+  ru: Дашборд оргструктуры
+
+system: true
+
+dashboardType: orgstructure-dashboard
