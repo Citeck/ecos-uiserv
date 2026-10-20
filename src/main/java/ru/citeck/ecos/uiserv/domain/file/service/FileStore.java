@@ -14,7 +14,7 @@ import ru.citeck.ecos.uiserv.domain.translation.repo.TranslatedRepository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Map;
 import java.util.Optional;
 
