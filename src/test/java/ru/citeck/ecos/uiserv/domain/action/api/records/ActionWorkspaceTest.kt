@@ -355,7 +355,7 @@ class ActionWorkspaceTest : ActionsTestBase() {
     @Test
     fun `artifact handler deploys actions into workspace`() {
 
-        val handler = ActionArtifactHandler(actionService)
+        val handler = ActionArtifactHandler(actionService, workspaceService)
         val changes = mutableListOf<Pair<ActionDto, String>>()
         handler.listenChanges { action, ws -> changes.add(Json.mapper.copy(action)!! to ws) }
 

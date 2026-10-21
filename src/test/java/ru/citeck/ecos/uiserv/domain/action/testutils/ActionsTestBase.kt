@@ -29,7 +29,7 @@ open class ActionsTestBase {
     protected lateinit var workspaceService: WorkspaceService
 
     /**
-     * Workspaces of every user in tests. Workspace id is equal to its system id.
+     * Workspaces of every user in tests. IDs map to themselves unless overridden below.
      */
     protected val userWorkspaces: MutableSet<String> = mutableSetOf()
 
@@ -37,6 +37,8 @@ open class ActionsTestBase {
      * Workspaces where every user in tests is a manager.
      */
     protected val managedWorkspaces: MutableSet<String> = mutableSetOf()
+
+    protected val workspaceSystemIds: MutableMap<String, String> = mutableMapOf()
 
     @BeforeEach
     fun before() {
@@ -64,7 +66,14 @@ open class ActionsTestBase {
                 identifiers: List<String>,
                 mappingType: WorkspaceApi.IdMappingType
             ): List<String> {
-                return identifiers
+                return identifiers.map { id ->
+                    when (mappingType) {
+                        WorkspaceApi.IdMappingType.WS_ID_TO_SYS_ID -> workspaceSystemIds[id] ?: id
+                        WorkspaceApi.IdMappingType.WS_SYS_ID_TO_ID ->
+                            workspaceSystemIds.entries.firstOrNull { it.value == id }?.key ?: id
+                        WorkspaceApi.IdMappingType.NO_MAPPING -> id
+                    }
+                }
             }
         })
         workspaceService = modelServices.workspaceService

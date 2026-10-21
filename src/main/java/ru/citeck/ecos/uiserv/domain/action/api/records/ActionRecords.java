@@ -42,6 +42,7 @@ import ru.citeck.ecos.uiserv.app.common.perms.UiServSystemArtifactPerms;
 import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefPredicateUtils;
 import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefUtils;
 import ru.citeck.ecos.uiserv.domain.action.service.ActionService;
+import ru.citeck.ecos.uiserv.domain.action.service.ActionWorkspaceRefs;
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto;
 import ru.citeck.ecos.webapp.api.constants.AppName;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
@@ -132,7 +133,8 @@ public class ActionRecords extends AbstractRecordsDao
             }
         }
         actionRecord.setWorkspace(workspace);
-        actionService.updateAction(actionRecord);
+        ActionDto toSave = ActionWorkspaceRefs.bindToWorkspace(actionRecord, workspace, workspaceService);
+        actionService.updateAction(toSave);
         return actionService.getRefLocalId(actionRecord);
     }
 
@@ -560,7 +562,7 @@ public class ActionRecords extends AbstractRecordsDao
 
         @JsonValue
         public ActionDto toJson() {
-            ActionDto dto = new ActionDto(this);
+            ActionDto dto = ActionWorkspaceRefs.prepareForExport(this, workspaceService);
             dto.setWorkspace("");
             return dto;
         }
