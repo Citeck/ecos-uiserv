@@ -6,16 +6,20 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService
+import ru.citeck.ecos.model.lib.workspace.bindRefToWorkspace
 import ru.citeck.ecos.records2.predicate.PredicateUtils
+import ru.citeck.ecos.records2.predicate.model.ComposedPredicate
+import ru.citeck.ecos.records2.predicate.model.NotPredicate
 import ru.citeck.ecos.records2.predicate.model.Predicate
 import ru.citeck.ecos.records2.predicate.model.ValuePredicate
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto
 import ru.citeck.ecos.webapp.api.entity.EntityRef
+import java.util.IdentityHashMap
 import java.util.function.Function
 
 /**
  * Reference keys have the same meaning at every config depth, including custom actions/payloads.
- * Only the owning workspace is made portable on export; explicit foreign references stay intact.
+ * Global actions bypass export rewriting. Only the owning workspace is made portable otherwise; foreign refs stay intact.
  * The action DTO's unused top-level typeRef is outside the config traversal.
  */
 object ActionWorkspaceRefs {
@@ -44,8 +48,14 @@ object ActionWorkspaceRefs {
         fields + fields.filterKeys { it.endsWith("Ref") || it.endsWith("Id") }.mapKeys { it.key + "s" }
     }
 
+    private val typeAttributes = setOf("_type", "_type?id", "_type?localId")
+    private val typeValuePredicates = setOf(ValuePredicate.Type.EQ, ValuePredicate.Type.IN, ValuePredicate.Type.CONTAINS)
+
     @JvmStatic
     fun prepareForExport(action: ActionDto, workspaceService: WorkspaceService): ActionDto {
+        if (workspaceService.isWorkspaceWithGlobalEntities(action.workspace)) {
+            return copyAction(action)
+        }
         return rewrite(action) { ref ->
             val id = ref.getLocalId()
             val portableId = workspaceService.replaceWsPrefixToCurrentWsPlaceholder(id)
@@ -60,20 +70,33 @@ object ActionWorkspaceRefs {
     }
 
     @JvmStatic
-    fun bindToWorkspace(action: ActionDto, workspace: String, workspaceService: WorkspaceService): ActionDto {
+    @JvmOverloads
+    fun bindToWorkspace(
+        action: ActionDto,
+        workspace: String,
+        workspaceService: WorkspaceService,
+        coDeployedRefs: Set<EntityRef> = emptySet()
+    ): ActionDto {
         return rewrite(action) { ref ->
-            ref.withLocalId(workspaceService.replaceCurrentWsPlaceholderToWsPrefix(ref.getLocalId(), workspace))
+            workspaceService.bindRefToWorkspace(ref, workspace, coDeployedRefs)
         }
     }
 
-    private fun rewrite(action: ActionDto, transform: Function<EntityRef, EntityRef>): ActionDto {
+    private fun copyAction(action: ActionDto): ActionDto {
         val result = ActionDto(action)
+        // The domain copy preserves groups; ActionDto's JSON copy can optimize their structure.
+        result.predicate = action.predicate?.copy<Predicate>()
+        result.evaluator = Json.mapper.copy(action.evaluator)
+        return result
+    }
+
+    private fun rewrite(action: ActionDto, transform: Function<EntityRef, EntityRef>): ActionDto {
+        val result = copyAction(action)
         val confirm = result.confirm
         if (confirm != null && EntityRef.isNotEmpty(confirm.formRef) && isStatic(confirm.formRef.toString())) {
             result.confirm = confirm.copy().withFormRef(transform.apply(confirm.formRef)).build()
         }
-        result.predicate = rewritePredicate(action.predicate, transform)
-        result.evaluator = Json.mapper.copy(action.evaluator)
+        rewritePredicate(result.predicate, transform)
         result.evaluator?.config?.let { rewriteNode(it.getData().asJson(), transform) }
         rewriteNode(result.config.getData().asJson(), transform)
         return result
@@ -94,8 +117,7 @@ object ActionWorkspaceRefs {
                 node.properties().forEach { (key, value) ->
                     var mappedValue = value
                     if (key == "predicate" && value.isObject) {
-                        val predicate = Json.mapper.convert(value, Predicate::class.java)
-                        mappedValue = Json.mapper.toJson(rewritePredicate(predicate, transform))
+                        mappedValue = rewriteNestedPredicate(value, transform)
                     }
                     node.set<JsonNode>(
                         key,
@@ -112,17 +134,31 @@ object ActionWorkspaceRefs {
         return node
     }
 
-    private fun rewritePredicate(predicate: Predicate?, transform: Function<EntityRef, EntityRef>): Predicate? {
-        val result = predicate?.copy<Predicate>()
-        // Visit values on the copy, retaining the original structure, including empty groups.
+    private fun rewriteNestedPredicate(node: JsonNode, transform: Function<EntityRef, EntityRef>): JsonNode {
+        val predicate = Json.mapper.convert(node, Predicate::class.java)
+        val values = IdentityHashMap<ValuePredicate, JsonNode>()
+        rewritePredicate(predicate, transform, values)
+        // Project changed values only: serializing the model would normalize aliases and discard custom data.
+        applyPredicateValues(node, predicate, values)
+        return node
+    }
+
+    // Visits values in place (callers pass a copy), retaining the original structure, including empty groups.
+    private fun rewritePredicate(
+        predicate: Predicate?,
+        transform: Function<EntityRef, EntityRef>,
+        values: MutableMap<ValuePredicate, JsonNode>? = null
+    ) {
         PredicateUtils.mapValuePredicates(
-            result,
+            predicate,
             { pred ->
-                if (pred.getAttribute() in setOf("_type", "_type?id", "_type?localId") &&
-                    pred.getType() in setOf(ValuePredicate.Type.EQ, ValuePredicate.Type.IN, ValuePredicate.Type.CONTAINS)
-                ) {
-                    val value = rewriteNode(pred.getValue().copy().asJson(), transform, true, "emodel/type")
-                    pred.setValue(value)
+                if (pred.getAttribute() in typeAttributes && pred.getType() in typeValuePredicates) {
+                    val original = pred.getValue().asJson()
+                    val value = rewriteNode(original.deepCopy<JsonNode>(), transform, true, "emodel/type")
+                    if (value != original) {
+                        pred.setValue(value)
+                        values?.put(pred, value)
+                    }
                 }
                 pred
             },
@@ -130,7 +166,49 @@ object ActionWorkspaceRefs {
             optimize = false,
             filterEmptyComposite = false
         )
-        return result
+    }
+
+    private fun applyPredicateValues(
+        node: JsonNode,
+        predicate: Predicate?,
+        values: Map<ValuePredicate, JsonNode>
+    ) {
+        if (node !is ObjectNode || (node.has("val") && node.has("v"))) {
+            // Two value fields are ambiguous; preserve their original data.
+            return
+        }
+        val valueName: String
+        if (node.has("val")) {
+            valueName = "val"
+        } else {
+            valueName = "v"
+        }
+        when (predicate) {
+            is ValuePredicate -> {
+                val value = values[predicate]
+                if (value != null && node.has(valueName)) {
+                    node.set<JsonNode>(valueName, value)
+                }
+            }
+            is ComposedPredicate -> {
+                val children = node.get(valueName)
+                val predicates = predicate.getPredicates()
+                if (children is ArrayNode && children.size() == predicates.size) {
+                    for (index in predicates.indices) {
+                        applyPredicateValues(children[index], predicates[index], values)
+                    }
+                }
+            }
+            is NotPredicate -> {
+                var child = node.get(valueName)
+                if (node.path("t").asText().startsWith("not-")) {
+                    child = node
+                }
+                if (child != null) {
+                    applyPredicateValues(child, predicate.getPredicate(), values)
+                }
+            }
+        }
     }
 
     private fun rewriteText(text: String, source: String?, transform: Function<EntityRef, EntityRef>): String {

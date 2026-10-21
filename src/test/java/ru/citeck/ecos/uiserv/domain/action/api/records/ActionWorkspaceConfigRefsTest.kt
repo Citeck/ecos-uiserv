@@ -5,12 +5,15 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.Mockito
+import ru.citeck.ecos.apps.app.domain.handler.ArtifactDeployMeta
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.commons.json.YamlUtils
 import ru.citeck.ecos.context.lib.auth.AuthContext
 import ru.citeck.ecos.model.lib.workspace.IdInWs
 import ru.citeck.ecos.records2.predicate.model.Predicate
+import ru.citeck.ecos.uiserv.domain.action.dto.ActionConfirmDef
 import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto
 import ru.citeck.ecos.uiserv.domain.action.eapps.ActionArtifactHandler
 import ru.citeck.ecos.uiserv.domain.action.service.ActionWorkspaceRefs
@@ -96,17 +99,138 @@ class ActionWorkspaceConfigRefsTest : ActionsTestBase() {
 
     @Test
     fun `predicate mapping retains empty nested groups`() {
+        val json = """{"t":"or","val":[{"t":"and","val":[]},{"t":"not","val":{"t":"or","val":[]}},{"t":"eq","att":"_type","val":"emodel/type@source-sys-id:contract"}]}"""
         val action = ActionDto().apply {
             workspace = "source"
-            predicate = Json.mapper.readNotNull(
-                """{"t":"or","val":[{"t":"and","val":[]},{"t":"not","val":{"t":"or","val":[]}},{"t":"eq","att":"_type","val":"emodel/type@source-sys-id:contract"}]}""",
-                Predicate::class.java
+            predicate = Json.mapper.readNotNull(json, Predicate::class.java)
+        }
+        val original = requireNotNull(action.predicate).copy<Predicate>()
+        val exported = ActionWorkspaceRefs.prepareForExport(action, workspaceService)
+        val expectedExport = Json.mapper.readNotNull(json.replace("source-sys-id:", "CURRENT_WS:"), Predicate::class.java)
+        assertThat(exported.predicate).isEqualTo(expectedExport)
+        val imported = ActionWorkspaceRefs.bindToWorkspace(exported, "target", workspaceService)
+        val expectedImport = Json.mapper.readNotNull(json.replace("source-sys-id:", "target-sys-id:"), Predicate::class.java)
+        assertThat(imported.predicate).isEqualTo(expectedImport)
+        assertThat(action.predicate).isEqualTo(original)
+    }
+
+    @Test
+    fun `custom payloads under a predicate key stay intact while real predicates are rewritten`() {
+        val action = ActionDto().apply {
+            workspace = "source"
+            config = ObjectData.create(
+                """{"a":{"predicate":{"foo":"bar"}},"b":{"predicate":{}},"c":{"predicate":{"t":"custom-type","att":"_type","val":"emodel/type@source-sys-id:x"}},"d":{"predicate":{"att":"name","val":"source-sys-id:literal","typeRef":"emodel/type@source-sys-id:y"}},"e":{"predicate":{"t":"eq","att":"_type","val":"emodel/type@source-sys-id:z"}},"f":{"predicate":{"t":"or","val":[{"t":"and","val":[]},{"t":"eq","att":"_type","val":"emodel/type@source-sys-id:w"}]}},"g":{"predicate":{"t":"eq","a":"_type","v":"emodel/type@source-sys-id:alias","label":"custom metadata"}},"h":{"predicate":{"t":"not-eq","a":"_type","v":"emodel/type@source-sys-id:negative"}},"i":{"predicate":{"t":"or","v":[{"t":"eq","a":"_type","v":"emodel/type@source-sys-id:child"},{"t":"not","v":{"t":"eq","att":"_type","val":"emodel/type@source-sys-id:not-child"}}]}},"j":{"predicate":{"t":"eq","att":"_type","val":"emodel/type@source-sys-id:ambiguous-a","v":"emodel/type@source-sys-id:ambiguous-b"}}}"""
             )
         }
         val snapshot = requireNotNull(Json.mapper.toString(action))
         val exported = ActionWorkspaceRefs.prepareForExport(action, workspaceService)
-        assertThat(Json.mapper.toString(exported)).isEqualTo(snapshot.replace("source-sys-id:", "CURRENT_WS:"))
+        val expectedExport = snapshot.replace("emodel/type@source-sys-id:y", "emodel/type@CURRENT_WS:y")
+            .replace("emodel/type@source-sys-id:z", "emodel/type@CURRENT_WS:z")
+            .replace("emodel/type@source-sys-id:w", "emodel/type@CURRENT_WS:w")
+            .replace("emodel/type@source-sys-id:alias", "emodel/type@CURRENT_WS:alias")
+            .replace("emodel/type@source-sys-id:negative", "emodel/type@CURRENT_WS:negative")
+            .replace("emodel/type@source-sys-id:child", "emodel/type@CURRENT_WS:child")
+            .replace("emodel/type@source-sys-id:not-child", "emodel/type@CURRENT_WS:not-child")
+        assertThat(Json.mapper.toString(exported)).isEqualTo(expectedExport)
+        val imported = ActionWorkspaceRefs.bindToWorkspace(exported, "target", workspaceService)
+        assertThat(Json.mapper.toString(imported)).isEqualTo(expectedExport.replace("CURRENT_WS:", "target-sys-id:"))
         assertThat(Json.mapper.toString(action)).isEqualTo(snapshot)
+    }
+
+    @Test
+    fun `global exports skip all reference mapping and return an independent copy`() {
+        for (workspace in listOf("", "default", "admin${'$'}tenant")) {
+            val service = Mockito.spy(workspaceService)
+            val action = ActionDto().apply {
+                this.workspace = workspace
+                config = ObjectData.create(
+                    """{"formId":"CURRENT_WS:form","nested":{"typeRef":"emodel/type@source-sys-id:type","predicate":{"foo":"bar"}}}"""
+                )
+                confirm = ActionConfirmDef.create().withFormRef(EntityRef.valueOf("uiserv/form@CURRENT_WS:confirm")).build()
+                predicate = predicate("CURRENT_WS:")
+                evaluator = evaluator("CURRENT_WS:")
+            }
+            val before = Json.mapper.toString(action)
+            val exported = ActionWorkspaceRefs.prepareForExport(action, service)
+            assertThat(Json.mapper.toString(exported)).isEqualTo(before)
+            assertThat(exported.predicate).isEqualTo(action.predicate)
+            Mockito.verify(service).isWorkspaceWithGlobalEntities(workspace)
+            Mockito.verifyNoMoreInteractions(service)
+            assertThat(exported).isNotSameAs(action)
+            exported.workspace = "changed"
+            exported.config.set("formId", "changed")
+            requireNotNull(requireNotNull(exported.evaluator).config).set("changed", true)
+            assertThat(Json.mapper.toString(action)).isEqualTo(before)
+        }
+    }
+
+    @Test
+    fun `globally exported app action binds only its co-deployed artifact references`() {
+        val case = RefCase(
+            "global app",
+            "custom-handler",
+            """{"formId":"__WS__app-form","formRef":"uiserv/form@__WS__app-form","editorFormId":"uiserv/form@__WS__app-editor","typeRef":"emodel/type@__WS__app-type","journalRef":"uiserv/journal@__WS__app-journal","actionRef":"__WS__app-next","templateRef":"transformations/template@__WS__app-template","nested":{"formId":"type${'$'}__WS__app-type","predicate":{"t":"not-eq","a":"_type","v":"emodel/type@__WS__app-type","label":"keep metadata"}},"external":{"formId":"platform-form","typeRef":"emodel/type@platform-type"}}"""
+        )
+        val source = ActionDto().apply {
+            id = "global-app-action"
+            type = case.type
+            config = case.config("")
+            confirm = ActionConfirmDef.create().withFormRef(EntityRef.valueOf("uiserv/form@app-form")).build()
+            predicate = Json.mapper.readNotNull("""{"t":"eq","att":"_type","val":"emodel/type@app-type"}""", Predicate::class.java)
+            evaluator = Json.mapper.readNotNull(
+                """{"type":"predicate","config":{"predicate":{"t":"eq","att":"_type","val":"emodel/type@app-type"}}}""",
+                RecordEvaluatorDto::class.java
+            )
+        }
+        val before = Json.mapper.toString(source)
+        val handler = ActionArtifactHandler(actionService, workspaceService)
+        val exports = mutableListOf<ActionDto>()
+        handler.listenChanges { action, _ -> exports.add(action) }
+        AuthContext.runAsSystem {
+            actionService.updateAction(source)
+            assertThat(Json.mapper.toString(exports.single())).isEqualTo(before)
+            val bytes = Base64.getDecoder().decode(records.getAtt(EntityRef.valueOf("action@global-app-action"), "data").asText())
+            val exported = requireNotNull(Json.mapper.convert(YamlUtils.read(String(bytes, Charsets.UTF_8)), ActionDto::class.java))
+            assertThat(exported.config).isEqualTo(case.config(""))
+            assertThat(Json.mapper.toString(exported)).doesNotContain("CURRENT_WS:")
+            val exportedBefore = Json.mapper.toString(exported)
+
+            // An individual artifact has no app siblings and must keep global references.
+            handler.deployArtifact(exported, "target")
+            assertThat(requireNotNull(actionService.getAction(IdInWs.create("target", source.id))).config)
+                .isEqualTo(case.config(""))
+
+            val meta = ArtifactDeployMeta.create()
+                .withSourceType("ECOS_APP")
+                .withSourceId("target-sys-id:reference-app")
+                .withWorkspace("target")
+                .withCoDeployedArtifacts(
+                    listOf(
+                        EntityRef.valueOf("uiserv/form@app-form"),
+                        EntityRef.valueOf("uiserv/form@app-editor"),
+                        EntityRef.valueOf("emodel/type@app-type"),
+                        EntityRef.valueOf("uiserv/journal@app-journal"),
+                        EntityRef.valueOf("uiserv/action@app-next"),
+                        EntityRef.valueOf("transformations/template@app-template")
+                    )
+                )
+                .build()
+            ArtifactDeployMeta.doWithMeta(meta) {
+                handler.deployArtifact(exported, "target")
+            }
+            val saved = requireNotNull(actionService.getAction(IdInWs.create("target", source.id)))
+            assertThat(saved.workspace).isEqualTo("target")
+            assertThat(saved.config).isEqualTo(case.config("target-sys-id:"))
+            assertThat(saved.confirm.formRef.toString()).isEqualTo("uiserv/form@target-sys-id:app-form")
+            assertThat(saved.predicate).isEqualTo(
+                Json.mapper.readNotNull("""{"t":"eq","att":"_type","val":"emodel/type@target-sys-id:app-type"}""", Predicate::class.java)
+            )
+            assertThat(Json.mapper.toString(saved.evaluator)).contains("emodel/type@target-sys-id:app-type")
+            assertThat(ArtifactDeployMeta.getThreadMeta().coDeployedArtifacts).isEmpty()
+            assertThat(Json.mapper.toString(exported)).isEqualTo(exportedBefore)
+            assertThat(Json.mapper.toString(source)).isEqualTo(before)
+            assertThat(Json.mapper.toString(actionService.getAction(source.id))).isEqualTo(before)
+        }
     }
 
     @Test

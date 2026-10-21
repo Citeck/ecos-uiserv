@@ -4,6 +4,7 @@ import kotlin.Unit;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import ru.citeck.ecos.apps.app.domain.handler.ArtifactDeployMeta;
 import ru.citeck.ecos.apps.app.domain.handler.WsAwareArtifactHandler;
 import ru.citeck.ecos.model.lib.workspace.IdInWs;
 import ru.citeck.ecos.model.lib.workspace.WorkspaceService;
@@ -11,6 +12,7 @@ import ru.citeck.ecos.uiserv.domain.action.dto.ActionDto;
 import ru.citeck.ecos.uiserv.domain.action.service.ActionService;
 import ru.citeck.ecos.uiserv.domain.action.service.ActionWorkspaceRefs;
 
+import java.util.HashSet;
 import java.util.function.BiConsumer;
 
 @Component
@@ -22,7 +24,10 @@ public class ActionArtifactHandler implements WsAwareArtifactHandler<ActionDto> 
 
     @Override
     public void deployArtifact(@NotNull ActionDto actionModule, @NotNull String workspace) {
-        ActionDto action = ActionWorkspaceRefs.bindToWorkspace(actionModule, workspace, workspaceService);
+        ActionDto action = ActionWorkspaceRefs.bindToWorkspace(
+            actionModule, workspace, workspaceService,
+            new HashSet<>(ArtifactDeployMeta.getThreadMeta().getCoDeployedArtifacts())
+        );
         action.setWorkspace(workspace);
         actionService.updateAction(action);
     }
