@@ -352,7 +352,7 @@ class DashboardRecordsTest {
             dashboardService.saveDashboard(
                 DashboardDto.create()
                     .withId("downloaded")
-                    .withConfig(ObjectData.create("""{"v2":{"widgets":[{"props":{"config":{"v2":{"journalId":"$sourceWs:nested-journal"}}}}]}}"""))
+                    .withConfig(ObjectData.create("""{"v2":{"widgets":[{"props":{"config":{"v2":{"journalId":"$sourceWs:nested-journal","journalsListIds":["uiserv/journal@$sourceWs:nested-journal"]}}}}]}}"""))
                     .withWorkspace(sourceWs)
                     .withTypeRef(EntityRef.valueOf(typeRef))
                     .build()
@@ -365,6 +365,8 @@ class DashboardRecordsTest {
 
         assertThat(exported["workspace"].asText()).isEmpty()
         assertThat(exported["config"].toString()).contains("CURRENT_WS:nested-journal")
+        assertThat(exported.getData().asJson().at("/config/v2/widgets/0/props/config/v2/journalsListIds/0").asText())
+            .isEqualTo("uiserv/journal@CURRENT_WS:nested-journal")
         assertThat(exported["typeRef"].asText()).isEqualTo("emodel/type@CURRENT_WS:ws-type")
 
         // the module upload form of a workspace journal sends the file in _content and the journal
@@ -378,7 +380,11 @@ class DashboardRecordsTest {
             val contentAtt = "_content" to listOf(mapOf("url" to content))
             val wsAtt = "_workspace" to "emodel/workspace@$targetWs"
             val atts = ObjectData.create(
-                if (contentFirst) linkedMapOf(contentAtt, wsAtt) else linkedMapOf(wsAtt, contentAtt)
+                if (contentFirst) {
+                    linkedMapOf(contentAtt, wsAtt)
+                } else {
+                    linkedMapOf(wsAtt, contentAtt)
+                }
             )
             AuthContext.runAs("admin", listOf(AuthRole.ADMIN)) {
                 recordsService.mutate(RecordAtts(EntityRef.valueOf("dashboard@"), atts))
@@ -386,6 +392,8 @@ class DashboardRecordsTest {
 
             val uploaded = dashboardService.getDashboardById("uploaded-$idx", targetWs).orElseThrow()
             assertThat(uploaded.config.toString()).contains("$targetWs:nested-journal")
+            assertThat(uploaded.config.getData().asJson().at("/v2/widgets/0/props/config/v2/journalsListIds/0").asText())
+                .isEqualTo("uiserv/journal@$targetWs:nested-journal")
             assertThat(uploaded.typeRef.getLocalId())
                 .isEqualTo(workspaceService.addWsPrefixToId("ws-type", targetWs))
             assertThat(dashboardService.getDashboardById("uploaded-$idx", "")).isEmpty()

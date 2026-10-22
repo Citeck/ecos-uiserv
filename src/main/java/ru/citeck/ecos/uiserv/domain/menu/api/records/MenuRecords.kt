@@ -1,5 +1,6 @@
 package ru.citeck.ecos.uiserv.domain.menu.api.records
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonValue
 import jakarta.annotation.PostConstruct
@@ -144,7 +145,11 @@ class MenuRecords(
         val withBoundRefs = MenuWorkspaceRefs.rewrite(menu) { ref ->
             ref.withLocalId(workspaceService.replaceCurrentWsPlaceholderToWsPrefix(ref.getLocalId(), menu.workspace))
         }
-        val saved = menuService.save(withBoundRefs)
+        val saved = if (record.importedContent) {
+            menuService.save(withBoundRefs, true)
+        } else {
+            menuService.save(withBoundRefs)
+        }
         return addMenuWsPrefixToId(saved.id, saved.workspace)
     }
 
@@ -160,7 +165,11 @@ class MenuRecords(
             return localId
         }
         val prefix = wsSysId + IdInWs.WS_DELIM
-        return if (localId.startsWith(prefix)) localId else prefix + localId
+        return if (localId.startsWith(prefix)) {
+            localId
+        } else {
+            prefix + localId
+        }
     }
 
     override fun delete(recordId: String): DelStatus {
@@ -208,7 +217,12 @@ class MenuRecords(
         }
 
         fun getDefaultMenuForJournal(): String {
-            return messageResolver.getMessage(if (isDefaultMenu()) "label.yes" else "label.no")
+            val messageKey = if (isDefaultMenu()) {
+                "label.yes"
+            } else {
+                "label.no"
+            }
+            return messageResolver.getMessage(messageKey)
         }
 
         fun getPermissions(): MenuPermissions {
@@ -233,21 +247,31 @@ class MenuRecords(
         @Nullable
         fun getCreated(): Instant? {
             val created = meta?.created
-            return if (created == null || created == Instant.EPOCH) null else created
+            return if (created == null || created == Instant.EPOCH) {
+                null
+            } else {
+                created
+            }
         }
 
         @AttName(RecordConstants.ATT_MODIFIED)
         @Nullable
         fun getModified(): Instant? {
             val modified = meta?.modified
-            return if (modified == null || modified == Instant.EPOCH) null else modified
+            return if (modified == null || modified == Instant.EPOCH) {
+                null
+            } else {
+                modified
+            }
         }
 
         @AttName(RecordConstants.ATT_CREATOR)
         @Nullable
         fun getCreator(): EntityRef? {
             val creator = meta?.creator
-            if (creator.isNullOrBlank()) return null
+            if (creator.isNullOrBlank()) {
+                return null
+            }
             return authoritiesApi.getPersonRef(creator)
         }
 
@@ -255,7 +279,9 @@ class MenuRecords(
         @Nullable
         fun getModifier(): EntityRef? {
             val modifier = meta?.modifier
-            if (modifier.isNullOrBlank()) return null
+            if (modifier.isNullOrBlank()) {
+                return null
+            }
             return authoritiesApi.getPersonRef(modifier)
         }
 
@@ -276,6 +302,10 @@ class MenuRecords(
     inner class MenuMutRecord(model: MenuDto?) : MenuDto.Builder(model ?: MenuDto.EMPTY) {
 
         private val originalId = model?.id ?: ""
+
+        @get:JsonIgnore
+        var importedContent: Boolean = false
+            private set
 
         override fun withSubMenu(subMenu: Map<String, SubMenuDef>?): MenuDto.Builder {
             val newSubMenu = HashMap(this.subMenu)
@@ -300,6 +330,7 @@ class MenuRecords(
 
         @JsonProperty("_content")
         fun setContent(content: List<ObjectData>) {
+            importedContent = true
             val dataUriContent = content[0].get("url", "")
             val data = mapper.read(dataUriContent, ObjectData::class.java)!!
             // Exported artifacts carry "workspace": "" — it must not reset the workspace

@@ -261,6 +261,14 @@ class TypeInWsCreatedListener(
         val menuItemType by lazy { evalMenuItemType() }
 
         fun addMenuItem() {
+            val existing = leftMenuJson[SECTION_ITEMS_JSON_PATH].any { items ->
+                items.any { isElementAutoItemForCurrentJournal(it) }
+            }
+            if (existing) {
+                updateJournalAndLabel()
+                return
+            }
+
             val item = DataValue.createObj()
                 .set(
                     "id",
