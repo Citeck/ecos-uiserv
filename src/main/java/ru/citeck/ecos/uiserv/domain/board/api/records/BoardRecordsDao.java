@@ -25,6 +25,7 @@ import ru.citeck.ecos.records3.record.dao.query.dto.query.QueryPage;
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefPredicateUtils;
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceScopingUtils;
 import ru.citeck.ecos.uiserv.app.common.api.records.Utils;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardDef;
 import ru.citeck.ecos.uiserv.domain.board.dto.BoardWithMeta;
@@ -91,6 +92,10 @@ public class BoardRecordsDao extends AbstractRecordsDao implements RecordAttsDao
             return new BoardRecord(workspaceService);
         } else {
             IdInWs idInWs = workspaceService.convertToIdInWs(localBoardId);
+            if (!WorkspaceScopingUtils.isArtifactReadable(workspaceService, idInWs.getWorkspace())) {
+                return null;
+            }
+
             BoardWithMeta board = boardService.getBoardById(idInWs);
             if (board == null) {
                 log.debug("Board with ID {} was not found", localBoardId);

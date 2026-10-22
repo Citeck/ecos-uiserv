@@ -31,6 +31,7 @@ import ru.citeck.ecos.records3.record.dao.query.RecordsQueryDao
 import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes
 import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefPredicateUtils
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceScopingUtils
 import ru.citeck.ecos.uiserv.domain.i18n.service.MessageResolver
 import ru.citeck.ecos.uiserv.domain.menu.api.records.MenuRecords.MenuMutRecord
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto
@@ -75,7 +76,12 @@ class MenuRecords(
     override fun getId() = ID
 
     override fun getRecordAtts(recordId: String): MenuRecord {
-        val withMeta = menuService.getMenuWithMeta(workspaceService.convertToIdInWs(recordId)).orElse(null)
+        val idInWs = workspaceService.convertToIdInWs(recordId)
+        if (!WorkspaceScopingUtils.isArtifactReadable(workspaceService, idInWs.workspace)) {
+            return MenuRecord(MenuDto.EMPTY, null)
+        }
+
+        val withMeta = menuService.getMenuWithMeta(idInWs).orElse(null)
             ?: return MenuRecord(MenuDto.EMPTY, null)
         return MenuRecord(withMeta.entity, withMeta.meta)
     }
@@ -226,7 +232,9 @@ class MenuRecords(
         }
 
         fun getPermissions(): MenuPermissions {
-            return MenuPermissions(!isDefaultMenu())
+            return MenuPermissions(
+                model.id.isNotBlank() && !isDefaultMenu() && menuService.canWriteToWorkspace(model.workspace)
+            )
         }
 
         fun getModuleId(): String {

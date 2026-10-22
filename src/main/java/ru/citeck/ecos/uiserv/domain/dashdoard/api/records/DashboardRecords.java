@@ -31,6 +31,7 @@ import ru.citeck.ecos.records3.record.dao.query.dto.query.RecordsQuery;
 import ru.citeck.ecos.records3.record.dao.query.dto.res.RecsQueryRes;
 import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefPredicateUtils;
 import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceRefUtils;
+import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceScopingUtils;
 import ru.citeck.ecos.commons.data.entity.EntityWithMeta;
 import ru.citeck.ecos.uiserv.domain.dashdoard.dto.DashboardDto;
 import ru.citeck.ecos.uiserv.domain.dashdoard.service.DashboardService;
@@ -140,6 +141,10 @@ public class DashboardRecords extends AbstractRecordsDao
             return new DashboardRecord();
         }
         IdInWs idInWs = workspaceService.convertToIdInWs(dashboardId);
+        if (!WorkspaceScopingUtils.isArtifactReadable(workspaceService, idInWs.getWorkspace())) {
+            return null;
+        }
+
         return dashboardService.getDashboardWithMeta(idInWs.getId(), idInWs.getWorkspace())
             .map(wm -> new DashboardRecord(wm, authoritiesApi, workspaceService))
             .orElse(null);

@@ -341,12 +341,16 @@ public class MenuService {
         return result.orElseThrow(() -> new RuntimeException("Cannot load default menu. Version: " + version));
     }
 
+    public boolean canWriteToWorkspace(String workspaceId) {
+        return workspaceId == null
+            || workspaceId.isEmpty()
+            || DEFAULT_WORKSPACE_ID.equals(workspaceId)
+            || AuthContext.isRunAsSystemOrAdmin()
+            || workspaceService.isUserManagerOf(AuthContext.getCurrentRunAsUser(), workspaceId);
+    }
+
     private void checkWorkspaceAccess(String workspaceId, boolean newMenu) {
-        if (workspaceId == null || workspaceId.isEmpty() || AuthContext.isRunAsSystemOrAdmin()) {
-            return;
-        }
-        var user = AuthContext.getCurrentRunAsUser();
-        if (!workspaceService.isUserManagerOf(user, workspaceId)) {
+        if (!canWriteToWorkspace(workspaceId)) {
             var action = newMenu ? "create" : "change";
             throw new RuntimeException("You can't " + action + " menu in workspace " + workspaceId);
         }
