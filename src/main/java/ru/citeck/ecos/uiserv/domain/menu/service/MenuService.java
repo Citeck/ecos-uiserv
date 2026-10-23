@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.citeck.ecos.apps.app.domain.handler.ArtifactDeployMeta;
 import ru.citeck.ecos.commons.data.DataValue;
 import ru.citeck.ecos.commons.json.Json;
 import ru.citeck.ecos.config.lib.records.CfgRecordsDao;
@@ -26,6 +27,7 @@ import ru.citeck.ecos.uiserv.app.common.utils.WorkspaceScopingUtils;
 import ru.citeck.ecos.uiserv.domain.menu.dto.MenuDto;
 import ru.citeck.ecos.uiserv.domain.menu.dto.SubMenuDef;
 import ru.citeck.ecos.uiserv.domain.menu.service.format.MenuReaderService;
+import ru.citeck.ecos.uiserv.domain.menu.service.utils.WorkspaceMenuImport;
 
 import jakarta.annotation.PostConstruct;
 import ru.citeck.ecos.webapp.api.entity.EntityRef;
@@ -115,7 +117,7 @@ public class MenuService {
 
         // Handler-provided workspace is authoritative — override whatever the JSON payload
         // embedded to avoid a ws="" deploy silently persisting under a JSON-embedded workspace.
-        MenuDto menuDto = menu.copy().withWorkspace(workspace).build();
+        MenuDto menuDto = mergeAutomaticWorkspaceMenus(menu.copy().withWorkspace(workspace).build());
 
         MenuDto menuBefore = null;
         MenuEntity entityBefore = menuDao.findByExtIdAndWorkspace(menuDto.getId(), normalizeWorkspace(menuDto.getWorkspace()));
@@ -339,18 +341,26 @@ public class MenuService {
         return result.orElseThrow(() -> new RuntimeException("Cannot load default menu. Version: " + version));
     }
 
+    public boolean canWriteToWorkspace(String workspaceId) {
+        return workspaceId == null
+            || workspaceId.isEmpty()
+            || DEFAULT_WORKSPACE_ID.equals(workspaceId)
+            || AuthContext.isRunAsSystemOrAdmin()
+            || workspaceService.isUserManagerOf(AuthContext.getCurrentRunAsUser(), workspaceId);
+    }
+
     private void checkWorkspaceAccess(String workspaceId, boolean newMenu) {
-        if (workspaceId == null || workspaceId.isEmpty() || AuthContext.isRunAsSystemOrAdmin()) {
-            return;
-        }
-        var user = AuthContext.getCurrentRunAsUser();
-        if (!workspaceService.isUserManagerOf(user, workspaceId)) {
+        if (!canWriteToWorkspace(workspaceId)) {
             var action = newMenu ? "create" : "change";
             throw new RuntimeException("You can't " + action + " menu in workspace " + workspaceId);
         }
     }
 
     public MenuDto save(MenuDto dto) {
+        return save(dto, false);
+    }
+
+    public MenuDto save(MenuDto dto, boolean imported) {
 
         if (dto == null) {
             throw new IllegalArgumentException("Dto cannot be null");
@@ -372,9 +382,52 @@ public class MenuService {
         }
         checkWorkspaceAccess(fixedDto.getWorkspace(), entityBefore == null);
 
+        if (imported) {
+            fixedDto = mergeAutomaticWorkspaceMenus(fixedDto);
+        }
+
         MenuDto result = mapToDto(menuDao.save(mapToEntity(fixedDto)));
         for (BiConsumer<MenuDto, MenuDto> listener : onChangeListeners) {
             listener.accept(valueBefore, result);
+        }
+        return result;
+    }
+
+    private MenuDto mergeAutomaticWorkspaceMenus(MenuDto imported) {
+        String workspace = normalizeWorkspace(imported.getWorkspace());
+        if (workspace.isEmpty()) {
+            return imported;
+        }
+
+        String templateId = workspace.startsWith("user$") ? DEFAULT_PERSONAL_WS_MENU_ID : DEFAULT_WS_MENU_ID;
+        MenuDto template = getMenu(IdInWs.create(templateId)).orElse(null);
+        if (template == null) {
+            return imported;
+        }
+
+        MenuDto result = imported;
+        Set<String> obsoleteIds = new HashSet<>();
+        boolean automaticReplay = "USER".equals(ArtifactDeployMeta.getThreadMeta().getSourceType());
+        for (MenuEntity candidate : menuDao.findAllByAuthoritiesContains(DEFAULT_AUTHORITY.toLowerCase(Locale.ROOT), workspace)) {
+            MenuDto existing = mapToDto(candidate);
+            MenuDto merged = WorkspaceMenuImport.mergeAutomaticMenu(result, existing, template);
+            if (merged != null) {
+                result = merged;
+                obsoleteIds.add(candidate.getExtId());
+            } else if (automaticReplay) {
+                // A previously generated USER artifact can be replayed after its menu was merged.
+                // Keep the customized menu, while app imports retain their explicit artifact ID.
+                merged = WorkspaceMenuImport.mergeAutomaticMenu(existing, result, template);
+                if (merged != null) {
+                    obsoleteIds.add(result.getId());
+                    result = merged;
+                }
+            }
+        }
+
+        obsoleteIds.remove(result.getId());
+        for (String obsoleteId : obsoleteIds) {
+            menuDao.deleteByExtIdAndWorkspace(obsoleteId, workspace);
         }
         return result;
     }

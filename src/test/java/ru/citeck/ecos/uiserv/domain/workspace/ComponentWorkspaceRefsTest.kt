@@ -42,6 +42,36 @@ class ComponentWorkspaceRefsTest {
     }
 
     @Test
+    fun `dashboard journal lists round trip at every depth and preserve representation and non references`() {
+        val config = ObjectData.create(
+            """
+            {
+              "v2": {"widgets": [{"props": {"config": {"v2": {
+                "journalId": "source:trips",
+                "journalsListIds": ["uiserv/journal@source:trips", "type${'$'}source:purpose", "global", "uiserv/journal@foreign:trips", "", null, 42],
+                "label": "uiserv/journal@source:trips",
+                "script": "CURRENT_WS:trips"
+              }}}}]},
+              "nested": [[{"journalsListIds": ["source:other"]}]]
+            }
+            """.trimIndent()
+        )
+        val before = config.deepCopy()
+        val exported = ComponentWorkspaceRefs.rewrite(config, export)
+        val imported = ComponentWorkspaceRefs.rewrite(exported, import)
+
+        assertThat(exported.getData().asJson().at("/v2/widgets/0/props/config/v2/journalsListIds/0").asText())
+            .isEqualTo("uiserv/journal@CURRENT_WS:trips")
+        assertThat(imported.getData().asJson().at("/v2/widgets/0/props/config/v2/journalsListIds"))
+            .isEqualTo(ObjectData.create("""{"items":["uiserv/journal@target:trips","type${'$'}target:purpose","global","uiserv/journal@foreign:trips","",null,42]}""").getData().asJson().get("items"))
+        assertThat(imported.getData().asJson().at("/nested/0/0/journalsListIds/0").asText()).isEqualTo("target:other")
+        assertThat(imported.getData().asJson().at("/v2/widgets/0/props/config/v2/label").asText())
+            .isEqualTo("uiserv/journal@source:trips")
+        assertThat(imported.getData().asJson().at("/v2/widgets/0/props/config/v2/script").asText()).isEqualTo("CURRENT_WS:trips")
+        assertThat(config).isEqualTo(before)
+    }
+
+    @Test
     fun `empty non textual and unrelated properties are unchanged`() {
         val config = ObjectData.create("""{"journalId":"","items":[{"journalId":null},{"journalId":42}],"label":"source:trips"}""")
         assertThat(ComponentWorkspaceRefs.rewrite(config, export)).isEqualTo(config)

@@ -60,11 +60,11 @@ public class BoardRecord {
 
     @JsonValue
     public JsonNode toNonDefaultJson() {
-        return Json.getMapper().toNonDefaultJson(getBoardDefCopy());
+        return Json.getMapper().toNonDefaultJson(getBoardDef());
     }
 
     public byte[] getData() {
-        BoardDef boardDefCopy = getBoardDefCopy();
+        BoardDef boardDefCopy = getBoardDefForExport();
         boardDefCopy.setTypeRef(prepareExtRef(boardDefCopy.getTypeRef()));
         boardDefCopy.setJournalRef(prepareExtRef(boardDefCopy.getJournalRef()));
         boardDefCopy.setCardFormRef(prepareExtRef(boardDefCopy.getCardFormRef()));
@@ -72,7 +72,7 @@ public class BoardRecord {
         return YamlUtils.toNonDefaultString(boardDefCopy).getBytes(StandardCharsets.UTF_8);
     }
 
-    private BoardDef getBoardDefCopy() {
+    private BoardDef getBoardDefForExport() {
         BoardDef boardDefCopy = new BoardDef(boardDefWithMeta.getBoardDef());
         boardDefCopy.setWorkspace("");
         return boardDefCopy;
