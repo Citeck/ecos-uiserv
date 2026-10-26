@@ -3,6 +3,7 @@ package ru.citeck.ecos.uiserv.domain.action.api.records
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import ru.citeck.ecos.commons.data.MLText
 import ru.citeck.ecos.commons.data.ObjectData
 import ru.citeck.ecos.commons.json.Json
 import ru.citeck.ecos.commons.json.YamlUtils
@@ -91,6 +92,32 @@ class ActionWorkspaceFormsTest : ActionsTestBase() {
     }
 
     @Test
+    fun `artifact deployment and export keep the whole confirm config`() {
+        val handler = ActionArtifactHandler(actionService, workspaceService)
+        val exports = mutableListOf<ActionDto>()
+        handler.listenChanges { action, _ -> exports.add(action) }
+
+        AuthContext.runAsSystem {
+            val global = action("confirm-global", "global-form").apply { confirm = confirm("uiserv/form@global-confirm") }
+            handler.deployArtifact(global, "")
+            assertThat(requireNotNull(actionService.getAction("confirm-global")).confirm)
+                .isEqualTo(confirm("uiserv/form@global-confirm"))
+
+            val source = action("confirm-ws", "source-sys-id:edit").apply {
+                workspace = "source"
+                confirm = confirm("uiserv/form@source-sys-id:confirm")
+            }
+            actionService.updateAction(source)
+            val exported = exports.last()
+            assertThat(exported.confirm).isEqualTo(confirm("uiserv/form@CURRENT_WS:confirm"))
+
+            handler.deployArtifact(exported, "target")
+            assertThat(requireNotNull(actionService.getAction(IdInWs.create("target", source.id))).confirm)
+                .isEqualTo(confirm("uiserv/form@target-sys-id:confirm"))
+        }
+    }
+
+    @Test
     fun `unqualified form ids stay global and placeholders imported globally lose the prefix`() {
         val handler = ActionArtifactHandler(actionService, workspaceService)
         AuthContext.runAsSystem {
@@ -126,6 +153,16 @@ class ActionWorkspaceFormsTest : ActionsTestBase() {
         }
         action.confirm = ActionConfirmDef.create().withFormRef(EntityRef.valueOf("uiserv/form@${prefix}confirm")).build()
         return action
+    }
+
+    private fun confirm(formRef: String): ActionConfirmDef {
+        return ActionConfirmDef.create()
+            .withTitle(MLText("Confirm"))
+            .withMessage(MLText("Are you sure?"))
+            .withFormRef(EntityRef.valueOf(formRef))
+            .withFormAttributes(ObjectData.create().set("mode", "short"))
+            .withAttributesMapping(mapOf("config.reason" to "reason"))
+            .build()
     }
 
     private fun assertForms(action: ActionDto, formId: String, prefix: String) {

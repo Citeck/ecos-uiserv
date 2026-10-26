@@ -49,7 +49,7 @@ data class ActionConfirmDef(
             this.message = base.message
             this.formRef = base.formRef
             this.formAttributes = base.formAttributes.deepCopy()
-            this.attributesMapping = DataValue.create(attributesMapping).asMap(String::class.java, String::class.java)
+            this.attributesMapping = DataValue.create(base.attributesMapping).asMap(String::class.java, String::class.java)
         }
 
         fun withTitle(title: MLText?): Builder {
